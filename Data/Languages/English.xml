@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Language>
+	<!-- Main Menu -->
+	<String Name="company_name">Jack's Mini Network</String>
+	<String Name="game_title">Grand Theft Auto Connected</String>
+	<String Name="sample_window">Console</String>
+
+	<!-- Generic buttons -->
+	<String Name="ok">OK</String>
+	<String Name="cancel">Cancel</String>
+	<String Name="close">Close</String>
+
+	<!-- Generic tips -->
+	<String Name="ok_tip">Close this window saving changes.</String>
+	<String Name="cancel_tip">Close this window without saving changes.</String>
+</Language>

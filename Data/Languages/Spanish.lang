@@ -1,0 +1,185 @@
+﻿[Language]
+author=Lucy
+
+[Common]
+
+# Languages
+language_English=Inglés
+language_French=Francés
+language_German=Alemán
+language_Italian=Italiano
+language_Spanish=Español
+language_Russian=Ruso
+
+# Tips
+tip_Close=Cerrar esta ventana.
+tip_Okay=Cerrar esta ventana guardando los cambios.
+tip_Cancel=Cerrar esta ventana sin guardar cambios.
+
+# Columns
+column_Title=Título
+column_Version=Versión
+column_ModifiedDate=Fecha modificada
+column_Description=Descripción
+
+# Buttons
+button_Okay=OK
+button_Close=Cerrar
+button_Cancel=Cancelar
+button_Yes=Sí
+button_No=No
+button_Retry=Reintentar
+button_Abort=Abortar
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Archivo
+menu_CheckForUpdates=Comprobar actualizaciones...
+menu_Exit=S&alir
+
+menu_Tools=&Herramientas
+menu_Settings=&Ajustes...
+menu_ResetSettings=Resetear los ajustes...
+
+menu_Help=&Ayuda
+menu_RunDiagnostics=Iniciar &Diagnóstico ...
+menu_About=&Sobre ...
+
+# Generic/Multiplayer
+menu_LargeIcons=Iconos largos
+menu_Refresh=Refrescar
+menu_Connect=Conectar
+
+# Mods context menu
+menu_ResetAll=Resetear todo
+menu_DisableAll=Desactivar todo
+menu_Delete=Eliminar
+
+# Open menu
+menu_LauncherSettings=Ajustes del &Launcher...
+menu_GameSettings=&Ajustes del juego...
+menu_Resources=Resources
+menu_Crashes=Crashes
+menu_Caches=Caches
+
+# Messages
+message_ConfirmResetSettings=¿Estás seguro que deseas resetear los ajustes del launcher por defecto?\nEsta acción no puede ser revertida, el launcher se reiniciará.
+
+# Tabs
+tab_Favourites=Favoritos
+tab_Internet=Internet
+tab_Official=Oficial
+tab_History=Historial
+tab_Local=Local
+tab_Mods=Mods
+
+# Status
+status_Disconnected=Desconectado
+status_Connecting=Conectando
+status_Connected=Conectado a la masterlist
+
+# Labels
+label_Game=Juego:
+label_GameEXEPath=Directorio del EXE:
+
+# Tips
+tip_Games=El juego a iniciar.
+tip_CloseLauncher=Cerrar esta ventana cuanto el juego inicie.
+tip_Launch=Iniciar el juego.
+tip_BrowseForGame=Buscar el ejecutable del juego.
+tip_ShowInExplorer=Mostrar el ejecutable del juego en {0}.
+tip_GameEXEPath=Directorio al ejecutable del juego.
+
+# Columns
+column_ServerName=Nombre del servidor
+column_Players=Jugadores
+column_GameMode=Modo de juego
+
+# Buttons
+button_OpenMenu=Abrir...
+button_CloseLauncher=Cerrar launcher
+button_Launch=Iniciar
+button_ShowInExplorer=Mostrar en {0}
+button_BrowseForGame=Abrir...
+
+[AboutWindow]
+
+windowTitle=Sobre
+group_About=Sobre
+
+# Labels
+label_Product=Producto:
+label_Copyright=Copyright \xC2\xA9 {0} {1}
+label_Version=Versión:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Packet Version:
+label_BuildDate=Fecha de la build:
+label_BuildTime=Hora de la build:
+label_Website=Sitio web:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Crashes This Week:
+label_Developers=Desarrolladores:
+
+[SettingsWindow]
+
+windowTitle=Ajustes del Launcher
+gameSettingsTitle=Ajustes del Juego
+
+# Tabs
+tab_General=General
+tab_AdditionalResourcesFolders=Additional Resources Folders
+tab_AdditionalMods=Additional Mods
+tab_Display=Display
+tab_Advanced=Advanced
+tab_NonModHacks=Non-mod Hacks
+tab_Licenses=Licenses
+
+# Labels
+label_Name=Nombre:
+
+# Additional resource folders
+button_ResourceAdd=Añadir...
+tip_ResourceAdd=Añadir una nueva carpeta de resources.
+
+button_ResourceRemove=Quitar
+tip_ResourceRemove=Quitar la carpeta seleccionada de resources.
+
+button_ResourceUp=Subir
+tip_ResourceUp=Desplazar la carpeta seleccionada de resources hacia arriba.
+
+button_ResourceDown=Bajar
+tip_ResourceDown=Desplazar la carpeta seleccionada de resources hacia abajo.
+
+tip_ResourceOpen=Abrir la carpeta seleccionada de resources en {0}.
+button_ResourceOpen=Abrir
+
+# Options
+opt_KeepSavedGamesSeparate=Mantener partidas guardadas separadas
+opt_KeepScreenshotsSeparate=Mantener capturas separadas
+opt_SaveCrashDump=Guardar Crash Dump
+opt_CheckForUpdates=Buscar actualizaciones
+opt_TerminateOnCrash=Terminar en cierre inesperados
+opt_VerboseLogging=Registros detallados
+opt_GameOutput=Mostrar output del juego en la consola
+opt_SCM=SCM
+opt_DisableStoryMode=Desactivar modo historia
+
+opt_AlwaysUsePrimaryMonitorResolution=Siempre utilizar resolución del monitor primario
+opt_AutomaticAspectRatio=Ratio de aspecto automático
+opt_InvisibleObjectsFix=Arreglar algunos objetos invisibles
+tip_InvisibleObjectsFix=Esta opción arregla ciertos objetos siendo tratatos como edificios grandes ('big buildings').\nEn Grand Theft Auto: III esto incluye las grúas en Portland Docks.\nEn Liberty City - The Leftovers Fix es intentado arreglar este problema reduciendo la distancia de dibujado, haciendo que el juego no trate estos objetos como edificios grandes ('big buildings').\nMientras esto es una solución a medias, está mal que las grúas no se puedan ver desde lejos.\nLa solución más apropiada es hacer que los objetos no-LOD sean interpretados como edificios grandes.
+opt_VCTrails=Vice City trails
+tip_VCTrails=Activa los rastros ('trails') en Vice City
+opt_AutoSave=Auto guardado
+
+[TestingWindow]
+
+windowTitle=Testing
+label_Message=Please enter the access code below to enable testing builds:
+
+[PasswordWindow]
+
+windowTitle=Contraseña
+label_Message=Introduzca la contraseña del servidor a conectarse:

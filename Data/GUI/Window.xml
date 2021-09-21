@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<FontStack Name="Main">
+		<Font Family="Open Sans"/>
+		<Font Family="Segoe UI Emoji"/>
+		<Font Family="Noto Color Emoji"/>
+	</FontStack>
+	<Rectangle Name="Window" Left="100" Top="100" Width="800" Height="600" Colour="#000000" Focus="true">
+		<Button Left="0" Top="0" Width="3" Height="3" Action="SizeTopLeft" />
+		<Button Left="3" Top="0" Height="3" Right="3" Action="SizeTop" />
+		<Button Top="0" Width="3" Height="3" Right="0" Action="SizeTopRight" />
+		<Button Top="3" Width="3" Right="0" Bottom="3" Action="SizeRight" />
+		<Button Width="3" Height="3" Right="0" Bottom="0" Action="SizeBottomRight" />
+		<Button Height="3" Left="3" Right="3" Bottom="0" Action="SizeBottom" />
+		<Button Left="0" Width="3" Height="3" Bottom="0" Action="SizeBottomLeft" />
+		<Button Left="0" Top="3" Width="3" Bottom="3" Action="SizeLeft" />
+		<Rectangle Name="Caption" Left="3" Top="3" Right="3" Height="42" Colour="#363636">
+			<Text Name="Title" Left="8" Right="45" Top="5" Bottom="5" Text="Grand Theft Auto Connected" Colour="#ffffff" FontStack="Main" Size="27" Align="0" AllowNewLines="false"/>
+			<Button Left="0" Top="0" Right="0" Bottom="0" Action="Move" />
+			<Rectangle Name="Close" Top="0" Width="37" Right="0" Bottom="0" Colour="#707070a3">
+				<Text Text="X" Colour="#ffffff" FontStack="Main" Size="27"/>
+				<Button Left="0" Top="0" Right="0" Bottom="0" Action="Close" />
+			</Rectangle>
+		</Rectangle>
+		<Rectangle Name="Client" Left="3" Top="48" Right="3" Bottom="3" Colour="#ffffff">
+			<Page Name="ClientArea" Left="0" Top="0" Right="0" Bottom="0"/>
+			<Page Left="0" Top="0" Right="0" Bottom="0" FileName="Client.xml"/>
+		</Rectangle>
+	</Rectangle>
+</Page>

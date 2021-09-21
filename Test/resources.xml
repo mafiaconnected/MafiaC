@@ -1,0 +1,7 @@
+<server>
+	<resources>
+		<resource src="test" />
+		<resource src="runcode" />
+		<resource src="cheatkeys" />
+	</resources>
+</server>

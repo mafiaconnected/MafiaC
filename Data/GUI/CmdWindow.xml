@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<FontStack Name="Main">
+		<Font Family="Open Sans"/>
+		<Font Family="Segoe UI Emoji"/>
+		<Font Family="Noto Color Emoji"/>
+	</FontStack>
+	<Text Text=">" Left="0" Top="0" Right="0" Colour="#ffffff" FontStack="Main" Size="35" DropShadow="true"/>
+	<Text Name="Input" Left="30" Top="0" Right="0" Colour="#ffffff" FontStack="Main" Size="35" Editable="true" ColourCodes="false" SelectionHighlightColour="#ff0000" SelectionColour="#ffffff" UnfocusedSelectionHighlightColour="#ff0000" UnfocusedSelectionColour="#ffffff" Leading="0.75" DropShadow="true" AllowNewLines="false"/>
+</Page>

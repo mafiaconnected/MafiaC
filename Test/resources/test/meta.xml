@@ -1,0 +1,5 @@
+<meta>
+	<info author="Vortrex" version="1.0.0" description="Basic local player spawn and sample vehicle" />
+
+	<script src="client.js" type="client" language="javascript" />
+</meta>

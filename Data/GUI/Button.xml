@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<FontStack Name="Main">
+		<Font Family="Arial"/>
+		<Font Family="Noto Color Emoji"/>
+	</FontStack>
+	<Rectangle Name="Default">
+		<Rectangle Left="0" Top="0" Right="0" Bottom="0" Colour="#000000">
+		</Rectangle>
+		<Rectangle Name="Up" Left="1" Top="1" Right="1" Bottom="1">
+			<Rectangle Left="0" Top="0" Right="0" Bottom="0" Colour="#000000">
+			</Rectangle>
+			<Rectangle Left="0" Top="0" Right="1" Bottom="1" Colour="#ffffff">
+			</Rectangle>
+			<Rectangle Left="1" Top="1" Right="1" Bottom="1" Colour="#848484">
+			</Rectangle>
+			<Rectangle Left="1" Top="1" Right="2" Bottom="2" Colour="#DEDEDE">
+			</Rectangle>
+			<Rectangle Left="2" Top="2" Right="2" Bottom="2" Colour="#C0C0C0">
+			</Rectangle>
+		</Rectangle>
+	</Rectangle>
+</Page>

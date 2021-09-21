@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<Page Left="0" Top="0" Right="0" Bottom="0" FileName="ImageNotLoadedBorder.xml"/>
+	<Rectangle Left="7" Top="7" Width="14" Height="16" Texture="ImageNotLoaded.png" TextureFilterMag="Point" SourcePosX="14" SourcePosY="0" SourceSizeX="14" SourceSizeY="16"/>
+</Page>

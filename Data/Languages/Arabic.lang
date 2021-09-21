@@ -1,0 +1,246 @@
+﻿[Language]
+name=Arabic
+native_name=Arabic
+author=! Kasir
+
+
+
+[Common]
+
+
+#اللغات
+
+language_English=English
+language_French=French
+language_German=German
+language_Italian=Italian
+language_Spanish=Spanish
+language_Russian=Russian
+language_Arabic=Arabic
+
+
+#نصائح 
+
+tip_Close=إغلاق النافذه.
+tip_Okay=اغلاق مع حفظ التغييرات
+tip_Cancel=إغلاق بدون حفظ التغييرات
+
+#الإعمدة
+
+column_Name=إسم العمود
+column_Title=إعدادت
+column_Version=إلاصدار
+column_ModifiedDate= تاريخ التعديل
+column_Description=وصف
+column_Key=إصدار
+column_Value=إصدار الخادم
+
+#الإزرار 
+button_Okay=موافق
+button_Close=اغلاق
+button_Cancel=الغاء
+button_Yes=نعم
+button_No=لا
+button_Retry=اعد المحاولة
+button_Abort= زر إحباط
+
+[LauncherWindow] 
+
+#اللائحة:
+
+menu_File=& تحديثات GTAC 
+menu_CheckForUpdates=تحقق من وجود تحديث...
+menu_Exit=خروج.
+
+menu_Server=إضافة سيرفر
+menu_AddServer=إضافة سيرفر
+menu_DeleteServer=حذف سيرفر
+
+menu_Tools=&إلاعدادت
+menu_Settings=&إلاعدادت
+menu_ResetSettings=إعادة ظبط ...
+menu_DesktopShortcut=إختصار سطح المكتب.
+
+menu_View=&إدوات العرض
+menu_Players=&وصف إلاعبين
+menu_Rules=&شريط الاصدار
+menu_FullWidthRules= التحكم في العرض 
+
+menu_Help=& حوٌل
+menu_RunDiagnostics=Run &تشغيل ...
+menu_About=& حول اللعبة...
+menu_Licenses= عرض التراخيص ...
+
+#عام\ متعدد الإعبين 
+
+menu_LargeIcons= إيقونات كبيرة
+menu_Refresh= ترقية 
+menu_Connect= إتصال
+menu_AddToFavourites=إضافة الى المفضلة
+menu_Favourite= المفضلة 
+menu_CopyServerIP= نسخ آيبي السيرفر
+menu_CopyAddress= نسخ العنوان
+menu_ViewPlayerMap=View Player Map...
+menu_VisitWebsite= موقع السيرفر..
+
+#قائمة سياق التعديل  
+menu_ResetAll=إعادة تعيين الكل
+menu_DisableAll= تعطيل الكل
+menu_Delete= حذف
+
+#فتح القائمه 
+menu_LauncherSettings=&إعدادت اللعبة ..
+menu_GameSettings=&مسار اللعبة
+menu_Resources=الموارد
+menu_Crashes=إلاعطال
+menu_Caches=التخزين المؤقت
+menu_Logs= السجل
+
+#رسائل 
+
+message_ConfirmResetSettings= هل أنت متأكد من رغبتك في إعادة تعيين إعدادات المشغل إلى الإعدادات الافتراضية؟\nلا يمكن عكس هذا الإجراء، سيتم إعادة تشغيل المشغل.
+
+#النافذه
+
+tab_Favourites=المفضله
+tab_Internet= انترنت
+tab_Official= محلي
+tab_History= إلاخيره
+tab_Local= محلي
+tab_Mods= تعديل
+
+#حالة 
+status_Disconnected=غير متصل
+status_Connecting= إتصال
+status_Connected= متصل بقائمة الخوادنم
+
+#ملصقات
+label_Game= اللعبة:
+label_GameEXEPath=مسار اللعبة :
+
+#النافذهـ
+tip_Games=اللعبة مرد إطلاقها
+tip_CloseLauncher=أغلق هذه النافذة عند بدء اللعبة.
+tip_Launch=قم بتشغيل اللعبة.
+tip_BrowseForGame=تصفح للوصول إلى اللعبة القابلة للتنفيذ.
+tip_ShowInExplorer=إظهار اللعبة القابلة للتنفيذ في {0}.
+tip_GameEXEPath=المسار إلى اللعبة القابلة للتنفيذ.
+
+#الإعمدة
+column_ServerName=إسم
+column_Players=الاعبين
+column_GameMode= نوع اللعب
+
+#Group Boxes | المجموعه
+group_Players=الاعبين
+group_Rules=وصف
+
+#أزرار
+button_OpenMenu= فتح ...
+button_CloseLauncher= اغلاق GTAC
+button_Launch=إتصال
+button_ShowInExplorer=إظهار في {0}.
+button_BrowseForGame=تصفح ..
+
+[AboutWindow]
+
+
+windowTitle=حول.
+group_About=حول.
+
+#ملصقآت
+
+label_Product=المنتج:
+label_Copyright=حقوق الطبع والنشر © {0} {1}
+label_Version=إلاصدار:
+label_GitBranch=فرع
+label_GitCommitHash= التسميه:
+label_PacketVersion=إصدار الحزمة:
+label_BuildDate=تاريخ بناء:
+label_BuildTime=وقت بناء:
+label_Website=موقع الرسمي:
+label_Patreon=المدير:
+label_CrashesThisWeek=الأعطال هذا الأسبوع:
+label_Developers=الـمـطـورين:
+
+[SettingsWindow]
+
+
+windowTitle=إعدادات اللعبة
+gameSettingsTitle= مسار اللعبة
+
+#نافذه
+tab_General=لعب متعدد
+tab_AdditionalResourcesFolders=مجلدات الموارد الإضافية
+tab_AdditionalMods=تعديلات إضافية
+tab_Display=إعدادت العرض
+tab_Advanced=إعدادت متقدمة
+tab_NonModHacks= اختراق غير معدل
+tab_Licenses=التراخيص
+tab_Language=اللغات
+tab_BugFixes=إصلاحات الشوائب
+tab_Debug= تصحيح
+
+#ملصقات
+label_Name=الإسم المستعار:
+
+# مجلدات موارد إضافية
+button_ResourceAdd=إضافه..
+tip_ResourceAdd=إضافة مجلد موارد جديد 
+
+button_ResourceRemove=إزاله
+tip_ResourceRemove=قم بإزالة مجلد الموارد المحدد حاليًا.
+opt_DebugMode=وضع التصحيح
+button_ResourceUp=إعلى
+tip_ResourceUp=نقل مجلد الموارد المحدد حاليًا لأعلى.
+
+button_ResourceDown=إسفل
+tip_ResourceDown=نقل مجلد الموارد المحدد حاليًا لأسفل.
+
+
+tip_ResourceOpen=Oافتح مجلد الموارد المحدد حاليًا في {0}.
+button_ResourceOpen=فتح
+
+#خيارات
+opt_KeepSavedGamesSeparate=احتفظ بالألعاب المحفوظة منفصلة.
+opt_KeepScreenshotsSeparate=حافظ على لقطات الشاشة منفصلة.
+opt_SaveCrashDump=حفظ تفريغ الأعطال.
+opt_CheckForUpdates=تحقق من وجود تحديثات.
+opt_TerminateOnCrash=الإنهاء عند التعطل.
+opt_VerboseLogging=التسجيل المطول.
+opt_GameOutput=إظهار كل مخرجات اللعبة في وحدة التحكم
+opt_MultithreadedNetworking=الشبكات متعددة مؤشرات الترابط
+opt_SCM=SCM
+opt_DisableStoryMode=تعطيل الوضع.
+
+opt_AlwaysUsePrimaryMonitorResolution=استخدم دائمًا دقة الشاشة الأساسية.
+opt_AutomaticAspectRatio=نسبة العرض إلى الارتفاع التلقائية.
+opt_InvisibleObjectsFix=إصلاح بعض العناصر غير المرئية.
+tip_InvisibleObjectsFix= يعمل هذا الخيار على إصلاح بعض الكائنات التي يتم التعامل معها على أنها مبانٍ كبيرة. \n في Grand Theft Auto: III ، يتضمن هذا الرافعات في Portland Docks. \n في Liberty City - The Leftovers Fix يحاول إصلاح هذه المشكلة عن طريق تقليل مسافة التعادل وبالتالي اللعبة لن يتعامل مع هذه الكائنات على أنها مبانٍ كبيرة. \n بينما يعمل هذا الإصلاح عن قرب ، إلا أنه خطأ لأنه لم يعد بالإمكان رؤية الرافعات من بعيد. \n الإصلاح الصحيح هو جعل الكائنات غير المحمية لا تعامل كمبنى كبير.
+opt_VCTrails=تأثيرات رسومية
+tip_VCTrails=تمكين الممرات في مدينة نائب
+opt_AutoSave=حفظ تلقائي
+opt_SyncAnimations=مزامنة الرسوم المتحركة
+opt_AllowDirectConnections=السماح بالاتصالات المباشرة (نظير إلى نظير)
+
+[TestingWindow]
+
+windowTitle=إختبار
+label_Message=الرجاء إدخال رمز الوصول أدناه لتمكين إصدارات الاختبار:
+
+[PasswordWindow]
+
+windowTitle=كلمة المرور
+label_Message=الرجاء إدخال كلمة المرور للاتصال بالخادم:
+
+[AddServerWindow]
+
+windowTitle=إضافة سيرفر
+label_Message=أدخل مضيف خادم جديد:المنفذ...
+
+[PlayerMapWindow]
+
+windowTitle=خريطة اللاعب
+
+# Menu
+menu_VCStyle=&نمط المدينة

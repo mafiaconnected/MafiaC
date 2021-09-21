@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<FontStack Name="Main">
+		<Font Family="Open Sans"/>
+		<Font Family="Segoe UI Emoji"/>
+		<Font Family="Noto Color Emoji"/>
+	</FontStack>
+	<Rectangle Left="0" Top="0" Right="0" Bottom="0" Clip="true">
+		<Text Name="Log" Left="0" Bottom="0" Right="0" Text="&#1;ff00ffffGrand Theft Auto III Connected 1.0.49&#2;&#10;&#1;ff00ffffNot connected to a server!&#2;" Colour="#ffffff" FontStack="Main" Size="31" Selectable="false" ColourCodes="true" SelectionHighlightColour="#ff0000" SelectionColour="#ffffff" UnfocusedSelectionHighlightColour="#ff0000" UnfocusedSelectionColour="#ffffff" Leading="0.75" DropShadow="true"/>
+	</Rectangle>
+	<Rectangle Name="InputBox" Left="0" Right="0" Height="0" Bottom="0" Visible="false">
+		<Rectangle Top="10" Left="0" Right="0" Height="0">
+			<Text Text=">" Left="0" Top="0" Right="0" Colour="#ffffff" FontStack="Main" Size="35" DropShadow="true"/>
+			<Text Name="Input" Left="30" Top="0" Right="0" Colour="#ffffff" FontStack="Main" Size="35" Editable="true" ColourCodes="false" SelectionHighlightColour="#ff0000" SelectionColour="#ffffff" UnfocusedSelectionHighlightColour="#ff0000" UnfocusedSelectionColour="#ffffff" Leading="0.75" DropShadow="true"/>
+		</Rectangle>
+	</Rectangle>
+</Page>

@@ -1,0 +1,232 @@
+﻿[Language]
+name=Czech
+native_name=Čeština
+author=Sevenisko
+
+[Common]
+
+# Languages
+language_English=Angličtina
+language_French=Francouzština
+language_German=Němčina
+language_Italian=Italština
+language_Spanish=Španělština
+language_Russian=Ruština
+language_Latvian=Lottyština
+
+# Tips
+tip_Close=Zavřit toto okno.
+tip_Okay=Zavřit toto okno a uložit změny.
+tip_Cancel=Zavřit toto okno a zahodit změny.
+
+# Columns
+column_Name=Název
+column_Title=Celý název
+column_Version=Verze
+column_ModifiedDate=Datum úpravy
+column_Description=Popis
+column_Key=Klíč
+column_Value=Hodnota
+
+# Buttons
+button_Okay=OK
+button_Close=Zavřít
+button_Cancel=Zrušit
+button_Yes=Ano
+button_No=Ne
+button_Retry=Znova
+button_Abort=Přerušit
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Soubor
+menu_CheckForUpdates=Zkontrolovat aktualizace...
+menu_Exit=Z&avřít
+
+menu_Server=&Server
+menu_AddServer=Přidat server
+menu_DeleteServer=Odstranit server
+
+menu_Tools=&Nástroje
+menu_Settings=&Nastavení...
+menu_ResetSettings=Obnovit všechna nastavení...
+menu_DesktopShortcut=Zástupce na ploše
+
+menu_View=&Zobrazit
+menu_Players=&Hráče
+menu_Rules=&Pravidla
+menu_FullWidthRules=Pravidla po &celé šířce
+
+menu_Help=&Pomoc
+menu_RunDiagnostics=Spustit &diagnostiku ...
+menu_About=&O aplikaci ...
+menu_Licenses=&Licence ...
+
+# Generic/Multiplayer
+menu_LargeIcons=Velké ikony
+menu_Refresh=Obnovit
+menu_Connect=Připojit
+menu_AddToFavourites=Pridat do oblíbených
+menu_Favourite=Oblíbené
+menu_CopyServerIP=Zkopírovat IP adresu serveru
+menu_CopyAddress=Zkopírovat adresu
+menu_ViewPlayerMap=Zobrazit mapu hráče...
+menu_VisitWebsite=Navšívit webové stránky...
+
+# Mods context menu
+menu_ResetAll=Obnovit vše
+menu_DisableAll=Deaktivovat vše
+menu_Delete=Odstranit
+
+# Open menu
+menu_LauncherSettings=&Nastavení spouštěcího programu...
+menu_GameSettings=&Nastavení hry...
+menu_Resources=Soubory
+menu_Crashes=Pády
+menu_Caches=Soubory cache
+menu_Logs=Záznamy
+
+# Messages
+message_ConfirmResetSettings=Opravdu chcete obnovit výchozí nastavení launcheru?\nTuto akci nelze vrátit zpět, potom se spouštěč restartuje.
+
+# Tabs
+tab_Favourites=Oblíbené
+tab_Internet=Internet
+tab_Official=Oficialní
+tab_History=Historie
+tab_Local=Lokální
+tab_Mods=Modifikace
+
+# Status
+status_Disconnected=Odpojeno
+status_Connecting=Připojování
+status_Connected=Připojeno k seznamu serverů
+
+# Labels
+label_Game=Hra:
+label_GameEXEPath=Cesta ke hře:
+
+# Tips
+tip_Games=Hra ke spuštění.
+tip_CloseLauncher=Zavřít toto okno při spuštění hry.
+tip_Launch=Spustit hru.
+tip_BrowseForGame=Vyhledat hru.
+tip_ShowInExplorer=Otevřít složku se hrou v průzkumníku souborů.
+tip_GameEXEPath=Cesta k hernímu EXE souboru.
+
+# Columns
+column_ServerName=Název serveru
+column_Players=Hráči
+column_GameMode=Herní režim
+
+# Group Boxes
+group_Players=Hráči
+group_Rules=Pravidla
+
+# Buttons
+button_OpenMenu=Otevřít...
+button_CloseLauncher=Zavřít spouštěč
+button_Launch=Spustit
+button_ShowInExplorer=Otevřít složku...
+button_BrowseForGame=Hledat hru...
+
+[AboutWindow]
+
+windowTitle=O aplikaci
+group_About=O aplikaci
+
+# Labels
+label_Product=Produkt:
+label_Copyright=Copyright © {0} {1}
+label_Version=Verze:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Verze paketu:
+label_BuildDate=Datum sestavení:
+label_BuildTime=Čas sestavení:
+label_Website=Webová stránka:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Pády za tento týden:
+label_Developers=Vývojářský tým:
+
+[SettingsWindow]
+
+windowTitle=Nastevení spouštěcího programu
+gameSettingsTitle=Nastevení hry
+
+# Tabs
+tab_General=Všeobecné
+tab_AdditionalResourcesFolders=Dodatečné zdrojové složky
+tab_AdditionalMods=Dodatečné modifikace
+tab_Display=Zobrazení
+tab_Advanced=Pokročilé
+tab_NonModHacks=Hacky bez modifikací
+tab_Licenses=Licence
+tab_Language=Jazyk
+tab_BugFixes=Opravy chyb
+tab_Debug=Ladění
+
+# Labels
+label_Name=Jméno:
+
+# Additional resource folders
+button_ResourceAdd=Přidat...
+tip_ResourceAdd=Přidá novou zdrojovou složku.
+
+button_ResourceRemove=Odstranit
+tip_ResourceRemove=Odstraní aktualně vybranou zdrojovou složku.
+
+button_ResourceUp=Nahoru
+tip_ResourceUp=Přesune atualně vybranou zdrojovou složku nahoru.
+
+button_ResourceDown=Dolu
+tip_ResourceDown=Přesune atualně vybranou zdrojovou složku dolu.
+
+tip_ResourceOpen=Otevře aktualně vybranou zdrojovou složku v {0}.
+button_ResourceOpen=Otevřit
+
+# Options
+opt_KeepSavedGamesSeparate=Zanechat uložené hry rozděleně
+opt_KeepScreenshotsSeparate=Zanechat screenshoty rozděleně
+opt_SaveCrashDump=Uložit výpis stavu systému
+opt_CheckForUpdates=Zkontrolovat aktualizace
+opt_DebugMode=Režim ladění
+opt_TerminateOnCrash=Ukončit při pádu
+opt_VerboseLogging=Podrobné záznamy
+opt_GameOutput=Zapisovat veškerý herní výstup do konzole
+opt_MultithreadedNetworking=Vícevláknová síť. komunikace
+opt_SCM=SCM
+opt_DisableStoryMode=Deaktivovat story mode
+
+opt_AlwaysUsePrimaryMonitorResolution=Vždy využivat rozlíšení primárního monitoru
+opt_AutomaticAspectRatio=Automatický poměr stran
+opt_InvisibleObjectsFix=Opravit některé neviditelné předměty
+tip_InvisibleObjectsFix=Tato možnost opravuje určité objekty, které jsou považovány za velké budovy.\nVe Grand Theft Auto III to zahrnuje jeřáby v Portland Docks.\nV Liberty City - Opravy zbytků se pokouší vyřešit tento problém snížením vykreslovací vzdálenosti, takže hra s nima nemůže nakládat jako s velkými budovami.\nKdyž se oprava projeví, tak je špatné, když jeřáby nejdou vidět z dálky.\nAktualní záplata je zajištění non-lod objektů, aby nebyly považovány za velké budovy.
+opt_VCTrails=Stopy ve Vice City
+tip_VCTrails=Aktivuje stopy ve Vice City
+opt_AutoSave=Automatické uložení
+opt_SyncAnimations=Synchronizace animací
+opt_AllowDirectConnections=Povolit přímé připojení přes P2P (Peer-To-Peer)
+
+[TestingWindow]
+
+windowTitle=Testovací sestavení
+label_Message=Prosím, zadejte přístupový kód pro přístup k testovacím sestavením:
+
+[PasswordWindow]
+
+windowTitle=Heslo
+label_Message=Prosím, zadejte heslo pro přístup na server:
+
+[AddServerWindow]
+
+windowTitle=Přidat nový server
+label_Message=Zadejte nový server ve formátu HOST:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Mapa hráče
+
+# Menu
+menu_VCStyle=&Vice City style

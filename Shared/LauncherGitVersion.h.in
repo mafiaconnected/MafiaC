@@ -1,0 +1,4 @@
+#pragma once
+
+#define LAUNCHER_GIT_BRANCH "@GIT_BRANCH@"
+#define LAUNCHER_GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"

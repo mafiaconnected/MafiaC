@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page TitleName="game_title">
+	<HtmlView Name="Main" Left="0" Top="0" Right="0" Bottom="0"/>
+</Page>

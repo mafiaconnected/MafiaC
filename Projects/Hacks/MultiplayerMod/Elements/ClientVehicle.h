@@ -1,0 +1,96 @@
+#pragma once
+
+#include "ClientEntity.h"
+#include "ClientHuman.h"
+#include "../ClientManager.h"
+#include "../ClientGame.h"
+#include "NetBlenderVehicle.h"
+
+class CClientVehicle : public CClientEntity
+{
+private:
+	MafiaSDK::C_Car* m_MafiaVehicle;
+
+	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
+
+	Galactic3D::Weak<CClientHuman> m_pOccupants[4];
+
+public:
+	CClientVehicle(CMafiaClientManager* pClientManager);
+
+	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+
+	virtual MafiaSDK::C_Car* GetGameVehicle();
+
+	virtual void Process(void) override;
+	virtual void Create(const GChar* model, const CVector3D& pos, float angle);
+	virtual void Delete(void);
+	virtual void Despawn(void);
+	virtual void Remove(void);
+
+	virtual bool SetPosition(const CVector3D& vecPos) override;
+	virtual bool GetPosition(CVector3D& vecPos) override;
+
+	virtual bool SetRotation(const CVector3D& vecPos);
+	virtual bool GetRotation(CVector3D& vecPos) override;
+
+	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
+	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
+
+	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
+	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
+
+	virtual bool SetVelocity(const CVector3D& vecVel);
+	virtual bool GetVelocity(CVector3D& vecVel);
+
+	virtual bool SetRotationVelocity(const CVector3D& vecRotVel);
+	virtual bool GetRotationVelocity(CVector3D& vecRotVel);
+
+	virtual bool SetSpeed(float speed);
+	virtual float GetSpeed();
+
+	virtual bool SetFuel(float fuel);
+	virtual float GetFuel();
+
+	virtual bool SetGear(float gear);
+	virtual float GetGear();
+
+	virtual bool SetSpeedLimit(float speedLimit);
+	virtual float GetSpeedLimit();
+
+	virtual bool SetWheelAngle(float wheelAngle);
+	virtual float GetWheelAngle();
+
+	virtual bool SetEngineHealth(float engineHealth);
+	virtual float GetEngineHealth();
+
+	virtual bool SetHealth(float health);
+	virtual float GetHealth();
+
+	virtual bool SetOdometer(float odometer);
+	virtual float GetOdometer();
+
+	virtual bool SetRoof(bool state);
+	virtual bool GetRoof();
+
+	virtual bool SetLocked(bool state);
+	virtual bool GetLocked();
+
+	virtual bool IsSeatOccupied(unsigned char ucSeat);
+	virtual bool AssignSeat(CClientHuman* pHuman, unsigned char ucSeat);
+	virtual bool FreeSeat(unsigned char ucSeat);
+
+	virtual bool SetSiren(bool state);
+	virtual bool GetSiren();
+
+	virtual bool SetEngine(bool state);
+	virtual bool GetEngine();
+
+	virtual bool SetLights(bool state);
+	virtual bool GetLights();
+
+	virtual bool Repair();
+	virtual bool Explode();
+
+	virtual void SetFromExistingEntity(MafiaSDK::C_Car* car);
+};

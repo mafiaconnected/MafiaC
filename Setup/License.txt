@@ -1,0 +1,16 @@
+OpenSSL:
+
+This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit. (http://www.openssl.org/)
+
+Mozilla:
+
+This product is powered by SpiderMonkey from Mozilla® (http://www.mozilla.org/foundation/licensing.html)
+
+All Mozilla software is open source and free software.
+This means that it is not only available for download free of charge, but you have access to the source code and may modify and redistribute our software subject to certain restrictions.
+
+Lua:
+
+The spirit of the Lua license is that you are free to use Lua for any purpose at no cost without having to ask us.
+The only requirement is that if you do use Lua, then you should give us credit by including the copyright notice somewhere in your product or its documentation.
+A nice, but optional, way to give us further credit is to include a Lua logo and a link to our site in a web page for your product. 

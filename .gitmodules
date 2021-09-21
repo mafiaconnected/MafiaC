@@ -1,0 +1,4 @@
+[submodule "cmake"]
+	path = cmake
+	url = https://github.com/jack9267/CMake-Modules
+	branch = master

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Launcher>
+	<Settings>
+	</Settings>
+
+	<Games>
+		<Game Name="mafia:one" Title="Mafia: The City of Lost Heaven" Argument="m1">
+			<Exes>
+				<Exe>Game.exe</Exe>
+			</Exes>
+		</Game>
+	</Games>
+
+	<Mods>
+		<Mod Name="MafiaC" Path="MafiaC" Title="Mafia Connected" Enabled="true" Combined="true" />
+		<Mod Name="Console" Category="Advanced" Visible="true" Fake="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="DPIAware" Title="DPI Aware" Category="Advanced" Visible="true" Fake="true" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="CrashHandler" Title="Crash handler" Visible="true" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="IPCServer" Title="IPC server" Visible="false" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="DiscordRichPresence" Title="Discord Rich Presence" Category="Advanced" Visible="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="WindowMode" Title="Window mode" Category="Display" Visible="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="WindowHacks" Title="WindowHacks" Category="Mod" Visible="false" Enabled="true">
+            <Game>*</Game>
+        </Mod>
+		<Mod Name="DirectInputHook" Title="DirectInput hook" Category="Advanced" Visible="false" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+        <Mod Name="Direct3D9" Title="Direct3D9" Category="Mod" Visible="false" Enabled="true">
+            <Game>*</Game>
+        </Mod>
+        <Mod Name="WindowHacks" Title="WindowHacks" Category="Mod" Visible="false" Enabled="true">
+            <Game>*</Game>
+        </Mod>
+		<Mod Name="ModLoader" Title="Mod Loader" Category="Mod" Visible="false" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+		<Mod Name="MultiplayerMod" Title="Multiplayer" Category="Mod" Visible="false" Enabled="true">
+			<Game>*</Game>
+		</Mod>
+	</Mods>
+</Launcher>

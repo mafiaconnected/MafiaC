@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<Rectangle Left="0" Top="0" Right="0" Height="1" Colour="#ACA899"/>
+	<Rectangle Left="0" Top="0" Bottom="0" Width="1" Colour="#ACA899"/>
+	<Rectangle Left="0" Bottom="0" Right="0" Height="1" Colour="#FFFFFF"/>
+	<Rectangle Right="0" Top="0" Bottom="0" Width="1" Colour="#FFFFFF"/>
+</Page>

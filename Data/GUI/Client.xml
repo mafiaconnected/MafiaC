@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<Rectangle Width="16" Height="16" Right="0" Bottom="0" Colour="#ffffff" Texture="SizeGrip.png">
+		<Button Width="20" Height="20" Right="0" Bottom="0" Action="SizeGrip" />
+	</Rectangle>
+</Page>

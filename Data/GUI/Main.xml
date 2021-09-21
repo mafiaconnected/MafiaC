@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page TitleName="game_title">
+	<Page Name="CmdWindow" Left="25" Top="0" Right="0" Bottom="0" Visible="false" FileName="CmdWindow.xml"/>
+	<Page Name="JoinRequest" Left="0" Top="0" Right="0" Bottom="0" Visible="false" FileName="JoinRequest.xml"/>
+
+	<!--<HtmlView Name="Menu" Left="0" Top="0" Right="0" Bottom="0" Path="https://lucasstuff.com/" />-->
+
+	<!--<Page Left="0" Top="0" Right="0" Bottom="0" FileName="Window.xml" BringToTop="true"/>-->
+
+	<!--<Page Name="ImageTemp" Left="25" Top="25" Width="256" Height="256" FileName="ImageNotLoaded2.xml"/>-->
+
+	<!--<Rectangle Left="0" Top="0" Right="0" Bottom="0" NativeWidth="1600" NativeHeight="900">
+		<HtmlView Name="Scoreboard" Width="620" Height="460" BasePath="/Html" Path="/Html/Scoreboard.html" />
+	</Rectangle>-->
+
+	<Page Name="Script" Left="0" Top="0" Right="0" Bottom="0" Visible="true" />
+</Page>

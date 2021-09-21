@@ -1,0 +1,231 @@
+﻿[Language]
+name=Polish
+native_name=Polski
+author=Kewun,DaviD1985
+
+[Common]
+
+# Języki
+language_English=Angielski
+language_French=Francuski
+language_German=Niemiecki
+language_Italian=Włoski
+language_Spanish=Hiszpański
+language_Russian=Rosyjski
+language_Latvian=Łotewski
+
+# Wskazówki
+tip_Close=Zamknij to okno.
+tip_Okay=Zamknij to okno zapisując zmiany.
+tip_Cancel=Zamknij to okno bez zapisywania zmian.
+
+# Kolumny
+column_Name=Nazwa
+column_Title=Tytuł
+column_Version=Wersja
+column_ModifiedDate=Data modyfikacji
+column_Description=Opis
+column_Key=Klawisz
+column_Value=Wartość
+
+# Przyciski
+button_Okay=OK
+button_Close=Zamknij
+button_Cancel=Anuluj
+button_Yes=Tak
+button_No=Nie
+button_Retry=Spróbuj ponownie
+button_Abort=Anuluj
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Plik
+menu_CheckForUpdates=Sprawdź aktualizacje...
+menu_Exit=Z&amknij
+
+menu_Server=&Serwer
+menu_AddServer=Dodaj Serwer
+menu_DeleteServer=Usuń Serwer
+
+menu_Tools=&Narzędzia
+menu_Settings=&Ustawienia...
+menu_ResetSettings=Resetuj ustawienia...
+menu_DesktopShortcut=Skrót na pulpicie
+
+menu_Help=&Pomoc
+menu_RunDiagnostics=Uruchom diagnostykę ...
+menu_About=&Info ...
+menu_FullWidthRules=Full &Width Rules
+
+menu_Help=&Pomoc
+menu_RunDiagnostics=Uruchom diagnostykę...
+menu_About=&O ...
+menu_Licenses=Wyświetl &Licencje...
+
+# Ogólne/Multiplayer
+menu_LargeIcons=Duże ikony
+menu_Refresh=Odśwież
+menu_Connect=Połącz
+menu_AddToFavourites=Dodaj do ulubionych
+menu_Favourite=Ulubiony
+menu_CopyServerIP=Skopiuj adres IP serwera
+menu_CopyAddress=Kopiuj adres
+menu_ViewPlayerMap=Zobacz mapę gracza...
+menu_VisitWebsite=Odwiedź witrynę internetową...
+
+# Menu kontekstowe modów
+menu_ResetAll=Zresetuj wszystko
+menu_DisableAll=Wyłącz wszystko
+menu_Delete=Usuń
+
+# Otwórz menu
+menu_LauncherSettings=&Ustawienia programu uruchamiającego
+menu_GameSettings=&Ustawienia gry...
+menu_Resources=Zasoby
+menu_Crashes=Crashe
+menu_Caches=Pamięć podręczna
+menu_Logs=Logi
+
+# Messages
+message_ConfirmResetSettings=Czy jesteś pewien czy chcesz przywrócić launchera do ustawień fabrycznych?\nTa akcja nie może zostać przywrócona, a launcher ulegnie restartowi.
+
+# Zakładki
+tab_Favourites=Ulubione
+tab_Internet=Internet
+tab_Official=Oficjalne
+tab_History=Historia
+tab_Local=Lokalne
+tab_Mods=Modyfikacje
+
+# Status
+status_Disconnected=Odłączono
+status_Connecting=Łączenie
+status_Connected=Połączono z listą serwerów
+
+# Etykiety
+label_Game=Gra:
+label_GameEXEPath=Ścieżka EXE gry:
+
+# Wskazówki
+tip_Games=Gra do włączenia
+tip_CloseLauncher=Zamknij to okno przy włączeniu gry.
+tip_Launch=Włącz grę.
+tip_BrowseForGame=Przeszukaj ścieżkę i plik EXE gry.
+tip_ShowInExplorer=Pokaż plik EXE gry w {0}.
+tip_GameEXEPath=Ścieżka do pliku EXE gry.
+
+# Kolumny
+column_ServerName=Nazwa Serwera
+column_Players=Gracze
+column_GameMode=Tryb Gry
+
+# Group Boxes
+group_Players=Gracze
+group_Rules=Zasady
+
+# Przyciski
+button_OpenMenu=Otwórz...
+button_CloseLauncher=Zamknij Launchera
+button_Launch=Start
+button_ShowInExplorer=Pokaż w Eksploratorze {0}
+button_BrowseForGame=Przeszukaj...
+
+[AboutWindow]
+
+windowTitle=Info
+group_About=Info
+
+# Labels
+label_Product=Produkt:
+label_Copyright=Prawa autorskie \xC2\xA9 {0} {1}
+label_Version=Wersja:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Wersja Pakietu:
+label_BuildDate=Data kompilacji:
+label_BuildTime=Godzina kompilacji:
+label_Website=Strona internetowa:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Crashe w tym tygodniu:
+label_Developers=Deweloperzy:
+
+[SettingsWindow]
+
+windowTitle=Ustawienia launchera
+gameSettingsTitle=Ustawienia gry
+
+# Zakładki
+tab_General=Ogólne
+tab_AdditionalResourcesFolders=Dodatkowe foldery z zasobami
+tab_AdditionalMods=Dodatkowe modyfikacje
+tab_Display=Ekran
+tab_Advanced=Zaawansowane
+tab_NonModHacks=Haki bez modów
+tab_Licenses=Licencje
+tab_Language=Język
+tab_BugFixes=Poprawki błędów
+tab_Debug=Debuguj
+
+# Etykiety
+label_Name=Pseudonim:
+
+# Additional resource folders
+button_ResourceAdd=Dodaj zasób...
+tip_ResourceAdd=Dodaje nowy folder z zasobami.
+
+button_ResourceRemove=Usuń
+tip_ResourceRemove=Usuwa zaznaczony folder z zasobami.
+
+button_ResourceUp=Góra
+tip_ResourceUp=Przenosi folder z zasobami w górę
+
+button_ResourceDown=Dół
+tip_ResourceDown=Przenosi folder z zasobami w dół.
+
+tip_ResourceOpen=Otwórz folder z zasobami {0}.
+button_ResourceOpen=Otwórz
+
+# Opcje
+opt_KeepSavedGamesSeparate=Zachowaj zapisane gry osobno
+opt_KeepScreenshotsSeparate=Zachowaj zrzuty ekranu osobno
+opt_SaveCrashDump=Zapisz logi crasha
+opt_CheckForUpdates=Sprawdź aktualizacje
+opt_TerminateOnCrash=Wyłącz launcher przy crashu
+opt_VerboseLogging=Logowanie dodatkowe
+opt_GameOutput=Pokaż wszelkie działania gry w konsoli
+opt_MultithreadedNetworking=Sieci wielowątkowe
+opt_SCM=SCM
+opt_DisableStoryMode=Wyłącz tryb fabularny
+
+opt_AlwaysUsePrimaryMonitorResolution=Zawsze używaj rozdzielczość pierwszego monitora
+opt_AutomaticAspectRatio=Automatyczny przedział ekranu
+opt_InvisibleObjectsFix=Napraw niewidzialne obiekty
+tip_InvisibleObjectsFix=Ta opcja naprawia niektóre obiekty które są traktowanie jako wielkie budowle..\nW Grand Theft Auto: III to zawiera magnesy na samochody w dokach Portland.\nW Liberty City - Pozostałośći są naprawiane przy ustawieniu dystansu renderowania na niższy.\nKiedy  ta naprawa jest zastosowana, nie mozna zobaczyc magnesow z daleka.\nPoprawną naprawą jest ustawienie nie-lodowych modeli jako lodowe.
+opt_VCTrails=Vice City ślady
+tip_VCTrails=Włącza ślady w Vice City
+opt_AutoSave=Automatyczny Zapis
+opt_SyncAnimations=Synchronizuj animacje
+opt_AllowDirectConnections=Zezwalaj na połączenia bezpośrednie (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=Testowanie
+label_Message=Proszę wprowadź kod dostępu do testowania:
+
+[PasswordWindow]
+
+windowTitle=Hasło
+label_Message=Proszę wprowadź hasło do serwera:
+
+[AddServerWindow]
+
+windowTitle=Dodaj Serwer
+label_Message=Wpisz od serwera IP:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Mapa gracza
+
+# Menu
+menu_VCStyle=&Vice City style

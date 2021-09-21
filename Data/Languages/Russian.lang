@@ -1,0 +1,196 @@
+﻿[Language]
+author=keyb0red
+
+[Common]
+
+# Languages
+language_English=Английский
+language_French=Французкий
+language_German=Немецкий
+language_Italian=Итальянский
+language_Spanish=Испанский
+language_Russian=Русский
+
+# Tips
+tip_Close=Закрыть это окно
+tip_Okay=Сохранить изменения и закрыть это окно
+tip_Cancel=Закрыть это окно без сохранения изменений
+
+# Columns
+column_Title=Название
+column_Version=Версия
+column_ModifiedDate=Дата изменения
+column_Description=Описание
+
+# Buttons
+button_Okay=ОК
+button_Close=Закрыть
+button_Cancel=Отмена
+button_Yes=Да
+button_No=Нет
+button_Retry=Повторить
+button_Abort=Отмена
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Файл
+menu_CheckForUpdates=Проверить наличие обновлений
+menu_Exit=В&ыход
+
+menu_Server=&Сервер
+menu_AddServer=Добавить сервер
+menu_DeleteServer=Удалить сервер
+
+menu_Tools=&Настройки
+menu_Settings=&Настройки
+menu_ResetSettings=Сбросить все настройки
+menu_DesktopShortcut=Показать ярлык на рабочем столе
+
+menu_Help=&Помощь
+menu_RunDiagnostics=Запустить &диагностику
+menu_About=&О программе
+
+# Generic/Multiplayer
+menu_LargeIcons=Большие иконки
+menu_Refresh=Обновить
+menu_Connect=Подключиться
+
+# Mods context menu
+menu_ResetAll=Сбросить всё
+menu_DisableAll=Отключить всё
+menu_Delete=Удалить
+
+# Open menu
+menu_LauncherSettings=&Настройки лаунчера
+menu_GameSettings=&Настройки игры
+menu_Resources=Ресурсы
+menu_Crashes=Краш-дампы
+menu_Caches=Кеш
+menu_Logs=Логи
+
+# Messages
+message_ConfirmResetSettings=Вы точно хотите сбросить настройки лаунчера?\nЭто действие нельзя отменить
+
+# Tabs
+tab_Favourites=Избранные
+tab_Internet=Интернет
+tab_Official=Официальные
+tab_History=История
+tab_Local=LAN
+tab_Mods=Модификации
+
+# Status
+status_Disconnected=Отключен
+status_Connecting=Подключение
+status_Connected=Подключен к мастер-серверу
+
+# Labels
+label_Game=Игра:
+label_GameEXEPath=Путь до EXE игры:
+
+# Tips
+tip_Games=Выбор игры
+tip_CloseLauncher=Закрыть лаунчер при запуске игры
+tip_Launch=Запустить игру
+tip_BrowseForGame=Открыть проводник
+tip_ShowInExplorer=Показать исполняемый файл игры в {0}
+tip_GameEXEPath=Путь до исполняемого файла игры
+
+# Columns
+column_ServerName=Название
+column_Players=Игроки
+column_GameMode=Режим игры
+
+# Buttons
+button_OpenMenu=Открыть
+button_CloseLauncher=Закрыть лаунчер
+button_Launch=Запустить
+button_ShowInExplorer=Показать в {0}
+button_BrowseForGame=Обзор...
+
+[AboutWindow]
+
+windowTitle=О программе
+group_About=О программе
+
+# Labels
+label_Product=Продукт:
+label_Copyright=Copyright \xC2\xA9 {0} {1}
+label_Version=Версия:
+label_GitBranch=Ветвь Git:
+label_GitCommitHash=Хэш коммита Git:
+label_PacketVersion=Версия пакета:
+label_BuildDate=Дата сборки:
+label_BuildTime=Время сборки:
+label_Website=Веб-сайт:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Крашей за неделю:
+label_Developers=Разработчики:
+
+[SettingsWindow]
+
+windowTitle=Настройки лаунчера
+gameSettingsTitle=Настройки игры
+
+# Tabs
+tab_General=Основное
+tab_AdditionalResourcesFolders=Доп. ресурсы
+tab_AdditionalMods=Доп. моды
+tab_Display=Дисплей
+tab_Advanced=Дополнительно
+tab_NonModHacks=Сторонние хаки
+tab_Licenses=Лицензии
+
+# Labels
+label_Name=Имя:
+
+# Additional resource folders
+button_ResourceAdd=Добавить...
+tip_ResourceAdd=Добавить новый ресурс
+
+button_ResourceRemove=Удалить
+tip_ResourceRemove=Удалить выбранный ресурс
+
+button_ResourceUp=Вверх
+tip_ResourceUp=Переместить выбранный ресурс вверх
+
+button_ResourceDown=Вниз
+tip_ResourceDown=Переместить выбранный ресурс вниз
+
+tip_ResourceOpen=Открыть выбранный ресурс в {0}
+button_ResourceOpen=Открыть
+
+# Options
+opt_KeepSavedGamesSeparate=Сохранять игру в отдельной папке
+opt_KeepScreenshotsSeparate=Сохранять скриншоты в отдельную папку
+opt_SaveCrashDump=Сохранять краш-дампы
+opt_CheckForUpdates=Проверять на наличие обновлений
+opt_TerminateOnCrash=Закрывать при краше игры
+opt_VerboseLogging=Включить отладочный лог
+opt_GameOutput=Выводить лог игры в консоль
+opt_SCM=SCM
+opt_DisableStoryMode=Отключить режим сюжета
+
+opt_AlwaysUsePrimaryMonitorResolution=Использовать разрешение основного монитора
+opt_AutomaticAspectRatio=Автоматическое соотн. сторон
+opt_InvisibleObjectsFix=Фикс бага с исчезающими объектами
+tip_InvisibleObjectsFix=Включить исправление бага с исчезающими\nкранами на доках в Grand Theft Auto: III.
+opt_VCTrails=Включить трейлы
+tip_VCTrails=Включить трейлы из Vice City
+opt_AutoSave=Автосохранение
+
+[TestingWindow]
+
+windowTitle=Бета-тест
+label_Message=Введите пароль для доступа к экспериментальным сборкам:
+
+[PasswordWindow]
+
+windowTitle=Пароль
+label_Message=Введите пароль, чтобы подключиться к серверу:
+
+[AddServerWindow]
+
+windowTitle=Добавить сервер
+label_Message=Введите IP и порт сервера

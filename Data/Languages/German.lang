@@ -1,0 +1,196 @@
+﻿[Language]
+author=Sladernimo
+
+[Common]
+
+# Languages
+language_English=Englisch
+language_French=Französisch
+language_German=Deutsch
+language_Italian=Italienisch
+language_Spanish=Spanisch
+language_Russian=Russisch
+
+# Tips
+tip_Close=Schließe das Fenster.
+tip_Okay=Schließe das Fenster, Änderungen werden gespeichert.
+tip_Cancel=Schließe das Fenster, Änderungen werden NICHT gespeichert.
+
+# Columns
+column_Title=Titel
+column_Version=Version
+column_ModifiedDate=Zuletzt geändert
+column_Description=Beschreibung
+
+# Buttons
+button_Okay=Zustimmen
+button_Close=Schließen
+button_Cancel=Abbrechen
+button_Yes=Ja
+button_No=Nein
+button_Retry=Wiederholen
+button_Abort=Abbrechen
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Datei
+menu_CheckForUpdates=Nach Updates suchen...
+menu_Exit=S&chließen
+
+menu_Server=&Server
+menu_AddServer=Server hinzufügen
+menu_DeleteServer=Server löschen
+
+menu_Tools=&Werkzeuge
+menu_Settings=&Einstellungen...
+menu_ResetSettings=Alle Einstellungen zurücksetzen...
+menu_DesktopShortcut=Desktop Verknüpfung
+
+menu_Help=&Hilfe
+menu_RunDiagnostics=Starte &Diagnose ...
+menu_About=&Über ...
+
+# Generic/Multiplayer
+menu_LargeIcons=Große Symbole
+menu_Refresh=Aktualisieren
+menu_Connect=Verbinden
+
+# Mods context menu
+menu_ResetAll=Alles zurücksetzen
+menu_DisableAll=Alles deaktivieren
+menu_Delete=Löschen
+
+# Open menu
+menu_LauncherSettings=&Launcher Einstellungen...
+menu_GameSettings=&Spiel Einstellungen...
+menu_Resources=Resources
+menu_Crashes=Crashes
+menu_Caches=Caches
+menu_Logs=Logs
+
+# Messages
+message_ConfirmResetSettings=Sind Sie sicher, dass Sie die Launcher Einstellungen auf Standard zurücksetzen möchten?\nDiese Aktion kann nicht rückgängig gemacht werden, der Launcher wird neugestartet.
+
+# Tabs
+tab_Favourites=Favoriten
+tab_Internet=Internet
+tab_Official=Offiziell
+tab_History=Historie
+tab_Local=Lokal
+tab_Mods=Modifikationen
+
+# Status
+status_Disconnected=Verbindung getrennt
+status_Connecting=Verbinde
+status_Connected=Verbunden zu masterlist
+
+# Labels
+label_Game=Spiel:
+label_GameEXEPath=Spiel EXE Pfad:
+
+# Tips
+tip_Games=Das zu startende Spiel.
+tip_CloseLauncher=Schließe dieses Fenster, wenn das Spiel gestartet wird.
+tip_Launch=Spiel starten.
+tip_BrowseForGame=Suche nach der Spiel EXE.
+tip_ShowInExplorer=Anzeigen der Spiel EXE in {0}.
+tip_GameEXEPath=Der Pfad zur Spiel EXE.
+
+# Columns
+column_ServerName=Server Name
+column_Players=Spieler
+column_GameMode=Spiel Modus
+
+# Buttons
+button_OpenMenu=Öffnen...
+button_CloseLauncher=Schließe Launcher
+button_Launch=Starte
+button_ShowInExplorer=Anzeigen in {0}
+button_BrowseForGame=Suchen...
+
+[AboutWindow]
+
+windowTitle=Über
+group_About=Über
+
+# Labels
+label_Product=Product:
+label_Copyright=Copyright \xC2\xA9 {0} {1}
+label_Version=Version:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Packet Version:
+label_BuildDate=Build Date:
+label_BuildTime=Build Time:
+label_Website=Website:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Crashes This Week:
+label_Developers=Developers:
+
+[SettingsWindow]
+
+windowTitle=Launcher Einstellungen
+gameSettingsTitle=Spiel Einstellungen
+
+# Tabs
+tab_General=General
+tab_AdditionalResourcesFolders=Zusätzliche Resources Ordner
+tab_AdditionalMods=Zusätzliche Modifikationen
+tab_Display=Anzeige
+tab_Advanced=Erweitert
+tab_NonModHacks=Non-mod Hacks
+tab_Licenses=Lizensen
+
+# Labels
+label_Name=Name:
+
+# Additional resource folders
+button_ResourceAdd=Hinzufügen...
+tip_ResourceAdd=Fügt einen neuen resource Ordner hinzu.
+
+button_ResourceRemove=Entfernen
+tip_ResourceRemove=Entfernt den ausgewählten resource Ordner.
+
+button_ResourceUp=Hochsetzen
+tip_ResourceUp=Setzt den ausgewählten resource Ordner hoch.
+
+button_ResourceDown=Runtersetzen
+tip_ResourceDown=Setzt den ausgewählten resource Ordner runter.
+
+tip_ResourceOpen=Öffnet den ausgewählten resource Ordner in {0}.
+button_ResourceOpen=Öffnen
+
+# Options
+opt_KeepSavedGamesSeparate=Halte die Spielstände separiert
+opt_KeepScreenshotsSeparate=Halte die Screenshots separiert
+opt_SaveCrashDump=Speichere Crash Dump
+opt_CheckForUpdates=Nach Updates suchen
+opt_TerminateOnCrash=Bei Absturz beenden
+opt_VerboseLogging=Ausführliche Protokollierung
+opt_GameOutput=Zeige den Siel output in der Konsole an
+opt_SCM=SCM
+opt_DisableStoryMode=Deaktiviere den Story Modus
+
+opt_AlwaysUsePrimaryMonitorResolution=Verwende immer die primäre Monitorauflösung
+opt_AutomaticAspectRatio=Automatisches Seitenverhältnis
+opt_InvisibleObjectsFix=Einige unsichtbare Objekte reparieren
+tip_InvisibleObjectsFix=Diese Option behebt einen Fehler, bei dem bestimmte Objekte sowie große Gebäude behandelt werden.\nIn Grand Theft Auto: III sind die Kräne bei den Portland Docks betroffen.\nBeim "Liberty City - The Leftovers Fix" wird versucht dies zu beheben, indem man die Sichtweite reduziert.\nDiese Lösung funktioniert zwar relativ gut, aber sie ist nicht optimal weil die Kräne dann auf große Distanz nicht mehr zu sehen sind.\nDie beste Lösung wäre es, non-lod Objekte zu erstellen welche dann nicht vom Spiel wie ein großes Gebäude behandelt werden.
+opt_VCTrails=Vice City trails
+tip_VCTrails=Aktiviert trails in Vice City
+opt_AutoSave=Automatisches Speichern
+
+[TestingWindow]
+
+windowTitle=Testen
+label_Message=Bitte geben Sie den Zugangscode unten ein, um die Test-Builds zu aktivieren:
+
+[PasswordWindow]
+
+windowTitle=Passwort
+label_Message=Bitte geben Sie das Passwort ein, um sich mit dem Server zu verbinden:
+
+[AddServerWindow]
+
+windowTitle=Server hinzufügen
+label_Message=Eingabe neuer Server HOST:PORT...
