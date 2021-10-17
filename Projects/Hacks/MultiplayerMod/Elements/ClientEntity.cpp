@@ -86,14 +86,13 @@ bool CClientEntity::ReadCreatePacket(Stream* pStream)
     _gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), pszModel);
     GFree(pszModel);
 
-	CVector3D vecPosition, vecRelPosition, vecRotation, vecRelRotation;
-	Reader.ReadVector3D(&vecPosition, 1);
-	Reader.ReadVector3D(&vecRelPosition, 1);
-	Reader.ReadVector3D(&vecRotation, 1);
-	Reader.ReadVector3D(&vecRelRotation, 1);
+	Reader.ReadVector3D(&m_Position, 1);
+	Reader.ReadVector3D(&m_RelativePosition, 1);
+	Reader.ReadVector3D(&m_Rotation, 1);
+	Reader.ReadVector3D(&m_RelativeRotation, 1);
 
-	SetPosition(vecPosition);
-	SetRotation(vecRotation);
+	//SetPosition(m_Position);
+	//SetRotation(m_Rotation);
 
     return true;
 }
@@ -105,14 +104,13 @@ bool CClientEntity::ReadSyncPacket(Stream* pStream)
 
 	CBinaryReader Reader(pStream);
 
-	CVector3D vecPosition, vecRelPosition, vecRotation, vecRelRotation;
-	Reader.ReadVector3D(&vecPosition, 1);
-	Reader.ReadVector3D(&vecRelPosition, 1);
-	Reader.ReadVector3D(&vecRotation, 1);
-	Reader.ReadVector3D(&vecRelRotation, 1);
+	Reader.ReadVector3D(&m_Position, 1);
+	Reader.ReadVector3D(&m_RelativePosition, 1);
+	Reader.ReadVector3D(&m_Rotation, 1);
+	Reader.ReadVector3D(&m_RelativeRotation, 1);
 
-	SetPosition(vecPosition);
-	SetRotation(vecRotation);
+	//SetPosition(m_Position);
+	//SetRotation(m_Rotation);
 
 	return true;
 }

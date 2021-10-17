@@ -152,7 +152,7 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	//pModel->SetName(name.CString());
 	pModel->SetScale({ 1, 1, 1 });
-	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
+	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(m_Position));
 	pModel->Update();
 
 	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy));
@@ -181,15 +181,15 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	auto rot = CVecTools::ComputeDirVector(angle);
 
-	m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(pos);
-	m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(rot);
+	m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
+	m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
 
-	SetPosition(pos);
-	SetRotation(rot);
+	//SetPosition(m_Position);
+	//SetRotation(m_Rotation);
 
 	m_pEntity = m_MafiaHuman;
 
-	//_glogprintf(_gstr("Spawned human for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f"), GetId(), m_szModel, pos.x, pos.y, pos.z, angle);
+	_glogprintf(_gstr("Spawned human for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f"), GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, angle);
 }
 
 void CClientHuman::Kill(void)
@@ -228,7 +228,6 @@ void CClientHuman::Delete(void)
 
 bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
-	CVector3D pos, rot;
 	float health;
 	bool isDucking, isAiming;
 	uint8_t animState;
@@ -237,21 +236,6 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		return false;
 
 	CBinaryReader Reader(pStream);
-
-	size_t size;
-
-    GChar* pszModel = Reader.ReadString(&size);
-    if (pszModel == nullptr)
-        return false;
-
-    _gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), pszModel);
-    GFree(pszModel);
-
-	Reader.ReadVector3D(&pos, 1);
-	Reader.ReadVector3D(&rot, 1);
-
-	relPos = pos;
-	relRot = rot;
 
 	Reader.ReadSingle(&health, 1);
 	Reader.ReadInt32(&m_nVehicleNetworkIndex, 1);
@@ -267,15 +251,15 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (GetGameHuman() == nullptr)
 	{
 		// Note (Sevenisko): Spawn the PED only, the Multiplayer will take care of the local player assignment
-		Spawn(pos, CVecTools::DirToRotation180(CVecTools::EulerToDir(rot)), GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex);
+		Spawn(m_Position, CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation)), GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex);
 
 		IHuman = GetGameHuman()->GetInterface();
 	}
 	else
 	{
 		IHuman = GetGameHuman()->GetInterface();
-		IHuman->entity.position = CVecTools::ConvertToMafiaVec(pos);
-		IHuman->entity.rotation = CVecTools::ConvertToMafiaVec(rot);
+		IHuman->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
+		IHuman->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
 	}
 
 	IHuman->animState = animState;
@@ -317,8 +301,11 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 		}
 	}
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
+	GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
+	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation))));
+
+	//SetPosition(m_Position);
+	//SetRotation(m_Rotation);
 
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 	
@@ -381,11 +368,11 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	CBinaryWriter Writer(pStream);
 
-	CVector3D pos; GetPosition(pos);
-	CVector3D rot; GetRotation(rot);
+	//CVector3D pos; GetPosition(pos);
+	//CVector3D rot; GetRotation(rot);
 
-	CVector3D diffPos = pos - prevPos;
-	CVector3D diffRot = rot - prevRot;
+	CVector3D diffPos = m_Position - prevPos;
+	CVector3D diffRot = m_Rotation - prevRot;
 
 	Writer.WriteVector3D(&diffPos, 1);
 	Writer.WriteVector3D(&diffRot, 1);
@@ -442,7 +429,7 @@ void CClientHuman::Process(void)
 	//	}
 	//}
 
-	CClientEntity::Process();
+	//CClientEntity::Process();
 }
 
 bool CClientHuman::IsInVehicle(void)
