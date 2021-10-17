@@ -180,8 +180,6 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (!CClientEntity::ReadCreatePacket(pStream))
 		return false;
 
-	CBinaryReader Reader(pStream);
-
 	S_vector rotForward, rotUp, rotRight;
 
 	relPos = m_Position;
@@ -217,12 +215,12 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	IVehicle.fuel = Packet.fuel;
 
 	IVehicle.sound_enabled = Packet.sound;
-	IVehicle.engine_on = Packet.engineOn;
+	//IVehicle.engine_on = Packet.engineOn;
 	IVehicle.horn = Packet.horn;
 	IVehicle.siren = Packet.siren;
 	IVehicle.lights = Packet.lights;
 
-	IVehicle.gear = Packet.gear;
+	//IVehicle.gear = Packet.gear;
 	IVehicle.engine_rpm = Packet.rpm;
 	IVehicle.accelerating = Packet.accel;
 	IVehicle.break_val = Packet.brake;
@@ -254,47 +252,39 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
-	CBinaryReader Reader(pStream);
+	tVehicleSyncPacket Packet;
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
-	int32_t iGear;
-	bool bEngine;
-	CVector3D speed, rotSpeed;
+	IVehicle.health = Packet.health;
+	IVehicle.engine_health = Packet.engineHealth;
+	IVehicle.fuel = Packet.fuel;
 
-	Reader.ReadSingle(&IVehicle.health, 1);
-	Reader.ReadSingle(&IVehicle.engine_health, 1);
-	Reader.ReadSingle(&IVehicle.fuel, 1);
+	IVehicle.sound_enabled = Packet.sound;
+	//IVehicle.engine_on = Packet.engineOn;
+	IVehicle.horn = Packet.horn;
+	IVehicle.siren = Packet.siren;
+	IVehicle.lights = Packet.lights;
 
-	Reader.ReadBoolean(IVehicle.sound_enabled);
-	Reader.ReadBoolean(bEngine);
-	Reader.ReadBoolean(IVehicle.horn);
-	Reader.ReadBoolean(IVehicle.siren);
-	Reader.ReadBoolean(IVehicle.lights);
+	//IVehicle.gear = Packet.gear;
+	IVehicle.engine_rpm = Packet.rpm;
+	IVehicle.accelerating = Packet.accel;
+	IVehicle.break_val = Packet.brake;
+	IVehicle.hand_break = Packet.handBrake;
+	IVehicle.speed_limit = Packet.speedLimit;
+	IVehicle.clutch = Packet.clutch;
+	IVehicle.wheel_angle = Packet.wheelAngle;
 
-	Reader.ReadInt32(&iGear, 1);
-	Reader.ReadSingle(&IVehicle.engine_rpm, 1);
-	Reader.ReadSingle(&IVehicle.accelerating, 1);
-	Reader.ReadSingle(&IVehicle.break_val, 1);
-	Reader.ReadSingle(&IVehicle.hand_break, 1);
-	Reader.ReadSingle(&IVehicle.speed_limit, 1);
-	Reader.ReadSingle(&IVehicle.clutch, 1);
-	Reader.ReadSingle(&IVehicle.wheel_angle, 1);
+	IVehicle.speed = CVecTools::ConvertToMafiaVec(Packet.speed);
+	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(Packet.rotSpeed);
 
-	Reader.ReadVector3D(&speed, 1);
-	Reader.ReadVector3D(&rotSpeed, 1);
-
-	//relPos = m_RelativePosition;
-	//relRot = m_RelativeRotation;
-
-	IVehicle.speed = CVecTools::ConvertToMafiaVec(speed);
-	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(rotSpeed);
-
-	if (iGear != IVehicle.gear) {
+	if (Packet.gear != IVehicle.gear) {
 		GetGameVehicle()->GearSnd();
-		GetGameVehicle()->SetGear(iGear);
+		GetGameVehicle()->SetGear(Packet.gear);
 	}
 
-	if (bEngine != IVehicle.engine_on) {
-		GetGameVehicle()->SetEngineOn(bEngine, 2);
+	if (Packet.engineOn != IVehicle.engine_on) {
+		GetGameVehicle()->SetEngineOn(Packet.engineOn, 2);
 	}
 
 	SetPosition(m_Position);
@@ -314,8 +304,6 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 		return false;
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
-
-	CBinaryWriter Writer(pStream);
 
 	//CMatrix3x3 rotMat(CVecTools::ConvertFromMafiaVec(IVehicle.rot_forward), CVecTools::ConvertFromMafiaVec(IVehicle.rot_up), CVecTools::ConvertFromMafiaVec(IVehicle.rot_right));
 	//CVector3D rot = rotMat.GetEuler();
@@ -350,8 +338,6 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 
 bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 {
-	_glogprintf(_gstr("Writing sync packet for vehicle"));
-
 	if (!CClientEntity::WriteSyncPacket(pStream))
 		return false;
 
@@ -360,26 +346,29 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
-	CBinaryWriter Writer(pStream);
+	tVehicleSyncPacket Packet;
 
-	Writer.WriteSingle(&IVehicle.health, 1);
-	Writer.WriteSingle(&IVehicle.engine_health, 1);
-	Writer.WriteSingle(&IVehicle.fuel, 1);
-	Writer.WriteBoolean(IVehicle.engine_on);
+	Packet.health = IVehicle.health;
+	Packet.engineHealth = IVehicle.engine_health;
+	Packet.fuel = IVehicle.fuel;
 
-	Writer.WriteBoolean(IVehicle.sound_enabled);
-	Writer.WriteBoolean(IVehicle.horn);
-	Writer.WriteBoolean(IVehicle.siren);
-	Writer.WriteBoolean(IVehicle.lights);
+	Packet.sound = IVehicle.sound_enabled;
+	Packet.engineOn = IVehicle.engine_on;
+	Packet.horn = IVehicle.horn;
+	Packet.siren = IVehicle.siren;
+	Packet.lights = IVehicle.lights;
 
-	Writer.WriteInt32((Sint32*)&IVehicle.gear, 1);
-	Writer.WriteSingle(&IVehicle.engine_rpm, 1);
-	Writer.WriteSingle(&IVehicle.accelerating, 1);
-	Writer.WriteSingle(&IVehicle.break_val, 1);
-	Writer.WriteSingle(&IVehicle.hand_break, 1);
-	Writer.WriteSingle(&IVehicle.speed_limit, 1);
-	Writer.WriteSingle(&IVehicle.clutch, 1);
-	Writer.WriteSingle(&IVehicle.wheel_angle, 1);
+	Packet.gear = IVehicle.gear;
+	Packet.rpm = IVehicle.engine_rpm;
+	Packet.accel = IVehicle.accelerating;
+	Packet.brake = IVehicle.break_val;
+	Packet.handBrake = IVehicle.hand_break;
+	Packet.speedLimit = IVehicle.speed_limit;
+	Packet.clutch = IVehicle.clutch;
+	Packet.wheelAngle = IVehicle.wheel_angle;
+
+	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	return true;
 }

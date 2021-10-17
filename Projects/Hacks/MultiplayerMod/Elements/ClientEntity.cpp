@@ -75,24 +75,17 @@ bool CClientEntity::ReadCreatePacket(Stream* pStream)
     if (!CNetObject::ReadCreatePacket(pStream))
         return false;
 
-    CBinaryReader Reader(pStream);
+	tEntityCreatePacket Packet;
 
-    size_t size;
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
-    GChar* pszModel = Reader.ReadString(&size);
-    if (pszModel == nullptr)
-        return false;
+	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), Packet.model);
 
-    _gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), pszModel);
-    GFree(pszModel);
-
-	Reader.ReadVector3D(&m_Position, 1);
-	Reader.ReadVector3D(&m_RelativePosition, 1);
-	Reader.ReadVector3D(&m_Rotation, 1);
-	Reader.ReadVector3D(&m_RelativeRotation, 1);
-
-	//SetPosition(m_Position);
-	//SetRotation(m_Rotation);
+	m_Position = Packet.position;
+	m_RelativePosition = Packet.positionRel;
+	m_Rotation = Packet.rotation;
+	m_RelativeRotation = Packet.rotationRel;
 
     return true;
 }
@@ -102,15 +95,15 @@ bool CClientEntity::ReadSyncPacket(Stream* pStream)
 	if (!CNetObject::ReadSyncPacket(pStream))
 		return false;
 
-	CBinaryReader Reader(pStream);
+	tEntitySyncPacket Packet;
 
-	Reader.ReadVector3D(&m_Position, 1);
-	Reader.ReadVector3D(&m_RelativePosition, 1);
-	Reader.ReadVector3D(&m_Rotation, 1);
-	Reader.ReadVector3D(&m_RelativeRotation, 1);
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
-	//SetPosition(m_Position);
-	//SetRotation(m_Rotation);
+	m_Position = Packet.position;
+	m_RelativePosition = Packet.positionRel;
+	m_Rotation = Packet.rotation;
+	m_RelativeRotation = Packet.rotationRel;
 
 	return true;
 }
@@ -120,13 +113,17 @@ bool CClientEntity::WriteCreatePacket(Stream* pStream)
 	if (!CNetObject::WriteCreatePacket(pStream))
 		return false;
 
-	CBinaryWriter Writer(pStream);
+	tEntityCreatePacket Packet;
 
-	Writer.WriteString(m_szModel);
-	Writer.WriteVector3D(m_Position);
-	Writer.WriteVector3D(m_RelativePosition);
-	Writer.WriteVector3D(m_Rotation);
-	Writer.WriteVector3D(m_RelativeRotation);
+	_gstrcpy_s(Packet.model, ARRAY_COUNT(m_szModel), m_szModel);
+
+	Packet.position = m_Position;
+	Packet.positionRel = m_RelativePosition;
+	Packet.rotation = m_Rotation;
+	Packet.rotationRel = m_RelativeRotation;
+
+	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	return true;
 }
@@ -136,12 +133,15 @@ bool CClientEntity::WriteSyncPacket(Stream* pStream)
 	if (!CNetObject::WriteSyncPacket(pStream))
 		return false;
 
-	CBinaryWriter Writer(pStream);
+	tEntitySyncPacket Packet;
 
-	Writer.WriteVector3D(m_Position);
-	Writer.WriteVector3D(m_RelativePosition);
-	Writer.WriteVector3D(m_Rotation);
-	Writer.WriteVector3D(m_RelativeRotation);
+	Packet.position = m_Position;
+	Packet.positionRel = m_RelativePosition;
+	Packet.rotation = m_Rotation;
+	Packet.rotationRel = m_RelativeRotation;
+
+	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	m_uiLastSendSyncTicks = OS::GetTicks();
 	return true;

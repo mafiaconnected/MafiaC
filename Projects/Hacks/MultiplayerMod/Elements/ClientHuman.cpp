@@ -228,25 +228,16 @@ void CClientHuman::Delete(void)
 
 bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
-	float health;
-	bool isDucking, isAiming;
-	uint8_t animState;
-
-	if (!CNetObject::ReadCreatePacket(pStream))
+	if (!CClientEntity::ReadCreatePacket(pStream))
 		return false;
 
-	CBinaryReader Reader(pStream);
-
-	Reader.ReadSingle(&health, 1);
-	Reader.ReadInt32(&m_nVehicleNetworkIndex, 1);
-	Reader.ReadUInt32(&m_nVehicleSeatIndex, 1);
-	Reader.ReadBoolean(isDucking);
-	Reader.ReadBoolean(isAiming);
-	Reader.ReadUInt8(&animState, 1);
-
-	//_glogprintf(L"Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f - %f, %f, %f]\n\tRotation: [%f, %f, %f - %f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), model, vecPos.x, vecPos.y, vecPos.z, vecRelPos.x, vecRelPos.y, vecRelPos.z, vecRot.x, vecRot.y, vecRot.z, vecRelRot.x, vecRelRot.y, vecRelRot.z, health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, isDucking ? L"Yes" : L"No", isAiming ? L"Yes" : L"No", animState);
-
 	MafiaSDK::C_Human_Interface* IHuman;
+
+	tHumanCreatePacket Packet;
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
+
+	_glogprintf(L"Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f - %f, %f, %f]\n\tRotation: [%f, %f, %f - %f, %f, %f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
 
 	if (GetGameHuman() == nullptr)
 	{
@@ -262,17 +253,19 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		IHuman->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
 	}
 
-	IHuman->animState = animState;
-	IHuman->health = health;
-	IHuman->isDucking = isDucking;
-	IHuman->isAiming = isAiming;
+	IHuman->health = Packet.health;
+	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
+	m_nVehicleSeatIndex = Packet.seat;
+	IHuman->isDucking = Packet.isCrouching;
+	IHuman->isAiming = Packet.isAiming;
+	IHuman->animState = Packet.animationState;
 
 	return true;
 }
 
 bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 {
-	if (!CNetObject::ReadSyncPacket(pStream))
+	if (!CClientEntity::ReadSyncPacket(pStream))
 		return false;
 
 	if (GetGameHuman() == nullptr)
@@ -280,13 +273,15 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IHuman = GetGameHuman()->GetInterface();
 
-	Galactic3D::CBinaryReader Reader(pStream);
+	tHumanSyncPacket Packet;
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
-	Reader.ReadSingle(&IHuman->health, 1);
-	Reader.ReadInt32(&m_nVehicleNetworkIndex, 1);
-	Reader.ReadBoolean(IHuman->isDucking);
-	Reader.ReadBoolean(IHuman->isAiming);
-	Reader.ReadUInt8(&IHuman->animState, 1);
+	IHuman->health = Packet.health;
+	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
+	IHuman->isDucking = Packet.isCrouching;
+	IHuman->isAiming = Packet.isAiming;
+	IHuman->animState = Packet.animationState;
 
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) {
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
@@ -329,7 +324,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 {
-	if (!CNetObject::WriteCreatePacket(pStream))
+	if (!CClientEntity::WriteCreatePacket(pStream))
 		return false;
 
 	if (GetGameHuman() == nullptr)
@@ -342,14 +337,17 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	if (IsInVehicle())
 		vehicleId = GetOccupiedVehicle()->GetId();
 
-	CBinaryWriter Writer(pStream);
+	tHumanCreatePacket Packet;
 
-	Writer.WriteSingle(&IHuman->health, 1);
-	Writer.WriteInt32(&vehicleId, 1);
-	Writer.WriteUInt32(&m_nVehicleSeatIndex, 1);
-	Writer.WriteBoolean(IHuman->isDucking);
-	Writer.WriteBoolean(IHuman->isAiming);
-	Writer.WriteUInt8(&IHuman->animStateLocal, 1);
+	Packet.health = IHuman->health;
+	Packet.vehicleNetworkIndex = vehicleId;
+	Packet.seat = m_nVehicleSeatIndex;
+	Packet.isCrouching = IHuman->isDucking;
+	Packet.isAiming = IHuman->isAiming;
+	Packet.animationState = IHuman->animStateLocal;
+
+	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	//_glogprintf(L"Sent create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), m_szModel, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 
@@ -363,32 +361,27 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IHuman = GetGameHuman()->GetInterface();
 
-	if (!CNetObject::WriteSyncPacket(pStream))
+	if (!CClientEntity::WriteSyncPacket(pStream))
 		return false;
-
-	CBinaryWriter Writer(pStream);
-
-	//CVector3D pos; GetPosition(pos);
-	//CVector3D rot; GetRotation(rot);
 
 	CVector3D diffPos = m_Position - prevPos;
 	CVector3D diffRot = m_Rotation - prevRot;
-
-	//Writer.WriteVector3D(&diffPos, 1);
-	//Writer.WriteVector3D(&diffRot, 1);
-
-	Writer.WriteSingle(&IHuman->health, 1);
 
 	int vehicleId = INVALID_NETWORK_ID;
 
 	if (IsInVehicle())
 		vehicleId = GetOccupiedVehicle()->GetId();
 
-	Writer.WriteInt32(&vehicleId, 1);
+	tHumanSyncPacket Packet;
 
-	Writer.WriteBoolean(IHuman->isDucking);
-	Writer.WriteBoolean(IHuman->isAiming);
-	Writer.WriteUInt8(&IHuman->animState, 1);
+	Packet.health = IHuman->health;
+	Packet.vehicleNetworkIndex = vehicleId;
+	Packet.isCrouching = IHuman->isDucking;
+	Packet.isAiming = IHuman->isAiming;
+	Packet.animationState = IHuman->animStateLocal;
+
+	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	//_glogprintf(L"Sent sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), pos.x, pos.y, pos.z, diffPos.x, diffPos.y, diffPos.z, rot.x, rot.y, rot.z, diffRot.x, diffRot.y, diffRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 
