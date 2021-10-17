@@ -18,7 +18,7 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
 	m_Games.Register(_gstr("mafia:one_de"), GAME_MAFIA_ONE_DE);
 
     auto pElements = pResourceMgr->m_pScripting->m_Global.AddNamespace(_gstr("elements"));
-    m_pClientEntityClass = pElements->NewClass(_gstr("Entity"), m_pNetObjectTransformableClass);
+    m_pClientEntityClass = pElements->NewClass(_gstr("Entity"), m_pNetObjectClass);
     m_pClientHumanClass = pElements->NewClass(_gstr("Ped"), m_pClientEntityClass);
     m_pClientPlayerClass = pElements->NewClass(_gstr("Player"), m_pClientHumanClass);
     m_pClientVehicleClass = pElements->NewClass(_gstr("Vehicle"), m_pClientEntityClass);
