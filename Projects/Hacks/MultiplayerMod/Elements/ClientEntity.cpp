@@ -115,7 +115,7 @@ bool CClientEntity::WriteCreatePacket(Stream* pStream)
 
 	tEntityCreatePacket Packet;
 
-	_gstrcpy_s(Packet.model, ARRAY_COUNT(m_szModel), m_szModel);
+	_gstrcpy_s(Packet.model, ARRAY_COUNT(Packet.model), m_szModel);
 
 	Packet.position = m_Position;
 	Packet.positionRel = m_RelativePosition;
