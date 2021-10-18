@@ -84,6 +84,8 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, float angl
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[1]));
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[2]));
 
+	m_pEntity = m_MafiaVehicle;
+
 	auto IVehicle = m_MafiaVehicle->GetInterface()->vehicle_interface;
 	_glogprintf(_gstr("Created new vehicle for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), model, pos.x, pos.y, pos.z, angle, IVehicle.health, IVehicle.engine_health, IVehicle.fuel, IVehicle.sound_enabled ? L"Yes" : L"No", IVehicle.engine_on ? L"Yes" : L"No", IVehicle.horn ? L"Yes" : L"No", IVehicle.siren ? L"Yes" : L"No", IVehicle.gear, IVehicle.engine_rpm, IVehicle.accelerating, IVehicle.break_val, IVehicle.hand_break, IVehicle.speed_limit, IVehicle.clutch, IVehicle.wheel_angle);
 }
@@ -251,9 +253,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
-
 	tVehicleSyncPacket Packet;
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -274,8 +273,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IVehicle.speed_limit = Packet.speedLimit;
 	IVehicle.clutch = Packet.clutch;
 	IVehicle.wheel_angle = Packet.wheelAngle;
-	IVehicle.speed = CVecTools::ConvertToMafiaVec(Packet.speed);
-	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(Packet.rotSpeed);
 
 	if (Packet.gear != IVehicle.gear) {
 		GetGameVehicle()->GearSnd();
@@ -286,13 +283,21 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		GetGameVehicle()->SetEngineOn(Packet.engineOn, 2);
 	}
 
+	m_RelativePosition = Packet.speed;
+	m_RelativeRotation = Packet.rotSpeed;
+
+	SetPosition(m_Position);
+	SetRotation(m_Rotation);
+	SetVelocity(Packet.speed);
+	SetRotationVelocity(Packet.rotSpeed);
+
 	//if (!IsSyncer()) {
 	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
 	//	pBlender->SetTargetPosition(m_Position);
 	//	pBlender->SetTargetRotation(m_Rotation);
 	//}
 
-	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, vRelRot.x, vRelRot.y, vRelRot.z);
+	_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
 
 	return true;
 }
