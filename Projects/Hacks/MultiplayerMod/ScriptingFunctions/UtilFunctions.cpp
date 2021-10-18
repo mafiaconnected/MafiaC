@@ -2,6 +2,7 @@
 #include "ScriptingFunctions.h"
 #include "../Elements/Elements.h"
 #include "../ClientManager.h"
+#include "ClientGame.h"
 
 // For SetChatWindowEnabled
 #include <Multiplayer/ChatWindow.h>
@@ -20,8 +21,6 @@ static bool FunctionSetChatWindowEnabled(IScriptState* pState, int argc, void* p
 		return false;
 
 	g_pClientGame->m_pChatWindow->SetEnabled(bEnabled);
-	//if (!bEnabled)
-	//	g_pClientGame->m_pChatWindow->FlushBuffers();
 	if (g_pClientGame->m_pCmdWindow->IsEnabled())
 	{
 		g_pClientGame->m_pCmdWindow->Disable();
