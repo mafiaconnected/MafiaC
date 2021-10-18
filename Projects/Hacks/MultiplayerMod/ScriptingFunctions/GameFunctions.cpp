@@ -52,6 +52,8 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 		return false;
 
 	pClientPlayer->SetModel(mdl);
+	//pClientPlayer->SetPosition(pos);
+	//pClientPlayer->SetHeading(angle);
 
 	pClientPlayer->Spawn(pos, angle, true);
 
@@ -227,27 +229,6 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 	return true;
 }
 
-/*
-static bool FunctionSetChatWindowEnabled(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	bool bEnabled;
-	if (!pState->CheckBoolean(0, bEnabled))
-		return false;
-
-	g_pClientGame->m_pChatWindow->IsEnabled(bEnabled);
-
-	if (g_pClientGame->m_pCmdWindow->IsEnabled())
-	{
-		g_pClientGame->m_pCmdWindow->Disable();
-		g_pClientGame->m_pCmdWindow->FlushBuffers();
-	}
-
-	return true;
-}
-*/
-
 static bool FunctionGetGame(IScriptState* pState, int argc, void* pUser)
 {
 	CClientGame* pClientGame = (CClientGame*)pUser;
@@ -340,30 +321,36 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 	auto pGameNamespace = pScripting->m_Global.GetNamespace(_gstr("mafia"));
 	auto pClientManager = pClientGame->m_pClientManager;
 
-	//pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
-
-	pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
-	pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
-	pGameNamespace->AddProperty(pClientGame, _gstr("height"), ARGUMENT_INTEGER, FunctionGetHeight);
-	pGameNamespace->AddProperty(pClientGame, _gstr("aspectRatio"), ARGUMENT_FLOAT, FunctionGetAspectRatio);
-
-	pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr(""), FunctionSetPlayerControl, pClientGame);
-
-	pClientManager->m_pClientHumanClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePed, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("createPed"), _gstr("svf"), FunctionGameCreatePed, pClientManager);
-
-	pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreateVehicle, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
-
-	pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
-
-	pGameNamespace->RegisterFunction(_gstr("hudMessage"), _gstr("si"), FunctionGameMessage, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("hudFadeScreen"), _gstr("bfi"), FunctionGameFadeScreen, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("hudEnableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("hudAnnounce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
-	pGameNamespace->RegisterFunction(_gstr("hudShowCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
-
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
+
+	{
+		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
+		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
+		pGameNamespace->AddProperty(pClientGame, _gstr("height"), ARGUMENT_INTEGER, FunctionGetHeight);
+		pGameNamespace->AddProperty(pClientGame, _gstr("aspectRatio"), ARGUMENT_FLOAT, FunctionGetAspectRatio);
+	}
+
+	{
+		pClientManager->m_pClientHumanClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePed, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createPed"), _gstr("svf"), FunctionGameCreatePed, pClientManager);
+
+		pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreateVehicle, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
+	}
+
+	{
+		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("fadeScreen"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr(""), FunctionSetPlayerControl, pClientGame);
+	}
+
+	{
+		auto pHUDNamespace = pGameNamespace->AddNamespace(_gstr("hud"));
+		pHUDNamespace->RegisterFunction(_gstr("message"), _gstr("si"), FunctionGameMessage, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
+	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
