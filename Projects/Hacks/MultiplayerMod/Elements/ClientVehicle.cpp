@@ -213,13 +213,11 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	IVehicle.health = Packet.health;
 	IVehicle.engine_health = Packet.engineHealth;
 	IVehicle.fuel = Packet.fuel;
-
 	IVehicle.sound_enabled = Packet.sound;
 	//IVehicle.engine_on = Packet.engineOn;
 	IVehicle.horn = Packet.horn;
 	IVehicle.siren = Packet.siren;
 	IVehicle.lights = Packet.lights;
-
 	//IVehicle.gear = Packet.gear;
 	IVehicle.engine_rpm = Packet.rpm;
 	IVehicle.accelerating = Packet.accel;
@@ -259,13 +257,11 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IVehicle.health = Packet.health;
 	IVehicle.engine_health = Packet.engineHealth;
 	IVehicle.fuel = Packet.fuel;
-
 	IVehicle.sound_enabled = Packet.sound;
 	//IVehicle.engine_on = Packet.engineOn;
 	IVehicle.horn = Packet.horn;
 	IVehicle.siren = Packet.siren;
 	IVehicle.lights = Packet.lights;
-
 	//IVehicle.gear = Packet.gear;
 	IVehicle.engine_rpm = Packet.rpm;
 	IVehicle.accelerating = Packet.accel;
@@ -274,7 +270,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IVehicle.speed_limit = Packet.speedLimit;
 	IVehicle.clutch = Packet.clutch;
 	IVehicle.wheel_angle = Packet.wheelAngle;
-
 	IVehicle.speed = CVecTools::ConvertToMafiaVec(Packet.speed);
 	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(Packet.rotSpeed);
 
@@ -314,13 +309,11 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.health = IVehicle.health;
 	Packet.engineHealth = IVehicle.engine_health;
 	Packet.fuel = IVehicle.fuel;
-
 	Packet.sound = IVehicle.sound_enabled;
 	Packet.engineOn = IVehicle.engine_on;
 	Packet.horn = IVehicle.horn;
 	Packet.siren = IVehicle.siren;
 	Packet.lights = IVehicle.lights;
-
 	Packet.gear = IVehicle.gear;
 	Packet.rpm = IVehicle.engine_rpm;
 	Packet.accel = IVehicle.accelerating;
@@ -329,6 +322,8 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.speedLimit = IVehicle.speed_limit;
 	Packet.clutch = IVehicle.clutch;
 	Packet.wheelAngle = IVehicle.wheel_angle;
+	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
+	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -351,13 +346,11 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.health = IVehicle.health;
 	Packet.engineHealth = IVehicle.engine_health;
 	Packet.fuel = IVehicle.fuel;
-
 	Packet.sound = IVehicle.sound_enabled;
 	Packet.engineOn = IVehicle.engine_on;
 	Packet.horn = IVehicle.horn;
 	Packet.siren = IVehicle.siren;
 	Packet.lights = IVehicle.lights;
-
 	Packet.gear = IVehicle.gear;
 	Packet.rpm = IVehicle.engine_rpm;
 	Packet.accel = IVehicle.accelerating;
@@ -366,6 +359,8 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.speedLimit = IVehicle.speed_limit;
 	Packet.clutch = IVehicle.clutch;
 	Packet.wheelAngle = IVehicle.wheel_angle;
+	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
+	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
