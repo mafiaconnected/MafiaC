@@ -152,7 +152,7 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	//pModel->SetName(name.CString());
 	pModel->SetScale({ 1, 1, 1 });
-	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(m_Position));
+	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 	pModel->Update();
 
 	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy));
@@ -181,11 +181,11 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	auto rot = CVecTools::ComputeDirVector(angle);
 
-	m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
-	m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
+	m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(pos);
+	m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(rot);
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
+	SetPosition(pos);
+	SetRotation(rot);
 
 	m_pEntity = m_MafiaHuman;
 
@@ -279,11 +279,13 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	IHuman->health = Packet.health;
 	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
+	m_nVehicleSeatIndex = Packet.seat;
 	IHuman->isDucking = Packet.isCrouching;
 	IHuman->isAiming = Packet.isAiming;
 	IHuman->animState = Packet.animationState;
 
-	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) {
+	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) 
+	{
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
 		if (pVehicle != nullptr && pVehicle->GetGameVehicle() != nullptr) {
 			WarpIntoVehicle(pVehicle, 0);
@@ -296,27 +298,33 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 		}
 	}
 
-	//GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
-	//GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation))));
-
 	SetPosition(m_Position);
 	SetRotation(m_Rotation);
 
+	//GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
+	//GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation))));
+
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 	
-	//if (m_pClientManager->m_pLocalPlayer.GetPointer() != this || !IsSyncer()) {
+	//if (!IsSyncer()) 
+	//{
 	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
 	//
 	//	if (!IsInVehicle())
 	//	{
-	//		pBlender->SetTargetPosition(vPos);
-	//		pBlender->SetTargetRotation(vRot);
+	//		pBlender->SetTargetPosition(m_Position);
+	//		pBlender->SetTargetRotation(m_Rotation);
 	//		pBlender->SetTargetSpeed(relPos, relRot);
 	//	}
 	//	else
 	//	{
 	//		pBlender->ResetInterpolation();
 	//	}
+	//}
+	//else 
+	//{
+	//	SetPosition(m_Position);
+	//	SetRotation(m_Rotation);
 	//}
 
 	return true;
@@ -361,6 +369,9 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	auto IHuman = GetGameHuman()->GetInterface();
 
+	GetPosition(m_Position);
+	GetRotation(m_Rotation);
+
 	if (!CClientEntity::WriteSyncPacket(pStream))
 		return false;
 
@@ -404,7 +415,7 @@ void CClientHuman::OnCreated(void)
 
 void CClientHuman::Process(void)
 {
-	//if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
+	//if (!IsSyncer() && GetGameHuman() != nullptr)
 	//{
 	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
 	//	pBlender->Interpolate();
@@ -422,7 +433,7 @@ void CClientHuman::Process(void)
 	//	}
 	//}
 
-	//CClientEntity::Process();
+	CClientEntity::Process();
 }
 
 bool CClientHuman::IsInVehicle(void)
