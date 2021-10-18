@@ -226,7 +226,6 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	IVehicle.speed_limit = Packet.speedLimit;
 	IVehicle.clutch = Packet.clutch;
 	IVehicle.wheel_angle = Packet.wheelAngle;
-
 	IVehicle.speed = CVecTools::ConvertToMafiaVec(Packet.speed);
 	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(Packet.rotSpeed);
 
@@ -237,6 +236,8 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (Packet.engineOn != IVehicle.engine_on) {
 		GetGameVehicle()->SetEngineOn(Packet.engineOn, 2);
 	}
+
+	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 	return true;
 }
 
@@ -249,6 +250,9 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		return false;
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
+
+	SetPosition(m_Position);
+	SetRotation(m_Rotation);
 
 	tVehicleSyncPacket Packet;
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
@@ -282,8 +286,11 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		GetGameVehicle()->SetEngineOn(Packet.engineOn, 2);
 	}
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
+	//if (!IsSyncer()) {
+	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
+	//	pBlender->SetTargetPosition(m_Position);
+	//	pBlender->SetTargetRotation(m_Rotation);
+	//}
 
 	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, vRelRot.x, vRelRot.y, vRelRot.z);
 
@@ -333,10 +340,13 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 
 bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::WriteSyncPacket(pStream))
+	if (GetGameVehicle() == nullptr)
 		return false;
 
-	if (GetGameVehicle() == nullptr)
+	GetPosition(m_Position);
+	GetRotation(m_Rotation);
+
+	if (!CClientEntity::WriteSyncPacket(pStream))
 		return false;
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
