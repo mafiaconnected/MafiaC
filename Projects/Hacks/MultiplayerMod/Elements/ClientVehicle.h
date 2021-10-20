@@ -31,7 +31,7 @@ public:
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;
 
-	virtual bool SetRotation(const CVector3D& vecPos);
+	virtual bool SetRotation(const CVector3D& vecPos) override;
 	virtual bool GetRotation(CVector3D& vecPos) override;
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
