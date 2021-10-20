@@ -137,6 +137,8 @@ bool CClientVehicle::SetRotation(const CVector3D& vecRot)
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[1]));
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[2]));
 
+	//_glogprintf(_gstr("Vehicle SetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), mat[0].x, mat[0].y, mat[0].z, mat[1].x, mat[1].y, mat[1].z, mat[2].x, mat[2].y, mat[2].z, vecRot.x, vecRot.y, vecRot.z);
+
 	CClientEntity::SetRotation(vecRot);
 	return true;
 }
@@ -153,6 +155,8 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 	CMatrix3x3 mat(front, up, right);
 
 	vecRot = mat.GetEuler();
+
+	//_glogprintf(_gstr("Vehicle GetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), front.x, front.y, front.z, up.x, up.y, up.z, right.x, right.y, right.z, vecRot.x, vecRot.y, vecRot.z);
 
 	return true;
 }
