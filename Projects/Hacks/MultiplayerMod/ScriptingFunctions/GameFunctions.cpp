@@ -82,7 +82,8 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
-	pClientVehicle->Create(mdl, pos, angle);
+	CVector3D rot = CVecTools::ComputeDirEuler(angle);
+	pClientVehicle->Create(mdl, pos, rot);
 
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterObject(pClientVehicle);
