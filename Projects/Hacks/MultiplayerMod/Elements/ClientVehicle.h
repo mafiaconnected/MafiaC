@@ -13,6 +13,10 @@ private:
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
+	CVector3D m_RotationFront;
+	CVector3D m_RotationUp;
+	CVector3D m_RotationRight;
+
 	Galactic3D::Weak<CClientHuman> m_pOccupants[4];
 
 public:
@@ -23,7 +27,7 @@ public:
 	virtual MafiaSDK::C_Car* GetGameVehicle();
 
 	virtual void Process(void) override;
-	virtual void Create(const GChar* model, const CVector3D& pos, float angle);
+	virtual void Create(const GChar* model, const CVector3D& pos, const CVector3D& rot);
 	virtual void Delete(void);
 	virtual void Despawn(void);
 	virtual void Remove(void);
@@ -52,14 +56,17 @@ public:
 	virtual bool SetFuel(float fuel);
 	virtual float GetFuel();
 
-	virtual bool SetGear(float gear);
-	virtual float GetGear();
+	virtual bool SetGear(uint32_t gear);
+	virtual uint32_t GetGear();
 
 	virtual bool SetSpeedLimit(float speedLimit);
 	virtual float GetSpeedLimit();
 
 	virtual bool SetWheelAngle(float wheelAngle);
 	virtual float GetWheelAngle();
+
+	virtual bool SetEngineRPM(float engineRPM);
+	virtual float GetEngineRPM();
 
 	virtual bool SetEngineHealth(float engineHealth);
 	virtual float GetEngineHealth();
