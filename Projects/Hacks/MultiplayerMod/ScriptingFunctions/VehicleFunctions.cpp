@@ -57,37 +57,6 @@ static bool FunctionVehicleDespawn(IScriptState* pState, int argc, void* pUser)
 
 	return true;
 }
-
-static bool FunctionVehicleSpawn(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	CClientVehicle* pClientVehicle;
-
-	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
-		return false;
-
-	const GChar* model = pState->CheckString(0);
-	if (!model) return false;
-
-	CVector3D pos;
-	if (!pState->CheckVector3D(1, pos))
-		return false;
-
-	float angle = 0;
-	if (!pState->CheckNumber(2, angle))
-		return false;
-
-	if (pClientVehicle->GetGameVehicle() == nullptr)
-	{
-		pState->Error(_gstr("vehicle not spawned"));
-		return false;
-	}
-
-	pClientVehicle->Create(model, pos, angle);
-
-	return true;
-}
 #pragma endregion
 
 #pragma region Properties
