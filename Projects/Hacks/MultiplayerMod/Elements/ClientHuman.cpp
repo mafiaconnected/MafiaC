@@ -67,7 +67,7 @@ float CClientHuman::GetHeading()
 
 	CVector3D rot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->entity.rotation);
 
-	return CVecTools::DirToRotation180(rot);
+	return CVecTools::DirToRotation360(rot);
 }
 
 bool CClientHuman::SetRotation(const CVector3D& vecRot)
@@ -181,8 +181,8 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	auto rot = CVecTools::ComputeDirVector(angle);
 
-	m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(pos);
-	m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(rot);
+	//m_MafiaHuman->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(pos);
+	//m_MafiaHuman->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(rot);
 
 	SetPosition(pos);
 	SetRotation(rot);
@@ -259,6 +259,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	IHuman->isDucking = Packet.isCrouching;
 	IHuman->isAiming = Packet.isAiming;
 	IHuman->animState = Packet.animationState;
+	IHuman->inCarRotation = Packet.inCarRotation;
 
 	return true;
 }
@@ -283,6 +284,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IHuman->isDucking = Packet.isCrouching;
 	IHuman->isAiming = Packet.isAiming;
 	IHuman->animState = Packet.animationState;
+	IHuman->inCarRotation = Packet.inCarRotation;
 
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) 
 	{
@@ -308,13 +310,13 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	
 	//if (!IsSyncer()) 
 	//{
-	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
+	//	auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
 	//
 	//	if (!IsInVehicle())
 	//	{
 	//		pBlender->SetTargetPosition(m_Position);
 	//		pBlender->SetTargetRotation(m_Rotation);
-	//		pBlender->SetTargetSpeed(relPos, relRot);
+	//		//pBlender->SetTargetSpeed(relPos, relRot);
 	//	}
 	//	else
 	//	{
@@ -352,7 +354,8 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.seat = m_nVehicleSeatIndex;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
-	Packet.animationState = IHuman->animStateLocal;
+	Packet.animationState = IHuman->animState;
+	Packet.inCarRotation = IHuman->inCarRotation;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -389,7 +392,8 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.vehicleNetworkIndex = vehicleId;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
-	Packet.animationState = IHuman->animStateLocal;
+	Packet.animationState = IHuman->animState;
+	Packet.inCarRotation = IHuman->inCarRotation;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
