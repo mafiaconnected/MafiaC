@@ -52,7 +52,7 @@ void CClientVehicle::Process(void)
 	CClientEntity::Process();
 }
 
-void CClientVehicle::Create(const GChar* model, const CVector3D& pos, float angle)
+void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVector3D& rot)
 {
 	if (m_MafiaVehicle != nullptr)
 		return;
@@ -74,20 +74,13 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, float angl
 
 	MafiaSDK::GetMission()->GetGame()->AddTemporaryActor(m_MafiaVehicle);
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.position = CVecTools::ConvertToMafiaVec(pos);
-
-	auto rot = CVecTools::ComputeDirEuler(angle);
-
-	CMatrix3x3 mat(rot);
-
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[0]));
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[1]));
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[2]));
-
 	m_pEntity = m_MafiaVehicle;
 
-	auto IVehicle = m_MafiaVehicle->GetInterface()->vehicle_interface;
-	_glogprintf(_gstr("Created new vehicle for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), model, pos.x, pos.y, pos.z, angle, IVehicle.health, IVehicle.engine_health, IVehicle.fuel, IVehicle.sound_enabled ? L"Yes" : L"No", IVehicle.engine_on ? L"Yes" : L"No", IVehicle.horn ? L"Yes" : L"No", IVehicle.siren ? L"Yes" : L"No", IVehicle.gear, IVehicle.engine_rpm, IVehicle.accelerating, IVehicle.break_val, IVehicle.hand_break, IVehicle.speed_limit, IVehicle.clutch, IVehicle.wheel_angle);
+	//SetPosition(pos);
+	//SetRotation(rot);
+
+	//auto IVehicle = m_MafiaVehicle->GetInterface()->vehicle_interface;
+	//_glogprintf(_gstr("Created new vehicle for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), model, pos.x, pos.y, pos.z, angle, IVehicle.health, IVehicle.engine_health, IVehicle.fuel, IVehicle.sound_enabled ? L"Yes" : L"No", IVehicle.engine_on ? L"Yes" : L"No", IVehicle.horn ? L"Yes" : L"No", IVehicle.siren ? L"Yes" : L"No", IVehicle.gear, IVehicle.engine_rpm, IVehicle.accelerating, IVehicle.break_val, IVehicle.hand_break, IVehicle.speed_limit, IVehicle.clutch, IVehicle.wheel_angle);
 }
 
 void CClientVehicle::Remove()
@@ -111,7 +104,7 @@ bool CClientVehicle::SetPosition(const CVector3D& vecPos)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
-
+	
 	m_MafiaVehicle->GetInterface()->vehicle_interface.position = CVecTools::ConvertToMafiaVec(vecPos);
 	CClientEntity::SetPosition(vecPos);
 	return true;
@@ -131,13 +124,21 @@ bool CClientVehicle::SetRotation(const CVector3D& vecRot)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
+	
+	//if (m_Rotation == vecRot)
+	CVector3D currentRotation;
+	GetRotation(currentRotation);
+	if (currentRotation.distance(vecRot) < 0.01)
+		return false;
+
+	//GetGameVehicle()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(vecRot);
+	
 	CMatrix3x3 mat(vecRot);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(mat[0]);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(mat[1]);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(mat[2]);
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[0]));
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[1]));
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(mat[2]));
-
-	//_glogprintf(_gstr("Vehicle SetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), mat[0].x, mat[0].y, mat[0].z, mat[1].x, mat[1].y, mat[1].z, mat[2].x, mat[2].y, mat[2].z, vecRot.x, vecRot.y, vecRot.z);
+	_glogprintf(_gstr("Vehicle SetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), mat[0].x, mat[0].y, mat[0].z, mat[1].x, mat[1].y, mat[1].z, mat[2].x, mat[2].y, mat[2].z, vecRot.x, vecRot.y, vecRot.z);
 
 	CClientEntity::SetRotation(vecRot);
 	return true;
@@ -148,15 +149,16 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	auto front = CVecTools::DirToEuler(CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward));
-	auto up = CVecTools::DirToEuler(CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up));
-	auto right = CVecTools::DirToEuler(CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right));
+	//vecRot = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetInterface()->entity.rotation);
+
+	CVector3D front = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward);
+	CVector3D up = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up);
+	CVector3D right = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right);
 
 	CMatrix3x3 mat(front, up, right);
-
 	vecRot = mat.GetEuler();
 
-	//_glogprintf(_gstr("Vehicle GetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), front.x, front.y, front.z, up.x, up.y, up.z, right.x, right.y, right.z, vecRot.x, vecRot.y, vecRot.z);
+	_glogprintf(_gstr("Vehicle GetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), front.x, front.y, front.z, up.x, up.y, up.z, right.x, right.y, right.z, vecRot.x, vecRot.y, vecRot.z);
 
 	return true;
 }
@@ -166,7 +168,7 @@ bool CClientVehicle::SetRotationVelocity(const CVector3D& vecRotVel)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_speed = CVecTools::ConvertToMafiaVec(vecRotVel);
+	GetGameVehicle()->GetInterface()->vehicle_interface.rot_speed = CVecTools::ConvertToMafiaVec(vecRotVel);
 
 	return true;
 }
@@ -176,7 +178,7 @@ bool CClientVehicle::GetRotationVelocity(CVector3D& vecRotVel)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	vecRotVel = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_speed);
+	vecRotVel = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetInterface()->vehicle_interface.rot_speed);
 
 	return true;
 }
@@ -186,15 +188,8 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (!CClientEntity::ReadCreatePacket(pStream))
 		return false;
 
-	S_vector rotForward, rotUp, rotRight;
-
 	relPos = m_Position;
 	relRot = m_Rotation;
-
-	CMatrix3x3 rotMat(m_Rotation);
-	rotForward = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(rotMat[0]));
-	rotUp = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(rotMat[1]));
-	rotRight = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(rotMat[2]));
 
 	tVehicleCreatePacket Packet;
 
@@ -204,17 +199,15 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	MafiaSDK::C_Vehicle_Interface IVehicle;
 	if (GetGameVehicle() == nullptr)
 	{
-		Create(m_szModel, m_Position, CVecTools::DirToRotation180(m_Rotation));
-		IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
+		Create(m_szModel, m_Position, m_Rotation);
 	}
 	else
 	{
-		IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
-		IVehicle.position = CVecTools::ConvertToMafiaVec(m_Position);
-		IVehicle.rot_forward = rotForward;
-		IVehicle.rot_right = rotRight;
-		IVehicle.rot_up = rotUp;
+		SetPosition(m_Position);
+		SetRotation(m_Rotation);
 	}
+
+	IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
 	IVehicle.health = Packet.health;
 	IVehicle.engine_health = Packet.engineHealth;
@@ -239,11 +232,23 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	//	GetGameVehicle()->SetGear(gear);
 	//}
 
-	if (Packet.engineOn != IVehicle.engine_on) {
-		GetGameVehicle()->SetEngineOn(Packet.engineOn, 2);
+	if (Packet.engineOn) 
+	{
+		if (!IVehicle.engine_on)
+		{
+			GetGameVehicle()->SetEngineOn(true, 2);
+		}
+	}
+	else 
+	{
+		if (!IVehicle.engine_on)
+		{
+			GetGameVehicle()->SetEngineOn(false, 2);
+		}
 	}
 
-	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
+	GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
+	GetGameVehicle()->SetActive(true);
 	return true;
 }
 
@@ -290,35 +295,49 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
-	SetVelocity(Packet.speed);
-	SetRotationVelocity(Packet.rotSpeed);
-
-	//if (!IsSyncer()) {
-	//	auto pBlender = static_cast<CNetBlenderLerp*>(m_pBlender);
-	//	pBlender->SetTargetPosition(m_Position);
-	//	pBlender->SetTargetRotation(m_Rotation);
+	//if (!IsSyncer())
+	//{
+	//	SetPosition(m_Position);
+	//	SetRotation(m_Rotation);
+	//	SetVelocity(Packet.speed);
+	//	SetRotationVelocity(Packet.rotSpeed);
+	//
+	//	GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 	//}
 
-	_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
+	SetPosition(m_Position);
+	SetRotation(m_Rotation);
+
+	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
+
+	//if (!IsSyncer()) {
+	//	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
+	//	pBlender->SetTargetPosition(m_Position);
+		//pBlender->SetTargetRotation(m_Rotation);
+		//pBlender->SetTargetSpeed(m_RelativePosition, m_RelativeRotation);
+		
+		// Not finished yet
+		//pBlender->SetTargetEngineRPM(Packet.rpm);
+		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
+	//}
+
+	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
 
 	return true;
 }
 
 bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::WriteCreatePacket(pStream))
-		return false;
-
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
+	GetPosition(m_Position);
+	GetRotation(m_Rotation);
 
-	//CMatrix3x3 rotMat(CVecTools::ConvertFromMafiaVec(IVehicle.rot_forward), CVecTools::ConvertFromMafiaVec(IVehicle.rot_up), CVecTools::ConvertFromMafiaVec(IVehicle.rot_right));
-	//CVector3D rot = rotMat.GetEuler();
-	//Writer.WriteVector3D(&rot, 1);
+	if (!CClientEntity::WriteCreatePacket(pStream))
+		return false;
+
+	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
 	tVehicleCreatePacket Packet;
 
@@ -338,8 +357,12 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.speedLimit = IVehicle.speed_limit;
 	Packet.clutch = IVehicle.clutch;
 	Packet.wheelAngle = IVehicle.wheel_angle;
-	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
-	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
+	GetVelocity(Packet.speed);
+	GetRotationVelocity(Packet.rotSpeed);
+
+	if (Packet.engineOn == true) {
+		GetGameVehicle()->SetEngineOn(true, 2);
+	}
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -454,7 +477,7 @@ float CClientVehicle::GetFuel()
 	return m_MafiaVehicle->GetInterface()->vehicle_interface.fuel;
 }
 
-bool CClientVehicle::SetGear(float gear)
+bool CClientVehicle::SetGear(uint32_t gear)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -464,7 +487,7 @@ bool CClientVehicle::SetGear(float gear)
 	return true;
 }
 
-float CClientVehicle::GetGear()
+uint32_t CClientVehicle::GetGear()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -524,6 +547,24 @@ float CClientVehicle::GetHealth()
 		return -1;
 
 	return m_MafiaVehicle->GetInterface()->vehicle_interface.health;
+}
+
+bool CClientVehicle::SetEngineRPM(float engineRPM)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetInterface()->vehicle_interface.engine_rpm = engineRPM;
+
+	return true;
+}
+
+float CClientVehicle::GetEngineRPM()
+{
+	if (m_MafiaVehicle == nullptr)
+		return -1;
+
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.engine_rpm;
 }
 
 bool CClientVehicle::SetWheelAngle(float wheelAngle)
