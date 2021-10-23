@@ -230,6 +230,21 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 	return true;
 }
 
+static bool FunctionGameSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D camPos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, camPos))
+		return false;
+
+	CVector3D lookAtPos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, lookAtPos))
+		return false;
+
+	//MafiaSDK::GetMission()->GetGame()->GetCamera()->LockAt(CVecTools::ConvertToMafiaVec(camPos), { 0,0,0 });
+	//MafiaSDK::GetMission()->GetGame()->GetCamera()->SetLookTo(CVecTools::ConvertToMafiaVec(lookAtPos), MafiaSDK::GetMission()->GetGame()->GetCamera()->GetInterface()->cameraFrame);
+	return true;
+}
+
 static bool FunctionGetGame(IScriptState* pState, int argc, void* pUser)
 {
 	CClientGame* pClientGame = (CClientGame*)pUser;
@@ -341,8 +356,9 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	{
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("fadeScreen"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr(""), FunctionSetPlayerControl, pClientGame);
+		//pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv"), FunctionSetCameraLookAt, pClientGame);
 	}
 
 	{
