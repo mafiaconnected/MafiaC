@@ -728,6 +728,26 @@ static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser
 	return false;
 }
 
+static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint8_t state;
+	if (!pState->CheckNumber(0, state))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() != nullptr)
+		pClientVehicle->GetGameVehicle()->SetActState(state);
+
+	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
 static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -769,6 +789,9 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("velocity"), ARGUMENT_VECTOR3D, FunctionVehicleGetVelocity, FunctionVehicleSetVelocity);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineHealth"), ARGUMENT_FLOAT, FunctionVehicleGetEngineHealth, FunctionVehicleSetEngineHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
+
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
+	
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
 }
