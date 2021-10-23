@@ -58,33 +58,6 @@ static void OnGameInit()
 	g_pClientGame->m_pOnMapLoadedEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault)
 		return;
-
-	g_pD3D9 = new MafiaDirect3D9(nullptr);
-	g_pD3D9->m_pD3DDevice = g_pD3DDevice;
-
-	D3DVERTEXELEMENT9 vertexElements[] =
-	{
-		{0, offsetof(Vertex3D,m_vecPosition), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0, offsetof(Vertex3D,m_vecNormal), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-		{0, offsetof(Vertex3D,m_Diffuse), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-		{0, offsetof(Vertex3D,m_vecUV), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-		{0, offsetof(Vertex3D,m_vecWeight), D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0},
-		{0, offsetof(Vertex3D,m_Indices), D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0},
-		D3DDECL_END()
-	};
-
-	g_pD3DDevice->CreateVertexDeclaration(vertexElements, &g_pD3D9->m_pDecl);
-
-	g_p2D = &g_pClientGame->m_p2D;
-	g_p2D->Set2DWorkaround(true);
-
-	auto pMaterial = Strong<Material>::New(new Material);
-	pMaterial->SetCullMode(CULLMODE_NONE);
-	pMaterial->SetTextureWrap(TEXTUREWRAP_CLAMP, TEXTUREWRAP_CLAMP);
-
-	g_p2D->Set2DMaterial(pMaterial);
-
-	g_pClientGame->m_b2DReady = true;
 }
 
 static void OnGameExit()
