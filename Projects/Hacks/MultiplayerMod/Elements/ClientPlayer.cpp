@@ -37,6 +37,9 @@ int32_t CClientPlayer::GetMoney()
 
 MafiaSDK::C_Player* CClientPlayer::GetGamePlayer()
 {
+	return (MafiaSDK::C_Player*)GetGameHuman();
+	/*
 	if (m_MafiaPlayer != nullptr) return NULL;
 	return m_MafiaPlayer;
+	*/
 }

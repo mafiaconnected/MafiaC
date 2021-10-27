@@ -1115,6 +1115,7 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 		{
 			if (Event.key.keysym.sym == SDLK_t || Event.key.keysym.sym == SDLK_BACKQUOTE)
 			{
+				LockControls(true);
 				m_bEnableCmdWindowOnCharPress = true;
 				SetCursorEnabled(true);
 				return true;
@@ -1736,7 +1737,13 @@ void CClientGame::OnDeviceReset(struct IDirect3DDevice8* pD3DDevice)
 
 void CClientGame::LockControls(bool state)
 {
-	//m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
+	if (m_pClientManager == nullptr)
+		return;
+	if (m_pClientManager->m_pLocalPlayer == nullptr)
+		return;
+	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer() == nullptr)
+		return;
+	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
 void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
