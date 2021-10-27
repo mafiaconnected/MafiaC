@@ -18,6 +18,11 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_uiLastReceivedSyncTicks = OS::GetTicks();
 	m_uiLastSendSyncTicks = 0;
 	m_fPacketArrivalRatio = 0.0f;
+	m_szModel[0] = '\0';
+	m_Position = CVector3D(0, 0, 0);
+	m_RelativePosition = CVector3D(0, 0, 0);
+	m_Rotation = CVector3D(0, 0, 0);
+	m_RelativeRotation = CVector3D(0, 0, 0);
 }
 
 Galactic3D::ReflectedClass* CClientEntity::GetReflectedClass(void)

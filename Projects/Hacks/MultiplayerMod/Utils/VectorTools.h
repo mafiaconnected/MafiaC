@@ -53,7 +53,7 @@ public:
 		CVector3D dir;
 
 		dir.x = (float)(sin(2.0f * M_PI * angle));
-		dir.y = 0;
+		dir.y = 0.0f;
 		dir.z = (float)(cos(2.0f * M_PI * angle));
 
 		return dir;
@@ -63,9 +63,9 @@ public:
 	{
 		CVector3D dir;
 
-		dir.x = euler.x / 360;
-		dir.y = euler.y / 360;
-		dir.z = euler.z / 360;
+		dir.x = euler.x / 360.0f;
+		dir.y = euler.y / 360.0f;
+		dir.z = euler.z / 360.0f;
 
 		return dir;
 	}
@@ -74,9 +74,9 @@ public:
 	{
 		CVector3D euler;
 
-		euler.x = dir.x * 360;
-		euler.y = dir.y * 360;
-		euler.z = dir.z * 360;
+		euler.x = dir.x * 360.0f;
+		euler.y = dir.y * 360.0f;
+		euler.z = dir.z * 360.0f;
 
 		return euler;
 	}
@@ -85,9 +85,9 @@ public:
 	{
 		CVector3D dir;
 
-		dir.x = (float)(sin(2.0f * M_PI * (angle / 360)));
-		dir.y = 0;
-		dir.z = (float)(cos(2.0f * M_PI * (angle / 360)));
+		dir.x = (float)(sin(2.0f * M_PI * (angle / 360.0f)));
+		dir.y = 0.0f;
+		dir.z = (float)(cos(2.0f * M_PI * (angle / 360.0f)));
 
 		return dir;
 	}
@@ -96,16 +96,16 @@ public:
 	{
 		float rad = atan2f(dir.x, dir.z);
 
-		return rad * (180 / M_PI);
+		return rad * (180.0f / M_PI);
 	}
 
 	static float DirToRotation360(const CVector3D& dir)
 	{
 		float rad = atan2f(dir.x, dir.z);
 
-		float val =  rad * (180 / M_PI);
+		float val =  rad * (180.0f / M_PI);
 
-		if (val < 0) val += 360.0f;
+		if (val < 0.0f) val += 360.0f;
 
 		return val;
 	}
