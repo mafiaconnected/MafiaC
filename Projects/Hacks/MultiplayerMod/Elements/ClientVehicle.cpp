@@ -313,8 +313,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	GChar szModel[64];
-	wmemcpy(szModel, m_szModel, 64);
 	CVector3D vecPos = m_Position;
 	CVector3D vecRot = m_Rotation;
 
