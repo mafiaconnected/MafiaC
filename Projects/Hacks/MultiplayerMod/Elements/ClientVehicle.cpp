@@ -125,7 +125,7 @@ bool CClientVehicle::SetPosition(const CVector3D& vecPos)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
-	
+
 	m_MafiaVehicle->GetInterface()->vehicle_interface.position = CVecTools::ConvertToMafiaVec(vecPos);
 	CClientEntity::SetPosition(vecPos);
 	return true;
@@ -146,7 +146,7 @@ bool CClientVehicle::SetRotation(const CVector3D& vecRot)
 		return false;
 
 	//GetGameVehicle()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(vecRot);
-	
+
 	CMatrix3x3 mat(vecRot);
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(mat.GetXAxis());
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(mat.GetYAxis());
@@ -243,7 +243,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_RotationRight = Packet.rotationRight;
 
 	MafiaSDK::C_Vehicle_Interface IVehicle;
-	
+
 	//CMatrix3x3 mat3(m_RotationFront, m_RotationUp, m_RotationRight);
 	GChar szModel[64];
 	wmemcpy(szModel, m_szModel, 64);
@@ -286,14 +286,14 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	//	GetGameVehicle()->SetGear(gear);
 	//}
 
-	if (Packet.engineOn) 
+	if (Packet.engineOn)
 	{
 		if (!IVehicle.engine_on)
 		{
 			GetGameVehicle()->SetEngineOn(true, 1);
 		}
 	}
-	else 
+	else
 	{
 		if (!IVehicle.engine_on)
 		{
@@ -393,9 +393,9 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	*/
 
 	//GetGameVehicle()->RepairPosition(TRUE);
-	
+
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
-	
+
 	//SetRotation(m_Rotation);
 	//SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 	//SetVelocity(Packet.speed);
@@ -410,7 +410,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	//	pBlender->SetTargetPosition(m_Position);
 		//pBlender->SetTargetRotation(m_Rotation);
 		//pBlender->SetTargetSpeed(m_RelativePosition, m_RelativeRotation);
-		
+
 		// Not finished yet
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
