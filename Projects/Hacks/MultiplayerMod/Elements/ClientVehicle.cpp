@@ -372,13 +372,9 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	SetPosition(vecPos);
 	//SetRotation(vecRot);
 
-	S_quat quat;
-	rotate(vecRot.z, vecRot.y, -M_PI, quat);
-
 	MafiaSDK::I3D_Model* pFrame = (MafiaSDK::I3D_Model*)GetGameVehicle()->GetFrame();
-	pFrame->SetRot(quat);
 	pFrame->SetWorldPos(CVecTools::ConvertToMafiaVec(vecPos));
-
+	SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 
 	/*
 	UTF8String mdl(true, model);
