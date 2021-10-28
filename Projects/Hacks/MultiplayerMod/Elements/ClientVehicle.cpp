@@ -83,15 +83,15 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	pVehModel->SetName("SomeOrdinaryVehicles");
 	pVehModel->SetScale({ 1, 1, 1 });
 
-	S_quat quat;
-	rotate(rot.z, rot.y, -M_PI, quat);
-	pVehModel->SetRot(quat);
+	//S_quat quat;
+	//rotate(rot.z, rot.y, -M_PI, quat);
+	//pVehModel->SetRot(quat);
+	//pVehModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 
-	pVehModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 	pVehModel->Update();
 
 	m_MafiaVehicle = reinterpret_cast<MafiaSDK::C_Car*>(MafiaSDK::GetMission()->CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes::Car));
-	//SetPosition(pos);
+	SetPosition(pos);
 	//CVector3D rot2(0, 0, 0);
 	//SetRotation(rot2);
 	m_MafiaVehicle->Init(pVehModel);
@@ -127,12 +127,29 @@ bool CClientVehicle::SetPosition(const CVector3D& vecPos)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
+	CClientEntity::SetPosition(vecPos);
+	m_MafiaVehicle->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(vecPos);
 	m_MafiaVehicle->GetInterface()->vehicle_interface.position = CVecTools::ConvertToMafiaVec(vecPos);
 
-	MafiaSDK::I3D_Model* pFrame = (MafiaSDK::I3D_Model*)GetGameVehicle()->GetFrame();
-	pFrame->SetWorldPos(CVecTools::ConvertToMafiaVec(vecPos));
+	if (m_MafiaVehicle->GetFrame() != nullptr)
+	{
+		uint32_t frame = (uint32_t)m_MafiaVehicle->GetFrame();
+		__asm
+		{
+			pushad
+			pushfd
+			mov eax, 0x60FC30 // update frame
+			mov ecx, frame
+			call eax
+			popfd
+			popad
+		}
+		m_MafiaVehicle->GetFrame()->Update();
+	}
 
-	CClientEntity::SetPosition(vecPos);
+	//MafiaSDK::I3D_Model* pFrame = (MafiaSDK::I3D_Model*)GetGameVehicle()->GetFrame();
+	//pFrame->SetWorldPos(CVecTools::ConvertToMafiaVec(vecPos));
+
 	return true;
 }
 
@@ -306,10 +323,10 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 		}
 	}
 
-	GetGameVehicle()->SetActive(true);
+	//GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(0);
-	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
-	GetGameVehicle()->SetColsOn(TRUE);
+	//GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
+	//GetGameVehicle()->SetColsOn(TRUE);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 	return true;
 }
@@ -364,10 +381,29 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
 
-	SetPosition(m_Position);
+
+
+
+	GetGameVehicle()->SetActive(true);
+
+	CVector3D vel;
+	GetVelocity(vel);
+	if (fabs(vel.GetLength()) == 0.0f && fabs(Packet.speed.GetLength()) != 0.0f)
+	{
+		// Note: Only set the vehicle's act state to 0 if the vehicle is not moving locally and syncer packet says vehicle is moving.
+		// So basically, set the vehicle's act state to 0 when the vehicle is supposed to start moving.
+		GetGameVehicle()->SetActState(0);
+	}
+
+	SetPosition(vecPos);
 	SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 	SetVelocity(m_RelativePosition);
-	SetRotationVelocity(m_RelativeRotation);
+	//SetRotationVelocity(m_RelativeRotation); // Note: This breaks vehicle position sync, not sure why yet.
+
+	
+
+
+
 
 	//if (!IsSyncer()) {
 	//	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
