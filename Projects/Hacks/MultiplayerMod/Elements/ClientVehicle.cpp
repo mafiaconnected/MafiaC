@@ -369,41 +369,28 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IVehicle.clutch = Packet.clutch;
 	IVehicle.wheel_angle = Packet.wheelAngle;
 
-	if (Packet.gear != IVehicle.gear) {
+	if (Packet.gear != IVehicle.gear)
+	{
 		GetGameVehicle()->GearSnd();
 		GetGameVehicle()->SetGear(Packet.gear);
 	}
 
-	if (Packet.engineOn != IVehicle.engine_on) {
+	if (Packet.engineOn != IVehicle.engine_on)
+	{
 		GetGameVehicle()->SetEngineOn(Packet.engineOn, 1);
 	}
 
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
 
-
-
+	SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
+	SetPosition(vecPos);
+	SetVelocity(m_RelativePosition);
+	SetRotationVelocity(m_RelativeRotation);
 
 	GetGameVehicle()->SetActive(true);
-
-	CVector3D vel;
-	GetVelocity(vel);
-	if (fabs(vel.GetLength()) == 0.0f && fabs(Packet.speed.GetLength()) != 0.0f)
-	{
-		// Note: Only set the vehicle's act state to 0 if the vehicle is not moving locally and syncer packet says vehicle is moving.
-		// So basically, set the vehicle's act state to 0 when the vehicle is supposed to start moving.
-		GetGameVehicle()->SetActState(0);
-	}
-
-	SetPosition(vecPos);
-	SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-	//SetVelocity(m_RelativePosition); // This might break veh pos sync too, not sure yet.
-	//SetRotationVelocity(m_RelativeRotation); // Note: This breaks vehicle position sync, not sure why yet.
-
-	
-
-
-
+	GetGameVehicle()->SetActState(0);
+	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
 
 	//if (!IsSyncer()) {
 	//	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
