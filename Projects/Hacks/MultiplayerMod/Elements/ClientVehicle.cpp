@@ -397,7 +397,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	SetPosition(vecPos);
 	SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-	SetVelocity(m_RelativePosition);
+	//SetVelocity(m_RelativePosition); // This might break veh pos sync too, not sure yet.
 	//SetRotationVelocity(m_RelativeRotation); // Note: This breaks vehicle position sync, not sure why yet.
 
 	
