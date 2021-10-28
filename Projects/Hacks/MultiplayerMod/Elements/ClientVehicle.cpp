@@ -389,7 +389,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	SetRotationVelocity(m_RelativeRotation);
 
 	GetGameVehicle()->SetActive(true);
-	GetGameVehicle()->SetActState(0);
+	//GetGameVehicle()->SetActState(0); // Note: Commeted as it caused vehicle jerking.
 	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
 
 	//if (!IsSyncer()) {
