@@ -726,7 +726,32 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		
 		case MAFIAPACKET_HUMAN_JACKVEHICLE:
 		{
+			uint32_t nHumanNetworkIndex;
+			uint32_t nVehicleNetworkIndex;
+			uint8_t nSeatId;
 
+			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadUInt8(&nSeatId, 1);
+
+			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				if (pClientHuman != nullptr)
+				{
+					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+					if (pClientVehicle != nullptr)
+					{
+						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
+						{
+							if (!pClientHuman->IsSyncer())
+							{
+								g_pClientGame->HumanJackVehicle(pClientHuman, pClientVehicle, nSeatId);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		default:

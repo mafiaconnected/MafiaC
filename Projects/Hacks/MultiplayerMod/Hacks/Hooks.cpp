@@ -124,7 +124,8 @@ RAWCODECALL HumanDoThrowCocotFromCar(void)
 
 RAWCODECALL HumanUseActor(void)
 {
-	if (g_pClientGame->m_bUseActorInvokedByGame) {
+	if (g_pClientGame->m_bUseActorInvokedByGame) 
+	{
 		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)g_pHumanUseActor_Human);
 		if (pClientHuman != nullptr)
 		{
@@ -442,12 +443,12 @@ void CGameHooks::InstallHooks()
 	g_ReturnHumanUseActor = (void*)(0x582180 + 6);
 
 	// Hook DoThrowCocotFromCar (jack/steal car)
-	//new CHackJumpHack(g_pHack, (void*)0x00587D70, HookHumanDoThrowCocotFromCar, 7);
-	//g_ReturnHumanDoThrowCocotFromCar = (void*)(0x00587D70 + 7);
+	//new CHackJumpHack(g_pHack, (void*)0x00587D70, HookHumanDoThrowCocotFromCar, 6);
+	//g_ReturnHumanDoThrowCocotFromCar = (void*)(0x00587D70 + 6);
 
 	// Hook CreateActor
-	//new CHackJumpHack(g_pHack, (void*)0x53F7D0, HookCreateActor, 6);
-	//g_ReturnCreateActor = (void*)(0x53F7D0 + 6);
+	new CHackJumpHack(g_pHack, (void*)0x0053F7D0, HookCreateActor, 6);
+	g_ReturnCreateActor = (void*)(0x0053F7D0 + 6);
 
 	// Note (Sevenisko): Currently unnecessary to work on
 	new CHackJumpHack(g_pHack, (void*)UpdateProgress_Addr, &SetProgress_Hook, 6);

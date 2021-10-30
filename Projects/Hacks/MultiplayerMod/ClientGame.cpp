@@ -1866,8 +1866,20 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	Args.AddNumber(iSeat);
 	m_pOnHumanJackVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsLocal() || !pClientHuman->IsSyncer())
-		return;
+	if (pClientHuman->IsSyncer()) 
+	{
+		Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
+		Packet.Write<int32_t>(pClientHuman->GetId());
+		Packet.Write<int32_t>(pClientVehicle->GetId());
+		Packet.Write<int8_t>(iSeat);
+		m_pMultiplayer->SendHostPacket(&Packet);
+	}
+	else
+	{
+		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = false;
+		pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
+		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
+	}
 
 	Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
 	Packet.Write<int32_t>(pClientHuman->GetId());
@@ -1908,6 +1920,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pCli
 	}
 }
 
-void CClientGame::DestroyUninitializedGameElements() {
+void CClientGame::DestroyUninitializedGameElements() 
+{
 	
 }
