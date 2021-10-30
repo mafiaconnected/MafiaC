@@ -516,6 +516,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			MafiaSDK::GetIndicators()->ConsoleAddText(text, color);
 		}
+		break;
 
 		case MAFIAPACKET_GUI_FADE:
 		{
@@ -601,6 +602,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				}
 			}
 		}
+		break;
 
 		case MAFIAPACKET_HUMAN_ENTEREDVEHICLE:
 		{
@@ -635,6 +637,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				}
 			}
 		}
+		break;
 
 		case MAFIAPACKET_HUMAN_EXITINGVEHICLE:
 		{
@@ -669,6 +672,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				}
 			}
 		}
+		break;
 
 		case MAFIAPACKET_HUMAN_EXITEDVEHICLE:
 		{
@@ -753,6 +757,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				}
 			}
 		}
+		break;
 
 		default:
 		{
