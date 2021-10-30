@@ -1880,12 +1880,6 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 		pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
 		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
 	}
-
-	Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
-	Packet.Write<int32_t>(pClientHuman->GetId());
-	Packet.Write<int32_t>(pClientVehicle->GetId());
-	Packet.Write<int8_t>(iSeat);
-	m_pMultiplayer->SendHostPacket(&Packet);
 }
 
 void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pClientHumanAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
