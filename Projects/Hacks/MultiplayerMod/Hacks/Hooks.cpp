@@ -179,6 +179,7 @@ RAWCODE HookHumanDoThrowCocotFromCar(void)
 		mov g_pHumanDoThrowCocotFromCar_Car, eax
 		mov eax, [esp + 8]
 		mov g_pHumanDoThrowCocotFromCar_SeatID, eax
+		pushad
 	}
 
 	g_bCancelHumanDoThrowCocotFromCar = false;
@@ -195,9 +196,7 @@ RAWCODE HookHumanDoThrowCocotFromCar(void)
 	{
 		popad
 		push 0xFFFFFFFF
-		//push offset
-		mov eax, fs:0
-		//push 0x006206A2 // i think
+		push 0x6206A2 // 0x587D70
 		jmp g_ReturnHumanDoThrowCocotFromCar
 	}
 }
@@ -443,8 +442,8 @@ void CGameHooks::InstallHooks()
 	g_ReturnHumanUseActor = (void*)(0x582180 + 6);
 
 	// Hook DoThrowCocotFromCar (jack/steal car)
-	//new CHackJumpHack(g_pHack, (void*)0x00587D70, HookHumanDoThrowCocotFromCar, 6);
-	//g_ReturnHumanDoThrowCocotFromCar = (void*)(0x00587D70 + 6);
+	new CHackJumpHack(g_pHack, (void*)0x00587D70, HookHumanDoThrowCocotFromCar, 7);
+	g_ReturnHumanDoThrowCocotFromCar = (void*)(0x00587D70 + 7);
 
 	// Hook CreateActor
 	new CHackJumpHack(g_pHack, (void*)0x0053F7D0, HookCreateActor, 6);
