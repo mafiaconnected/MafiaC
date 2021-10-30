@@ -1776,7 +1776,7 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogprintf(_gstr("Human entering vehicle"));
+	_glogprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1804,7 +1804,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 
 void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogprintf(_gstr("Human entering vehicle"));
+	_glogprintf(_gstr("Human exiting vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1832,7 +1832,7 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogprintf(_gstr("Human entering vehicle"));
+	_glogprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
