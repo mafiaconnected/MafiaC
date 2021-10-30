@@ -451,4 +451,7 @@ void CGameHooks::InstallHooks()
 
 	// Note (Sevenisko): Currently unnecessary to work on
 	new CHackJumpHack(g_pHack, (void*)UpdateProgress_Addr, &SetProgress_Hook, 6);
+
+	// Fix exiting vehicle for passengers.
+	new CHackValueHack(g_pHack, (void*)0x595040, 1, (uint8_t)0xEB);
 }
