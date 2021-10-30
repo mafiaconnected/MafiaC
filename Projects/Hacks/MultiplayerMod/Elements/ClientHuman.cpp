@@ -258,7 +258,10 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_nVehicleSeatIndex = Packet.seat;
 	IHuman->isDucking = Packet.isCrouching;
 	IHuman->isAiming = Packet.isAiming;
+	//IHuman->animStateLocal = Packet.animStateLocal;
+	//IHuman->isInAnimWithCarLocal = Packet.isInAnimWithCarLocal;
 	IHuman->animState = Packet.animationState;
+	//IHuman->isInAnimWithCar = Packet.isInAnimWithCar;
 	IHuman->inCarRotation = Packet.inCarRotation;
 
 	return true;
@@ -284,6 +287,10 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IHuman->isDucking = Packet.isCrouching;
 	IHuman->isAiming = Packet.isAiming;
 	IHuman->animState = Packet.animationState;
+	//IHuman->animStateLocal = Packet.animStateLocal;
+	IHuman->isInAnimWithCarLocal = Packet.isInAnimWithCarLocal;
+	IHuman->animState = Packet.animationState;
+	IHuman->isInAnimWithCar = Packet.isInAnimWithCar;
 	IHuman->inCarRotation = Packet.inCarRotation;
 
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) 
@@ -354,7 +361,10 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.seat = m_nVehicleSeatIndex;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
+	Packet.animStateLocal = IHuman->animStateLocal;
+	Packet.isInAnimWithCarLocal = IHuman->isInAnimWithCarLocal;
 	Packet.animationState = IHuman->animState;
+	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
@@ -392,7 +402,10 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.vehicleNetworkIndex = vehicleId;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
+	Packet.animStateLocal = IHuman->animStateLocal;
+	Packet.isInAnimWithCarLocal = IHuman->isInAnimWithCarLocal;
 	Packet.animationState = IHuman->animState;
+	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
