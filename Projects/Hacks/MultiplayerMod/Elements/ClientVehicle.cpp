@@ -29,6 +29,9 @@ void CClientVehicle::Process(void)
 	//if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	//{
 	//	m_pBlender->Interpolate();
+	// 	GetGameVehicle()->SetActive(true);
+	//	//GetGameVehicle()->SetActState(0); // Note: Commeted as it caused vehicle jerking.
+	//	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
 	//	GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 	//}
 
@@ -53,22 +56,6 @@ void CClientVehicle::Process(void)
 	CClientEntity::Process();
 }
 
-void rotate(double heading, double attitude, double bank, S_quat& quat) {
-	// Assuming the angles are in radians.
-	double c1 = cos(heading / 2.0f);
-	double s1 = sin(heading / 2.0f);
-	double c2 = cos(attitude / 2.0f);
-	double s2 = sin(attitude / 2.0f);
-	double c3 = cos(bank / 2.0f);
-	double s3 = sin(bank / 2.0f);
-	double c1c2 = c1 * c2;
-	double s1s2 = s1 * s2;
-	quat.w = c1c2 * c3 - s1s2 * s3;
-	quat.x = c1c2 * s3 + s1s2 * c3;
-	quat.y = s1 * c2 * c3 + c1 * s2 * s3;
-	quat.z = c1 * s2 * c3 - s1 * c2 * s3;
-}
-
 void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVector3D& rot)
 {
 	if (m_MafiaVehicle != nullptr)
@@ -84,7 +71,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	pVehModel->SetScale({ 1, 1, 1 });
 
 	//S_quat quat;
-	//rotate(rot.z, rot.y, -M_PI, quat);
+	//CVecTools::rotate(rot.z, rot.y, -M_PI, quat);
 	//pVehModel->SetRot(quat);
 	//pVehModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 
