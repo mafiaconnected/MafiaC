@@ -351,12 +351,10 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			{
 				if (IHuman->playersCar == nullptr)
 				{
-					printf("Warp 1\n");
 					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
 				}
 				else if (pVehicle->GetGameVehicle() != IHuman->playersCar)
 				{
-					printf("Warp 2\n");
 					RemoveFromVehicle();
 					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
 				}
@@ -370,6 +368,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			}
 		}
 	}
+
 	IHuman->inCarRotation = Packet.inCarRotation;
 
 	SetPosition(m_Position);
@@ -477,8 +476,15 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	int vehicleId = INVALID_NETWORK_ID;
 
-	if (IsInVehicle())
-		vehicleId = GetOccupiedVehicle()->GetId();
+	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
+	if (pClientVehicle == nullptr)
+	{
+		pClientVehicle = GetOccupiedVehicle();
+	}
+	if (pClientVehicle != nullptr)
+	{
+		vehicleId = pClientVehicle->GetId();
+	}
 
 	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
 
@@ -608,13 +614,22 @@ void CClientHuman::RemoveFromVehicle(void)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
+	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+		return;
+
 	CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
 
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 
-	pVehicle->FreeSeat(m_nVehicleSeatIndex);
+	if (pVehicle != nullptr)
+	{
+		pVehicle->FreeSeat(m_nVehicleSeatIndex);
+	}
 
-	GetGameHuman()->Intern_FromCar();
+	if (GetGameHuman()->GetInterface()->playersCar != nullptr)
+	{
+		GetGameHuman()->Intern_FromCar();
+	}
 }
 
 void CClientHuman::ExitVehicle(void)
@@ -630,6 +645,9 @@ void CClientHuman::ExitVehicle(void)
 bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
+
+	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+		return false;
 
 	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
 
