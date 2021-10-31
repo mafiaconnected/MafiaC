@@ -270,6 +270,19 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 			IHuman->animStateLocal = Packet.animStateLocal;
 			IHuman->animState = Packet.animStateLocal;
 		}
+
+		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
+		if (Packet.animStopTime <= 0)
+		{
+			__asm
+			{
+				push 0
+				mov ecx, IHuman
+				mov eax, 0x57F830 // C_human::Do_Aimed
+				call eax
+			}
+		}
+
 		IHuman->isDucking = Packet.isCrouching;
 		IHuman->isAiming = Packet.isAiming;
 	}
@@ -307,6 +320,19 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			IHuman->animStateLocal = Packet.animStateLocal;
 			IHuman->animState = Packet.animStateLocal;
 		}
+
+		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
+		if (Packet.animStopTime <= 0)
+		{
+			__asm
+			{
+				push 0
+				mov ecx, IHuman
+				mov eax, 0x57F830 // C_human::Do_Aimed
+				call eax
+			}
+		}
+
 		IHuman->isDucking = Packet.isCrouching;
 		IHuman->isAiming = Packet.isAiming;
 	}
@@ -328,6 +354,22 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	SetPosition(m_Position);
 	SetRotation(m_Rotation);
+
+	if (GetGameHuman()->GetFrame() != nullptr)
+	{
+		uint32_t frame = (uint32_t)GetGameHuman()->GetFrame();
+		__asm
+		{
+			pushad
+			pushfd
+			mov eax, 0x60FC30 // update frame
+			mov ecx, frame
+			call eax
+			popfd
+			popad
+		}
+		GetGameHuman()->GetFrame()->Update();
+	}
 
 	//GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
 	//GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation))));
@@ -373,6 +415,8 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	if (IsInVehicle())
 		vehicleId = GetOccupiedVehicle()->GetId();
 
+	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
+
 	tHumanCreatePacket Packet;
 
 	Packet.health = IHuman->health;
@@ -385,6 +429,7 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.animationState = IHuman->animState;
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
+	Packet.animStopTime = iStopAnimTime;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -415,6 +460,8 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	if (IsInVehicle())
 		vehicleId = GetOccupiedVehicle()->GetId();
 
+	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
+
 	tHumanSyncPacket Packet;
 
 	Packet.health = IHuman->health;
@@ -426,6 +473,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.animationState = IHuman->animState;
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
+	Packet.animStopTime = iStopAnimTime;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
