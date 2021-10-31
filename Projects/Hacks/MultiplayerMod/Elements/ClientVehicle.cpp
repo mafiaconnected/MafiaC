@@ -766,15 +766,18 @@ bool CClientVehicle::Explode()
 
 bool CClientVehicle::IsSeatOccupied(unsigned char ucSeat)
 {
+	return GetHumanInSeat(ucSeat) != nullptr;
+}
+
+CClientHuman* CClientVehicle::GetHumanInSeat(unsigned char ucSeat)
+{
 	if (m_MafiaVehicle == nullptr)
-		return false;
+		return nullptr;
 
-	auto pHuman = m_pOccupants[ucSeat].GetPointer();
+	if (m_pOccupants[ucSeat] == nullptr)
+		return nullptr;
 
-	if (pHuman == nullptr)
-		return false;
-
-	return true;
+	return m_pOccupants[ucSeat].GetPointer();
 }
 
 bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)

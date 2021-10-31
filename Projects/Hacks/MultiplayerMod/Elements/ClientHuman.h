@@ -80,6 +80,7 @@ public:
 
 	CClientVehicle* GetOccupiedVehicle(void);
 	CClientVehicle* GetEnteringExitingVehicle(void);
+	int8_t GetVehicleSeat(void);
 
 	bool IsInVehicle(void);
 	bool IsInVehicle(CClientVehicle* pClientVehicle);

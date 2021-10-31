@@ -86,6 +86,7 @@ public:
 	virtual bool SetLocked(bool state);
 	virtual bool GetLocked();
 
+	virtual CClientHuman* GetHumanInSeat(unsigned char ucSeat);
 	virtual bool IsSeatOccupied(unsigned char ucSeat);
 	virtual bool AssignSeat(CClientHuman* pHuman, unsigned char ucSeat);
 	virtual bool FreeSeat(unsigned char ucSeat);

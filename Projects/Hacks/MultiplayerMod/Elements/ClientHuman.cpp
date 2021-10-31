@@ -271,15 +271,19 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 			IHuman->animState = Packet.animStateLocal;
 		}
 
+		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
 		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
-			__asm
+			if (iAnimStopTime > 0)
 			{
-				push 0
-				mov ecx, IHuman
-				mov eax, 0x57F830 // C_human::Do_Aimed
-				call eax
+				__asm
+				{
+					push 0
+					mov ecx, IHuman
+					mov eax, 0x57F830 // C_human::Do_Aimed
+					call eax
+				}
 			}
 		}
 
@@ -321,36 +325,52 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			IHuman->animState = Packet.animStateLocal;
 		}
 
+		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
 		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
-			__asm
+			if (iAnimStopTime > 0)
 			{
-				push 0
-				mov ecx, IHuman
-				mov eax, 0x57F830 // C_human::Do_Aimed
-				call eax
+				__asm
+				{
+					push 0
+					mov ecx, IHuman
+					mov eax, 0x57F830 // C_human::Do_Aimed
+					call eax
+				}
 			}
 		}
 
 		IHuman->isDucking = Packet.isCrouching;
 		IHuman->isAiming = Packet.isAiming;
+
+		if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
+		{
+			CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
+			if (pVehicle != nullptr && pVehicle->GetGameVehicle() != nullptr)
+			{
+				if (IHuman->playersCar == nullptr)
+				{
+					printf("Warp 1\n");
+					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+				}
+				else if (pVehicle->GetGameVehicle() != IHuman->playersCar)
+				{
+					printf("Warp 2\n");
+					RemoveFromVehicle();
+					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+				}
+			}
+		}
+		else
+		{
+			if (IsInVehicle())
+			{
+				RemoveFromVehicle();
+			}
+		}
 	}
 	IHuman->inCarRotation = Packet.inCarRotation;
-
-	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID) 
-	{
-		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
-		if (pVehicle != nullptr && pVehicle->GetGameVehicle() != nullptr) {
-			WarpIntoVehicle(pVehicle, 0);
-		}
-	}
-	else
-	{
-		if (IsInVehicle()) {
-			RemoveFromVehicle();
-		}
-	}
 
 	SetPosition(m_Position);
 	SetRotation(m_Rotation);
@@ -548,6 +568,31 @@ CClientVehicle* CClientHuman::GetEnteringExitingVehicle(void)
 
 	CClientVehicle* pClientVehicle = m_pClientManager->FindVehicle(pVehicle);
 	return pClientVehicle;
+}
+
+int8_t CClientHuman::GetVehicleSeat(void)
+{
+	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
+	if (pClientVehicle == nullptr)
+	{
+		pClientVehicle = GetOccupiedVehicle();
+
+		if (pClientVehicle == nullptr)
+		{
+			return -1;
+		}
+	}
+
+	for (int8_t i = 0; i < 4; i++)
+	{
+		CClientHuman *pClientHuman = pClientVehicle->GetHumanInSeat(i);
+		if(pClientHuman != nullptr && this == pClientHuman)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)

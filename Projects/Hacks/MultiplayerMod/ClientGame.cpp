@@ -1746,8 +1746,10 @@ void CClientGame::LockControls(bool state)
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
-void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
+	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
+
 	_glogprintf(_gstr("Human entering vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1759,15 +1761,15 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		Packet Packet(MAFIAPACKET_HUMAN_ENTERINGVEHICLE);
 		Packet.Write<int32_t>(pClientHuman->GetId());
 		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iSeat);
+		Packet.Write<int8_t>(iDoor);
 		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iUnknown);
+		Packet.Write<int32_t>(iHopSeatsBool);
 		m_pMultiplayer->SendHostPacket(&Packet);
 	}
 	else 
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
+		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
 		g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
@@ -1799,11 +1801,13 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 		//g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
-	pClientVehicle->AssignSeat(pClientHuman, iSeat);
+	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
+	int8_t iSeat = pClientHuman->GetVehicleSeat();
+
 	_glogprintf(_gstr("Human exiting vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1815,15 +1819,15 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		Packet Packet(MAFIAPACKET_HUMAN_EXITINGVEHICLE);
 		Packet.Write<int32_t>(pClientHuman->GetId());
 		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iSeat);
+		Packet.Write<int8_t>(iUnknown1);
 		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iUnknown);
+		Packet.Write<int32_t>(iUnknown2);
 		m_pMultiplayer->SendHostPacket(&Packet);
 	}
 	else
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
+		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
 		g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
@@ -1855,7 +1859,7 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 		//g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
-	pClientVehicle->FreeSeat(iSeat);
+	//pClientVehicle->FreeSeat(iSeat);
 }
 
 void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat)
