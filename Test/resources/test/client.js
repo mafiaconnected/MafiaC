@@ -9,12 +9,12 @@ let godMode = false;
 // ===========================================================================
 
 addEventHandler("OnMapLoaded", (event, mapName) => {
-	if(game.mapName != "FREERIDENOC") {
-		game.changeMap("FREERIDENOC");
-		return false;
-	}
+	//if(game.mapName != "FREERIDENOC") {
+	//	game.changeMap("FREERIDENOC");
+	//	return false;
+	//}
 
-	game.setTrafficEnabled(false);
+	game.setTrafficEnabled(true);
 	game.createPlayer("TommyCOATHAT.i3d", new Vec3(-1981.51, -4.66, 29.37), 0.0);
 });
 
@@ -52,7 +52,7 @@ addEventHandler("OnPedExitedVehicle", function(event, ped, vehicle, seat) {
 
 // ===========================================================================
 
-addCommandHandler("veh", (command, params) => {
+addCommandHandler("veh", (command, params, client) => {
 	let model = getVehicleModelFromParams(params);
 
 	if(!model) {
@@ -60,10 +60,15 @@ addCommandHandler("veh", (command, params) => {
 		return false;
 	}
 
-	let position = localPlayer.position;
-	position.x += 5;
-	game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(localPlayer.position, localPlayer.heading, 5), 0.0);
-	message(`You spawned a ${vehicleNames[vehicleModels.indexOf(model)]}`);
+	let vehicle = game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(client.player.position, client.player.heading, 5), degToRad(client.player.heading));
+
+	if(game.mapName == "FREERIDENOC") {
+		vehicle.lights = true;
+	} else {
+		vehicle.lights = false;
+	}
+
+    message(`You spawned a ${vehicleNames[vehicleModels.indexOf(model)]}`, COLOUR_YELLOW);
 });
 
 // ===========================================================================
@@ -130,7 +135,7 @@ addCommandHandler("skin", (command, params) => {
 	let model = getSkinModelFromParams(params);
 
 	if(!model) {
-		message("That vehicle model is invalid!");
+		message("That ped model is invalid!");
 		return false;
 	}
 
@@ -859,89 +864,31 @@ let weaponNames = {
 
 // ===========================================================================
 
-function getPosToRightOfPos(pos, angle, distance) {
-	angle = degreesToRadians(angle);
-
-	let x = (pos.x+((Math.cos((-angle+1.57)+(Math.PI/2)))*distance));
-	let z = (pos.z+((Math.sin((-angle+1.57)+(Math.PI/2)))*distance));
-
-	let rightPos = new Vec3(x, pos.y, z);
-
-	return rightPos;
-}
-
-// ===========================================================================
-
-function getPosToLeftOfPos(pos, angle, distance) {
-	angle = degreesToRadians(angle);
-
-	let x = (pos.x+((Math.cos((angle+1.57)+(Math.PI/2)))*distance));
-	let z = (pos.y+((Math.sin((angle+1.57)+(Math.PI/2)))*distance));
-
-	let leftPos = new Vec3(x, pos.y, z);
-
-	return leftPos;
-}
-
-// ===========================================================================
-
 function getPosInFrontOfPos(pos, angle, distance) {
-	angle = degreesToRadians(angle);
+    while(angle < 0.0)
+        angle += 360.0;
+    while(angle > 360.0)
+        angle -= 360.0;
 
-	let x = (pos.x+((Math.cos(angle+(Math.PI/2)))*distance));
-	let y = pos.y;
-	let z = (pos.z+((Math.sin(angle+(Math.PI/2)))*distance));
+    angle = degToRad(angle);
 
-	return new Vec3(x, y, z);
+    let x = (pos.x+((Math.cos(angle-(Math.PI/2)))*distance));
+    let y = pos.y;
+    let z = (pos.z+((Math.sin(angle+(Math.PI/2)))*distance))
+
+    return new Vec3(x, y, z);
 }
 
 // ===========================================================================
 
-function getPosBehindPos(pos, angle, distance) {
-	angle = degreesToRadians(angle);
-
-	let x = (pos.x+((Math.cos(angle-(Math.PI/2)))*distance));
-	let y = pos.y;
-	let z = (pos.z+((Math.sin(angle-(Math.PI/2)))*distance));
-
-
-	return new Vec3(x,y,z);
+function degToRad(deg) {
+	return deg * Math.PI / 180;
 }
 
 // ===========================================================================
 
-function getPosAbovePos(pos, distance) {
-	return new Vec3(pos.x, pos.y+distance, pos.z);
-}
-
-// ===========================================================================
-
-function getPosBelowPos(pos, distance) {
-	return new Vec3(pos.x, pos.y-distance, pos.z);
-}
-
-// ===========================================================================
-
-function applyOffsetToPos(position, position2) {
-	return new Vec3(position.x+position2.x, position.y+position2.y, position.z+position2.z);
-}
-
-// ===========================================================================
-
-function getRandom(min, max) {
-	return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-// ===========================================================================
-
-function degreesToRadians(deg) {
-    return deg * ( Math.PI / 180 );
-}
-
-// ===========================================================================
-
-function radiansToDegrees(rad) {
-    return rad * ( 180 / Math.PI );
+function radToDeg(rad) {
+	return rad * 180 / Math.PI;
 }
 
 // ===========================================================================

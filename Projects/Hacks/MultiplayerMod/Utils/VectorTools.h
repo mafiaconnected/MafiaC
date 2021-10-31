@@ -121,4 +121,6 @@ public:
 
 	static S_vector ConvertToMafiaVec(const CVector3D& vec);
 	static CVector3D ConvertFromMafiaVec(const S_vector& vec);
+
+	static void Rotate(double heading, double attitude, double bank, S_quat& quat);
 };

@@ -508,6 +508,26 @@ static bool FunctionVehicleGetWheelAngle(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+static bool FunctionVehicleGetSpeedLimit(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pState->ReturnNumber(pClientVehicle->GetSpeedLimit());
+
+	return true;
+}
+
 static bool FunctionVehicleSetSpeedLimit(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -780,7 +800,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engine"), ARGUMENT_BOOLEAN, FunctionVehicleGetEngine, FunctionVehicleSetEngine);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("odometer"), ARGUMENT_BOOLEAN, FunctionVehicleGetOdometer, FunctionVehicleSetOdometer);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("roof"), ARGUMENT_BOOLEAN, FunctionVehicleGetRoof, FunctionVehicleSetRoof);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("speedLimit"), ARGUMENT_FLOAT, FunctionVehicleGetRoof, FunctionVehicleSetRoof);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("speedLimit"), ARGUMENT_FLOAT, FunctionVehicleGetSpeedLimit, FunctionVehicleSetSpeedLimit);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("gear"), ARGUMENT_FLOAT, FunctionVehicleGetGear, FunctionVehicleSetGear);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("wheelAngle"), ARGUMENT_FLOAT, FunctionVehicleGetWheelAngle, FunctionVehicleSetWheelAngle);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("fuel"), ARGUMENT_FLOAT, FunctionVehicleGetFuel, FunctionVehicleSetFuel);
