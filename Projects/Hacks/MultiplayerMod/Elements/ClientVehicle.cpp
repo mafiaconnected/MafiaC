@@ -293,7 +293,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	pBlender->SetTargetPosition(vecPos);
 	pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-	pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
+	//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 
 	IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
@@ -403,12 +403,9 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	{
 		auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
 		
-		CMatrix3x3 mat33Rot(m_RotationFront, m_RotationUp, m_RotationRight);
-		CVector3D vec3Rot = mat33Rot.GetEuler();
-
 		pBlender->SetTargetPosition(vecPos);
 		pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-		pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
+		//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle); 

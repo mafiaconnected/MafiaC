@@ -174,7 +174,7 @@ void CNetBlenderLerp::Interpolate()
 {
 	UpdateTargetPosition();
 	UpdateTargetRotation();
-	UpdateTargetSpeed();
+	//UpdateTargetSpeed();
 }
 
 void CNetBlenderLerp::SetTargetPosition(const CVector3D& vecPosition)
