@@ -14,6 +14,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 void CScriptingFunctions::RegisterDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	RegisterGameDefines(pDefineHandlers);
+	RegisterUtilDefines(pDefineHandlers);
 }
 
 void CScriptingFunctions::RegisterFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
