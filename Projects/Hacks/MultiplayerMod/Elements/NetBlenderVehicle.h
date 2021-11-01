@@ -22,9 +22,11 @@ public:
 
 	float m_fRotationMaxError = m_fPositionMaxError;
 
+	void SetTargetRotation(CVector3D& front, CVector3D& up, CVector3D& right);
+
 	void UpdateTargetEngineRPM();
 	void UpdateTargetWheelAngle();
-	void UpdateTargetVehicleRotation();
+	virtual void UpdateTargetRotation() override;
 
 	virtual void GetPosition(CVector3D& vecPos) override;
 	virtual void SetPosition(const CVector3D& vecPos) override;
@@ -41,17 +43,17 @@ public:
 	virtual void GetTurnSpeed(CVector3D& vecTurnSpeed) override;
 	virtual void SetTurnSpeed(const CVector3D& vecTurnSpeed) override;
 
+	/*
 	virtual float GetTargetEngineRPM();
 	virtual void SetTargetEngineRPM(float engineRPM);
 
 	virtual float GetTargetWheelAngle();
 	virtual void SetTargetWheelAngle(float wheelAngle);
+	*/
 
 	virtual float GetEngineRPM();
 	virtual void SetEngineRPM(float engineRPM);
 
 	virtual float GetWheelAngle();
 	virtual void SetWheelAngle(float wheelAngle);
-
-	virtual void SetTargetVehicleRotation(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight);
 };

@@ -41,14 +41,13 @@ public:
 	void SetDelay(uint32_t uiDelay);
 
 	void UpdateTargetPosition();
-	void UpdateTargetRotation();
+	virtual void UpdateTargetRotation() = 0;
 	void UpdateTargetSpeed();
 
 	virtual bool IsInterpolating() override;
 	virtual void Interpolate() override;
 
 	void SetTargetPosition(const CVector3D& vecPosition);
-	void SetTargetRotation(const CVector3D& vecRotation);
 	void SetTargetSpeed(const CVector3D& vecMoveSpeed, const CVector3D& vecTurnSpeed);
 
 	virtual void ResetInterpolation() override;

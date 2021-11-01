@@ -32,6 +32,8 @@ public:
 	virtual void Despawn(void);
 	virtual void Remove(void);
 
+	void UpdateGameMatrix(void);
+
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;
 
@@ -104,4 +106,6 @@ public:
 	virtual bool Explode();
 
 	virtual void SetFromExistingEntity(MafiaSDK::C_Car* car);
+
+	virtual void CreateNetBlender() override;
 };

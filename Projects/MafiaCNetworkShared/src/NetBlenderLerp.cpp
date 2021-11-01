@@ -128,20 +128,6 @@ void CNetBlenderLerp::UpdateTargetPosition()
 	}
 }
 
-void CNetBlenderLerp::UpdateTargetRotation()
-{
-	if (m_Rotation.HasTarget())
-	{
-		CVector3D vecCurrentRotation;
-		GetRotation(vecCurrentRotation);
-
-		CVector3D vecNewRotation = vecCurrentRotation;
-		m_Rotation.Update(vecNewRotation, 1.0f);
-
-		SetRotation(vecNewRotation);
-	}
-}
-
 void CNetBlenderLerp::UpdateTargetSpeed()
 {
 	if (m_MoveSpeed.HasTarget())
@@ -202,17 +188,6 @@ void CNetBlenderLerp::SetTargetPosition(const CVector3D& vecPosition)
 	vecError *= m_vecErrorMultiplier;
 
 	m_Position.SetTarget(vecPosition, vecError, m_uiDelay);
-}
-
-void CNetBlenderLerp::SetTargetRotation(const CVector3D& vecRotation)
-{
-	UpdateTargetRotation();
-
-	CVector3D vecLocalRotation;
-	GetRotation(vecLocalRotation);
-
-	CVector3D vecError = GetDifferenceBetweenAngles(vecLocalRotation, vecRotation);
-	m_Rotation.SetTarget(vecRotation, vecError, m_uiDelay);
 }
 
 void CNetBlenderLerp::SetTargetSpeed(const CVector3D& vecMoveSpeed, const CVector3D& vecTurnSpeed)
