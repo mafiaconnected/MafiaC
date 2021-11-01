@@ -269,6 +269,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		{
 			IHuman->animStateLocal = Packet.animStateLocal;
 			IHuman->animState = Packet.animStateLocal;
+			IHuman->isInAnimWithCar = true;
 		}
 
 		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
@@ -323,6 +324,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 		{
 			IHuman->animStateLocal = Packet.animStateLocal;
 			IHuman->animState = Packet.animStateLocal;
+			IHuman->isInAnimWithCar = true;
 		}
 
 		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
