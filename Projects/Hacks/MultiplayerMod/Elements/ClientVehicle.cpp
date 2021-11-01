@@ -216,6 +216,8 @@ bool CClientVehicle::SetVehicleRotation(const CVector3D& rotationFront, const CV
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(rotationUp);
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(rotationRight);
 
+	UpdateGameMatrix();
+
 	//_glogprintf(_gstr("Vehicle SetVehicleRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n"), GetId(), rotationFront.x, rotationFront.y, rotationFront.z, rotationUp.x, rotationUp.y, rotationUp.z, rotationRight.x, rotationRight.y, rotationRight.z);
 	return true;
 }
@@ -406,7 +408,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		pBlender->SetTargetPosition(vecPos);
 		pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 		//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
-
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle); 
 	}
