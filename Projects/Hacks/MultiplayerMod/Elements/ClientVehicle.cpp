@@ -82,7 +82,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	m_MafiaVehicle = reinterpret_cast<MafiaSDK::C_Car*>(MafiaSDK::GetMission()->CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes::Car));
 	SetPosition(pos);
 	//CVector3D rot2(0, 0, 0);
-	//SetRotation(rot2);
+	SetRotation(rot);
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
 
@@ -167,16 +167,23 @@ bool CClientVehicle::SetRotation(const CVector3D& vecRot)
 
 	//GetGameVehicle()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(vecRot);
 
+	/*
 	CMatrix3x3 mat(vecRot);
+
+	m_RotationFront = mat.GetXAxis();
+	m_RotationUp = mat.GetYAxis();
+	m_RotationRight = mat.GetZAxis();
+
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(mat.GetXAxis());
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(mat.GetYAxis());
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(mat.GetZAxis());
 
 	//_glogprintf(_gstr("Vehicle SetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), mat[0].x, mat[0].y, mat[0].z, mat[1].x, mat[1].y, mat[1].z, mat[2].x, mat[2].y, mat[2].z, vecRot.x, vecRot.y, vecRot.z);
+	*/
 
 	CClientEntity::SetRotation(vecRot);
 
-	UpdateGameMatrix();
+	//UpdateGameMatrix();
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -193,7 +200,7 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 	vecRot = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetInterface()->entity.rotation);
 	return true;
 
-	///*
+	/*
 	CVector3D front = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward);
 	CVector3D up = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up);
 	CVector3D right = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right);
@@ -204,13 +211,17 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 
 	//_glogprintf(_gstr("Vehicle GetRotation #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n\tVec3Rotation: {%f, %f, %f}\n"), GetId(), front.x, front.y, front.z, up.x, up.y, up.z, right.x, right.y, right.z, vecRot.x, vecRot.y, vecRot.z);
 	return true;
-	//*/
+	*/
 }
 
 bool CClientVehicle::SetVehicleRotation(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
+
+	//m_RotationFront = rotationFront;
+	//m_RotationUp = rotationUp;
+	//m_RotationRight = rotationRight;
 
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(rotationFront);
 	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(rotationUp);
@@ -272,8 +283,6 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_RotationUp = Packet.rotationUp;
 	m_RotationRight = Packet.rotationRight;
 
-	MafiaSDK::C_Vehicle_Interface IVehicle;
-
 	//CMatrix3x3 mat3(m_RotationFront, m_RotationUp, m_RotationRight);
 	GChar szModel[64];
 	wmemcpy(szModel, m_szModel, 64);
@@ -288,8 +297,8 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	{
 		SetPosition(vecPos);
 		SetRotation(vecRot);
-		//SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 	}
+	//SetVehicleRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 
 	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
 
@@ -297,26 +306,24 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
 	//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 
-	IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
+	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
+	auto pGameCar = GetGameVehicle();
 
-	IVehicle.health = Packet.health;
-	IVehicle.engine_health = Packet.engineHealth;
-	IVehicle.fuel = Packet.fuel;
-	IVehicle.sound_enabled = Packet.sound;
-	//IVehicle.engine_on = Packet.engineOn;
-	IVehicle.horn = Packet.horn;
-	IVehicle.siren = Packet.siren;
-	IVehicle.lights = Packet.lights;
-	//IVehicle.gear = Packet.gear;
-	IVehicle.engine_rpm = Packet.rpm;
-	IVehicle.accelerating = Packet.accel;
-	IVehicle.break_val = Packet.brake;
-	IVehicle.hand_break = Packet.handBrake;
-	IVehicle.speed_limit = Packet.speedLimit;
-	IVehicle.clutch = Packet.clutch;
-	IVehicle.wheel_angle = Packet.wheelAngle;
-	IVehicle.speed = CVecTools::ConvertToMafiaVec(Packet.speed);
-	IVehicle.rot_speed = CVecTools::ConvertToMafiaVec(Packet.rotSpeed);
+	pGameVehicle->health = Packet.health;
+	pGameVehicle->engine_health = Packet.engineHealth;
+	pGameVehicle->fuel = Packet.fuel;
+	pGameVehicle->sound_enabled = Packet.sound;
+	//pGameVehicle->engine_on = Packet.engineOn;
+	pGameVehicle->horn = Packet.horn;
+	pGameVehicle->siren = Packet.siren;
+	pGameVehicle->lights = Packet.lights;
+	//pGameVehicle->gear = Packet.gear;
+	pGameVehicle->engine_rpm = Packet.rpm;
+	pGameVehicle->accelerating = Packet.accel;
+	pGameVehicle->break_val = Packet.brake;
+	pGameVehicle->hand_break = Packet.handBrake;
+	pGameVehicle->speed_limit = Packet.speedLimit;
+	pGameVehicle->clutch = Packet.clutch;
 
 	//if (gear != IVehicle.gear) {
 	//	GetGameVehicle()->SetGear(gear);
@@ -324,14 +331,14 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	if (Packet.engineOn)
 	{
-		if (!IVehicle.engine_on)
+		if (!pGameVehicle->engine_on)
 		{
 			GetGameVehicle()->SetEngineOn(true, 1);
 		}
 	}
 	else
 	{
-		if (!IVehicle.engine_on)
+		if (!pGameVehicle->engine_on)
 		{
 			GetGameVehicle()->SetEngineOn(false, 1);
 		}
@@ -356,7 +363,8 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	CVector3D vecPos = m_Position;
 	CVector3D vecRot = m_Rotation;
 
-	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
+	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
+	auto pGameCar = GetGameVehicle();
 
 	tVehicleSyncPacket Packet;
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
@@ -366,30 +374,30 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RotationUp = Packet.rotationUp;
 	m_RotationRight = Packet.rotationRight;
 
-	IVehicle.health = Packet.health;
-	IVehicle.engine_health = Packet.engineHealth;
-	IVehicle.fuel = Packet.fuel;
-	IVehicle.sound_enabled = Packet.sound;
-	//IVehicle.engine_on = Packet.engineOn;
-	IVehicle.horn = Packet.horn;
-	IVehicle.siren = Packet.siren;
-	IVehicle.lights = Packet.lights;
-	//IVehicle.gear = Packet.gear;
-	IVehicle.engine_rpm = Packet.rpm;
-	IVehicle.accelerating = Packet.accel;
-	IVehicle.break_val = Packet.brake;
-	IVehicle.hand_break = Packet.handBrake;
-	IVehicle.speed_limit = Packet.speedLimit;
-	IVehicle.clutch = Packet.clutch;
-	IVehicle.wheel_angle = Packet.wheelAngle;
+	pGameVehicle->health = Packet.health;
+	pGameVehicle->engine_health = Packet.engineHealth;
+	pGameVehicle->fuel = Packet.fuel;
+	pGameVehicle->sound_enabled = Packet.sound;
+	//pGameVehicle->engine_on = Packet.engineOn;
+	pGameVehicle->horn = Packet.horn;
+	pGameVehicle->siren = Packet.siren;
+	pGameVehicle->lights = Packet.lights;
+	//pGameVehicle->gear = Packet.gear;
+	pGameVehicle->engine_rpm = Packet.rpm;
+	pGameVehicle->accelerating = Packet.accel;
+	pGameVehicle->break_val = Packet.brake;
+	pGameVehicle->hand_break = Packet.handBrake;
+	pGameVehicle->speed_limit = Packet.speedLimit;
+	pGameVehicle->clutch = Packet.clutch;
+	pGameVehicle->wheel_angle = Packet.wheelAngle;
 
-	if (Packet.gear != IVehicle.gear)
+	if (Packet.gear != pGameVehicle->gear)
 	{
 		GetGameVehicle()->GearSnd();
 		GetGameVehicle()->SetGear(Packet.gear);
 	}
 
-	if (Packet.engineOn != IVehicle.engine_on)
+	if (Packet.engineOn != pGameVehicle->engine_on)
 	{
 		GetGameVehicle()->SetEngineOn(Packet.engineOn, 1);
 	}
@@ -397,9 +405,9 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
 
-	GetGameVehicle()->SetActive(true);
+	//GetGameVehicle()->SetActive(true);
 	//GetGameVehicle()->SetActState(0); // Note: Commeted as it caused vehicle jerking.
-	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
+	//GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
 
 	if (!IsSyncer())
 	{

@@ -26,9 +26,12 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 
 
 
-CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity)
+CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) :
+	m_pEntity(pEntity),
+	m_fRotationMaxError(1.0f),
+	m_fWheelAngleMaxError(1.0f),
+	m_fEngineRPMMaxError(1.0f)
 {
-	m_pEntity = pEntity;
 }
 
 
@@ -44,9 +47,9 @@ void CNetBlenderVehicle::SetTargetRotation(CVector3D& frontNew, CVector3D& upNew
 	CVector3D vecErrorFront = GetDifferenceBetweenAngles2(frontLocal, frontNew);
 	CVector3D vecErrorUp = GetDifferenceBetweenAngles2(upLocal, upNew);
 	CVector3D vecErrorRight = GetDifferenceBetweenAngles2(rightLocal, rightNew);
-	m_RotationFront.SetTarget(frontLocal, vecErrorFront, m_uiDelay);
-	m_RotationUp.SetTarget(upLocal, vecErrorUp, m_uiDelay);
-	m_RotationRight.SetTarget(rightLocal, vecErrorRight, m_uiDelay);
+	m_RotationFront.SetTarget(frontNew, vecErrorFront, m_uiDelay);
+	m_RotationUp.SetTarget(upNew, vecErrorUp, m_uiDelay);
+	m_RotationRight.SetTarget(rightNew, vecErrorRight, m_uiDelay);
 }
 
 void CNetBlenderVehicle::UpdateTargetRotation()
@@ -63,17 +66,17 @@ void CNetBlenderVehicle::UpdateTargetRotation()
 
 	if (m_RotationFront.HasTarget())
 	{
-		m_RotationFront.Update(vecNewRotationFront, 1.0f);
+		m_RotationFront.Update(vecNewRotationFront, m_fRotationMaxError);
 	}
 
 	if (m_RotationUp.HasTarget())
 	{
-		m_RotationUp.Update(vecNewRotationUp, 1.0f);
+		m_RotationUp.Update(vecNewRotationUp, m_fRotationMaxError);
 	}
 
 	if (m_RotationRight.HasTarget())
 	{
-		m_RotationUp.Update(vecNewRotationRight, 1.0f);
+		m_RotationRight.Update(vecNewRotationRight, m_fRotationMaxError);
 	}
 
 	SetVehicleRotation(vecNewRotationFront, vecNewRotationUp, vecNewRotationRight);

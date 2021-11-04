@@ -373,23 +373,26 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	IHuman->inCarRotation = Packet.inCarRotation;
 
-	SetPosition(m_Position);
-	SetRotation(m_Rotation);
-
-	if (GetGameHuman()->GetFrame() != nullptr)
+	if (!IsInVehicle())
 	{
-		uint32_t frame = (uint32_t)GetGameHuman()->GetFrame();
-		__asm
+		SetPosition(m_Position);
+		SetRotation(m_Rotation);
+
+		if (GetGameHuman()->GetFrame() != nullptr)
 		{
-			pushad
-			pushfd
-			mov eax, 0x60FC30 // update frame
-			mov ecx, frame
-			call eax
-			popfd
-			popad
+			uint32_t frame = (uint32_t)GetGameHuman()->GetFrame();
+			__asm
+			{
+				pushad
+				pushfd
+				mov eax, 0x60FC30 // update frame
+				mov ecx, frame
+				call eax
+				popfd
+				popad
+			}
+			GetGameHuman()->GetFrame()->Update();
 		}
-		GetGameHuman()->GetFrame()->Update();
 	}
 
 	//GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
