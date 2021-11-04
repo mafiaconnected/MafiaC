@@ -8,6 +8,7 @@ public:
 	CNetBlenderHuman(CClientHuman* pEntity);
 
 	CClientHuman* m_pEntity;
+	float m_fRotationMaxError;
 
 	virtual void GetPosition(CVector3D& vecPos) override;
 	virtual void SetPosition(const CVector3D& vecPos) override;

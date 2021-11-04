@@ -5,7 +5,27 @@
 #include "Multiplayer.h"
 #include "NetBlenderHuman.h"
 
-CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity)
+// TODO - Duplicate utility functions.
+static float GetDifferenceBetweenAngles2(float a, float b)
+{
+	float c = (b > a) ? b - a : 0.0f - (a - b);
+
+	if (c > PI)
+		c = 0.0f - (TWO_PI - c);
+	else if (c <= -PI)
+		c = (TWO_PI + c);
+
+	return c;
+}
+
+static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D& b)
+{
+	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
+}
+
+CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity) :
+	m_pEntity(pEntity),
+	m_fRotationMaxError(1.0f)
 {
 	m_pEntity = pEntity;
 }
