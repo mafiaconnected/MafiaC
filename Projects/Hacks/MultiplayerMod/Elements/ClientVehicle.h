@@ -19,6 +19,9 @@ private:
 
 	Galactic3D::Weak<CClientHuman> m_pOccupants[4];
 
+	bool m_Horn = false;
+	float m_EngineRPM = 0.0;
+
 public:
 	CClientVehicle(CMafiaClientManager* pClientManager);
 

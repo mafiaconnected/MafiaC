@@ -748,6 +748,46 @@ static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser
 	return false;
 }
 
+static bool FunctionVehicleGetEngineRPM(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pState->ReturnNumber(pClientVehicle->GetEngineRPM());
+
+	return true;
+}
+
+static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	float engineRPM;
+	if (!pState->CheckNumber(0, engineRPM))
+		return false;
+
+	if (pClientVehicle->SetEngineRPM(engineRPM))
+		return true;
+
+	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
 static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -798,17 +838,18 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("siren"), ARGUMENT_BOOLEAN, FunctionVehicleGetSiren, FunctionVehicleSetSiren);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("lights"), ARGUMENT_BOOLEAN, FunctionVehicleGetLights, FunctionVehicleSetLights);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engine"), ARGUMENT_BOOLEAN, FunctionVehicleGetEngine, FunctionVehicleSetEngine);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("odometer"), ARGUMENT_BOOLEAN, FunctionVehicleGetOdometer, FunctionVehicleSetOdometer);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("roof"), ARGUMENT_BOOLEAN, FunctionVehicleGetRoof, FunctionVehicleSetRoof);
+	//pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("odometer"), ARGUMENT_BOOLEAN, FunctionVehicleGetOdometer, FunctionVehicleSetOdometer);
+	//pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("roof"), ARGUMENT_BOOLEAN, FunctionVehicleGetRoof, FunctionVehicleSetRoof);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("speedLimit"), ARGUMENT_FLOAT, FunctionVehicleGetSpeedLimit, FunctionVehicleSetSpeedLimit);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("gear"), ARGUMENT_FLOAT, FunctionVehicleGetGear, FunctionVehicleSetGear);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("wheelAngle"), ARGUMENT_FLOAT, FunctionVehicleGetWheelAngle, FunctionVehicleSetWheelAngle);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("fuel"), ARGUMENT_FLOAT, FunctionVehicleGetFuel, FunctionVehicleSetFuel);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("speed"), ARGUMENT_FLOAT, FunctionVehicleGetSpeed, FunctionVehicleSetSpeed);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("rotVelocity"), ARGUMENT_VECTOR3D, FunctionVehicleGetRotVelocity, FunctionVehicleSetRotVelocity);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("turnVelocity"), ARGUMENT_VECTOR3D, FunctionVehicleGetRotVelocity, FunctionVehicleSetRotVelocity);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("velocity"), ARGUMENT_VECTOR3D, FunctionVehicleGetVelocity, FunctionVehicleSetVelocity);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineHealth"), ARGUMENT_FLOAT, FunctionVehicleGetEngineHealth, FunctionVehicleSetEngineHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineRPM"), ARGUMENT_FLOAT, FunctionVehicleGetEngineRPM, FunctionVehicleSetEngineRPM);
 
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
 	

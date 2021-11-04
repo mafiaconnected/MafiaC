@@ -29,6 +29,9 @@ void CClientVehicle::Process(void)
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	{
 		m_pBlender->Interpolate();
+		GetGameVehicle()->GetInterface()->vehicle_interface.horn = m_Horn;
+		GetGameVehicle()->GetInterface()->vehicle_interface.engine_rpm = m_EngineRPM;
+		
 		/*
 	 	GetGameVehicle()->SetActive(true);
 		//GetGameVehicle()->SetActState(0); // Note: Commeted as it caused vehicle jerking.
@@ -314,11 +317,13 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
 	//pGameVehicle->engine_on = Packet.engineOn;
-	pGameVehicle->horn = Packet.horn;
+	m_Horn = Packet.horn;
+	//pGameVehicle->horn = Packet.horn;
 	pGameVehicle->siren = Packet.siren;
 	pGameVehicle->lights = Packet.lights;
 	//pGameVehicle->gear = Packet.gear;
-	pGameVehicle->engine_rpm = Packet.rpm;
+	//pGameVehicle->engine_rpm = Packet.rpm;
+	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
@@ -331,16 +336,16 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	if (Packet.engineOn)
 	{
-		if (!pGameVehicle->engine_on)
+		if (!GetEngine())
 		{
-			GetGameVehicle()->SetEngineOn(true, 1);
+			SetEngine(true);
 		}
 	}
 	else
 	{
 		if (!pGameVehicle->engine_on)
 		{
-			GetGameVehicle()->SetEngineOn(false, 1);
+			SetEngine(false);
 		}
 	}
 
@@ -379,11 +384,13 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
 	//pGameVehicle->engine_on = Packet.engineOn;
-	pGameVehicle->horn = Packet.horn;
+	//pGameVehicle->horn = Packet.horn;
+	m_Horn = Packet.horn;
 	pGameVehicle->siren = Packet.siren;
 	pGameVehicle->lights = Packet.lights;
 	//pGameVehicle->gear = Packet.gear;
-	pGameVehicle->engine_rpm = Packet.rpm;
+	//pGameVehicle->engine_rpm = Packet.rpm;
+	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
@@ -391,23 +398,23 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	pGameVehicle->clutch = Packet.clutch;
 	pGameVehicle->wheel_angle = Packet.wheelAngle;
 
-	if (Packet.gear != pGameVehicle->gear)
+	if (Packet.gear != GetGear())
 	{
-		GetGameVehicle()->SetGear(Packet.gear);
+		SetGear(Packet.gear);
 	}
 
 	if (Packet.engineOn)
 	{
-		if (!pGameVehicle->engine_on)
+		if (!GetEngine())
 		{
-			GetGameVehicle()->SetEngineOn(true, 1);
+			SetEngine(true);
 		}
 	}
 	else
 	{
 		if (!pGameVehicle->engine_on)
 		{
-			GetGameVehicle()->SetEngineOn(false, 1);
+			SetEngine(false);
 		}
 	}
 
