@@ -322,7 +322,7 @@ static void OnHumanShoot(const S_vector& pos)
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		pMultiplayer->SendLocalPlayerShoot(CVecTools::ConvertFromMafiaVec(pos));
+		pMultiplayer->SendLocalPlayerShoot(true, CVecTools::ConvertFromMafiaVec(pos));
 	}
 }
 

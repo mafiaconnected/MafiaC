@@ -34,7 +34,9 @@ namespace MafiaSDK
         PADDING(C_Human_Interface, _pad3, 0x144);
         bool isDucking;
         bool isAiming;
-        PADDING(C_Human_Interface, _pad4, 0x16);
+        PADDING(C_Human_Interface, _pad4, 0x6);
+        bool isShooting;
+        PADDING(C_Human_Interface, _pad4b, 0x0F);
         bool isReloading;
         PADDING(C_Human_Interface, _pad5, 0x11B);
         I3D_Frame * neckFrame;

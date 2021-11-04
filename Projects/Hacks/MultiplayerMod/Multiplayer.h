@@ -37,7 +37,7 @@ public:
 	bool MigrateEntity(CClientEntity* pElement);
 	void ProcessNewPeerElements();
 
-	void SendLocalPlayerShoot(CVector3D position);
+	void SendLocalPlayerShoot(bool bState, CVector3D position);
 	void SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart);
 	void SendHumanDeath(CClientHuman* target, CClientHuman* attacker);
 	void SendHumanDropWeapon(CClientHuman* target);

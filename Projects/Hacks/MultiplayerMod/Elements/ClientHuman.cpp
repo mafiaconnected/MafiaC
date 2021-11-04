@@ -256,8 +256,6 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	IHuman->health = Packet.health;
 	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
 	m_nVehicleSeatIndex = Packet.seat;
-	IHuman->isDucking = Packet.isCrouching;
-	IHuman->isAiming = Packet.isAiming;
 	if (IHuman->carLeavingOrEntering == nullptr)
 	{
 		if (IHuman->playersCar == nullptr)
@@ -290,6 +288,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 		IHuman->isDucking = Packet.isCrouching;
 		IHuman->isAiming = Packet.isAiming;
+		IHuman->isShooting = Packet.isShooting;
 	}
 	IHuman->inCarRotation = Packet.inCarRotation;
 
@@ -345,6 +344,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 		IHuman->isDucking = Packet.isCrouching;
 		IHuman->isAiming = Packet.isAiming;
+		IHuman->isShooting = Packet.isShooting;
 
 		if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 		{
@@ -448,6 +448,7 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.seat = m_nVehicleSeatIndex;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
+	Packet.isShooting = IHuman->isShooting;
 	Packet.animStateLocal = IHuman->animStateLocal;
 	Packet.isInAnimWithCarLocal = IHuman->isInAnimWithCarLocal;
 	Packet.animationState = IHuman->animState;
@@ -499,6 +500,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.vehicleNetworkIndex = vehicleId;
 	Packet.isCrouching = IHuman->isDucking;
 	Packet.isAiming = IHuman->isAiming;
+	Packet.isShooting = IHuman->isShooting;
 	Packet.animStateLocal = IHuman->animStateLocal;
 	Packet.isInAnimWithCarLocal = IHuman->isInAnimWithCarLocal;
 	Packet.animationState = IHuman->animState;

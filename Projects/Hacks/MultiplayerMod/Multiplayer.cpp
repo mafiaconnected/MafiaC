@@ -999,13 +999,14 @@ void CMultiplayer::ProcessNewPeerElements(void)
 	}
 }
 
-void CMultiplayer::SendLocalPlayerShoot(CVector3D position)
+void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 {
 	//if (pPed->IsLocal() || !pPed->IsSyncer())
 	//	return;
 
 	Packet Packet(MAFIAPACKET_HUMAN_SHOOT);
 	Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
+	Packet.Write<bool>(bState);
 	Packet.Write<CVector3D>(position);
 	SendHostPacket(&Packet);
 }
