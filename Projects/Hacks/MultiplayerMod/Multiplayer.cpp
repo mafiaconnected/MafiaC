@@ -446,6 +446,121 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		}
 		break;
 
+		case MAFIAPACKET_VEHICLE_SETFUEL:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			float fuel = false;
+			Reader.ReadSingle(&fuel, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetFuel(fuel);
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETWHEELANGLE:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			float wheelAngle = false;
+			Reader.ReadSingle(&wheelAngle, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetWheelAngle(wheelAngle);
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETENGINERPM:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			float engineRPM = false;
+			Reader.ReadSingle(&engineRPM, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetEngineRPM(engineRPM);
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETSPEEDLIMIT:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			float speedLimit = false;
+			Reader.ReadSingle(&speedLimit, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetSpeedLimit(speedLimit);
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETENGINEHEALTH:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			float engineHealth = false;
+			Reader.ReadSingle(&engineHealth, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetEngineHealth(engineHealth);
+				}
+			}
+		}
+		break;
+
 		case MAFIAPACKET_VEHICLE_EXPLODE:
 		{
 			int32_t nVehicleNetworkIndex;
