@@ -304,7 +304,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	pBlender->SetTargetPosition(vecPos);
 	pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-	//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
+	pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 
 	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
 	auto pGameCar = GetGameVehicle();
@@ -393,13 +393,22 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	if (Packet.gear != pGameVehicle->gear)
 	{
-		GetGameVehicle()->GearSnd();
 		GetGameVehicle()->SetGear(Packet.gear);
 	}
 
-	if (Packet.engineOn != pGameVehicle->engine_on)
+	if (Packet.engineOn)
 	{
-		GetGameVehicle()->SetEngineOn(Packet.engineOn, 1);
+		if (!pGameVehicle->engine_on)
+		{
+			GetGameVehicle()->SetEngineOn(true, 1);
+		}
+	}
+	else
+	{
+		if (!pGameVehicle->engine_on)
+		{
+			GetGameVehicle()->SetEngineOn(false, 1);
+		}
 	}
 
 	m_RelativePosition = Packet.speed;
@@ -415,7 +424,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		
 		pBlender->SetTargetPosition(vecPos);
 		pBlender->SetTargetRotation(m_RotationFront, m_RotationUp, m_RotationRight);
-		//pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
+		pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle); 
 	}
