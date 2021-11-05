@@ -263,6 +263,28 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		}
 		break;
 
+		case MAFIAPACKET_HUMAN_CHANGEWEAP:
+		{
+			int32_t nPlayerNetworkIndex;
+			Reader.ReadInt32(&nPlayerNetworkIndex, 1);
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			int32_t nWeaponId;
+			Reader.ReadInt32(&nWeaponId, 1);
+
+			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				if (pClientPlayer != nullptr)
+				{
+					pClientPlayer->SetActiveWeapon(nWeaponId);
+				}
+			}
+		}
+		break;
+
 		case MAFIAPACKET_HUMAN_REMWEAP:
 		{
 			int32_t nPlayerNetworkIndex;

@@ -109,6 +109,7 @@ public:
 	virtual void ClearInventory();
 	void GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2);
 	bool HasWeapon(unsigned short ucWeapon);
+	void SetActiveWeapon(unsigned short usWeapon);
 	int GetFirstEmptyWeaponIndex();
 	int GetIndexOfWeapon(unsigned short ucWeapon);
 	void TakeWeapon(unsigned short ucWeapon);

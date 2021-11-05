@@ -315,11 +315,11 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 			IHuman->isInAnimWithCar = true;
 		}
 
-		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
+		int32_t iAnimTimeLeft = *(int32_t*)(((uint32_t)IHuman) + 2772);
 		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
-			if (iAnimStopTime > 0)
+			if (iAnimTimeLeft > 0)
 			{
 				__asm
 				{
@@ -336,6 +336,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		IHuman->isShooting = Packet.isShooting;
 	}
 	IHuman->inCarRotation = Packet.inCarRotation;
+	SetActiveWeapon(Packet.weaponId);
 
 	return true;
 }
@@ -374,11 +375,11 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			IHuman->isInAnimWithCar = true;
 		}
 
-		int32_t iAnimStopTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
+		int32_t iAnimTimeLeft = *(int32_t*)(((uint32_t)IHuman) + 2772);
 		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
-			if (iAnimStopTime > 0)
+			if (iAnimTimeLeft > 0)
 			{
 				__asm
 				{
@@ -418,8 +419,8 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			}
 		}
 	}
-
 	IHuman->inCarRotation = Packet.inCarRotation;
+	SetActiveWeapon(Packet.weaponId);
 
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 	
@@ -465,6 +466,7 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 	Packet.animStopTime = iStopAnimTime;
+	Packet.weaponId = *(uint16_t*)(((uint32_t)IHuman) + 1184);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -517,6 +519,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 	Packet.animStopTime = iStopAnimTime;
+	Packet.weaponId = *(uint16_t*)(((uint32_t)IHuman) + 1184);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -803,6 +806,29 @@ bool CClientHuman::HasWeapon(unsigned short ucWeapon)
 	}
 
 	return false;
+}
+
+void CClientHuman::SetActiveWeapon(unsigned short usWeapon)
+{
+	uint32_t uiHuman = (uint32_t)GetGameHuman();
+	if (uiHuman == 0)
+		return;
+
+	if (*(uint16_t*)(uiHuman + 1184) == usWeapon)
+		return;
+
+	GiveWeapon(usWeapon, 32000, 32000);
+
+	*(uint16_t*)(uiHuman + 1184) = usWeapon; // uint16 +1184 = active weapon id
+
+	__asm
+	{
+		push 1
+		push 1
+		mov ecx, uiHuman
+		mov eax, 0x57F550 // Human::ChangeWeapon
+		call eax
+	}
 }
 
 int CClientHuman::GetFirstEmptyWeaponIndex()
