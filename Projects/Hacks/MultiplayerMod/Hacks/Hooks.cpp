@@ -97,6 +97,12 @@ HOOKVAR MafiaSDK::C_Actor* g_pCreateActor_Actor;
 HOOKVAR int g_pCreateActor_Arg1;
 HOOKVAR bool g_bCancelCreateActor;
 
+// SceneCreateActor
+HOOKADDRESS g_ReturnSceneCreateActor;
+HOOKVAR MafiaSDK::C_Mission_Enum::ObjectTypes g_pSceneCreateActor_Type;
+HOOKVAR DWORD g_pSceneCreateActor_Frame;
+HOOKVAR bool g_bCancelSceneCreateActor;
+
 // HumanSetAimPose
 HOOKADDRESS g_ReturnHumanSetAimPose;
 HOOKVAR MafiaSDK::C_Human* g_pHumanSetAimPose_Human;
@@ -180,6 +186,30 @@ RAWCODECALL CreateActor(void)
 			//g_pClientGame->CreateGameHuman(g_pCreateActor_Actor, g_pCreateActor_Arg1);
 		}
 	}
+}
+
+RAWCODECALL SceneCreateActor(void)
+{
+	using ObjTypes = MafiaSDK::C_Mission_Enum::ObjectTypes;
+	std::vector<ObjTypes> forbidden_objects = {
+		ObjTypes::Car,
+		ObjTypes::Dog,
+		ObjTypes::Enemy,
+		ObjTypes::Pumpar,
+		ObjTypes::Trolley,
+		ObjTypes::Player
+	};
+
+	for (auto forbidden_type : forbidden_objects) {
+		if (g_pSceneCreateActor_Type == forbidden_type && g_pSceneCreateActor_Frame != NULL) {
+			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return;
+		}
+	}
+
+	MafiaSDK::GetMission()->CreateActor(g_pSceneCreateActor_Type);
 }
 
 RAWCODECALL HumanSetAimPose(void)
@@ -306,6 +336,35 @@ RAWCODE HookCreateActor(void)
 		popad
 		mov eax, fs:0
 		jmp g_ReturnCreateActor
+	}
+}
+
+// Unfinished
+RAWCODE HookSceneCreateActor(void)
+{
+	_asm
+	{
+		mov g_pSceneCreateActor_Actor, ecx
+		mov eax, [esp + 4]
+		mov g_pSceneCreateActor_Arg1, eax
+		pushad
+	}
+	g_bCancelSceneCreateActor = false;
+	SceneCreateActor();
+	if (g_bCancelSceneCreateActor)
+	{
+		_asm
+		{
+			//popad
+			//retn
+		}
+	}
+	__asm {
+		push edi
+		push eax
+		call SceneCreateActor
+		add esp, 0x8
+		jmp g_ReturnSceneCreateActor
 	}
 }
 
@@ -564,4 +623,8 @@ void CGameHooks::InstallHooks()
 	// Hook Human::SetNormalPose
 	new CHackJumpHack(g_pHack, (void*)0x579630, HookHumanSetNormalPose, 6);
 	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
+
+	// Hook SceneCreateActor
+	new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
+	g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
 }
