@@ -586,13 +586,13 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
 
 	// Disable local player weapon drop
-	new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
 
 	// Disable weapon drops
-	new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6); 
 
 	// Game Exit
 	new CHackJumpHack(g_pHack, (void*)0x00612485, (void*)OnGameExit_Hook, 6);
@@ -625,6 +625,6 @@ void CGameHooks::InstallHooks()
 	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
 
 	// Hook SceneCreateActor
-	new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
-	g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
+	//new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
+	//g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
 }
