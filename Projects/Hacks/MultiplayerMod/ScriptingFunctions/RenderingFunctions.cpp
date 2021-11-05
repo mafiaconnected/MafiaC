@@ -101,10 +101,11 @@ static bool FunctionShowCursor(IScriptState* pState, int argc, void* pUser)
 	bool bToggleControls = true;
 	if (argc > 1 && !pState->CheckBoolean(1,bToggleControls))
 		return false;
-	pState->GetResource()->m_bCursorEnabled = bEnabled;
-	g_pClientGame->UpdateCursorEnabled();
+	//pState->GetResource()->m_bCursorEnabled = bEnabled;
+	g_pClientGame->SetCursorEnabled(bEnabled);
+	//g_pClientGame->UpdateCursorEnabled();
 	if (bToggleControls)
-		g_pClientGame->m_bScriptControlsDisabled = bEnabled;
+		g_pClientGame->LockControls(!bToggleControls);
 	return true;
 }
 
