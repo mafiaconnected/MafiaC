@@ -340,6 +340,7 @@ RAWCODE HookCreateActor(void)
 }
 
 // Unfinished
+/*
 RAWCODE HookSceneCreateActor(void)
 {
 	_asm
@@ -367,6 +368,7 @@ RAWCODE HookSceneCreateActor(void)
 		jmp g_ReturnSceneCreateActor
 	}
 }
+*/
 
 RAWCODE HookHumanSetAimPose(void)
 {
