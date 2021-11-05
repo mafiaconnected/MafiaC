@@ -36,6 +36,8 @@ public:
 	bool m_bExitedVehicleEvent = false;
 	bool m_bExitingVehicleEvent = false;
 
+	CVector3D m_vecCamera;
+
 	CClientVehicle* m_pVehicleEvent = nullptr;
 	
 	Galactic3D::Weak<CClientVehicle> m_pCurrentVehicle;

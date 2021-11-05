@@ -188,6 +188,8 @@ public:
 	bool m_bUseActorInvokedByGame = true;
 	bool m_bDoThrowCocotFromCarInvokedByGame = true;
 	bool m_bCreateActorInvokedByGame = true;
+	bool m_bHumanSetAimPoseInvokedByGame = true;
+	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }

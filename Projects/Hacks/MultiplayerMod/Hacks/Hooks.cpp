@@ -97,6 +97,18 @@ HOOKVAR MafiaSDK::C_Actor* g_pCreateActor_Actor;
 HOOKVAR int g_pCreateActor_Arg1;
 HOOKVAR bool g_bCancelCreateActor;
 
+// HumanSetAimPose
+HOOKADDRESS g_ReturnHumanSetAimPose;
+HOOKVAR MafiaSDK::C_Human* g_pHumanSetAimPose_Human;
+HOOKVAR CVector3D* g_pvecHumanSetAimPose_Vec;
+HOOKVAR bool g_bCancelHumanSetAimPose;
+
+// HumanSetNormalPose
+HOOKADDRESS g_ReturnHumanSetNormalPose;
+HOOKVAR MafiaSDK::C_Human* g_pHumanSetNormalPose_Human;
+HOOKVAR CVector3D* g_pvecHumanSetNormalPose_Vec;
+HOOKVAR bool g_bCancelHumanSetNormalPose;
+
 RAWCODECALL HumanDoThrowCocotFromCar(void)
 {
 	if (g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame)
@@ -166,6 +178,42 @@ RAWCODECALL CreateActor(void)
 		{
 			// Human
 			//g_pClientGame->CreateGameHuman(g_pCreateActor_Actor, g_pCreateActor_Arg1);
+		}
+	}
+}
+
+RAWCODECALL HumanSetAimPose(void)
+{
+	if (g_pClientGame->m_bHumanSetAimPoseInvokedByGame)
+	{
+		CClientHuman* pLocalClientHuman = (CClientHuman*)g_pClientGame->m_pClientManager->m_pLocalPlayer.GetPointer();
+
+		if (pLocalClientHuman != nullptr)
+		{
+			MafiaSDK::C_Human* pLocalGameHuman = pLocalClientHuman->GetGameHuman();
+
+			if (g_pHumanSetAimPose_Human == pLocalGameHuman)
+			{
+				pLocalClientHuman->m_vecCamera = *g_pvecHumanSetAimPose_Vec;
+			}
+		}
+	}
+}
+
+RAWCODECALL HumanSetNormalPose(void)
+{
+	if (g_pClientGame->m_bHumanSetNormalPoseInvokedByGame)
+	{
+		CClientHuman* pLocalClientHuman = (CClientHuman*)g_pClientGame->m_pClientManager->m_pLocalPlayer.GetPointer();
+
+		if (pLocalClientHuman != nullptr)
+		{
+			MafiaSDK::C_Human* pLocalGameHuman = pLocalClientHuman->GetGameHuman();
+
+			if (g_pHumanSetNormalPose_Human == pLocalGameHuman)
+			{
+				pLocalClientHuman->m_vecCamera = *g_pvecHumanSetNormalPose_Vec;
+			}
 		}
 	}
 }
@@ -258,6 +306,60 @@ RAWCODE HookCreateActor(void)
 		popad
 		mov eax, fs:0
 		jmp g_ReturnCreateActor
+	}
+}
+
+RAWCODE HookHumanSetAimPose(void)
+{
+	_asm
+	{
+		mov g_pHumanSetAimPose_Human, ecx
+		mov g_pvecHumanSetAimPose_Vec, esp
+		add g_pvecHumanSetAimPose_Vec, 4
+		pushad
+	}
+	g_bCancelHumanSetAimPose = false;
+	HumanSetAimPose();
+	if (g_bCancelHumanSetAimPose)
+	{
+		_asm
+		{
+			popad
+			retn
+		}
+	}
+	_asm
+	{
+		popad
+		sub		esp, 0xB4
+		jmp		g_ReturnHumanSetAimPose
+	}
+}
+
+RAWCODE HookHumanSetNormalPose(void)
+{
+	_asm
+	{
+		mov g_pHumanSetNormalPose_Human, ecx
+		mov g_pvecHumanSetNormalPose_Vec, esp
+		add g_pvecHumanSetNormalPose_Vec, 4
+		pushad
+	}
+	g_bCancelHumanSetNormalPose = false;
+	HumanSetNormalPose();
+	if (g_bCancelHumanSetNormalPose)
+	{
+		_asm
+		{
+			popad
+			retn
+		}
+	}
+	_asm
+	{
+		popad
+		sub		esp, 0xC0
+		jmp		g_ReturnHumanSetNormalPose
 	}
 }
 
@@ -448,10 +550,18 @@ void CGameHooks::InstallHooks()
 	// Hook CreateActor
 	new CHackJumpHack(g_pHack, (void*)0x0053F7D0, HookCreateActor, 6);
 	g_ReturnCreateActor = (void*)(0x0053F7D0 + 6);
-
+	
 	// Note (Sevenisko): Currently unnecessary to work on
 	new CHackJumpHack(g_pHack, (void*)UpdateProgress_Addr, &SetProgress_Hook, 6);
 
 	// Fix exiting vehicle for passengers.
 	new CHackValueHack(g_pHack, (void*)0x595040, 1, (uint8_t)0xEB);
+
+	// Hook Human::SetAimPose
+	new CHackJumpHack(g_pHack, (void*)0x579EA0, HookHumanSetAimPose, 6);
+	g_ReturnHumanSetAimPose = (void*)(0x579EA0 + 6);
+
+	// Hook Human::SetNormalPose
+	new CHackJumpHack(g_pHack, (void*)0x579630, HookHumanSetNormalPose, 6);
+	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
 }

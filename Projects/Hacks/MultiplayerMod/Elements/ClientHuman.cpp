@@ -21,6 +21,8 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 	m_bExitedVehicleEvent = false;
 	m_bExitingVehicleEvent = false;
 	m_bEnteringVehicleEvent = false;
+
+	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
 
 Galactic3D::ReflectedClass* CClientHuman::GetReflectedClass(void)
@@ -422,6 +424,28 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	IHuman->inCarRotation = Packet.inCarRotation;
 	SetActiveWeapon(Packet.weaponId);
 
+	m_vecCamera = Packet.camera;
+	if (m_vecCamera.GetLength() != 0.0f)
+	{
+		uint32_t uiCamera = (uint32_t)&m_vecCamera;
+		g_pClientGame->m_bHumanSetAimPoseInvokedByGame = false;
+		float x, y, z;
+		x = m_vecCamera.x;
+		y = m_vecCamera.y;
+		z = m_vecCamera.z;
+		uint32_t uiFunc = Packet.isAiming ? 0x579EA0 : 0x579630; // set aim pose / set normal pose
+		__asm
+		{
+			push z
+			push y
+			push x
+			mov ecx, IHuman
+			mov eax, uiFunc
+			call eax
+		}
+		g_pClientGame->m_bHumanSetAimPoseInvokedByGame = true;
+	}
+
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 	
 	if (!IsSyncer())
@@ -466,7 +490,7 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 	Packet.animStopTime = iStopAnimTime;
-	Packet.weaponId = *(uint16_t*)(((uint32_t)IHuman) + 1184);
+	Packet.weaponId = *(int16_t*)(((uint32_t)IHuman) + 1184);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -505,6 +529,23 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	}
 
 	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
+	
+	/*
+	uint32_t uiGame0 = *(uint32_t*)0x63788C;
+	uint32_t v54 = *(uint32_t*)(uiGame0 + 16);
+	uint32_t v55 = *(uint32_t*)(v54 + 380);
+	uint32_t v56 = v55 + 48;
+	CVector3D vecCamera = *(CVector3D*)v56;
+	//printf("vec: %f %f %f\n", vec.x, vec.y, vec.z);
+	*/
+
+	//uint32_t frame = *(uint32_t*)(((uint32_t)IHuman) + 1760);
+	//CVector3D vecCamera(0,0,0);
+	//vecCamera.z = *(float*)(((uint32_t)IHuman) + 0x5F4);
+	//if (frame > 0)
+	{
+		//vecCamera = *(CVector3D*)(((uint32_t)IHuman) + 512);
+	}
 
 	tHumanSyncPacket Packet;
 
@@ -519,7 +560,8 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
 	Packet.animStopTime = iStopAnimTime;
-	Packet.weaponId = *(uint16_t*)(((uint32_t)IHuman) + 1184);
+	Packet.weaponId = *(int16_t*)(((uint32_t)IHuman) + 1184);
+	Packet.camera = m_vecCamera;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;

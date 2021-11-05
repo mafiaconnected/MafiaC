@@ -110,6 +110,7 @@ struct tHumanSyncPacket
 	float inCarRotation;
 	int32_t animStopTime;
 	int16_t weaponId;
+	CVector3D camera;
 };
 
 struct tVehicleCreatePacket
