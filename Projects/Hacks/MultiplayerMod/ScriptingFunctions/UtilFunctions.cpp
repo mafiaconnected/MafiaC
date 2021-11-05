@@ -133,6 +133,11 @@ static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, v
 
 	if (D3DXVec3Project(&out, &input, &viewport, &projection, &view, &world) == nullptr)
 		printf("D3DXVec3Project fail\n");
+	
+	CVector3D vecScreen;
+	vecScreen.x = out.x;
+	vecScreen.y = out.y;
+	vecScreen.z = out.z;
 
 	pState->ReturnVector3D(vecScreen);
 
