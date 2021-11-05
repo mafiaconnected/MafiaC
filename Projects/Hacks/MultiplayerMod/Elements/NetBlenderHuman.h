@@ -21,4 +21,6 @@ public:
 
 	virtual void GetTurnSpeed(CVector3D& vecTurnSpeed) override;
 	virtual void SetTurnSpeed(const CVector3D& vecTurnSpeed) override;
+
+	virtual void UpdateTargetRotation() override {};
 };

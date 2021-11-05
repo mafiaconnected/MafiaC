@@ -850,3 +850,12 @@ void CClientHuman::SetBehavior(uint32_t iBehavior)
 {
 	
 }
+
+void CClientHuman::CreateNetBlender()
+{
+	auto pBlender = new CNetBlenderHuman(this);
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
+		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
+	m_pBlender = pBlender;
+}

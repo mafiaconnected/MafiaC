@@ -117,5 +117,7 @@ public:
 
 	virtual void SetFromExistingEntity(MafiaSDK::C_Human* human);
 
-	void CClientHuman::SetBehavior(uint32_t iBehavior);
+	void SetBehavior(uint32_t iBehavior);
+
+	virtual void CreateNetBlender() override;
 };
