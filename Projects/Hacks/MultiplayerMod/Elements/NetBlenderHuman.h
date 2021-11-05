@@ -10,6 +10,8 @@ public:
 	CClientHuman* m_pEntity;
 	float m_fRotationMaxError;
 
+	void SetTargetRotation(CVector3D& vecRotation);
+
 	virtual void GetPosition(CVector3D& vecPos) override;
 	virtual void SetPosition(const CVector3D& vecPos) override;
 
@@ -22,5 +24,5 @@ public:
 	virtual void GetTurnSpeed(CVector3D& vecTurnSpeed) override;
 	virtual void SetTurnSpeed(const CVector3D& vecTurnSpeed) override;
 
-	virtual void UpdateTargetRotation() override {};
+	virtual void UpdateTargetRotation() override;
 };

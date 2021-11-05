@@ -44,6 +44,8 @@ public:
 
 	virtual MafiaSDK::C_Human* GetGameHuman();
 
+	void UpdateGameMatrix(void);
+
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;
 

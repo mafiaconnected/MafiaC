@@ -12,8 +12,6 @@ using namespace Galactic3D;
 
 CClientPlayer::CClientPlayer(CMafiaClientManager* pClientManager) : CClientHuman(pClientManager)
 {
-	MafiaSDK::C_Player* m_MafiaPlayer;
-
 	m_Type = ELEMENT_PLAYER;
 	m_uiMoney = 0;
 }
@@ -38,8 +36,4 @@ int32_t CClientPlayer::GetMoney()
 MafiaSDK::C_Player* CClientPlayer::GetGamePlayer()
 {
 	return (MafiaSDK::C_Player*)GetGameHuman();
-	/*
-	if (m_MafiaPlayer != nullptr) return NULL;
-	return m_MafiaPlayer;
-	*/
 }

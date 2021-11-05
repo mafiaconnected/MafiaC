@@ -30,6 +30,17 @@ CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity) :
 	m_pEntity = pEntity;
 }
 
+void CNetBlenderHuman::SetTargetRotation(CVector3D& vecRotation)
+{
+	UpdateTargetRotation();
+
+	CVector3D vecLocalRotation;
+	GetRotation(vecLocalRotation);
+
+	CVector3D vecError = GetDifferenceBetweenAngles2(vecLocalRotation, vecRotation);
+	m_Rotation.SetTarget(vecRotation, vecError, m_uiDelay);
+}
+
 void CNetBlenderHuman::GetPosition(CVector3D& vecPos)
 {
 	m_pEntity->GetPosition(vecPos);
@@ -74,4 +85,18 @@ void CNetBlenderHuman::GetTurnSpeed(CVector3D& vecTurnSpeed)
 void CNetBlenderHuman::SetTurnSpeed(const CVector3D& vecTurnSpeed)
 {
 	m_pEntity->SetRotationVelocity(vecTurnSpeed);
+}
+
+void CNetBlenderHuman::UpdateTargetRotation()
+{
+	if (m_Rotation.HasTarget())
+	{
+		CVector3D vecCurrentRotation;
+		GetRotation(vecCurrentRotation);
+
+		CVector3D vecNewRotation = vecCurrentRotation;
+		m_Rotation.Update(vecNewRotation, m_fRotationMaxError);
+
+		SetRotation(vecNewRotation);
+	}
 }

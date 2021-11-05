@@ -28,6 +28,26 @@ Galactic3D::ReflectedClass* CClientHuman::GetReflectedClass(void)
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientHumanClass;
 }
 
+void CClientHuman::UpdateGameMatrix(void)
+{
+	if (m_MafiaHuman->GetFrame() == nullptr)
+		return;
+
+	uint32_t frame = (uint32_t)m_MafiaHuman->GetFrame();
+	__asm
+	{
+		pushad
+		pushfd
+		mov eax, 0x60FC30 // update frame
+		mov ecx, frame
+		call eax
+		popfd
+		popad
+	}
+
+	m_MafiaHuman->GetFrame()->Update();
+}
+
 bool CClientHuman::GetPosition(CVector3D& vecPos)
 {
 	//auto bResult = CClientEntity::GetPosition(vecPos);
@@ -38,7 +58,15 @@ bool CClientHuman::GetPosition(CVector3D& vecPos)
 bool CClientHuman::SetPosition(const CVector3D& vecPos)
 {
 	auto bResult = CClientEntity::SetPosition(vecPos);
+	
 	GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(vecPos);
+
+	UpdateGameMatrix();
+
+	// Disable interpolation
+	if (m_pBlender != nullptr)
+		m_pBlender->ResetInterpolation();
+
 	return bResult;
 }
 
@@ -56,6 +84,12 @@ bool CClientHuman::SetHeading(float heading)
 		return false;
 
 	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(heading));
+
+	UpdateGameMatrix();
+
+	// Disable interpolation
+	if (m_pBlender != nullptr)
+		m_pBlender->ResetInterpolation();
 
 	return true;
 }
@@ -76,6 +110,12 @@ bool CClientHuman::SetRotation(const CVector3D& vecRot)
 		return false;
 
 	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(vecRot));
+
+	UpdateGameMatrix();
+
+	// Disable interpolation
+	if (m_pBlender != nullptr)
+		m_pBlender->ResetInterpolation();
 
 	return true;
 }
@@ -253,6 +293,11 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		IHuman->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
 	}
 
+	auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
+
+	pBlender->SetTargetPosition(m_Position);
+	pBlender->SetTargetRotation(m_Rotation);
+
 	IHuman->health = Packet.health;
 	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
 	m_nVehicleSeatIndex = Packet.seat;
@@ -299,6 +344,9 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 {
 	if (!CClientEntity::ReadSyncPacket(pStream))
 		return false;
+
+	CVector3D vecPos = m_Position;
+	CVector3D vecRot = m_Rotation;
 
 	if (GetGameHuman() == nullptr)
 		return false;
@@ -373,40 +421,14 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	IHuman->inCarRotation = Packet.inCarRotation;
 
-	if (!IsInVehicle())
-	{
-		SetPosition(m_Position);
-		SetRotation(m_Rotation);
-
-		if (GetGameHuman()->GetFrame() != nullptr)
-		{
-			uint32_t frame = (uint32_t)GetGameHuman()->GetFrame();
-			__asm
-			{
-				pushad
-				pushfd
-				mov eax, 0x60FC30 // update frame
-				mov ecx, frame
-				call eax
-				popfd
-				popad
-			}
-			GetGameHuman()->GetFrame()->Update();
-		}
-	}
-
-	//GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
-	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation))));
-
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 	
 	if (!IsSyncer())
 	{
 		auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
 
-		pBlender->SetTargetPosition(m_Position);
-		//pBlender->SetTargetRotation(m_Rotation);
-		//pBlender->SetTargetSpeed(m_Velocity, Packet.m_RotationVelocity);
+		pBlender->SetTargetPosition(vecPos);
+		pBlender->SetTargetRotation(vecRot);
 	}
 
 	return true;

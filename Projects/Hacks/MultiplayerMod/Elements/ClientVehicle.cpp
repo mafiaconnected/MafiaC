@@ -130,6 +130,7 @@ void CClientVehicle::UpdateGameMatrix(void)
 		popfd
 		popad
 	}
+
 	m_MafiaVehicle->GetFrame()->Update();
 }
 
