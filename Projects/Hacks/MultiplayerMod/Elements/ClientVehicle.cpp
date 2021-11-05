@@ -40,6 +40,20 @@ void CClientVehicle::Process(void)
 		*/
 	}
 
+	// Prevent vehicle damage.
+	uint32_t uiVehicle = (uint32_t)GetGameVehicle();
+	if (uiVehicle)
+	{
+		GetGameVehicle()->GetInterface()->vehicle_interface.health = 100.0f;
+		GetGameVehicle()->GetInterface()->vehicle_interface.engine_health = 100.0f;
+		*(uint32_t*)(uiVehicle + 3176) = 0; // flags
+		for (int i = 0; i < 4; i++)
+		{
+			uint32_t uiWheel = *(uint32_t*)((*(uint32_t*)(uiVehicle + 3240)) + (4 * i));
+			*(float*)(uiWheel + 0x18C) = 100.0f; // prevent wheel falling off
+		}
+	}
+
 	//GetGameVehicle()->AI(g_pClientGame->m_pTime->m_fDeltaTime);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 
