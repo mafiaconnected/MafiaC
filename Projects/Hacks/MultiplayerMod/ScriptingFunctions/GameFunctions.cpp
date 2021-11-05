@@ -11,8 +11,6 @@ static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	CClientHuman* pClientHuman = reinterpret_cast<CClientHuman*>(pClientManager->Create(ELEMENT_PED));
-
 	const GChar* mdl = pState->CheckString(0);
 	if (!mdl) return false;
 
@@ -24,10 +22,9 @@ static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
+	CClientHuman* pClientHuman = reinterpret_cast<CClientHuman*>(pClientManager->Create(ELEMENT_PED));
 	pClientHuman->SetModel(mdl);
-
 	pClientHuman->Spawn(pos, angle, false);
-
 	pClientHuman->m_pResource = pState->GetResource();
 	pState->ReturnObject(pClientHuman);
 
@@ -38,8 +35,6 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	CClientPlayer* pClientPlayer = reinterpret_cast<CClientPlayer*>(pClientManager->Create(ELEMENT_PLAYER));
-
 	const GChar* mdl = pState->CheckString(0);
 	if (!mdl) return false;
 
@@ -51,14 +46,12 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
+	CClientPlayer* pClientPlayer = reinterpret_cast<CClientPlayer*>(pClientManager->Create(ELEMENT_PLAYER));
 	pClientPlayer->SetModel(mdl);
 	//pClientPlayer->SetPosition(pos);
 	//pClientPlayer->SetHeading(angle);
-
 	pClientPlayer->Spawn(pos, angle, true);
-
 	pClientManager->SetLocalPlayer(pClientPlayer);
-
 	pClientPlayer->m_pResource = pState->GetResource();
 	pState->ReturnObject(pClientPlayer);
 
@@ -69,8 +62,6 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
-
 	const GChar* mdl = pState->CheckString(0);
 	if (!mdl) return false;
 
@@ -82,9 +73,9 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
+	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
 	CVector3D rot = CVecTools::ComputeDirEuler(angle);
 	pClientVehicle->Create(mdl, pos, rot);
-
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterObject(pClientVehicle);
 	pClientVehicle->Release();
