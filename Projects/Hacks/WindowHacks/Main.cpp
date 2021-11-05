@@ -19,16 +19,16 @@ static LRESULT CALLBACK SDLHackWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	{
 		//case WM_SHOWWINDOW:
 		//case WM_NCACTIVATE:
-	case WM_ACTIVATE://SDL handling this breaks bully
-	//case WM_GETMINMAXINFO:
-	//case WM_WINDOWPOSCHANGING:
-	//case WM_WINDOWPOSCHANGED:
-	//case WM_SIZE:
-	//case WM_PAINT:
-	//case WM_ERASEBKGND:
-	//case WM_DROPFILES:
-	//case WM_NCCALCSIZE:
-	//case WM_NCHITTEST:
+		case WM_ACTIVATE://SDL handling this breaks bully
+		//case WM_GETMINMAXINFO:
+		//case WM_WINDOWPOSCHANGING:
+		//case WM_WINDOWPOSCHANGED:
+		//case WM_SIZE:
+		//case WM_PAINT:
+		//case WM_ERASEBKGND:
+		//case WM_DROPFILES:
+		//case WM_NCCALCSIZE:
+		//case WM_NCHITTEST:
 		return WndProc(hWnd, message, wParam, lParam);
 	}
 	return CallWindowProc(SDLWndProc, hWnd, message, wParam, lParam);
@@ -73,14 +73,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_NCDESTROY:
 	{
-		if (GHWND == hWnd)
-			GHWND = NULL;
+		//if (GHWND == hWnd)
+		//	GHWND = NULL;
 
 		// Destroy SDL window
-		if (g_pWindow != nullptr)
-			SDL_DestroyWindow(g_pWindow);
-		SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		g_pWindow = nullptr;
+		//if (g_pWindow != nullptr)
+		//	SDL_DestroyWindow(g_pWindow);
+		//SDL_QuitSubSystem(SDL_INIT_VIDEO);
+		//g_pWindow = nullptr;
 	}
 	break;
 	case WM_SETCURSOR:
