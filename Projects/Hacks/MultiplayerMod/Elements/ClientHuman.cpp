@@ -919,7 +919,7 @@ void CClientHuman::DropWeapon()
 {
 	if (m_MafiaHuman == nullptr) return;
 
-	m_MafiaHuman->Do_WeaponDrop();
+	GetGameHuman()->Do_WeaponDrop();
 }
 
 int CClientHuman::GetAnimationState()

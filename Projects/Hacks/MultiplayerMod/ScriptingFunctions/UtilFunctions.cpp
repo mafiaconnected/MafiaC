@@ -115,21 +115,24 @@ static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, v
 	if (!pState->CheckVector3D(0, vecWorld))
 		return false;
 
-	// From Oakwood
-	D3DXVECTOR3 input = { vecWorld.x, vecWorld.y, vecWorld.z };
+	D3DXVECTOR3 input(vecWorld.x, vecWorld.y, vecWorld.z);
 	D3DXVECTOR3 out;
+
 	D3DVIEWPORT9 viewport;
-	g_pD3DDevice->GetViewport(&viewport);
-	D3DXMATRIX projection, view, world;
-	g_pD3DDevice->GetTransform(D3DTS_VIEW, &view);
-	D3DXMatrixIdentity(&world);
-	g_pD3DDevice->GetTransform(D3DTS_PROJECTION, &projection);
-	D3DXVec3Project(&out, &input, &viewport, &projection, &view, &world);
-	
-	CVector3D vecScreen;
-	vecScreen.x = out.x;
-	vecScreen.y = out.y;
-	vecScreen.z = out.z;
+	D3DXMATRIX view, projection, world;
+
+	if (g_pD3DDevice->GetViewport(&viewport) != D3D_OK)
+		printf("GetViewport fail\n");
+	if (g_pD3DDevice->GetTransform(D3DTS_VIEW, &view) != D3D_OK)
+		printf("GetTransform D3DTS_VIEW fail\n");
+	if (g_pD3DDevice->GetTransform(D3DTS_PROJECTION, &projection) != D3D_OK)
+		printf("GetTransform D3DTS_PROJECTION fail\n");
+
+	if (D3DXMatrixIdentity(&world) == nullptr)
+		printf("D3DXMatrixIdentity fail\n");
+
+	if (D3DXVec3Project(&out, &input, &viewport, &projection, &view, &world) == nullptr)
+		printf("D3DXVec3Project fail\n");
 
 	pState->ReturnVector3D(vecScreen);
 
@@ -174,9 +177,9 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
 
-	pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
-	pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
-	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
+	//pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 }
