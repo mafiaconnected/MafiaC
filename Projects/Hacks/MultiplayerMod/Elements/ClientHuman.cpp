@@ -946,6 +946,6 @@ void CClientHuman::CreateNetBlender()
 	auto pBlender = new CNetBlenderHuman(this);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
-		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
+		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 0;
 	m_pBlender = pBlender;
 }
