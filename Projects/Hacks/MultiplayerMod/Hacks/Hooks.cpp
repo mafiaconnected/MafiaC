@@ -500,6 +500,7 @@ static void OnRender2DStuff()
 		{
 			g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
 			g_pClientGame->OnRender2DStuff();
+			g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
 			g_p2D->End2D();
 		}
 	}

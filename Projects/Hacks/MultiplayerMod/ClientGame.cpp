@@ -1162,6 +1162,8 @@ void CClientGame::OnRender2DStuff(void)
 {
 	CVector2D vecSize;
 
+	m_pOnDrawnHUDEventType->Trigger();
+
 	if(!MafiaSDK::IsWindowFocused())
 	{
 		if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
@@ -1172,7 +1174,7 @@ void CClientGame::OnRender2DStuff(void)
 		return;
 	}
 
-	m_pOnDrawnHUDEventType->Trigger();
+	//m_pOnDrawnHUDEventType->Trigger();
 
 	float fWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
 	float fHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
