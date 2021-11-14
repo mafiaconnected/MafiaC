@@ -111,49 +111,42 @@ static bool FunctionGetPlayers(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
 {
-	CVector3D vecWorld;
-	if (!pState->CheckVector3D(0, vecWorld))
+	CVector3D pos;
+	if (!pState->CheckVector3D(0, pos))
 		return false;
 
-	// From Oakwood
-	D3DXVECTOR3 input = { vecWorld.x, vecWorld.y, vecWorld.z };
-	D3DXVECTOR3 out;
-	D3DVIEWPORT9 viewport;
-	g_pD3DDevice->GetViewport(&viewport);
-	D3DXMATRIX projection, view, world;
-	g_pD3DDevice->GetTransform(D3DTS_VIEW, &view);
-	D3DXMatrixIdentity(&world);
-	g_pD3DDevice->GetTransform(D3DTS_PROJECTION, &projection);
-	D3DXVec3Project(&out, &input, &viewport, &projection, &view, &world);
-	
+	D3DDEVICE_CREATION_PARAMETERS cparams;
+	RECT rect;
+	g_pD3DDevice->GetCreationParameters(&cparams);
+	GetWindowRect(cparams.hFocusWindow, &rect);
+
+	int iWindowWidth = rect.right - rect.left;
+	int iWindowHeight = rect.bottom - rect.top;
+
+	D3DXMATRIX matrix;
+	if (g_pD3DDevice->GetTransform(D3DTS_WORLD, &matrix) != D3D_OK)
+		return false;
+
+	CVector4D clipCoords;
+	clipCoords.x = pos.x * matrix[0] + pos.y * matrix[1] + pos.z * matrix[2] + matrix[3];
+	clipCoords.y = pos.x * matrix[4] + pos.y * matrix[5] + pos.z * matrix[6] + matrix[7];
+	clipCoords.z = pos.x * matrix[8] + pos.y * matrix[9] + pos.z * matrix[10] + matrix[11];
+	clipCoords.w = pos.x * matrix[12] + pos.y * matrix[13] + pos.z * matrix[14] + matrix[15];
+
+	if (clipCoords.w < 0.1f)
+		return false;
+
+	CVector3D NDC;
+	NDC.x = clipCoords.x / clipCoords.w;
+	NDC.y = clipCoords.y / clipCoords.w;
+	NDC.z = clipCoords.z / clipCoords.w;
+
 	CVector3D vecScreen;
-	vecScreen.x = out.x;
-	vecScreen.y = out.y;
-	vecScreen.z = out.z;
+	vecScreen.x = (iWindowWidth / 2 * NDC.x) + (NDC.x + iWindowWidth / 2);
+	vecScreen.y = -(iWindowHeight / 2 * NDC.y) + (NDC.y + iWindowHeight / 2);
+	vecScreen.z = 0.0f;
 
 	pState->ReturnVector3D(vecScreen);
-
-	// From GTA Connected
-	// Get the static view matrix as D3DXMATRIX
-	//CMatrix4x4 m ( (float*)SELECTADDRESS_GTA(0x7095F0, 0x7E4EF8, 0xB6FA2C, SELECTADDRESS_ADDRESS_NOTIMPLEMENTED, 0x7095F0, 0x7E4F00, 0xB720AC, SELECTADDRESS_ADDRESS_NOTIMPLEMENTED, SELECTADDRESS_ADDRESS_NOTIMPLEMENTED) );
-	//D3DXMATRIX projection;
-
-	// Get the static virtual screen (x,y)-sizes
-	//unsigned int uiLenX = MafiaSDK::GetIGraph()->Scrn_sx();
-	//unsigned int uiLenY = MafiaSDK::GetIGraph()->Scrn_sy();
-
-	// Do a transformation
-	//CVector3D vecScreen;
-	//vecScreen.x = vecWorld.z * m.m_vec[2].x + vecWorld.y * m.m_vec[1].x + vecWorld.x * m.m_vec[0].x + m.m_vec[3].x;
-	//vecScreen.y = vecWorld.z * m.m_vec[2].y + vecWorld.y * m.m_vec[1].y + vecWorld.x * m.m_vec[0].y + m.m_vec[3].y;
-	//vecScreen.z = vecWorld.z * m.m_vec[2].z + vecWorld.y * m.m_vec[1].z + vecWorld.x * m.m_vec[0].z + m.m_vec[3].z;
-
-	// Get the correct screen coordinates
-	//float fRecip = 1.0f / vecScreen.m_Z;
-	//vecScreen.m_X *= fRecip * uiLenX;
-	//vecScreen.m_Y *= fRecip * uiLenY;
-
-	
 
 	return true;
 }
