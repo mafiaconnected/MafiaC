@@ -145,9 +145,8 @@ static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, v
 	vecScreen.x = (iWindowWidth / 2 * NDC.x) + (NDC.x + iWindowWidth / 2);
 	vecScreen.y = -(iWindowHeight / 2 * NDC.y) + (NDC.y + iWindowHeight / 2);
 	vecScreen.z = 0.0f;
-
+	
 	pState->ReturnVector3D(vecScreen);
-
 	return true;
 }
 
@@ -167,9 +166,9 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
 
-	pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
-	pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
-	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
+	//pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 }

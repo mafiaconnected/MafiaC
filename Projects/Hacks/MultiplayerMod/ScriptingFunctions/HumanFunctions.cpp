@@ -626,6 +626,25 @@ static bool FunctionHumanRemoveFromVehicle(IScriptState* pState, int argc, void*
 	pClientHuman->RemoveFromVehicle();
 	return true;
 }
+
+static bool FunctionHumanPlayAnim(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	const GChar* animName = pState->CheckString(0);
+	if (!animName)
+		return false;
+
+	pClientHuman->PlayAnim((const char*)animName);
+
+	pState->Error(_gstr("human not spawned"));
+	return false;
+}
 #pragma endregion
 
 void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
@@ -647,12 +666,12 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("giveWeapon"), _gstr("tiii"), FunctionHumanGiveWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("hasWeapon"), _gstr("ti"), FunctionHumanHasWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("takeWeapon"), _gstr("ti"), FunctionHumanTakeWeapon, pClientManager);
-	//pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("dropWeapon"), _gstr("t"), FunctionHumanDropWeapon, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("dropWeapon"), _gstr("t"), FunctionHumanDropWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
-	//pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("playAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
 
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
 
-	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
+	//pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
 }

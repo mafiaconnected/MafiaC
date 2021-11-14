@@ -348,7 +348,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 	{
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr(""), FunctionSetPlayerControl, pClientGame);
+		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
 		//pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv"), FunctionSetCameraLookAt, pClientGame);
 	}
 

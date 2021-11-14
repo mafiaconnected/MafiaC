@@ -500,6 +500,7 @@ static void OnRender2DStuff()
 		{
 			g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
 			g_pClientGame->OnRender2DStuff();
+			g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
 			g_p2D->End2D();
 		}
 	}
@@ -588,7 +589,7 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	//new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
 
 	// Disable local player weapon drop
 	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 

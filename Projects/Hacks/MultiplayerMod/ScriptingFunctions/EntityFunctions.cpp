@@ -111,4 +111,5 @@ void CScriptingFunctions::RegisterEntityFunctions(Galactic3D::CScripting* pScrip
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionEntityGetPosition, FunctionEntitySetPosition);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("rotation"), ARGUMENT_VECTOR3D, FunctionEntityGetRotation, FunctionEntitySetRotation);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("model"), ARGUMENT_STRING, FunctionEntityGetModel);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModel);
 }
