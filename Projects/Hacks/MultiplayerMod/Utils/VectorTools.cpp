@@ -34,14 +34,14 @@ CMatrix3x3::CMatrix3x3(const CVector3D& front, const CVector3D& up, const CVecto
 CVector3D CMatrix3x3::GetEuler()
 {
 	if (CMatrix3x3::CloseEnough(m_rotX.z, -1.0f)) {
-		float x = 0;
-		float y = PI / 2;
+		float x = 0.0f;
+		float y = PI / 2.0f;
 		float z = x + atan2(m_rotY[0], m_rotZ[0]);
 		return { x, y, z };
 	}
 	else if (CloseEnough(m_rotX.z, 1.0f)) {
-		float x = 0;
-		float y = -PI / 2;
+		float x = 0.0f;
+		float y = -PI / 2.0f;
 		float z = -x + atan2(-m_rotY[0], -m_rotZ[0]);
 		return { x, y, z };
 	}
