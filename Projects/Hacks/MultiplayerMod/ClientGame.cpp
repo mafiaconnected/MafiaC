@@ -1409,7 +1409,7 @@ void CClientGame::StopMultiplayerGameWhenSafe(int iReason)
 
 bool CClientGame::CanRotateCamera(void)
 {
-	if (m_pCmdWindow->IsEnabled())
+	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return false;
 	if (IsCursorEnabled())
 		return false;
@@ -1424,7 +1424,7 @@ bool CClientGame::IsInputDisabled(void)
 		return true;
 	if (m_bFocusedSupressInput)
 		return true;
-	if (m_pCmdWindow->IsEnabled())
+	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return true;
 	if (m_GUISystem.m_pPage)
 	{
