@@ -109,6 +109,45 @@ static bool FunctionGetPlayers(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionGetCameraPosition(IScriptState* pState, int argc, void* pUser)
+{
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+
+	CVector3D vecCameraPosition;
+	vecCameraPosition.x = camMat3.m[3][0];
+	vecCameraPosition.y = camMat3.m[3][1];
+	vecCameraPosition.z = camMat3.m[3][2];
+
+	pState->ReturnVector3D(vecCameraPosition);
+	return true;
+}
+
+static bool FunctionGetCameraLookAtPosition(IScriptState* pState, int argc, void* pUser)
+{
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+
+	CVector3D vecCameraPosition;
+	vecCameraPosition.x = camMat3.m[3][0];
+	vecCameraPosition.y = camMat3.m[3][1];
+	vecCameraPosition.z = camMat3.m[3][2];
+
+	D3DXMATRIX temp1;
+	D3DXMatrixInverse(&temp1, NULL, &camMat3);
+	D3DXVECTOR3 lookAtInViewSpace(0.0f, 1.0f, 0.0f); // Forward vector (use 0, 0, -1 if you have a right-handed coordinate system)
+	D3DXVECTOR4 lookAtInWorldSpace;
+	D3DXVec3Transform(&lookAtInWorldSpace, &lookAtInViewSpace, &temp1); // Transform into world space.
+
+	CVector3D vecCameraLookAtPosition;
+	vecCameraLookAtPosition.x = lookAtInWorldSpace.x;
+	vecCameraLookAtPosition.y = lookAtInWorldSpace.y;
+	vecCameraLookAtPosition.z = lookAtInWorldSpace.z;
+
+	pState->ReturnVector3D(vecCameraLookAtPosition);
+	return true;
+}
+
 static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
 {
 	CVector3D pos;
@@ -163,6 +202,8 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 
 void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
+	auto pClientManager = pClientGame->m_pClientManager;
+
 	pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
 
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
@@ -173,4 +214,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	//pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
+	
+	pScripting->m_Global.AddProperty(pClientManager, _gstr("cameraPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition);
+	pScripting->m_Global.AddProperty(pClientManager, _gstr("cameraLookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition);
 }
