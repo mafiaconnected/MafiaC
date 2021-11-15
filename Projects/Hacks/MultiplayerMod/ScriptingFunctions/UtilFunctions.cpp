@@ -115,37 +115,39 @@ static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, v
 	if (!pState->CheckVector3D(0, pos))
 		return false;
 
-	D3DDEVICE_CREATION_PARAMETERS cparams;
-	RECT rect;
-	g_pD3DDevice->GetCreationParameters(&cparams);
-	GetWindowRect(cparams.hFocusWindow, &rect);
+	D3DXVECTOR3 origin;
+	origin.x = pos.x;
+	origin.y = pos.y;
+	origin.z = pos.z;
 
-	int iWindowWidth = rect.right - rect.left;
-	int iWindowHeight = rect.bottom - rect.top;
+	D3DXMATRIX world;
+	D3DXMatrixIdentity(&world);
 
-	D3DXMATRIX matrix;
-	if (g_pD3DDevice->GetTransform(D3DTS_WORLD, &matrix) != D3D_OK)
+	D3DVIEWPORT9 vp;
+	if (g_pD3DDevice->GetViewport(&vp) != D3D_OK)
 		return false;
 
-	CVector4D clipCoords;
-	clipCoords.x = pos.x * matrix[0] + pos.y * matrix[1] + pos.z * matrix[2] + matrix[3];
-	clipCoords.y = pos.x * matrix[4] + pos.y * matrix[5] + pos.z * matrix[6] + matrix[7];
-	clipCoords.z = pos.x * matrix[8] + pos.y * matrix[9] + pos.z * matrix[10] + matrix[11];
-	clipCoords.w = pos.x * matrix[12] + pos.y * matrix[13] + pos.z * matrix[14] + matrix[15];
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
 
-	if (clipCoords.w < 0.1f)
-		return false;
+	D3DXMATRIX camMat1 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 356);
+	D3DXMATRIX camMat2 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 484);
 
-	CVector3D NDC;
-	NDC.x = clipCoords.x / clipCoords.w;
-	NDC.y = clipCoords.y / clipCoords.w;
-	NDC.z = clipCoords.z / clipCoords.w;
+	D3DXMATRIX Projection;
+	D3DXMatrixPerspectiveFovLH(&Projection, 0.4f * 3.14f, ((float)vp.Width) / ((float)vp.Height), 1.0f, 1000.0f);
+
+	D3DXMATRIX WVP1 = world * camMat1 * Projection;
+	D3DXMATRIX WVP2 = world * camMat2 * Projection;
+
+	D3DXVECTOR3 screenCoord1(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 screenCoord2(0.0f, 0.0f, 0.0f);
+	D3DXVec3TransformCoord(&screenCoord1, &origin, &WVP1);
+	D3DXVec3TransformCoord(&screenCoord2, &origin, &WVP2);
 
 	CVector3D vecScreen;
-	vecScreen.x = (iWindowWidth / 2 * NDC.x) + (NDC.x + iWindowWidth / 2);
-	vecScreen.y = -(iWindowHeight / 2 * NDC.y) + (NDC.y + iWindowHeight / 2);
+	vecScreen.x = (screenCoord1.x + 0.5f) * (float)vp.Width;
+	vecScreen.y = ((-screenCoord2.y + 1.0f) / 3.0f) * (float)vp.Height;
 	vecScreen.z = 0.0f;
-	
+
 	pState->ReturnVector3D(vecScreen);
 	return true;
 }
