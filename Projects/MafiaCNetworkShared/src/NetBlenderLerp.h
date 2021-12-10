@@ -13,9 +13,10 @@ public:
 	public:
 		CInterpolation();
 
-		CVector3D m_vecStart;
 		CVector3D m_vecTarget;
 		CVector3D m_vecError;
+		CQuaternion m_quatTarget;
+		CQuaternion m_quatError;
 		float m_fLastAlpha;
 		uint32_t m_uiStartTime;
 		uint32_t m_uiFinishTime;
@@ -24,7 +25,9 @@ public:
 		inline void RemoveTarget() { m_uiFinishTime = 0; }
 
 		void Update(CVector3D& vecResult, float fMaxError);
+		void Update(CQuaternion& quatResult, float fMaxError);
 		void SetTarget(const CVector3D& vecTarget, const CVector3D& vecError, uint32_t uiDelay);
+		void SetTarget(const CQuaternion& quatTarget, const CQuaternion& quatError, uint32_t uiDelay);
 	};
 
 	uint32_t m_uiDelay;

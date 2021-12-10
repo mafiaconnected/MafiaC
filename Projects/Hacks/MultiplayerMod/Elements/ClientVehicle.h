@@ -20,7 +20,12 @@ private:
 	Galactic3D::Weak<CClientHuman> m_pOccupants[4];
 
 	bool m_Horn = false;
-	float m_EngineRPM = 0.0;
+	float m_EngineRPM = 0.0f;
+
+public:
+	CVector3D m_vecCachedPositionForTraffic{ 0, 0, 0 };
+
+	bool m_bDontRemoveGameItem = false;
 
 public:
 	CClientVehicle(CMafiaClientManager* pClientManager);
@@ -43,8 +48,11 @@ public:
 	virtual bool SetRotation(const CVector3D& vecPos) override;
 	virtual bool GetRotation(CVector3D& vecPos) override;
 
-	virtual bool SetVehicleRotation(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight);
-	virtual bool GetVehicleRotation(CVector3D& rotationFront, CVector3D& rotationUp, CVector3D& rotationRight);
+	virtual bool SetRotationMat(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight);
+	virtual bool GetRotationMat(CVector3D& rotationFront, CVector3D& rotationUp, CVector3D& rotationRight);
+
+	bool SetRotationQuat(CQuaternion& quatRot);
+	bool GetRotationQuat(CQuaternion& quatRot);
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;

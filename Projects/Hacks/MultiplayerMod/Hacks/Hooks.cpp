@@ -16,6 +16,9 @@
 
 using namespace Galactic3D;
 
+bool g_bTrafficEnabled = false;
+std::unordered_map<uint32_t, std::string> g_umapModelNames;
+
 extern decltype(Direct3DCreate9)* g_pDirect3DCreate9;
 extern IDirect3D9* WINAPI HookDirect3DCreate9(UINT SDKVersion);
 
@@ -44,7 +47,8 @@ static void OnGameInit()
 	CGameHacks::EnableGameMap(false);
 
 	// Disable the traffic
-	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(false);
+	if (!g_bTrafficEnabled)
+		MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(false);
 
 	auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
 	auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
@@ -67,12 +71,12 @@ static void OnGameExit()
 
 __declspec(naked) void OnGameExit_Hook()
 {
-    __asm {
-        pushad
-        call OnGameExit
-        popad
-        retn
-    }
+	__asm {
+		pushad
+		call OnGameExit
+		popad
+		retn
+	}
 }
 
 // UseActor
@@ -97,6 +101,11 @@ HOOKVAR MafiaSDK::C_Actor* g_pCreateActor_Actor;
 HOOKVAR int g_pCreateActor_Arg1;
 HOOKVAR bool g_bCancelCreateActor;
 
+// CarCar
+HOOKADDRESS g_ReturnCarUpdate;
+HOOKVAR MafiaSDK::C_Car* g_pCarUpdate_Car;
+HOOKVAR bool g_bCancelCarUpdate;
+
 // SceneCreateActor
 HOOKADDRESS g_ReturnSceneCreateActor;
 HOOKVAR MafiaSDK::C_Mission_Enum::ObjectTypes g_pSceneCreateActor_Type;
@@ -114,6 +123,12 @@ HOOKADDRESS g_ReturnHumanSetNormalPose;
 HOOKVAR MafiaSDK::C_Human* g_pHumanSetNormalPose_Human;
 HOOKVAR CVector3D* g_pvecHumanSetNormalPose_Vec;
 HOOKVAR bool g_bCancelHumanSetNormalPose;
+
+// HookModelOpen
+HOOKADDRESS g_ReturnModelOpen;
+HOOKVAR uint32_t g_pModelOpen_Arg1;
+HOOKVAR uint32_t g_pModelOpen_Arg2;
+HOOKVAR bool g_bCancelModelOpen;
 
 RAWCODECALL HumanDoThrowCocotFromCar(void)
 {
@@ -142,7 +157,7 @@ RAWCODECALL HumanDoThrowCocotFromCar(void)
 
 RAWCODECALL HumanUseActor(void)
 {
-	if (g_pClientGame->m_bUseActorInvokedByGame) 
+	if (g_pClientGame->m_bUseActorInvokedByGame)
 	{
 		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)g_pHumanUseActor_Human);
 		if (pClientHuman != nullptr)
@@ -174,9 +189,10 @@ RAWCODECALL HumanUseActor(void)
 
 RAWCODECALL CreateActor(void)
 {
-	if (g_pClientGame->m_bCreateActorInvokedByGame) {
-		_glogprintf(_gstr("CreateActor: %i"), g_pCreateActor_Arg1);
-		
+	if (g_pClientGame->m_bCreateActorInvokedByGame)
+	{
+		//_glogprintf(_gstr("[GAME] CreateActor: %i"), g_pCreateActor_Arg1);
+
 		// 2 = spawned player
 		// 4 = spawned vehicle
 
@@ -184,6 +200,54 @@ RAWCODECALL CreateActor(void)
 		{
 			// Human
 			//g_pClientGame->CreateGameHuman(g_pCreateActor_Actor, g_pCreateActor_Arg1);
+		}
+	}
+}
+
+RAWCODECALL ModelOpen(void)
+{
+	//if (g_pClientGame->m_bModelOpenInvokedByGame)
+	{
+		//printf("[Model::Open] Frame=0x%X ModelName=%s\n", g_pModelOpen_Arg1, (char*)g_pModelOpen_Arg2);
+
+		g_umapModelNames[(uint32_t)g_pModelOpen_Arg1] = (char*)g_pModelOpen_Arg2;
+	}
+}
+
+RAWCODECALL CarUpdate(void)
+{
+	if (!g_bTrafficEnabled)
+		return;
+
+	if (g_pClientGame->m_bCreateVehicleInvokedByGame)
+	{
+		if (g_pCarUpdate_Car == nullptr)
+			return;
+
+		CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(g_pCarUpdate_Car);
+
+		if (pClientVehicle == nullptr)
+		{
+			//_glogprintf(_gstr("[GAME] Car::Update - Added Vehicle 0x%X Frame 0x%X"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()));
+			//printf("Model Name for Create: %s\n", g_umapModelNames[(uint32_t)(g_pCarCar_Car->GetFrame())].c_str());
+
+			g_pClientGame->OnTrafficCarCreate(g_pCarUpdate_Car);
+		}
+		else
+		{
+			CVector3D vecGamePosition;
+			pClientVehicle->GetPosition(vecGamePosition);
+
+			float fDistance = vecGamePosition.distance(pClientVehicle->m_vecCachedPositionForTraffic);
+			if (fDistance >= 25.0f)
+			{
+				//_glogprintf(_gstr("[GAME] Car::Update - Respawned Vehicle 0x%X Frame 0x%X %f"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()), fDistance);
+				//printf("Model Name for Respawn: %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str());
+
+				g_pClientGame->OnTrafficCarRespawn(pClientVehicle, g_pCarUpdate_Car);
+			}
+
+			pClientVehicle->m_vecCachedPositionForTraffic = vecGamePosition;
 		}
 	}
 }
@@ -316,7 +380,6 @@ RAWCODE HookCreateActor(void)
 {
 	_asm
 	{
-		mov g_pCreateActor_Actor, ecx
 		mov eax, [esp + 4]
 		mov g_pCreateActor_Arg1, eax
 		pushad
@@ -336,6 +399,22 @@ RAWCODE HookCreateActor(void)
 		popad
 		mov eax, fs:0
 		jmp g_ReturnCreateActor
+	}
+}
+
+RAWCODE HookCarUpdate(void)
+{
+	_asm
+	{
+		mov		g_pCarUpdate_Car, ecx
+		pushad
+	}
+	CarUpdate();
+	_asm
+	{
+		popad
+		mov     eax, fs:0
+		jmp		g_ReturnCarUpdate
 	}
 }
 
@@ -369,6 +448,34 @@ RAWCODE HookSceneCreateActor(void)
 	}
 }
 */
+
+RAWCODE HookModelOpen(void)
+{
+	_asm
+	{
+		mov eax, [esp + 4]
+		mov g_pModelOpen_Arg1, eax
+		mov eax, [esp + 8]
+		mov g_pModelOpen_Arg2, eax
+		pushad
+	}
+	g_bCancelModelOpen = false;
+	ModelOpen();
+	if (g_bCancelModelOpen)
+	{
+		_asm
+		{
+			//popad
+			//retn
+		}
+	}
+	__asm {
+		popad
+		push    ebx
+		mov     ebx, [esp + 8]
+		jmp		g_ReturnModelOpen
+	}
+}
 
 RAWCODE HookHumanSetAimPose(void)
 {
@@ -500,7 +607,6 @@ static void OnRender2DStuff()
 		{
 			g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
 			g_pClientGame->OnRender2DStuff();
-			g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
 			g_p2D->End2D();
 		}
 	}
@@ -575,12 +681,12 @@ DWORD HumanHit_Addr = 0x005762A0;
 void CGameHooks::InstallHooks()
 {
 	// Game Hooks
-    MafiaSDK::C_Game_Hooks::HookOnGameInit(OnGameInit);
-    MafiaSDK::C_Game_Hooks::HookOnGameTick(OnGameTick);
-    MafiaSDK::C_Game_Hooks::HookLocalPlayerFallDown(OnLocalPlayerFallDown);
+	MafiaSDK::C_Game_Hooks::HookOnGameInit(OnGameInit);
+	MafiaSDK::C_Game_Hooks::HookOnGameTick(OnGameTick);
+	MafiaSDK::C_Game_Hooks::HookLocalPlayerFallDown(OnLocalPlayerFallDown);
 
 	// Indicator Hooks
-    MafiaSDK::C_Indicators_Hooks::HookAfterAllDraw(HookRender2DStuff);
+	MafiaSDK::C_Indicators_Hooks::HookAfterAllDraw(HookRender2DStuff);
 
 	// Human Hooks
 	MafiaSDK::C_Human_Hooks::HookOnHumanHit(OnHumanHit);
@@ -589,7 +695,7 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
 
 	// Disable local player weapon drop
 	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
@@ -612,7 +718,7 @@ void CGameHooks::InstallHooks()
 	// Hook CreateActor
 	new CHackJumpHack(g_pHack, (void*)0x0053F7D0, HookCreateActor, 6);
 	g_ReturnCreateActor = (void*)(0x0053F7D0 + 6);
-	
+
 	// Note (Sevenisko): Currently unnecessary to work on
 	new CHackJumpHack(g_pHack, (void*)UpdateProgress_Addr, &SetProgress_Hook, 6);
 
@@ -630,4 +736,12 @@ void CGameHooks::InstallHooks()
 	// Hook SceneCreateActor
 	//new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
 	//g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
+
+	// Hook Car::Update
+	new CHackJumpHack(g_pHack, (void*)0x41FAC0, HookCarUpdate, 6);
+	g_ReturnCarUpdate = (void*)(0x41FAC0 + 6);
+
+	// Hook I3D_Model::Open
+	new CHackJumpHack(g_pHack, (void*)0x100335A0, HookModelOpen, 5);
+	g_ReturnModelOpen = (void*)(0x100335A0 + 5);
 }

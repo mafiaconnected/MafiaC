@@ -10,6 +10,8 @@ class CClientVehicle;
 
 #define MAFIA_P2P_SERVER_IDS 1
 
+CNetObject* FromGUID(uint64_t uiGuid);
+
 class CMultiplayer : public Galactic3D::CClientNetGame
 {
 public:
