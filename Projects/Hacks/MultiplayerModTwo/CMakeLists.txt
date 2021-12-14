@@ -2,17 +2,17 @@ file(GLOB_RECURSE SOURCES *.cpp *.h *.rc)
 
 group_sources("${SOURCES}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../MafiaSDK")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Direct3D9")
 
 if(MSVC)
 	precompiled_header(stdafx)
 endif()
 
-new_hack_static(MultiplayerMod "${SOURCES}" "")
+new_hack_static(MultiplayerModTwo "${SOURCES}" "")
 
 target_link_libraries(
-	MultiplayerMod
+	MultiplayerModTwo
 	PRIVATE
 	d3d8to9_static
 	asmjit_static

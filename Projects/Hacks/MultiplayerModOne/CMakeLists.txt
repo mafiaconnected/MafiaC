@@ -9,10 +9,10 @@ if(MSVC)
 	precompiled_header(stdafx)
 endif()
 
-new_hack_static(MultiplayerMod "${SOURCES}" "")
+new_hack_static(MultiplayerModOne "${SOURCES}" "")
 
 target_link_libraries(
-	MultiplayerMod
+	MultiplayerModOne
 	PRIVATE
 	d3d8to9_static
 	asmjit_static
