@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ClientEntity.h"
+#include "ClientVehicle.h"
 #include "../ClientManager.h"
 #include "../ClientGame.h"
 #include "NetBlenderHuman.h"
@@ -13,7 +14,7 @@ public:
 	unsigned short ammo2 = 0;
 };
 
-class CClientHuman : public CClientEntity
+class CClientHumanII : public CClientEntityII
 {
 private:
 	M2::C_Human2* m_MafiaHuman;
@@ -23,7 +24,7 @@ private:
 	InventoryItem items[8];
 
 public:
-	CClientHuman(CMafiaClientManager* pClientManager);
+	CClientHumanII(CMafiaClientManagerII* pClientManager);
 
 	bool m_isLocalPlayer = false;
 
@@ -38,15 +39,13 @@ public:
 
 	CVector3D m_vecCamera;
 
-	CClientVehicle* m_pVehicleEvent = nullptr;
+	CClientVehicleII* m_pVehicleEvent = nullptr;
 	
-	Galactic3D::Weak<CClientVehicle> m_pCurrentVehicle;
+	Galactic3D::Weak<CClientVehicleII> m_pCurrentVehicle;
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
 
 	virtual M2::C_Human2* GetGameHuman();
-
-	void UpdateGameMatrix(void);
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;
@@ -82,17 +81,17 @@ public:
 	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
 
-	CClientVehicle* GetOccupiedVehicle(void);
-	CClientVehicle* GetEnteringExitingVehicle(void);
+	CClientVehicleII* GetOccupiedVehicle(void);
+	CClientVehicleII* GetEnteringExitingVehicle(void);
 	int8_t GetVehicleSeat(void);
 
 	bool IsInVehicle(void);
-	bool IsInVehicle(CClientVehicle* pClientVehicle);
-	bool IsInVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat);
-	void EnterVehicle(CClientVehicle* pVehicle, uint8_t ucSeat);
+	bool IsInVehicle(CClientVehicleII* pClientVehicle);
+	bool IsInVehicle(CClientVehicleII* pClientVehicle, uint8_t ucSeat);
+	void EnterVehicle(CClientVehicleII* pVehicle, uint8_t ucSeat);
 	void RemoveFromVehicle(void);
 	void ExitVehicle(void);
-	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t byteSeat);
+	bool WarpIntoVehicle(CClientVehicleII* pClientVehicle, uint8_t byteSeat);
 
 	virtual bool SetModel(uint32_t modelName) override;
 	virtual uint32_t GetModel() override;

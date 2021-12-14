@@ -24,25 +24,25 @@ namespace Galactic3D
 	class CClientDownloadManager;
 };
 
-class CClientPlayer;
+class CClientPlayerII;
 
-class CMafiaCHtmlContainer : public CHtmlContainer
+class CMafiaCHtmlContainerII : public CHtmlContainer
 {
 public:
-	CMafiaCHtmlContainer(Context* pContext, class CClientGame* pClientGame);
+	CMafiaCHtmlContainerII(Context* pContext, class CClientGameII* pClientGame);
 
-	CClientGame* m_pClientGame;
+	CClientGameII* m_pClientGame;
 
 	virtual Galactic3D::Stream* OpenFile(const GChar* pszPath) override;
 	virtual void on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el) override;
 };
 
 #ifdef MAFIA_NAMETAGS
-class CNametags
+class CNametagsII
 {
 public:
-	CNametags(Galactic3D::Context* pContext, LucasGUI::CFonts* pFonts, float fScale);
-	~CNametags();
+	CNametagsII(Galactic3D::Context* pContext, LucasGUI::CFonts* pFonts, float fScale);
+	~CNametagsII();
 
 	Galactic3D::Context* m_pContext;
 	LucasGUI::CFonts* m_pFonts;
@@ -55,10 +55,10 @@ public:
 };
 #endif
 
-class CTextDrawing
+class CTextDrawingII
 {
 public:
-	CTextDrawing();
+	CTextDrawingII();
 
 	float m_fLargeSize;
 	LucasGUI::CFontStack m_LargeFontStack;
@@ -73,24 +73,24 @@ public:
 	void RenderText(Galactic3D::I2D* p2D, size_t Font, const GChar* pszText, const CVector2D& vecOffset, float fWidth, float fAlign, float fJustify, Galactic3D::COLOUR Colour, bool bWordWrap, bool bColourCodes = true, bool bIgnoreColourCodes = false, bool bShadow = false);
 };
 
-class CClientGame
+class CClientGameII
 {
 public:
-	CClientGame(Galactic3D::Context* pContext);
-	~CClientGame(void);
+	CClientGameII(Galactic3D::Context* pContext);
+	~CClientGameII(void);
 
 	Galactic3D::Context* m_pContext;
 	Galactic3D::CVarSystem m_CVars;
 	bool m_bCEGUIInitialised;
-	class CMafiaClientManager* m_pClientManager;
+	class CMafiaClientManagerII* m_pClientManager;
 	Galactic3D::CInternetCache m_InternetCache;
 	Galactic3D::CInternetRequestMgr m_InternetRequestMgr;
 	bool m_bStopMultiplayerGame;
 	int m_iStopMultiplayerGameReason;
 	bool m_bMultiplayerWorld;
 	bool m_bForceMultiplayerWorld;
-	class CMultiplayer* m_pMultiplayer;
-	class CMultiplayer* m_pNewMultiplayer;
+	class CMultiplayerII* m_pMultiplayer;
+	class CMultiplayerII* m_pNewMultiplayer;
 	class CMafiaClientResourceMgr* m_pResourceMgr;
 	Galactic3D::CGalacticFunctions* m_pGalacticFunctions;
 	Galactic3D::Audio::CAudioScriptingFunctions* m_pAudioScriptingFunctions;
@@ -119,7 +119,7 @@ public:
 	Galactic3D::CClientDownloadManager* m_pDownloadManager;
 	Galactic3D::TimeManager m_TimeManager;
 	LucasGUI::CFonts m_Fonts;
-	CTextDrawing m_TextDrawing;
+	CTextDrawingII m_TextDrawing;
 	bool m_bTrainsEnabled;
 
 	//CProxy2DRenderer m_Proxy2D;
@@ -169,7 +169,7 @@ public:
 	GString m_DiscordUserId;
 
 #ifdef MAFIA_NAMETAGS
-	CNametags* m_pNametags;
+	CNametagsII* m_pNametags;
 #endif
 
 	CHtmlContainer* m_pHtmlContainer;
@@ -191,8 +191,8 @@ public:
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
-	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
-	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
+	inline CMultiplayerII* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
+	inline CMultiplayerII* GetActiveMultiplayer(void) { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
 
 	void Initialise();
@@ -260,19 +260,19 @@ public:
 
 	void LockControls(bool state);
 
-	void HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
-	void HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown);
-	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
-	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
-	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat);
-	void HumanHit(CClientHuman* humanTarget, CClientEntity* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
+	void HumanEnteringVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
+	void HumanEnteredVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown);
+	void HumanExitingVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
+	void HumanExitedVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
+	void HumanJackVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat);
+	void HumanHit(CClientHumanII* humanTarget, CClientEntityII* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
 
-	M2::eEntityType CClientGame::ToMafiaEntityType(int entityType);
+	M2::eEntityType ToMafiaEntityType(int entityType);
 };
 
-extern CClientGame* g_pClientGame;
+extern CClientGameII* g_pClientGame;
 
 class CSuppressNetworkedEntities
 {

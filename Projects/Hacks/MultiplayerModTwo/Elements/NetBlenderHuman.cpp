@@ -23,14 +23,14 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
 }
 
-CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity) :
+CNetBlenderHumanII::CNetBlenderHumanII(CClientHumanII* pEntity) :
 	m_pEntity(pEntity),
 	m_fRotationMaxError(1.0f)
 {
 	m_pEntity = pEntity;
 }
 
-void CNetBlenderHuman::SetTargetRotation(CVector3D& vecRotation)
+void CNetBlenderHumanII::SetTargetRotation(CVector3D& vecRotation)
 {
 	UpdateTargetRotation();
 
@@ -41,12 +41,12 @@ void CNetBlenderHuman::SetTargetRotation(CVector3D& vecRotation)
 	m_Rotation.SetTarget(vecRotation, vecError, m_uiDelay);
 }
 
-void CNetBlenderHuman::GetPosition(CVector3D& vecPos)
+void CNetBlenderHumanII::GetPosition(CVector3D& vecPos)
 {
 	m_pEntity->GetPosition(vecPos);
 }
 
-void CNetBlenderHuman::SetPosition(const CVector3D& vecPos)
+void CNetBlenderHumanII::SetPosition(const CVector3D& vecPos)
 {
 	auto pBlender = m_pEntity->m_pBlender;
 	m_pEntity->m_pBlender = nullptr;
@@ -54,12 +54,12 @@ void CNetBlenderHuman::SetPosition(const CVector3D& vecPos)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderHuman::GetRotation(CVector3D& vecRotation)
+void CNetBlenderHumanII::GetRotation(CVector3D& vecRotation)
 {
 	m_pEntity->GetRotation(vecRotation);
 }
 
-void CNetBlenderHuman::SetRotation(const CVector3D& vecRotation)
+void CNetBlenderHumanII::SetRotation(const CVector3D& vecRotation)
 {
 	auto pBlender = m_pEntity->m_pBlender;
 	m_pEntity->m_pBlender = nullptr;
@@ -67,27 +67,27 @@ void CNetBlenderHuman::SetRotation(const CVector3D& vecRotation)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderHuman::GetMoveSpeed(CVector3D& vecMoveSpeed)
+void CNetBlenderHumanII::GetMoveSpeed(CVector3D& vecMoveSpeed)
 {
 	m_pEntity->GetVelocity(vecMoveSpeed);
 }
 
-void CNetBlenderHuman::SetMoveSpeed(const CVector3D& vecMoveSpeed)
+void CNetBlenderHumanII::SetMoveSpeed(const CVector3D& vecMoveSpeed)
 {
 	m_pEntity->SetVelocity(vecMoveSpeed);
 }
 
-void CNetBlenderHuman::GetTurnSpeed(CVector3D& vecTurnSpeed)
+void CNetBlenderHumanII::GetTurnSpeed(CVector3D& vecTurnSpeed)
 {
 	m_pEntity->GetRotationVelocity(vecTurnSpeed);
 }
 
-void CNetBlenderHuman::SetTurnSpeed(const CVector3D& vecTurnSpeed)
+void CNetBlenderHumanII::SetTurnSpeed(const CVector3D& vecTurnSpeed)
 {
 	m_pEntity->SetRotationVelocity(vecTurnSpeed);
 }
 
-void CNetBlenderHuman::UpdateTargetRotation()
+void CNetBlenderHumanII::UpdateTargetRotation()
 {
 	if (m_Rotation.HasTarget())
 	{

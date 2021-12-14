@@ -1,6 +1,6 @@
 #pragma once
 
-class CGameHacks
+class CGameHacksII
 {
 public:
 	static void EnableGameMap(bool state);

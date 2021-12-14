@@ -8,73 +8,71 @@
 
 using namespace Galactic3D;
 
-CClientVehicle::CClientVehicle(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
+CClientVehicleII::CClientVehicleII(CMafiaClientManagerII* pClientManager) : CClientEntityII(pClientManager)
 {
 	m_Type = ELEMENT_VEHICLE;
 	m_MafiaVehicle = nullptr;
 }
 
-Galactic3D::ReflectedClass* CClientVehicle::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientVehicleII::GetReflectedClass(void)
 {
-	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientVehicleClass;
+	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientVehicleClass;
 }
 
-M2::C_Car* CClientVehicle::GetGameVehicle()
+M2::C_Car* CClientVehicleII::GetGameVehicle()
 {
 	return m_MafiaVehicle;
 }
 
-void CClientVehicle::Process(void)
+void CClientVehicleII::Process(void)
 {
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	{
 		m_pBlender->Interpolate();
 	}
 
-	CClientEntity::Process();
+	CClientEntityII::Process();
 }
 
-void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVector3D& rot)
+void CClientVehicleII::Create(uint32_t model, const CVector3D& pos, const CVector3D& rot)
 {
 	if (m_MafiaVehicle != nullptr)
 		return;
-
-
 }
 
-void CClientVehicle::Remove()
+void CClientVehicleII::Remove()
 {
 	CNetObject::Remove();
 
 	Delete();
 }
 
-void CClientVehicle::Delete()
+void CClientVehicleII::Delete()
 {
 	Despawn();
 }
 
-void CClientVehicle::Despawn()
+void CClientVehicleII::Despawn()
 {
 	
 }
 
-bool CClientVehicle::SetModel(uint32_t model)
+bool CClientVehicleII::SetModel(uint32_t model)
 {
 	return true;
 }
 
-uint32_t CClientVehicle::GetModel()
+uint32_t CClientVehicleII::GetModel()
 {
-	return CClientEntity::GetModel();
+	return CClientEntityII::GetModel();
 }
 
-bool CClientVehicle::SetPosition(const CVector3D& vecPos)
+bool CClientVehicleII::SetPosition(const CVector3D& vecPos)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	CClientEntity::SetPosition(vecPos);
+	CClientEntityII::SetPosition(vecPos);
 	GetGameVehicle()->SetPos(CVecTools::ConvertToMafiaVec(vecPos));
 
 	// Disable interpolation
@@ -84,7 +82,7 @@ bool CClientVehicle::SetPosition(const CVector3D& vecPos)
 	return true;
 }
 
-bool CClientVehicle::GetPosition(CVector3D& vecPos)
+bool CClientVehicleII::GetPosition(CVector3D& vecPos)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -93,12 +91,12 @@ bool CClientVehicle::GetPosition(CVector3D& vecPos)
 	return true;
 }
 
-bool CClientVehicle::SetRotation(const CVector3D& vecRot)
+bool CClientVehicleII::SetRotation(const CVector3D& vecRot)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	CClientEntity::SetRotation(vecRot);
+	CClientEntityII::SetRotation(vecRot);
 	GetGameVehicle()->SetRot(CVecTools::ConvertVec3ToMafiaQuat(vecRot));
 
 	// Disable interpolation
@@ -108,7 +106,7 @@ bool CClientVehicle::SetRotation(const CVector3D& vecRot)
 	return true;
 }
 
-bool CClientVehicle::GetRotation(CVector3D& vecRot)
+bool CClientVehicleII::GetRotation(CVector3D& vecRot)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -117,7 +115,7 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 	return true;
 }
 
-bool CClientVehicle::SetHeading(float heading)
+bool CClientVehicleII::SetHeading(float heading)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -131,7 +129,7 @@ bool CClientVehicle::SetHeading(float heading)
 	return true;
 }
 
-float CClientVehicle::GetHeading()
+float CClientVehicleII::GetHeading()
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -139,7 +137,7 @@ float CClientVehicle::GetHeading()
 	return GetGameVehicle()->GetRot().z;
 }
 
-bool CClientVehicle::SetRotationVelocity(const CVector3D& vecRotVel)
+bool CClientVehicleII::SetRotationVelocity(const CVector3D& vecRotVel)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -147,7 +145,7 @@ bool CClientVehicle::SetRotationVelocity(const CVector3D& vecRotVel)
 	return true;
 }
 
-bool CClientVehicle::GetRotationVelocity(CVector3D& vecRotVel)
+bool CClientVehicleII::GetRotationVelocity(CVector3D& vecRotVel)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -155,17 +153,17 @@ bool CClientVehicle::GetRotationVelocity(CVector3D& vecRotVel)
 	return true;
 }
 
-bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
+bool CClientVehicleII::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::ReadCreatePacket(pStream))
+	if (!CClientEntityII::ReadCreatePacket(pStream))
 		return false;
 
 	return true;
 }
 
-bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
+bool CClientVehicleII::ReadSyncPacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::ReadSyncPacket(pStream))
+	if (!CClientEntityII::ReadSyncPacket(pStream))
 		return false;
 
 	if (GetGameVehicle() == nullptr)
@@ -174,21 +172,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	return true;
 }
 
-bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
-{
-	if (GetGameVehicle() == nullptr)
-		return false;
-
-	GetPosition(m_Position);
-	GetRotation(m_Rotation);
-
-	if (!CClientEntity::WriteCreatePacket(pStream))
-		return false;
-
-	return true;
-}
-
-bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
+bool CClientVehicleII::WriteCreatePacket(Galactic3D::Stream* pStream)
 {
 	if (GetGameVehicle() == nullptr)
 		return false;
@@ -196,13 +180,27 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 	GetPosition(m_Position);
 	GetRotation(m_Rotation);
 
-	if (!CClientEntity::WriteSyncPacket(pStream))
+	if (!CClientEntityII::WriteCreatePacket(pStream))
 		return false;
 
 	return true;
 }
 
-bool CClientVehicle::SetVelocity(const CVector3D& vecVel)
+bool CClientVehicleII::WriteSyncPacket(Galactic3D::Stream* pStream)
+{
+	if (GetGameVehicle() == nullptr)
+		return false;
+
+	GetPosition(m_Position);
+	GetRotation(m_Rotation);
+
+	if (!CClientEntityII::WriteSyncPacket(pStream))
+		return false;
+
+	return true;
+}
+
+bool CClientVehicleII::SetVelocity(const CVector3D& vecVel)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -210,7 +208,7 @@ bool CClientVehicle::SetVelocity(const CVector3D& vecVel)
 	return true;
 }
 
-bool CClientVehicle::GetVelocity(CVector3D& vecVel)
+bool CClientVehicleII::GetVelocity(CVector3D& vecVel)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -218,7 +216,7 @@ bool CClientVehicle::GetVelocity(CVector3D& vecVel)
 	return true;
 }
 
-bool CClientVehicle::SetSpeed(float speed)
+bool CClientVehicleII::SetSpeed(float speed)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -226,7 +224,7 @@ bool CClientVehicle::SetSpeed(float speed)
 	return true;
 }
 
-float CClientVehicle::GetSpeed()
+float CClientVehicleII::GetSpeed()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -236,7 +234,7 @@ float CClientVehicle::GetSpeed()
 	return magnitude;
 }
 
-bool CClientVehicle::SetFuel(float fuel)
+bool CClientVehicleII::SetFuel(float fuel)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -244,7 +242,7 @@ bool CClientVehicle::SetFuel(float fuel)
 	return true;
 }
 
-float CClientVehicle::GetFuel()
+float CClientVehicleII::GetFuel()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -252,7 +250,7 @@ float CClientVehicle::GetFuel()
 	return 0.0;
 }
 
-bool CClientVehicle::SetGear(uint32_t gear)
+bool CClientVehicleII::SetGear(uint32_t gear)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -260,7 +258,7 @@ bool CClientVehicle::SetGear(uint32_t gear)
 	return true;
 }
 
-uint32_t CClientVehicle::GetGear()
+uint32_t CClientVehicleII::GetGear()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -268,7 +266,7 @@ uint32_t CClientVehicle::GetGear()
 	return 0;
 }
 
-bool CClientVehicle::SetSpeedLimit(float speedLimit)
+bool CClientVehicleII::SetSpeedLimit(float speedLimit)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -276,7 +274,7 @@ bool CClientVehicle::SetSpeedLimit(float speedLimit)
 	return true;
 }
 
-float CClientVehicle::GetSpeedLimit()
+float CClientVehicleII::GetSpeedLimit()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -284,7 +282,7 @@ float CClientVehicle::GetSpeedLimit()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetEngineHealth(float engineHealth)
+bool CClientVehicleII::SetEngineHealth(float engineHealth)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -292,7 +290,7 @@ bool CClientVehicle::SetEngineHealth(float engineHealth)
 	return true;
 }
 
-float CClientVehicle::GetEngineHealth()
+float CClientVehicleII::GetEngineHealth()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -300,7 +298,7 @@ float CClientVehicle::GetEngineHealth()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetHealth(float health)
+bool CClientVehicleII::SetHealth(float health)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -308,7 +306,7 @@ bool CClientVehicle::SetHealth(float health)
 	return true;
 }
 
-float CClientVehicle::GetHealth()
+float CClientVehicleII::GetHealth()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -316,7 +314,7 @@ float CClientVehicle::GetHealth()
 	return 100.0f;
 }
 
-bool CClientVehicle::SetEngineRPM(float engineRPM)
+bool CClientVehicleII::SetEngineRPM(float engineRPM)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -324,7 +322,7 @@ bool CClientVehicle::SetEngineRPM(float engineRPM)
 	return true;
 }
 
-float CClientVehicle::GetEngineRPM()
+float CClientVehicleII::GetEngineRPM()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -332,7 +330,7 @@ float CClientVehicle::GetEngineRPM()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetWheelAngle(float wheelAngle)
+bool CClientVehicleII::SetWheelAngle(float wheelAngle)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -340,7 +338,7 @@ bool CClientVehicle::SetWheelAngle(float wheelAngle)
 	return true;
 }
 
-float CClientVehicle::GetWheelAngle()
+float CClientVehicleII::GetWheelAngle()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -348,7 +346,7 @@ float CClientVehicle::GetWheelAngle()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetOdometer(float odometer)
+bool CClientVehicleII::SetOdometer(float odometer)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -356,7 +354,7 @@ bool CClientVehicle::SetOdometer(float odometer)
 	return true;
 }
 
-float CClientVehicle::GetOdometer()
+float CClientVehicleII::GetOdometer()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;
@@ -364,7 +362,7 @@ float CClientVehicle::GetOdometer()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetRoof(bool state)
+bool CClientVehicleII::SetRoof(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -372,7 +370,7 @@ bool CClientVehicle::SetRoof(bool state)
 	return false;
 }
 
-bool CClientVehicle::GetRoof()
+bool CClientVehicleII::GetRoof()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -380,7 +378,7 @@ bool CClientVehicle::GetRoof()
 	return false;
 }
 
-bool CClientVehicle::SetLocked(bool state)
+bool CClientVehicleII::SetLocked(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -388,7 +386,7 @@ bool CClientVehicle::SetLocked(bool state)
 	return false;
 }
 
-bool CClientVehicle::GetLocked()
+bool CClientVehicleII::GetLocked()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -396,7 +394,7 @@ bool CClientVehicle::GetLocked()
 	return false;
 }
 
-bool CClientVehicle::SetLights(bool state)
+bool CClientVehicleII::SetLights(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -404,7 +402,7 @@ bool CClientVehicle::SetLights(bool state)
 	return true;
 }
 
-bool CClientVehicle::GetLights()
+bool CClientVehicleII::GetLights()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -412,7 +410,7 @@ bool CClientVehicle::GetLights()
 	return false;
 }
 
-bool CClientVehicle::SetEngine(bool state)
+bool CClientVehicleII::SetEngine(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -420,7 +418,7 @@ bool CClientVehicle::SetEngine(bool state)
 	return true;
 }
 
-bool CClientVehicle::GetEngine()
+bool CClientVehicleII::GetEngine()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -428,7 +426,7 @@ bool CClientVehicle::GetEngine()
 	return false;
 }
 
-bool CClientVehicle::Explode()
+bool CClientVehicleII::Explode()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -436,12 +434,12 @@ bool CClientVehicle::Explode()
 	return true;
 }
 
-bool CClientVehicle::IsSeatOccupied(unsigned char ucSeat)
+bool CClientVehicleII::IsSeatOccupied(unsigned char ucSeat)
 {
 	return GetHumanInSeat(ucSeat) != nullptr;
 }
 
-CClientHuman* CClientVehicle::GetHumanInSeat(unsigned char ucSeat)
+CClientHumanII* CClientVehicleII::GetHumanInSeat(unsigned char ucSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return nullptr;
@@ -452,7 +450,7 @@ CClientHuman* CClientVehicle::GetHumanInSeat(unsigned char ucSeat)
 	return m_pOccupants[ucSeat].GetPointer();
 }
 
-bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
+bool CClientVehicleII::AssignSeat(CClientHumanII* pHuman, unsigned char ucSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -467,7 +465,7 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
 	return true;
 }
 
-bool CClientVehicle::FreeSeat(unsigned char ucSeat)
+bool CClientVehicleII::FreeSeat(unsigned char ucSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -479,7 +477,7 @@ bool CClientVehicle::FreeSeat(unsigned char ucSeat)
 	return true;
 }
 
-bool CClientVehicle::SetSiren(bool state)
+bool CClientVehicleII::SetSiren(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -489,7 +487,7 @@ bool CClientVehicle::SetSiren(bool state)
 	return true;
 }
 
-bool CClientVehicle::GetSiren()
+bool CClientVehicleII::GetSiren()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -497,7 +495,7 @@ bool CClientVehicle::GetSiren()
 	return m_Siren;
 }
 
-bool CClientVehicle::Repair()
+bool CClientVehicleII::Repair()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -505,13 +503,13 @@ bool CClientVehicle::Repair()
 	return true;
 }
 
-void CClientVehicle::SetFromExistingEntity(M2::C_Car* car) {
+void CClientVehicleII::SetFromExistingEntity(M2::C_Car* car) {
 	m_MafiaVehicle = car;
 }
 
-void CClientVehicle::CreateNetBlender()
+void CClientVehicleII::CreateNetBlender()
 {
-	auto pBlender = new CNetBlenderVehicle(this);
+	auto pBlender = new CNetBlenderVehicleII(this);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;

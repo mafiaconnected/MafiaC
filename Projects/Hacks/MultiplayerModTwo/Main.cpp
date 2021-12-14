@@ -15,7 +15,7 @@
 tHack* g_pHack;
 Context* g_pContext;
 
-CClientGame* g_pClientGame;
+CClientGameII* g_pClientGame;
 
 extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
@@ -70,10 +70,10 @@ static void Load(tHackEventDataLoad* pData)
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	enet_initialize();
 
-	CGameHacks::InstallHacks();
-	CGameHooks::InstallHooks();
+	CGameHacksII::InstallHacks();
+	CGameHooksII::InstallHooks();
 
-	g_pClientGame = new CClientGame(g_pContext);
+	g_pClientGame = new CClientGameII(g_pContext);
 	g_pClientGame->Initialise();
 }
 

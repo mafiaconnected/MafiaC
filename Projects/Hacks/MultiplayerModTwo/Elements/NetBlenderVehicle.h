@@ -2,12 +2,12 @@
 #include "ClientVehicle.h"
 #include <NetBlenderLerp.h>
 
-class CNetBlenderVehicle : public CNetBlenderLerp
+class CNetBlenderVehicleII : public CNetBlenderLerp
 {
 public:
-	CNetBlenderVehicle(CClientVehicle* pEntity);
+	CNetBlenderVehicleII(CClientVehicleII* pEntity);
 
-	CClientVehicle* m_pEntity;
+	CClientVehicleII* m_pEntity;
 
 	CInterpolation m_RotationFront;
 	CInterpolation m_RotationUp;

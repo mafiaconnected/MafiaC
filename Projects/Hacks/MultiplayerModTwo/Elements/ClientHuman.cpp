@@ -10,7 +10,7 @@
 
 using namespace Galactic3D;
 
-CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
+CClientHumanII::CClientHumanII(CMafiaClientManagerII* pClientManager) : CClientEntityII(pClientManager)
 {
 	m_Type = ELEMENT_PED;
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
@@ -25,21 +25,21 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
 
-Galactic3D::ReflectedClass* CClientHuman::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientHumanII::GetReflectedClass(void)
 {
-	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientHumanClass;
+	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientHumanClass;
 }
 
-bool CClientHuman::GetPosition(CVector3D& vecPos)
+bool CClientHumanII::GetPosition(CVector3D& vecPos)
 {
-	//auto bResult = CClientEntity::GetPosition(vecPos);
+	//auto bResult = CClientEntityII::GetPosition(vecPos);
 	vecPos = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetPos());
 	return true;
 }
 
-bool CClientHuman::SetPosition(const CVector3D& vecPos)
+bool CClientHumanII::SetPosition(const CVector3D& vecPos)
 {
-	auto bResult = CClientEntity::SetPosition(vecPos);
+	auto bResult = CClientEntityII::SetPosition(vecPos);
 	GetGameHuman()->SetPos(CVecTools::ConvertToMafiaVec(vecPos));
 
 	// Disable interpolation
@@ -49,14 +49,14 @@ bool CClientHuman::SetPosition(const CVector3D& vecPos)
 	return bResult;
 }
 
-bool CClientHuman::GetRotation(CVector3D& vecRot)
+bool CClientHumanII::GetRotation(CVector3D& vecRot)
 {
 	if (GetGameHuman() == nullptr) return false;
 	vecRot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetRot().toEularAngles());
 	return true;
 }
 
-bool CClientHuman::SetHeading(float heading)
+bool CClientHumanII::SetHeading(float heading)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -70,7 +70,7 @@ bool CClientHuman::SetHeading(float heading)
 	return true;
 }
 
-float CClientHuman::GetHeading()
+float CClientHumanII::GetHeading()
 {
 	if (GetGameHuman() == nullptr) 
 		return 0.0f;
@@ -78,7 +78,7 @@ float CClientHuman::GetHeading()
 	return GetGameHuman()->GetRot().z;
 }
 
-bool CClientHuman::SetRotation(const CVector3D& vecRot)
+bool CClientHumanII::SetRotation(const CVector3D& vecRot)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -92,7 +92,7 @@ bool CClientHuman::SetRotation(const CVector3D& vecRot)
 	return true;
 }
 
-bool CClientHuman::SetHealth(float fHealth)
+bool CClientHumanII::SetHealth(float fHealth)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -102,7 +102,7 @@ bool CClientHuman::SetHealth(float fHealth)
 	return true;
 }
 
-float CClientHuman::GetHealth()
+float CClientHumanII::GetHealth()
 {
 	if (GetGameHuman() == nullptr)
 		return -1;
@@ -110,7 +110,7 @@ float CClientHuman::GetHealth()
 	return GetGameHuman()->GetScript()->m_fHealth;
 }
 
-bool CClientHuman::SetVelocity(const CVector3D& vecVel)
+bool CClientHumanII::SetVelocity(const CVector3D& vecVel)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -120,7 +120,7 @@ bool CClientHuman::SetVelocity(const CVector3D& vecVel)
 	return true;
 }
 
-bool CClientHuman::GetVelocity(CVector3D& vecVel)
+bool CClientHumanII::GetVelocity(CVector3D& vecVel)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -130,7 +130,7 @@ bool CClientHuman::GetVelocity(CVector3D& vecVel)
 	return true;
 }
 
-bool CClientHuman::SetRotationVelocity(const CVector3D& vecRotVel)
+bool CClientHumanII::SetRotationVelocity(const CVector3D& vecRotVel)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -140,7 +140,7 @@ bool CClientHuman::SetRotationVelocity(const CVector3D& vecRotVel)
 	return true;
 }
 
-bool CClientHuman::GetRotationVelocity(CVector3D& vecRotVel)
+bool CClientHumanII::GetRotationVelocity(CVector3D& vecRotVel)
 {
 	if (GetGameHuman() == nullptr) 
 		return false;
@@ -150,7 +150,7 @@ bool CClientHuman::GetRotationVelocity(CVector3D& vecRotVel)
 	return true;
 }
 
-void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
+void CClientHumanII::Spawn(const CVector3D& pos, float angle, bool isLocal)
 {
 	if (GetGameHuman() != nullptr) 
 		Despawn();
@@ -178,17 +178,17 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	return;
 }
 
-void CClientHuman::Kill(void)
+void CClientHumanII::Kill(void)
 {
 	GetGameHuman()->GetScript()->SetHealth(0);
 }
 
-bool CClientHuman::Create(void)
+bool CClientHumanII::Create(void)
 {
 	return false;
 }
 
-void CClientHuman::Despawn(void)
+void CClientHumanII::Despawn(void)
 {
 	if (GetGameHuman() != nullptr)
 	{
@@ -204,32 +204,32 @@ void CClientHuman::Despawn(void)
 	}
 }
 
-void CClientHuman::Delete(void)
+void CClientHumanII::Delete(void)
 {
 	Despawn();
 }
 
 #define ExpandVec(vec) vec.x, vec.y, vec.z
 
-bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
+bool CClientHumanII::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::ReadCreatePacket(pStream))
+	if (!CClientEntityII::ReadCreatePacket(pStream))
 		return false;
 
 	return true;
 }
 
-bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
+bool CClientHumanII::ReadSyncPacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::ReadSyncPacket(pStream))
+	if (!CClientEntityII::ReadSyncPacket(pStream))
 		return false;
 
 	return true;
 }
 
-bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
+bool CClientHumanII::WriteCreatePacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::WriteCreatePacket(pStream))
+	if (!CClientEntityII::WriteCreatePacket(pStream))
 		return false;
 
 	if (GetGameHuman() == nullptr)
@@ -238,9 +238,9 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	return true;
 }
 
-bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
+bool CClientHumanII::WriteSyncPacket(Galactic3D::Stream* pStream)
 {
-	if (!CClientEntity::WriteCreatePacket(pStream))
+	if (!CClientEntityII::WriteCreatePacket(pStream))
 		return false;
 
 	if (GetGameHuman() == nullptr)
@@ -249,12 +249,12 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	return true;
 }
 
-void CClientHuman::OnCreated(void)
+void CClientHumanII::OnCreated(void)
 {
 	// Initial vehicle
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 	{
-		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
+		CClientVehicleII* pVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
 		WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 	}
 
@@ -263,42 +263,42 @@ void CClientHuman::OnCreated(void)
 	g_pClientGame->m_pOnHumanSpawnEventType->Trigger(Args);
 }
 
-void CClientHuman::Process(void)
+void CClientHumanII::Process(void)
 {
 	if(!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
 		m_pBlender->Interpolate();
 	}
 
-	CClientEntity::Process();
+	CClientEntityII::Process();
 }
 
-bool CClientHuman::IsInVehicle(void)
+bool CClientHumanII::IsInVehicle(void)
 {
 	return GetOccupiedVehicle() != nullptr;
 }
 
-bool CClientHuman::IsInVehicle(CClientVehicle* pClientVehicle)
+bool CClientHumanII::IsInVehicle(CClientVehicleII* pClientVehicle)
 {
 	return GetOccupiedVehicle() == pClientVehicle;
 }
 
-CClientVehicle* CClientHuman::GetOccupiedVehicle(void)
+CClientVehicleII* CClientHumanII::GetOccupiedVehicle(void)
 {
 	M2::C_Car* pVehicle = GetGameHuman()->m_pCurrentCar;
 
-	CClientVehicle* pClientVehicle = m_pClientManager->FindVehicle(pVehicle);
+	CClientVehicleII* pClientVehicle = m_pClientManager->FindVehicle(pVehicle);
 	return pClientVehicle;
 }
 
-CClientVehicle* CClientHuman::GetEnteringExitingVehicle(void)
+CClientVehicleII* CClientHumanII::GetEnteringExitingVehicle(void)
 {
 	return nullptr;
 }
 
-int8_t CClientHuman::GetVehicleSeat(void)
+int8_t CClientHumanII::GetVehicleSeat(void)
 {
-	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
+	CClientVehicleII* pClientVehicle = GetEnteringExitingVehicle();
 	if (pClientVehicle == nullptr)
 	{
 		pClientVehicle = GetOccupiedVehicle();
@@ -311,7 +311,7 @@ int8_t CClientHuman::GetVehicleSeat(void)
 
 	for (int8_t i = 0; i < 4; i++)
 	{
-		CClientHuman *pClientHuman = pClientVehicle->GetHumanInSeat(i);
+		CClientHumanII *pClientHuman = pClientVehicle->GetHumanInSeat(i);
 		if(pClientHuman != nullptr && this == pClientHuman)
 		{
 			return i;
@@ -321,18 +321,18 @@ int8_t CClientHuman::GetVehicleSeat(void)
 	return -1;
 }
 
-void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
+void CClientHumanII::EnterVehicle(CClientVehicleII* pVehicle, uint8_t iSeat)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_nVehicleNetworkIndex = pVehicle->GetId();
 }
 
-void CClientHuman::RemoveFromVehicle(void)
+void CClientHumanII::RemoveFromVehicle(void)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
-	CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
+	CClientVehicleII* pVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
 
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 
@@ -342,7 +342,7 @@ void CClientHuman::RemoveFromVehicle(void)
 	}
 }
 
-void CClientHuman::ExitVehicle(void)
+void CClientHumanII::ExitVehicle(void)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);
@@ -351,32 +351,16 @@ void CClientHuman::ExitVehicle(void)
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 }
 
-bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
+bool CClientHumanII::WarpIntoVehicle(CClientVehicleII* pClientVehicle, uint8_t ucSeat)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
-	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
-		return false;
-
-	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
-
-	if (!pClientVehicle->IsSeatOccupied(ucSeat))
-	{
-		if (IsInVehicle())
-		{
-			RemoveFromVehicle();
-		}
-
-		pClientVehicle->AssignSeat(this, ucSeat);
-
-		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), ucSeat);
-	}
 	return true;
 }
 
-bool CClientHuman::SetModel(uint32_t model)
+bool CClientHumanII::SetModel(uint32_t model)
 {
-	CClientEntity::SetModel(model);
+	CClientEntityII::SetModel(model);
 
 	Despawn();
 	Spawn(m_Position, m_Rotation.z, (m_Type == ELEMENT_PLAYER) ? true : false);
@@ -384,69 +368,67 @@ bool CClientHuman::SetModel(uint32_t model)
 	return true;
 }
 
-const GChar* CClientHuman::GetModel()
+uint32_t CClientHumanII::GetModel()
 {
-	return CClientEntity::GetModel();
+	return CClientEntityII::GetModel();
 }
 
-void CClientHuman::PlayAnim(const char* animName)
-{
-	if (m_MafiaHuman == nullptr) return;
-}
-
-void CClientHuman::Shoot(bool state, const CVector3D& dstPos)
+void CClientHumanII::PlayAnim(const char* animName)
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-void CClientHuman::Jump()
+void CClientHumanII::Shoot(bool state, const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-void CClientHuman::ThrowGrenade(const CVector3D& dstPos)
+void CClientHumanII::Jump()
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-void CClientHuman::Reload()
+void CClientHumanII::ThrowGrenade(const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-void CClientHuman::HolsterWeapon()
+void CClientHumanII::Reload()
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-void CClientHuman::Crouch(bool state)
+void CClientHumanII::HolsterWeapon()
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-M2::C_Human2* CClientHuman::GetGameHuman()
+void CClientHumanII::Crouch(bool state)
+{
+	if (m_MafiaHuman == nullptr) return;
+}
+
+M2::C_Human2* CClientHumanII::GetGameHuman()
 {
 	return m_MafiaHuman;
 }
 
-void CClientHuman::ClearInventory()
+void CClientHumanII::ClearInventory()
 {
 	for (int i = 0; i < 8; i++)
 	{
 		auto item = items[i];
 
-		if (item.weapId != 0) GetGameHuman()->G_Inventory_RemoveWeapon(item.weapId);
-
 		item.weapId = item.ammo1 = item.ammo2 = 0;
 	}
 }
 
-void CClientHuman::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2)
+void CClientHumanII::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2)
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-bool CClientHuman::HasWeapon(unsigned short ucWeapon)
+bool CClientHumanII::HasWeapon(unsigned short ucWeapon)
 {
 	if (m_MafiaHuman == nullptr) return false;
 
@@ -460,12 +442,12 @@ bool CClientHuman::HasWeapon(unsigned short ucWeapon)
 	return false;
 }
 
-void CClientHuman::SetActiveWeapon(unsigned short usWeapon)
+void CClientHumanII::SetActiveWeapon(unsigned short usWeapon)
 {
-
+	return;
 }
 
-int CClientHuman::GetFirstEmptyWeaponIndex()
+int CClientHumanII::GetFirstEmptyWeaponIndex()
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -477,7 +459,7 @@ int CClientHuman::GetFirstEmptyWeaponIndex()
 	return -1;
 }
 
-int CClientHuman::GetIndexOfWeapon(unsigned short ucWeapon)
+int CClientHumanII::GetIndexOfWeapon(unsigned short ucWeapon)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -489,38 +471,39 @@ int CClientHuman::GetIndexOfWeapon(unsigned short ucWeapon)
 	return -1;
 }
 
-void CClientHuman::TakeWeapon(unsigned short ucWeapon)
+void CClientHumanII::TakeWeapon(unsigned short ucWeapon)
 {
 	if (m_MafiaHuman == nullptr) return;
 
 }
 
-void CClientHuman::DropWeapon()
+void CClientHumanII::DropWeapon()
 {
 	if (m_MafiaHuman == nullptr) return;
 }
 
-int CClientHuman::GetAnimationState()
+int CClientHumanII::GetAnimationState()
 {
-
+	return 0;
 }
 
-int CClientHuman::GetAnimationStateLocal()
+int CClientHumanII::GetAnimationStateLocal()
 {
+	return 0;
 }
 
-void CClientHuman::SetFromExistingEntity(M2::C_Human2* human) {
+void CClientHumanII::SetFromExistingEntity(M2::C_Human2* human) {
 	m_MafiaHuman = human;
 }
 
-void CClientHuman::SetBehavior(uint32_t iBehavior)
+void CClientHumanII::SetBehavior(uint32_t iBehavior)
 {
-	
+	return;
 }
 
-void CClientHuman::CreateNetBlender()
+void CClientHumanII::CreateNetBlender()
 {
-	auto pBlender = new CNetBlenderHuman(this);
+	auto pBlender = new CNetBlenderHumanII(this);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 0;

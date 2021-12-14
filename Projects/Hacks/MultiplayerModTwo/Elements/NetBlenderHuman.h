@@ -2,12 +2,12 @@
 #include "ClientHuman.h"
 #include <NetBlenderLerp.h>
 
-class CNetBlenderHuman : public CNetBlenderLerp
+class CNetBlenderHumanII : public CNetBlenderLerp
 {
 public:
-	CNetBlenderHuman(CClientHuman* pEntity);
+	CNetBlenderHumanII(CClientHumanII* pEntity);
 
-	CClientHuman* m_pEntity;
+	CClientHumanII* m_pEntity;
 	float m_fRotationMaxError;
 
 	void SetTargetRotation(CVector3D& vecRotation);

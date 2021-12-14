@@ -22,8 +22,8 @@ namespace M2
     {
     public:
         pad(S_HumanCommandMoveDir, pad0, 0x18);//0x000D4
-        zpl_vec2 moveVector; //0x0028
-        zpl_vec2 potentialMoveVector; //0x0030
+        Vector2 moveVector; //0x0028
+        Vector2 potentialMoveVector; //0x0030
         pad(S_HumanCommandMoveDir, pad1, 0x4);//0x0038
         float speedMultiplier; //0x003C
         pad(S_HumanCommandMoveDir, pad2, 0x10);//0x0040
@@ -35,15 +35,15 @@ namespace M2
     class S_HumanCommandStand : public C_Command
     {
     public:
-        zpl_vec2 standingDirVector;                 //0000 - 0010
+        Vector2 standingDirVector;                 //0000 - 0010
         pad(S_HumanCommandStand, pad0, 0x8);        //0010 - 0018
     }; //Size=0x0058
 
     class C_CommandDescription
     {
     public:
-        __int32 m_iCommandPriority;     //0x0000 
-        void*   m_pCommand;             //0x0004 
+        __int32 m_iCommandPriority;     //0x0000
+        void*   m_pCommand;             //0x0004
 
     }; //Size=0x0008
 };

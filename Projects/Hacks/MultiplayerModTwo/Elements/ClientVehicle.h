@@ -6,7 +6,7 @@
 #include "../ClientGame.h"
 #include "NetBlenderVehicle.h"
 
-class CClientVehicle : public CClientEntity
+class CClientVehicleII : public CClientEntityII
 {
 private:
 	M2::C_Car* m_MafiaVehicle;
@@ -17,7 +17,7 @@ private:
 	CVector3D m_RotationUp;
 	CVector3D m_RotationRight;
 
-	Galactic3D::Weak<CClientHuman> m_pOccupants[4];
+	Galactic3D::Weak<CClientHumanII> m_pOccupants[4];
 
 	bool m_Horn = false;
 	float m_EngineRPM = 0.0;
@@ -25,14 +25,14 @@ private:
 	bool m_Siren = false;
 
 public:
-	CClientVehicle(CMafiaClientManager* pClientManager);
+	CClientVehicleII(CMafiaClientManagerII* pClientManager);
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
 
 	virtual M2::C_Car* GetGameVehicle();
 
 	virtual void Process(void) override;
-	virtual void Create(const GChar* model, const CVector3D& pos, const CVector3D& rot);
+	virtual void Create(uint32_t model, const CVector3D& pos, const CVector3D& rot);
 	virtual void Delete(void);
 	virtual void Despawn(void);
 	virtual void Remove(void);
@@ -99,9 +99,9 @@ public:
 	virtual bool SetLocked(bool state);
 	virtual bool GetLocked();
 
-	virtual CClientHuman* GetHumanInSeat(unsigned char ucSeat);
+	virtual CClientHumanII* GetHumanInSeat(unsigned char ucSeat);
 	virtual bool IsSeatOccupied(unsigned char ucSeat);
-	virtual bool AssignSeat(CClientHuman* pHuman, unsigned char ucSeat);
+	virtual bool AssignSeat(CClientHumanII* pHuman, unsigned char ucSeat);
 	virtual bool FreeSeat(unsigned char ucSeat);
 
 	virtual bool SetSiren(bool state);

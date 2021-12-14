@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VectorTools.h"
 
-using namespace Mafia2SDK;
+using namespace M2;
 
 #define Clamp(value, min, max) if (value < min) value = min; else if (value > max) value = max;
 

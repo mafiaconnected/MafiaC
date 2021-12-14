@@ -30,19 +30,19 @@ using namespace Galactic3D;
 
 extern SDL_Window* g_pWindow;
 
-CMafiaCHtmlContainer::CMafiaCHtmlContainer(Context* pContext, CClientGame* pClientGame) : CHtmlContainer(pContext), m_pClientGame(pClientGame)
+CMafiaCHtmlContainerII::CMafiaCHtmlContainerII(Context* pContext, CClientGameII* pClientGame) : CHtmlContainer(pContext), m_pClientGame(pClientGame)
 {
 	m_pInternetRequestMgr = &pClientGame->m_InternetRequestMgr;
 }
 
-Galactic3D::Stream* CMafiaCHtmlContainer::OpenFile(const GChar* pszPath)
+Galactic3D::Stream* CMafiaCHtmlContainerII::OpenFile(const GChar* pszPath)
 {
 	if (m_pActiveView->m_pResource != nullptr)
 		return m_pActiveView->m_pResource->OpenFile(pszPath, false);
 	return CHtmlContainer::OpenFile(pszPath);
 }
 
-void CMafiaCHtmlContainer::on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el)
+void CMafiaCHtmlContainerII::on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el)
 {
 	CArguments Args;
 	Args.AddObject(m_pActiveView);
@@ -54,11 +54,11 @@ void CMafiaCHtmlContainer::on_anchor_click(const litehtml::tchar_t* url, const l
 		CHtmlContainer::on_anchor_click(url, el);
 }
 
-CTextDrawing::CTextDrawing()
+CTextDrawingII::CTextDrawingII()
 {
 }
 
-void CTextDrawing::Initialise(LucasGUI::CFonts& Fonts)
+void CTextDrawingII::Initialise(LucasGUI::CFonts& Fonts)
 {
 	m_fLargeSize = CHAT_FONT_SIZE + 1;
 	unsigned int uiLargeSize = (unsigned int)(m_fLargeSize * 64.0f);
@@ -71,13 +71,13 @@ void CTextDrawing::Initialise(LucasGUI::CFonts& Fonts)
 	m_SmallFontStack.m_FontSizes.push_back(Fonts.GetFont(_gstr("Noto Color Emoji"))->GetSize(uiSmallSize));
 }
 
-void CTextDrawing::ShutDown()
+void CTextDrawingII::ShutDown()
 {
 	m_LargeFontStack.ShutDown();
 	m_SmallFontStack.ShutDown();
 }
 
-void CTextDrawing::MeasureText(size_t Font, CVector2D& vecSize, const GChar* pszText, float fWidth, float fAlign, float fJustify, bool bWordWrap, bool bColourCodes)
+void CTextDrawingII::MeasureText(size_t Font, CVector2D& vecSize, const GChar* pszText, float fWidth, float fAlign, float fJustify, bool bWordWrap, bool bColourCodes)
 {
 	float fSize;
 	LucasGUI::CFontStack* pFontStack = nullptr;
@@ -97,7 +97,7 @@ void CTextDrawing::MeasureText(size_t Font, CVector2D& vecSize, const GChar* psz
 	CDumbUtil::MeasureText(pFontStack, vecSize, pszText, fWidth, fAlign, fJustify, fSize, bWordWrap, bColourCodes);
 }
 
-void CTextDrawing::RenderText(Galactic3D::I2D* p2D, size_t Font, const GChar* pszText, const CVector2D& vecOffset, float fWidth, float fAlign, float fJustify, Galactic3D::COLOUR Colour, bool bWordWrap, bool bColourCodes, bool bIgnoreColourCodes, bool bShadow)
+void CTextDrawingII::RenderText(Galactic3D::I2D* p2D, size_t Font, const GChar* pszText, const CVector2D& vecOffset, float fWidth, float fAlign, float fJustify, Galactic3D::COLOUR Colour, bool bWordWrap, bool bColourCodes, bool bIgnoreColourCodes, bool bShadow)
 {
 	float fSize;
 	LucasGUI::CFontStack* pFontStack = nullptr;
@@ -117,7 +117,7 @@ void CTextDrawing::RenderText(Galactic3D::I2D* p2D, size_t Font, const GChar* ps
 	CDumbUtil::RenderText(p2D, pFontStack, pszText, vecOffset, fWidth, fAlign, fJustify, fSize, Colour, bWordWrap, bColourCodes, bIgnoreColourCodes, bShadow);
 }
 
-CClientGame::CClientGame(Galactic3D::Context* pContext)
+CClientGameII::CClientGameII(Galactic3D::Context* pContext)
 	: m_GUISystem(pContext, &m_Fonts, &m_LanguageLocalisation, &m_SlotMgr), m_InternetCache(pContext), m_InternetRequestMgr(pContext, &m_InternetCache)
 {
 	m_pContext = pContext;
@@ -156,11 +156,11 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_bSupressNetworkedEntities = false;
 }
 
-CClientGame::~CClientGame(void)
+CClientGameII::~CClientGameII(void)
 {
 }
 
-void CClientGame::Initialise()
+void CClientGameII::Initialise()
 {
 	m_TimeManager.Initialise(60.0, 16.0);
 	m_GUISystem.m_Action = [this](const GChar* pszAction, LucasGUI::GUI::CButton* pButton) {
@@ -236,7 +236,7 @@ void CClientGame::Initialise()
 		}
 	}
 
-	m_pHtmlContainer = new CMafiaCHtmlContainer(m_pContext, this);
+	m_pHtmlContainer = new CMafiaCHtmlContainerII(m_pContext, this);
 	//m_pHtmlContainer->UseDPIScaling();
 
 	m_GUISystem.m_CreateHtmlView = [this](LucasGUI::GUI::CSystem* pSystem) {
@@ -251,7 +251,7 @@ void CClientGame::Initialise()
 	InitialiseScripting();
 }
 
-void CClientGame::ShutDown()
+void CClientGameII::ShutDown()
 {
 	assert(m_pMultiplayer == nullptr);
 	if (m_pMultiplayer != NULL)
@@ -269,12 +269,12 @@ void CClientGame::ShutDown()
 	//	delete m_pFonts;
 }
 
-void CClientGame::InitialiseCVars()
+void CClientGameII::InitialiseCVars()
 {
 	m_CVars.Clear();
 }
 
-void CClientGame::InitialiseScripting(void)
+void CClientGameII::InitialiseScripting(void)
 {
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
@@ -331,10 +331,10 @@ void CClientGame::InitialiseScripting(void)
 		m_pDownloadManager->m_pResourceMgr = m_pResourceMgr;
 	m_pResourceMgr->m_pDownloadManager = m_pDownloadManager;
 
-	m_pClientManager = new CMafiaClientManager(m_pContext,m_pResourceMgr);
+	m_pClientManager = new CMafiaClientManagerII(m_pContext,m_pResourceMgr);
 	m_pClientManager->m_pChatWindow = m_pChatWindow;
-	CScriptingFunctions::RegisterDefines(m_pResourceMgr->m_pDefineHandlers);
-	CScriptingFunctions::RegisterFunctions(m_pResourceMgr->m_pScripting,this);
+	CScriptingFunctionsII::RegisterDefines(m_pResourceMgr->m_pDefineHandlers);
+	CScriptingFunctionsII::RegisterFunctions(m_pResourceMgr->m_pScripting,this);
 
 	m_pResourceMgr->DefineAllClasses();
 
@@ -347,7 +347,7 @@ void CClientGame::InitialiseScripting(void)
 	}
 }
 
-void CClientGame::ShutdownScripting(void)
+void CClientGameII::ShutdownScripting(void)
 {
 	if (m_pCmdWindow != nullptr)
 	{
@@ -396,7 +396,7 @@ static bool LoadSystemFontCB(const TCHAR* pszValueName, const TCHAR* pszValue)
 	return false;
 }
 
-void CClientGame::LoadFonts()
+void CClientGameII::LoadFonts()
 {
 	// Clear the existing fonts first
 	m_LucasFontFunctions.m_Fonts.Clear();
@@ -408,7 +408,7 @@ void CClientGame::LoadFonts()
 
 	{
 		m_pContext->GetFileSystem()->Enumerate(_gstr("/Fonts"), [](const Galactic3D::CFileMgr::tDirectoryEntry& Entry, void* pUser) {
-			auto pClientGame = ((CClientGame*)pUser);
+			auto pClientGame = ((CClientGameII*)pUser);
 			GString Path = Entry.pszPath;
 			PathUtil::AppendPath(Path, Entry.pszFileName);
 			auto pStream = Strong<Stream>::New(pClientGame->m_pContext->GetFileSystem()->Open(Path.c_str(), false));
@@ -425,7 +425,7 @@ void CClientGame::LoadFonts()
 	m_TextDrawing.Initialise(m_Fonts);
 }
 
-bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	CArguments args;
 
@@ -616,7 +616,7 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return false;
 }
 
-void CClientGame::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+void CClientGameII::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	switch (message)
 	{
@@ -647,7 +647,7 @@ void CClientGame::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 }
 
-void CClientGame::OnPreStartInGame(bool bRestarted)
+void CClientGameII::OnPreStartInGame(bool bRestarted)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -662,7 +662,7 @@ void CClientGame::OnPreStartInGame(bool bRestarted)
 	UpdateCursorEnabled(true);
 }
 
-void CClientGame::OnStartInGame(bool bRestarted)
+void CClientGameII::OnStartInGame(bool bRestarted)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -774,7 +774,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	}
 }
 
-void CClientGame::OnEndInGame(void)
+void CClientGameII::OnEndInGame(void)
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -854,7 +854,7 @@ void CClientGame::OnEndInGame(void)
 	UpdateCursorEnabled();
 }
 
-void CClientGame::ResetWorld(void)
+void CClientGameII::ResetWorld(void)
 {
 	m_pResourceMgr->ClearAllResources();
 	//m_pCmdWindow->ReInitialise();
@@ -862,7 +862,7 @@ void CClientGame::ResetWorld(void)
 	RegisterCommands();
 }
 
-void CClientGame::LoadLobbyResource(void)
+void CClientGameII::LoadLobbyResource(void)
 {
 	m_pResourceMgr->RefreshResources(false);
 
@@ -961,7 +961,7 @@ void CClientGame::LoadLobbyResource(void)
 	}
 }
 
-void CClientGame::OnProcess(void)
+void CClientGameII::OnProcess(void)
 {
 	if (!IsCursorEnabled())
 	{
@@ -1041,7 +1041,7 @@ void CClientGame::OnProcess(void)
 	m_pClientManager->OnProcess();
 }
 
-void CClientGame::OnFrame(void)
+void CClientGameII::OnFrame(void)
 {
 	m_FPSCounter.Frame();
 
@@ -1049,7 +1049,7 @@ void CClientGame::OnFrame(void)
 		m_pGalacticFunctions->m_bCursorEnabled = m_bCursorEnabled;
 }
 
-bool CClientGame::OnKeyUp(const SDL_Event& Event)
+bool CClientGameII::OnKeyUp(const SDL_Event& Event)
 {
 	//_glogprintf(_gstr("Key up (%i)"), Event.key.keysym);
 
@@ -1073,7 +1073,7 @@ bool CClientGame::OnKeyUp(const SDL_Event& Event)
 	return false;
 }
 
-bool CClientGame::OnKeyDown(const SDL_Event& Event)
+bool CClientGameII::OnKeyDown(const SDL_Event& Event)
 {
 
 	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
@@ -1146,7 +1146,7 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 	return false;
 }
 
-void CClientGame::OnCharacter(wchar_t c)
+void CClientGameII::OnCharacter(wchar_t c)
 {
 	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
 	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
@@ -1176,7 +1176,7 @@ void CClientGame::OnCharacter(wchar_t c)
 	}
 }
 
-void CClientGame::OnRender2DStuff(void)
+void CClientGameII::OnRender2DStuff(void)
 {
 	CVector2D vecSize;
 
@@ -1202,7 +1202,7 @@ void CClientGame::OnRender2DStuff(void)
 	float fWidth = (float)width;
 	float fHeight = (float)height;
 
-	CMultiplayer* pMultiplayer = GetMultiplayer();
+	CMultiplayerII* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (!pMultiplayer->IsConnected())
@@ -1275,7 +1275,7 @@ void CClientGame::OnRender2DStuff(void)
 	m_GUISystem.Render(m_pGalacticFunctions->m_p2D);
 }
 
-bool CClientGame::OnCameraProcess(void)
+bool CClientGameII::OnCameraProcess(void)
 {
 	{
 		bool bPreventDefault = false;
@@ -1288,12 +1288,12 @@ bool CClientGame::OnCameraProcess(void)
 	return true;
 }
 
-void CClientGame::NoName(void)
+void CClientGameII::NoName(void)
 {
 	m_pChatWindow->AddMessage(_gstr("Please set your name by using /setname <name>"), Galactic3D::COLOUR::Red);
 }
 
-bool CClientGame::Connect(const GString& str)
+bool CClientGameII::Connect(const GString& str)
 {
 	GString strHost;
 	unsigned short usPort = 22000;
@@ -1311,7 +1311,7 @@ bool CClientGame::Connect(const GString& str)
 	return Connect(strHost.c_str(), usPort, nullptr);
 }
 
-bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
+bool CClientGameII::Connect(const GString& str, const GChar* pszPassword)
 {
 	GString strHost;
 	unsigned short usPort = 22000;
@@ -1321,7 +1321,7 @@ bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
 	return Connect(strHost.c_str(), usPort, pszPassword);
 }
 
-bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
+bool CClientGameII::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
 	if (GetMultiplayer() != NULL)
 	{
@@ -1338,7 +1338,7 @@ bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GCh
 		}
 	}
 
-	m_pNewMultiplayer = new CMultiplayer(m_pClientManager, &m_CVars);
+	m_pNewMultiplayer = new CMultiplayerII(m_pClientManager, &m_CVars);
 
 	if (m_pNewMultiplayer->InitAsClient())
 	{
@@ -1379,9 +1379,9 @@ bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GCh
 	return false;
 }
 
-void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
+void CClientGameII::StopMultiplayerGame(int iReason, bool bPreventRestart)
 {
-	CMultiplayer* pMultiplayer = GetMultiplayer();
+	CMultiplayerII* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		tHackEventDataDiscordUpdate Data = {};
@@ -1417,7 +1417,7 @@ void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
 	}
 }
 
-void CClientGame::StopMultiplayerGameWhenSafe(int iReason)
+void CClientGameII::StopMultiplayerGameWhenSafe(int iReason)
 {
 	if (m_pMultiplayer != nullptr || m_pNewMultiplayer != nullptr)
 	{
@@ -1426,7 +1426,7 @@ void CClientGame::StopMultiplayerGameWhenSafe(int iReason)
 	}
 }
 
-bool CClientGame::CanRotateCamera(void)
+bool CClientGameII::CanRotateCamera(void)
 {
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return false;
@@ -1437,7 +1437,7 @@ bool CClientGame::CanRotateCamera(void)
 	return true;
 }
 
-bool CClientGame::IsInputDisabled(void)
+bool CClientGameII::IsInputDisabled(void)
 {
 	if (!m_bFocused)
 		return true;
@@ -1456,18 +1456,19 @@ bool CClientGame::IsInputDisabled(void)
 	return false;
 }
 
-bool CClientGame::IsCursorEnabled(void)
+bool CClientGameII::IsCursorEnabled(void)
 {
 	if (!m_bFocused)
 		return true;
 	return IsCursorEnabled2();
 }
 
-bool CClientGame::IsCursorEnabled2(void)
+bool CClientGameII::IsCursorEnabled2(void)
 {
 	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
 	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
-		return;
+		return false;
+
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return true;
 	if (m_GUISystem.m_pPage)
@@ -1483,18 +1484,18 @@ bool CClientGame::IsCursorEnabled2(void)
 	return false;
 }
 
-bool CClientGame::IsDebugMode(void)
+bool CClientGameII::IsDebugMode(void)
 {
 	return m_bDebugMode;
 }
 
-bool CClientGame::DontClipCursor()
+bool CClientGameII::DontClipCursor()
 {
 	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
 	return !(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 }
 
-void CClientGame::SetCursorClipped(bool bClipped, bool bForce)
+void CClientGameII::SetCursorClipped(bool bClipped, bool bForce)
 {
 	if (bForce || m_bMouseClipped)
 	{
@@ -1505,21 +1506,21 @@ void CClientGame::SetCursorClipped(bool bClipped, bool bForce)
 	}
 }
 
-void CClientGame::SetCursorEnabled(bool bEnabled)
+void CClientGameII::SetCursorEnabled(bool bEnabled)
 {
 	m_bScriptCursorEnabled = bEnabled;
 
 	UpdateCursorEnabled();
 }
 
-void CClientGame::UpdateCursorEnabled(bool bForce)
+void CClientGameII::UpdateCursorEnabled(bool bForce)
 {
 	bool bCursorEnabled = IsCursorEnabled();
 	bool bCursorClipped = !bCursorEnabled;
 	SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 }
 
-void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
+void CClientGameII::UpdateCursor(SDL_SystemCursor Cursor)
 {
 	if (m_bCapured) // HACK?
 	{
@@ -1536,11 +1537,11 @@ void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
 	}
 }
 
-void CClientGame::UpdateCursor(void)
+void CClientGameII::UpdateCursor(void)
 {
 }
 
-void CClientGame::SetMouseCapture(bool bEnabled)
+void CClientGameII::SetMouseCapture(bool bEnabled)
 {
 #ifdef _WIN32
 	if (bEnabled)
@@ -1566,12 +1567,12 @@ void CClientGame::SetMouseCapture(bool bEnabled)
 #endif
 }
 
-void CClientGame::EnableInput(bool bEnabled)
+void CClientGameII::EnableInput(bool bEnabled)
 {
 
 }
 
-void CClientGame::OnEvent(const SDL_Event *event)
+void CClientGameII::OnEvent(const SDL_Event *event)
 {
 	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
 	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
@@ -1653,7 +1654,7 @@ void CClientGame::OnEvent(const SDL_Event *event)
 	m_pGalacticFunctions->OnEvent(*event);
 }
 
-bool CClientGame::OnAction(const GChar* pszAction, LucasGUI::GUI::CButton* pButton)
+bool CClientGameII::OnAction(const GChar* pszAction, LucasGUI::GUI::CButton* pButton)
 {
 	if (_gstrcmp(pszAction, _gstr("DiscordRespondYes")) == 0)
 	{
@@ -1695,7 +1696,7 @@ bool CClientGame::OnAction(const GChar* pszAction, LucasGUI::GUI::CButton* pButt
 	return false;
 }
 
-void CClientGame::OnJoinRequest(tHackEventDataDiscordUser* pUser)
+void CClientGameII::OnJoinRequest(tHackEventDataDiscordUser* pUser)
 {
 	if (!m_DiscordUserId.empty())
 	{
@@ -1733,26 +1734,26 @@ void CClientGame::OnJoinRequest(tHackEventDataDiscordUser* pUser)
 	pAvatar->m_Material.SetTexture(pRequest->m_pTexture);
 }
 
-void CClientGame::OnDeviceLost(void)
+void CClientGameII::OnDeviceLost(void)
 {
 }
 
-void CClientGame::OnDeviceReset(struct IDirect3DDevice8* pD3DDevice)
+void CClientGameII::OnDeviceReset(struct IDirect3DDevice8* pD3DDevice)
 {
 }
 
-void CClientGame::LockControls(bool state)
+void CClientGameII::LockControls(bool state)
 {
 	if (m_pClientManager == nullptr)
 		return;
 	if (m_pClientManager->m_pLocalPlayer == nullptr)
 		return;
-	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer() == nullptr)
+	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayerII>()->GetGamePlayer() == nullptr)
 		return;
-	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
+	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayerII>()->GetGamePlayer()->LockControls(state);
 }
 
-void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
+void CClientGameII::HumanEnteringVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
 	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
 
@@ -1775,14 +1776,14 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 	else 
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
+		// Use game sdk to enter veh
 		g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
 	pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGameII::HumanEnteredVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
@@ -1810,7 +1811,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
+void CClientGameII::HumanExitingVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
@@ -1833,14 +1834,14 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	else
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
+		// Use game sdk to enter veh
 		g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
 	pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGameII::HumanExitedVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
@@ -1868,7 +1869,7 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	//pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat)
+void CClientGameII::HumanJackVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat)
 {
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1887,12 +1888,12 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	else
 	{
 		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
+		// Use game sdk to jack veh
 		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pClientHumanAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CClientGameII::HumanHit(CClientHumanII* pClientHumanTarget, CClientEntityII* pClientHumanAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
@@ -1924,12 +1925,12 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pCli
 	}
 }
 
-void CClientGame::DestroyUninitializedGameElements() 
+void CClientGameII::DestroyUninitializedGameElements()
 {
 	
 }
 
-M2::eEntityType CClientGame::ToMafiaEntityType(int entityType) 
+M2::eEntityType CClientGameII::ToMafiaEntityType(int entityType) 
 {
 	switch (entityType) 
 	{
@@ -1949,5 +1950,5 @@ M2::eEntityType CClientGame::ToMafiaEntityType(int entityType)
 		}
 	}
 
-	return;
+	return M2::eEntityType::MOD_ENTITY_PLAYER;
 }

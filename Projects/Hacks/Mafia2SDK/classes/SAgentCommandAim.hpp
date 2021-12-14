@@ -34,12 +34,12 @@ namespace M2
             return Mem::InvokeFunction<Mem::call_this, int>(0x18AC3D0, this);
         }
 
-        unsigned int SetupAim(bool aim, C_EntityPos const* ent, zpl_vec3_t const &vec)
+        unsigned int SetupAim(bool aim, C_EntityPos const* ent, Vector3 const &vec)
         {
             return Mem::InvokeFunction<Mem::call_this, unsigned int>(0x18AC320, this, aim, ent, vec);
         }
 
-        unsigned int SetupAimDir(bool aim, zpl_vec3_t const &vec)
+        unsigned int SetupAimDir(bool aim, Vector3 const &vec)
         {
             return Mem::InvokeFunction<Mem::call_this, unsigned int>(0x18AC360, this, aim, vec);
         }

@@ -6,34 +6,34 @@
 #include "ClientEntity.h"
 #include "Multiplayer.h"
 
-std::vector<CClientPlayer*> Players;
+std::vector<CClientPlayerII*> Players;
 
 using namespace Galactic3D;
 
-CClientPlayer::CClientPlayer(CMafiaClientManager* pClientManager) : CClientHuman(pClientManager)
+CClientPlayerII::CClientPlayerII(CMafiaClientManagerII* pClientManager) : CClientHumanII(pClientManager)
 {
 	m_Type = ELEMENT_PLAYER;
 	m_uiMoney = 0;
 }
 
-Galactic3D::ReflectedClass* CClientPlayer::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientPlayerII::GetReflectedClass(void)
 {
-	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientPlayerClass;
+	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientPlayerClass;
 }
 
-void CClientPlayer::SetMoney(int32_t uiMoney)
+void CClientPlayerII::SetMoney(int32_t uiMoney)
 {
 	// m_uiMoney =
 }
 
-int32_t CClientPlayer::GetMoney()
+int32_t CClientPlayerII::GetMoney()
 {
 	return 0;
 
 	// return m_uiMoney;
 }
 
-M2::C_Player2* CClientPlayer::GetGamePlayer()
+M2::C_Player2* CClientPlayerII::GetGamePlayer()
 {
 	return (M2::C_Player2*)GetGameHuman();
 }

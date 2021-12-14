@@ -23,10 +23,7 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
 }
 
-
-
-
-CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) :
+CNetBlenderVehicleII::CNetBlenderVehicleII(CClientVehicleII* pEntity) :
 	m_pEntity(pEntity),
 	m_fRotationMaxError(1.0f),
 	m_fWheelAngleMaxError(1.0f),
@@ -37,7 +34,7 @@ CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) :
 
 
 
-void CNetBlenderVehicle::SetTargetRotation(CVector3D& frontNew, CVector3D& upNew, CVector3D& rightNew)
+void CNetBlenderVehicleII::SetTargetRotation(CVector3D& frontNew, CVector3D& upNew, CVector3D& rightNew)
 {
 	UpdateTargetRotation();
 
@@ -52,7 +49,7 @@ void CNetBlenderVehicle::SetTargetRotation(CVector3D& frontNew, CVector3D& upNew
 	m_RotationRight.SetTarget(rightNew, vecErrorRight, m_uiDelay);
 }
 
-void CNetBlenderVehicle::UpdateTargetRotation()
+void CNetBlenderVehicleII::UpdateTargetRotation()
 {
 	CVector3D vecCurrentRotationFront;
 	CVector3D vecCurrentRotationUp;
@@ -83,12 +80,12 @@ void CNetBlenderVehicle::UpdateTargetRotation()
 }
 
 
-void CNetBlenderVehicle::GetPosition(CVector3D& vecPos)
+void CNetBlenderVehicleII::GetPosition(CVector3D& vecPos)
 {
 	m_pEntity->GetPosition(vecPos);
 }
 
-void CNetBlenderVehicle::SetPosition(const CVector3D& vecPos)
+void CNetBlenderVehicleII::SetPosition(const CVector3D& vecPos)
 {
 	CVector3D currPos;
 	if (m_pEntity->GetPosition(currPos))
@@ -103,12 +100,12 @@ void CNetBlenderVehicle::SetPosition(const CVector3D& vecPos)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderVehicle::GetRotation(CVector3D& vecRotation)
+void CNetBlenderVehicleII::GetRotation(CVector3D& vecRotation)
 {
 	m_pEntity->GetRotation(vecRotation);
 }
 
-void CNetBlenderVehicle::SetRotation(const CVector3D& vecRotation)
+void CNetBlenderVehicleII::SetRotation(const CVector3D& vecRotation)
 {
 	auto pBlender = m_pEntity->m_pBlender;
 	m_pEntity->m_pBlender = nullptr;
@@ -116,12 +113,12 @@ void CNetBlenderVehicle::SetRotation(const CVector3D& vecRotation)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderVehicle::GetVehicleRotation(CVector3D& vecRotationFront, CVector3D& vecRotationUp, CVector3D& vecRotationRight)
+void CNetBlenderVehicleII::GetVehicleRotation(CVector3D& vecRotationFront, CVector3D& vecRotationUp, CVector3D& vecRotationRight)
 {
 	m_pEntity->GetVehicleRotation(vecRotationFront, vecRotationUp, vecRotationRight);
 }
 
-void CNetBlenderVehicle::SetVehicleRotation(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight)
+void CNetBlenderVehicleII::SetVehicleRotation(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight)
 {
 	auto pBlender = m_pEntity->m_pBlender;
 	m_pEntity->m_pBlender = nullptr;
@@ -129,47 +126,47 @@ void CNetBlenderVehicle::SetVehicleRotation(const CVector3D& vecRotationFront, c
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderVehicle::GetMoveSpeed(CVector3D& vecMoveSpeed)
+void CNetBlenderVehicleII::GetMoveSpeed(CVector3D& vecMoveSpeed)
 {
 	m_pEntity->GetVelocity(vecMoveSpeed);
 }
 
-void CNetBlenderVehicle::SetMoveSpeed(const CVector3D& vecMoveSpeed)
+void CNetBlenderVehicleII::SetMoveSpeed(const CVector3D& vecMoveSpeed)
 {
 	m_pEntity->SetVelocity(vecMoveSpeed);
 }
 
-void CNetBlenderVehicle::GetTurnSpeed(CVector3D& vecTurnSpeed)
+void CNetBlenderVehicleII::GetTurnSpeed(CVector3D& vecTurnSpeed)
 {
 	m_pEntity->GetRotationVelocity(vecTurnSpeed);
 }
 
-void CNetBlenderVehicle::SetTurnSpeed(const CVector3D& vecTurnSpeed)
+void CNetBlenderVehicleII::SetTurnSpeed(const CVector3D& vecTurnSpeed)
 {
 	m_pEntity->SetRotationVelocity(vecTurnSpeed);
 }
 
-float CNetBlenderVehicle::GetEngineRPM()
+float CNetBlenderVehicleII::GetEngineRPM()
 {
 	return m_pEntity->GetEngineRPM();
 }
 
-void CNetBlenderVehicle::SetEngineRPM(float engineRPM)
+void CNetBlenderVehicleII::SetEngineRPM(float engineRPM)
 {
 	m_pEntity->SetEngineRPM(engineRPM);
 }
 
-float CNetBlenderVehicle::GetWheelAngle()
+float CNetBlenderVehicleII::GetWheelAngle()
 {
 	return m_pEntity->GetWheelAngle();
 }
 
-void CNetBlenderVehicle::SetWheelAngle(float wheelAngle)
+void CNetBlenderVehicleII::SetWheelAngle(float wheelAngle)
 {
 	m_pEntity->SetWheelAngle(wheelAngle);
 }
 
-void CNetBlenderVehicle::UpdateTargetWheelAngle()
+void CNetBlenderVehicleII::UpdateTargetWheelAngle()
 {
 	if (m_WheelAngle.HasTarget())
 	{
@@ -183,7 +180,7 @@ void CNetBlenderVehicle::UpdateTargetWheelAngle()
 	}
 }
 
-void CNetBlenderVehicle::UpdateTargetEngineRPM()
+void CNetBlenderVehicleII::UpdateTargetEngineRPM()
 {
 	if (m_EngineRPM.HasTarget())
 	{

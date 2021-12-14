@@ -54,7 +54,7 @@ namespace M2
             Mem::InvokeFunction<Mem::call_this, void>(0x18AC780, this, style);
         }
 
-        void SetTarget(C_EntityPos const *ent, zpl_vec3_t const &vec)
+        void SetTarget(C_EntityPos const *ent, Vector3 const &vec)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x18AC710, this, ent, vec);
         }

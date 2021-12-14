@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-using namespace Mafia2SDK;
+using namespace M2;
 extern SDL_Window* g_pWindow;
 
 namespace Mafia2SDK

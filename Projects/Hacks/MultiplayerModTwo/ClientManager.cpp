@@ -9,7 +9,7 @@
 
 using namespace Galactic3D;
 
-CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientResourceMgr* pResourceMgr) :
+CMafiaClientManagerII::CMafiaClientManagerII(Galactic3D::Context* pContext, CClientResourceMgr* pResourceMgr) :
 	CClientManager(pContext,pResourceMgr)
 {
 	m_Games.Register(_gstr("mafia:one"), GAME_MAFIA_ONE);
@@ -29,16 +29,16 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
 	//RegisterFunctions(pResourceMgr->m_pScripting);
 }
 
-CNetObject* CMafiaClientManager::Create(int Type)
+CNetObject* CMafiaClientManagerII::Create(int Type)
 {
-	CClientVehicle* veh;
-	CClientHuman* ped;
-	CClientPlayer* player;
+	CClientVehicleII* veh;
+	CClientHumanII* ped;
+	CClientPlayerII* player;
 
 	switch (Type)
 	{
 	case ELEMENT_VEHICLE:
-		veh = new CClientVehicle(this);
+		veh = new CClientVehicleII(this);
 		for (int i = 0; i < MAX_VEHICLES; i++)
 		{
 			if (m_rgpVehicles[i].IsNull())
@@ -50,7 +50,7 @@ CNetObject* CMafiaClientManager::Create(int Type)
 
 		break;
 	case ELEMENT_PLAYER:
-		player = new CClientPlayer(this);
+		player = new CClientPlayerII(this);
 		for (int i = 0; i < MAX_PEDS; i++)
 		{
 			if (m_rgpPlayers[i].IsNull()) 
@@ -62,7 +62,7 @@ CNetObject* CMafiaClientManager::Create(int Type)
 
 		break;
 	case ELEMENT_PED:
-		ped = new CClientHuman(this);
+		ped = new CClientHumanII(this);
 		for (int i = 0; i < MAX_PEDS; i++)
 		{
 			if (m_rgpPeds[i].IsNull())
@@ -79,19 +79,19 @@ CNetObject* CMafiaClientManager::Create(int Type)
 	return nullptr;
 }
 
-bool CMafiaClientManager::IsConnecting(void)
+bool CMafiaClientManagerII::IsConnecting(void)
 {
 	if (IsConnected())
 		return false;
 	return g_pClientGame->m_pMultiplayer != nullptr;
 }
 
-bool CMafiaClientManager::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
+bool CMafiaClientManagerII::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
 	return g_pClientGame->Connect(pszHost, usPort, pszPassword);
 }
 
-bool CMafiaClientManager::Disconnect(void)
+bool CMafiaClientManagerII::Disconnect(void)
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 		g_pClientGame->StopMultiplayerGame();
@@ -128,7 +128,7 @@ void CMafiaClientResourceMgr::RemoveThingsAssociatedWithResource(CResource* pRes
 	CClientResourceMgr::RemoveThingsAssociatedWithResource(pResource);
 }
 
-CClientVehicle* CMafiaClientManager::FindVehicle(M2::C_Car* pVehicle)
+CClientVehicleII* CMafiaClientManagerII::FindVehicle(M2::C_Car* pVehicle)
 {
 	if (pVehicle == nullptr)
 		return nullptr;
@@ -143,7 +143,7 @@ CClientVehicle* CMafiaClientManager::FindVehicle(M2::C_Car* pVehicle)
 	return nullptr;
 }
 
-CClientHuman* CMafiaClientManager::FindHuman(M2::C_Human2* pHuman)
+CClientHumanII* CMafiaClientManagerII::FindHuman(M2::C_Human2* pHuman)
 {
 	if (pHuman == nullptr)
 		return nullptr;
@@ -166,14 +166,14 @@ CClientHuman* CMafiaClientManager::FindHuman(M2::C_Human2* pHuman)
 	return nullptr;
 }
 
-CClientPlayer* CMafiaClientManager::FindPlayer(M2::C_Player2* pPlayer)
+CClientPlayerII* CMafiaClientManagerII::FindPlayer(M2::C_Player2* pPlayer)
 {
 	if (pPlayer == nullptr)
 		return nullptr;
 
 	for (auto pElement : m_rgpPlayers)
 	{
-		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameHuman() == pPlayer)
+		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGamePlayer() == pPlayer)
 		{
 			return pElement.GetPointer();
 		}
@@ -181,7 +181,7 @@ CClientPlayer* CMafiaClientManager::FindPlayer(M2::C_Player2* pPlayer)
 	return nullptr;
 }
 
-bool CMafiaClientManager::OnProcess(void) {
+bool CMafiaClientManagerII::OnProcess(void) {
 	for (auto pPed : m_rgpPeds)
 	{
 		if (pPed != NULL && pPed.GetPointer() != nullptr && pPed.GetPointer()->GetGameHuman() != nullptr) {

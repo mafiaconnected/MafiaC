@@ -22,7 +22,7 @@ namespace Mem
     };
 
     // Helpers
-    inline M2_Address GetModuleAddress(const char *szModule) { return reinterpret_cast<uint32_t>(GetModuleHandle(szModule)); }
+    //inline M2_Address GetModuleAddress(const char *szModule) { return reinterpret_cast<uint32_t>(GetModuleHandle(szModule)); }
 
     template <typename T> T Read(M2_Address addr) { return *reinterpret_cast<T*>(addr); }
 
@@ -40,7 +40,7 @@ namespace Mem
     }
 
     // Scoped protect
-    class ScopedProtect 
+    class ScopedProtect
     {
     public:
         ScopedProtect(M2_Address addr, size_t size) :m_addr(addr), m_size(size)

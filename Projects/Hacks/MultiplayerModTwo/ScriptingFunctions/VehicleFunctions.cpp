@@ -8,9 +8,9 @@
 #pragma region Functions
 static bool FunctionVehicleExplode(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -24,9 +24,9 @@ static bool FunctionVehicleExplode(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleRepair(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -40,9 +40,9 @@ static bool FunctionVehicleRepair(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleDespawn(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -62,9 +62,9 @@ static bool FunctionVehicleDespawn(IScriptState* pState, int argc, void* pUser)
 #pragma region Properties
 static bool FunctionVehicleGetPosition(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -84,9 +84,9 @@ static bool FunctionVehicleGetPosition(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleSetPosition(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -104,9 +104,9 @@ static bool FunctionVehicleSetPosition(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleGetRotation(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -126,9 +126,9 @@ static bool FunctionVehicleGetRotation(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleSetRotation(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -146,9 +146,9 @@ static bool FunctionVehicleSetRotation(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleGetRotVelocity(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -168,9 +168,9 @@ static bool FunctionVehicleGetRotVelocity(IScriptState* pState, int argc, void* 
 
 static bool FunctionVehicleSetRotVelocity(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -188,9 +188,9 @@ static bool FunctionVehicleSetRotVelocity(IScriptState* pState, int argc, void* 
 
 static bool FunctionVehicleGetVelocity(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -210,9 +210,9 @@ static bool FunctionVehicleGetVelocity(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleSetVelocity(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -230,9 +230,9 @@ static bool FunctionVehicleSetVelocity(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleGetSiren(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -250,9 +250,9 @@ static bool FunctionVehicleGetSiren(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetSiren(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -270,9 +270,9 @@ static bool FunctionVehicleSetSiren(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleGetLocked(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -290,9 +290,9 @@ static bool FunctionVehicleGetLocked(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleSetLocked(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -310,9 +310,9 @@ static bool FunctionVehicleSetLocked(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleGetLights(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -330,9 +330,9 @@ static bool FunctionVehicleGetLights(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleSetLights(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -350,9 +350,9 @@ static bool FunctionVehicleSetLights(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleGetEngine(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -370,9 +370,9 @@ static bool FunctionVehicleGetEngine(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleSetEngine(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -390,9 +390,9 @@ static bool FunctionVehicleSetEngine(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleGetRoof(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -410,9 +410,9 @@ static bool FunctionVehicleGetRoof(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetRoof(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -430,9 +430,9 @@ static bool FunctionVehicleSetRoof(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleGetFuel(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -450,9 +450,9 @@ static bool FunctionVehicleGetFuel(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetFuel(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -470,9 +470,9 @@ static bool FunctionVehicleSetFuel(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetWheelAngle(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -490,9 +490,9 @@ static bool FunctionVehicleSetWheelAngle(IScriptState* pState, int argc, void* p
 
 static bool FunctionVehicleGetWheelAngle(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -510,9 +510,9 @@ static bool FunctionVehicleGetWheelAngle(IScriptState* pState, int argc, void* p
 
 static bool FunctionVehicleGetSpeedLimit(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -530,9 +530,9 @@ static bool FunctionVehicleGetSpeedLimit(IScriptState* pState, int argc, void* p
 
 static bool FunctionVehicleSetSpeedLimit(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -550,9 +550,9 @@ static bool FunctionVehicleSetSpeedLimit(IScriptState* pState, int argc, void* p
 
 static bool FunctionVehicleGetGear(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -570,9 +570,9 @@ static bool FunctionVehicleGetGear(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetGear(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -590,9 +590,9 @@ static bool FunctionVehicleSetGear(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleGetOdometer(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -610,9 +610,9 @@ static bool FunctionVehicleGetOdometer(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleSetOdometer(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -630,9 +630,9 @@ static bool FunctionVehicleSetOdometer(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionVehicleGetSpeed(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -650,9 +650,9 @@ static bool FunctionVehicleGetSpeed(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleSetSpeed(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -670,9 +670,9 @@ static bool FunctionVehicleSetSpeed(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionVehicleGetEngineHealth(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -690,9 +690,9 @@ static bool FunctionVehicleGetEngineHealth(IScriptState* pState, int argc, void*
 
 static bool FunctionVehicleSetEngineHealth(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -710,9 +710,9 @@ static bool FunctionVehicleSetEngineHealth(IScriptState* pState, int argc, void*
 
 static bool FunctionVehicleGetHealth(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -730,9 +730,9 @@ static bool FunctionVehicleGetHealth(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -750,9 +750,9 @@ static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser
 
 static bool FunctionVehicleGetEngineRPM(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -770,9 +770,9 @@ static bool FunctionVehicleGetEngineRPM(IScriptState* pState, int argc, void* pU
 
 static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientVehicle* pClientVehicle;
+	CClientVehicleII* pClientVehicle;
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
@@ -787,48 +787,9 @@ static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pU
 	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
-
-static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	CClientVehicle* pClientVehicle;
-
-	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
-		return false;
-
-	uint8_t state;
-	if (!pState->CheckNumber(0, state))
-		return false;
-
-	if (pClientVehicle->GetGameVehicle() != nullptr)
-		pClientVehicle->GetGameVehicle()->SetActState(state);
-
-	pState->Error(_gstr("vehicle not spawned"));
-	return false;
-}
-
-static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	CClientVehicle* pClientVehicle;
-
-	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
-		return false;
-
-	if (pClientVehicle == nullptr)
-	{
-		pState->Error(_gstr("vehicle not spawned"));
-		return false;
-	}
-
-	pState->ReturnNumber((uint32_t)pClientVehicle->GetGameVehicle());
-	return true;
-}
 #pragma endregion
 
-void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
+void CScriptingFunctionsII::RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGameII* pClientGame)
 {
 	auto pClientManager = pClientGame->m_pClientManager;
 
@@ -850,8 +811,4 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineHealth"), ARGUMENT_FLOAT, FunctionVehicleGetEngineHealth, FunctionVehicleSetEngineHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineRPM"), ARGUMENT_FLOAT, FunctionVehicleGetEngineRPM, FunctionVehicleSetEngineRPM);
-
-	// Debug
-	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
-	//pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
 }

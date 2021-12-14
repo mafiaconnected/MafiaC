@@ -5,11 +5,11 @@
 #include "ClientEntity.h"
 #include <Utils/VectorTools.h>
 
-std::vector<CClientEntity*> Entities;
+std::vector<CClientEntityII*> Entities;
 
 using namespace Galactic3D;
 
-CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(pClientManager), m_pClientManager(pClientManager)
+CClientEntityII::CClientEntityII(CMafiaClientManagerII* pClientManager) : CNetObject(pClientManager), m_pClientManager(pClientManager)
 {
 	m_Type = ELEMENT_ENTITY;
 	m_pEntity = NULL;
@@ -25,48 +25,48 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_RelativeRotation = CVector3D(0, 0, 0);
 }
 
-Galactic3D::ReflectedClass* CClientEntity::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientEntityII::GetReflectedClass(void)
 {
-	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientEntityClass;
+	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientEntityClass;
 }
 
-bool CClientEntity::SetPosition(const CVector3D& vecPos)
+bool CClientEntityII::SetPosition(const CVector3D& vecPos)
 {
 	m_Position = vecPos;
 	return true;
 }
 
-bool CClientEntity::GetPosition(CVector3D& vecPos)
+bool CClientEntityII::GetPosition(CVector3D& vecPos)
 {
 	vecPos = m_Position;
 	return true;
 }
 
-bool CClientEntity::SetRotation(const CVector3D& vecRotation)
+bool CClientEntityII::SetRotation(const CVector3D& vecRotation)
 {
 	m_Rotation = vecRotation;
 	return true;
 }
 
-bool CClientEntity::GetRotation(CVector3D& vecRotation)
+bool CClientEntityII::GetRotation(CVector3D& vecRotation)
 {
 	vecRotation = m_Rotation;
 	return true;
 }
 
-void CClientEntity::Remove(void)
+void CClientEntityII::Remove(void)
 {
 	CNetObject::Remove();
 	Delete();
 }
 
 // Note (Sevenisko): The Actor creation in Mafia must be specified type (Enemy, Player, Physical, Vehicle, etc)
-bool CClientEntity::Create(void)
+bool CClientEntityII::Create(void)
 {
 	return false;
 }
 
-void CClientEntity::Delete(void)
+void CClientEntityII::Delete(void)
 {
 	if (m_pEntity != nullptr)
 	{
@@ -75,7 +75,7 @@ void CClientEntity::Delete(void)
 	}
 }
 
-bool CClientEntity::ReadCreatePacket(Stream* pStream)
+bool CClientEntityII::ReadCreatePacket(Stream* pStream)
 {
     if (!CNetObject::ReadCreatePacket(pStream))
         return false;
@@ -94,7 +94,7 @@ bool CClientEntity::ReadCreatePacket(Stream* pStream)
     return true;
 }
 
-bool CClientEntity::ReadSyncPacket(Stream* pStream)
+bool CClientEntityII::ReadSyncPacket(Stream* pStream)
 {
 	if (!CNetObject::ReadSyncPacket(pStream))
 		return false;
@@ -112,7 +112,7 @@ bool CClientEntity::ReadSyncPacket(Stream* pStream)
 	return true;
 }
 
-bool CClientEntity::WriteCreatePacket(Stream* pStream)
+bool CClientEntityII::WriteCreatePacket(Stream* pStream)
 {
 	if (!CNetObject::WriteCreatePacket(pStream))
 		return false;
@@ -131,7 +131,7 @@ bool CClientEntity::WriteCreatePacket(Stream* pStream)
 	return true;
 }
 
-bool CClientEntity::WriteSyncPacket(Stream* pStream)
+bool CClientEntityII::WriteSyncPacket(Stream* pStream)
 {
 	if (!CNetObject::WriteSyncPacket(pStream))
 		return false;
@@ -150,7 +150,7 @@ bool CClientEntity::WriteSyncPacket(Stream* pStream)
 	return true;
 }
 
-void CClientEntity::OnCreated(void)
+void CClientEntityII::OnCreated(void)
 {
 	CNetObject::OnCreated();
 
@@ -161,7 +161,7 @@ void CClientEntity::OnCreated(void)
 	}
 }
 
-void CClientEntity::Process(void)
+void CClientEntityII::Process(void)
 {
 	if (m_pEntity == nullptr)
 		return;
@@ -195,13 +195,13 @@ void CClientEntity::Process(void)
 	}
 }
 
-bool CClientEntity::SetModel(uint32_t model)
+bool CClientEntityII::SetModel(uint32_t model)
 {
 	m_Model = model;
 	return true;
 }
 
-uint32_t CClientEntity::GetModel()
+uint32_t CClientEntityII::GetModel()
 {
 	return m_Model;
 }

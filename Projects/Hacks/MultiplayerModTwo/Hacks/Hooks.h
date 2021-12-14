@@ -3,7 +3,7 @@
 #include "ClientGame.h"
 #include "ClientManager.h"
 
-class CGameHooks
+class CGameHooksII
 {
 public:
 	static void InstallHooks();

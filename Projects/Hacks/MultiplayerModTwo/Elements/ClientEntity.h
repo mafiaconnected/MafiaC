@@ -3,17 +3,17 @@
 #include "../ClientManager.h"
 #include "../ClientGame.h"
 
-class CClientEntity : public CNetObject
+class CClientEntityII : public CNetObject
 {
 public:
-	CClientEntity(CMafiaClientManager* pClientManager);
+	CClientEntityII(CMafiaClientManagerII* pClientManager);
 
-	CMafiaClientManager* m_pClientManager;
+	CMafiaClientManagerII* m_pClientManager;
 
 	M2::C_Entity* m_pEntity;
 	CMatrix4x4 m_mat;
 	uint32_t m_Model;
-	CClientEntity* m_pRelativeElement;
+	CClientEntityII* m_pRelativeElement;
 	unsigned int m_uiLastReceivedSyncTicks;
 	unsigned int m_uiLastSendSyncTicks;
 	float m_fPacketArrivalRatio;

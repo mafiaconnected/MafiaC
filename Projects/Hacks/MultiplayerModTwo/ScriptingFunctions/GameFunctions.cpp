@@ -9,12 +9,13 @@
 
 extern SDL_Window* g_pWindow;
 
-static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameCreatePedII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
+	uint32_t model = 0;
+	if (!pState->CheckNumber(0, model))
+		return false;
 
 	CVector3D pos = { 0, 0, 0 };
 	if (!pState->CheckVector3D(1, pos))
@@ -24,8 +25,8 @@ static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
-	CClientHuman* pClientHuman = reinterpret_cast<CClientHuman*>(pClientManager->Create(ELEMENT_PED));
-	pClientHuman->SetModel(mdl);
+	CClientHumanII* pClientHuman = reinterpret_cast<CClientHumanII*>(pClientManager->Create(ELEMENT_PED));
+	pClientHuman->SetModel(model);
 	pClientHuman->Spawn(pos, angle, false);
 	pClientHuman->m_pResource = pState->GetResource();
 	pState->ReturnObject(pClientHuman);
@@ -33,12 +34,13 @@ static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameCreatePlayerII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
+	uint32_t model = 0;
+	if (!pState->CheckNumber(0, model))
+		return false;
 
 	CVector3D pos = { 0, 0, 0 };
 	if (!pState->CheckVector3D(1, pos))
@@ -48,8 +50,8 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
-	CClientPlayer* pClientPlayer = reinterpret_cast<CClientPlayer*>(pClientManager->Create(ELEMENT_PLAYER));
-	pClientPlayer->SetModel(mdl);
+	CClientPlayerII* pClientPlayer = reinterpret_cast<CClientPlayerII*>(pClientManager->Create(ELEMENT_PLAYER));
+	pClientPlayer->SetModel(model);
 	//pClientPlayer->SetPosition(pos);
 	//pClientPlayer->SetHeading(angle);
 	pClientPlayer->Spawn(pos, angle, true);
@@ -60,12 +62,13 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 	return true;
 }
 
-static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameCreateVehicleII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
+	uint32_t model = 0;
+	if (!pState->CheckNumber(0, model))
+		return false;
 
 	CVector3D pos = { 0, 0, 0 };
 	if (!pState->CheckVector3D(1, pos))
@@ -75,9 +78,9 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 	if (!pState->CheckNumber(2, angle))
 		return false;
 
-	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
+	CClientVehicleII* pClientVehicle = reinterpret_cast<CClientVehicleII*>(pClientManager->Create(ELEMENT_VEHICLE));
 	CVector3D rot = CVecTools::ComputeDirEuler(angle);
-	pClientVehicle->Create(mdl, pos, rot);
+	pClientVehicle->Create(model, pos, rot);
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterObject(pClientVehicle);
 	pClientVehicle->Release();
@@ -86,7 +89,7 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 	return true;
 }
 
-static bool FunctionGameEnableMap(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameEnableMapII(IScriptState* pState, int argc, void* pUser)
 {
 	bool state = true;
 	if (!pState->CheckBoolean(0, state))
@@ -96,7 +99,7 @@ static bool FunctionGameEnableMap(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGameSetTrafficEnabled(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameSetTrafficEnabledII(IScriptState* pState, int argc, void* pUser)
 {
 	bool state = true;
 	if (!pState->CheckBoolean(0, state))
@@ -106,7 +109,7 @@ static bool FunctionGameSetTrafficEnabled(IScriptState* pState, int argc, void* 
 	return true;
 }
 
-static bool FunctionGameCreateExplosion(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameCreateExplosionII(IScriptState* pState, int argc, void* pUser)
 {
 	CVector3D pos = { 0, 0, 0 };
 	if (!pState->CheckVector3D(0, pos))
@@ -124,11 +127,11 @@ static bool FunctionGameCreateExplosion(IScriptState* pState, int argc, void* pU
 	return true;
 }
 
-static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameSetLocalPlayerII(IScriptState* pState, int argc, void* pUser)
 {
- 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+ 	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientPlayer* pClientPlayer;
+	CClientPlayerII* pClientPlayer;
 	if (!pState->CheckClass(pClientManager->m_pClientPlayerClass, 0, false, &pClientPlayer))
 		return false;
 
@@ -136,7 +139,7 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 	return true;
 }
 
-static bool FunctionGameSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameSetCameraLookAtII(IScriptState* pState, int argc, void* pUser)
 {
 	CVector3D camPos = { 0, 0, 0 };
 	if (!pState->CheckVector3D(0, camPos))
@@ -150,14 +153,14 @@ static bool FunctionGameSetCameraLookAt(IScriptState* pState, int argc, void* pU
 	return true;
 }
 
-static bool FunctionGetGame(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGetGameII(IScriptState* pState, int argc, void* pUser)
 {
-	CClientGame* pClientGame = (CClientGame*)pUser;
+	CClientGameII* pClientGame = (CClientGameII*)pUser;
 	pState->ReturnNumber(GAME_MAFIA_ONE);
 	return true;
 }
 
-static bool FunctionGetWidth(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGetWidthII(IScriptState* pState, int argc, void* pUser)
 {
 	int width;
 	int height;
@@ -167,7 +170,7 @@ static bool FunctionGetWidth(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGetHeight(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGetHeightII(IScriptState* pState, int argc, void* pUser)
 {
 	int width;
 	int height;
@@ -177,7 +180,7 @@ static bool FunctionGetHeight(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGetAspectRatio(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGetAspectRatioII(IScriptState* pState, int argc, void* pUser)
 {
 	int width;
 	int height;
@@ -187,9 +190,9 @@ static bool FunctionGetAspectRatio(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionSetPlayerControl(IScriptState* pState, int argc, void* pUser)
+static bool FunctionSetPlayerControlII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
 	bool bEnabled;
 	if (!pState->CheckBoolean(0, bEnabled))
@@ -199,7 +202,7 @@ static bool FunctionSetPlayerControl(IScriptState* pState, int argc, void* pUser
 	return true;
 }
 
-void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
+void CScriptingFunctionsII::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
 
@@ -241,43 +244,43 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("WEAPON_DOGSHEAD"), 32);
 }
 
-void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
+void CScriptingFunctionsII::RegisterGameFunctions(Galactic3D::CScripting* pScripting, CClientGameII* pClientGame)
 {
 	auto pGameNamespace = pScripting->m_Global.GetNamespace(_gstr("mafia"));
 	auto pClientManager = pClientGame->m_pClientManager;
 
 	{
-		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
-		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
-		pGameNamespace->AddProperty(pClientGame, _gstr("height"), ARGUMENT_INTEGER, FunctionGetHeight);
-		pGameNamespace->AddProperty(pClientGame, _gstr("aspectRatio"), ARGUMENT_FLOAT, FunctionGetAspectRatio);
+		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGameII);
+		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidthII);
+		pGameNamespace->AddProperty(pClientGame, _gstr("height"), ARGUMENT_INTEGER, FunctionGetHeightII);
+		pGameNamespace->AddProperty(pClientGame, _gstr("aspectRatio"), ARGUMENT_FLOAT, FunctionGetAspectRatioII);
 	}
 
 	{
-		pClientManager->m_pClientHumanClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePed, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createPed"), _gstr("svf"), FunctionGameCreatePed, pClientManager);
+		pClientManager->m_pClientHumanClass->RegisterConstructor(_gstr("tivf"), FunctionGameCreatePedII, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createPed"), _gstr("ivf"), FunctionGameCreatePedII, pClientManager);
 
-		pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreateVehicle, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
+		pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tivf"), FunctionGameCreateVehicleII, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("ivf"), FunctionGameCreateVehicleII, pClientManager);
 	}
 
 	{
-		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
+		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosionII, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControlII, pClientGame);
 		//pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv"), FunctionSetCameraLookAt, pClientGame);
 	}
 
 	{
 		auto pHUDNamespace = pGameNamespace->AddNamespace(_gstr("hud"));
-		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMapII, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
-		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabledII, pClientManager);
 
-		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePlayer, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("svf"), FunctionGameCreatePlayer, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
+		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tivf"), FunctionGameCreatePlayerII, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("ivf"), FunctionGameCreatePlayerII, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayerII, pClientManager);
 	}
 }

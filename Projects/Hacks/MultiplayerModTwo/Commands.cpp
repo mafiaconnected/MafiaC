@@ -9,7 +9,7 @@
 
 extern bool g_bSkipMenu;
 
-void CMafiaCSayCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CMafiaCSayCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (g_pClientGame->m_pMultiplayer != NULL)
 		g_pClientGame->m_pMultiplayer->SendChat(pszArguments, _gstrlen(pszArguments));
@@ -23,7 +23,7 @@ void CMafiaCSayCommandHandler::Execute(const GChar* pszCommandName, const GChar*
 	}
 }
 
-void CMafiaCUnhandledCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CMafiaCUnhandledCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (g_pClientGame->m_pMultiplayer != NULL)
 		g_pClientGame->m_pMultiplayer->SendCommand(pszCommandName, _gstrlen(pszCommandName), pszArguments, (pszArguments == nullptr) ? 0 : _gstrlen(pszArguments));
@@ -31,7 +31,7 @@ void CMafiaCUnhandledCommandHandler::Execute(const GChar* pszCommandName, const 
 		CUnhandledCommandHandler::Execute(pszCommandName, pszArguments, pClient);
 }
 
-void CSetNameCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CSetNameCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (pszArguments == nullptr || _gstrlen(pszArguments) >= NETGAME_MAX_NAME_BUFFER)
 	{
@@ -48,7 +48,7 @@ void CSetNameCommandHandler::Execute(const GChar* pszCommandName, const GChar* p
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_INFO, _gstr("Name changed!"));
 }
 
-void CConnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CConnectCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 	{
@@ -64,7 +64,7 @@ void CConnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* p
 	}
 }
 
-void CReconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CReconnectCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 
@@ -90,7 +90,7 @@ void CReconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar*
 	}
 }
 
-void CDisconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CDisconnectCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 		g_pClientGame->StopMultiplayerGame();
@@ -98,7 +98,7 @@ void CDisconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_WARN, _gstr("Not connected to a server!"));
 }
 
-void CMafiaCExitCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CMafiaCExitCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 //	g_pClientGame->ShutDown();
 
@@ -106,7 +106,7 @@ void CMafiaCExitCommandHandler::Execute(const GChar* pszCommandName, const GChar
 		SendMessageW(GHWND, WM_CLOSE, 0, 0);
 }
 
-void CConsoleCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CConsoleCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	bool bConsole = true; //!GContext->IsConsoleEnabled();
 	if (g_pClientGame->m_pContext->IsConsoleEnabled() != bConsole)
@@ -124,7 +124,7 @@ void CConsoleCommandHandler::Execute(const GChar* pszCommandName, const GChar* p
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_INFO, _gstr("Console disabled"));
 }
 
-void CGameStatsCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CGameStatsCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	g_pClientGame->m_bShowGameStatistics = !g_pClientGame->m_bShowGameStatistics;
 	if (g_pClientGame->m_bShowGameStatistics)
@@ -133,7 +133,7 @@ void CGameStatsCommandHandler::Execute(const GChar* pszCommandName, const GChar*
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_INFO, _gstr("Game stats disabled"));
 }
 
-void CChatScaleCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
+void CChatScaleCommandHandlerII::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (pszArguments != nullptr && *pszArguments != '\0')
 	{
@@ -159,12 +159,12 @@ void CChatScaleCommandHandler::Execute(const GChar* pszCommandName, const GChar*
 	}
 }
 
-void CClientGame::RegisterCommands()
+void CClientGameII::RegisterCommands()
 {
 	m_pResourceMgr->m_pCommandHandlers->ClearCmds();
 
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCSayCommandHandler, _gstr("say"));
-	m_pResourceMgr->m_pCommandHandlers->AddUnhandledCmdProc(new CMafiaCUnhandledCommandHandler);
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCSayCommandHandlerII, _gstr("say"));
+	m_pResourceMgr->m_pCommandHandlers->AddUnhandledCmdProc(new CMafiaCUnhandledCommandHandlerII);
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CCallbackCommandHandler([this](const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient) {
 		m_pChatWindow->FlushBuffers();
 	}), _gstr("clear"));
@@ -176,22 +176,22 @@ void CClientGame::RegisterCommands()
 		m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CStopAllResourcesCommandHandler(m_pResourceMgr), _gstr("stopall"));
 		m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CRestartResourceCommandHandler(m_pResourceMgr), _gstr("restart"));
 		m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CRefreshResourcesCommandHandler(m_pResourceMgr), _gstr("refresh"));
-		m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CSetNameCommandHandler, _gstr("setname"));
+		m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CSetNameCommandHandlerII, _gstr("setname"));
 	}
 
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CConnectCommandHandler, _gstr("connect"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CReconnectCommandHandler, _gstr("reconnect"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CDisconnectCommandHandler, _gstr("disconnect"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandler, _gstr("q"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandler, _gstr("quit"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandler, _gstr("exit"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CConsoleCommandHandler, _gstr("console"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CGameStatsCommandHandler, _gstr("gamestats"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CConnectCommandHandlerII, _gstr("connect"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CReconnectCommandHandlerII, _gstr("reconnect"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CDisconnectCommandHandlerII, _gstr("disconnect"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandlerII, _gstr("q"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandlerII, _gstr("quit"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CMafiaCExitCommandHandlerII, _gstr("exit"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CConsoleCommandHandlerII, _gstr("console"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CGameStatsCommandHandlerII, _gstr("gamestats"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CCallbackCommandHandler([this](const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient) {
 		m_bFPSCounter = !m_bFPSCounter;
 	}), _gstr("fpscounter"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CVarCommandHandler(&m_CVars), _gstr("cvar"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new Galactic3D::CDumpDocumentationCommandHandler(m_pResourceMgr), _gstr("dumpdoc"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CChatScaleCommandHandler, _gstr("chatscale"));
+	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CChatScaleCommandHandlerII, _gstr("chatscale"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new Galactic3D::CHelpCommandHandler, _gstr("help"));
 }

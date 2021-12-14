@@ -4,13 +4,13 @@
 #include "../ClientManager.h"
 #include "../ClientGame.h"
 
-class CClientPlayer : public CClientHuman
+class CClientPlayerII : public CClientHumanII
 {
 private:
 	M2::C_Player2* m_MafiaPlayer;
 
 public:
-	CClientPlayer(CMafiaClientManager* pClientManager);
+	CClientPlayerII(CMafiaClientManagerII* pClientManager);
 
 	int32_t m_uiMoney;
 

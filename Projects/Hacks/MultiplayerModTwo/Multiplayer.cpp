@@ -11,7 +11,7 @@ extern Uint32 g_uiSyncedTickCount;
 
 using namespace Galactic3D;
 
-CMultiplayer::CMultiplayer(CClientManager* pClientManager, CVarSystem* pCVars) : CClientNetGame(pClientManager, pCVars)
+CMultiplayerII::CMultiplayerII(CClientManager* pClientManager, CVarSystem* pCVars) : CClientNetGame(pClientManager, pCVars)
 {
 	m_bRestartingGame = false;
 	m_bNametags = true;
@@ -28,7 +28,7 @@ CMultiplayer::CMultiplayer(CClientManager* pClientManager, CVarSystem* pCVars) :
 	m_Version.m_GameVersion = 1;
 }
 
-void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
+void CMultiplayerII::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
 {
 	Galactic3D::CBinaryReader Reader(pStream);
 
@@ -65,7 +65,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			}
 			else
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					// Set player with M2 SDK
@@ -92,7 +92,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->Kill();
@@ -116,7 +116,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->ThrowGrenade(vecTargetPos);
@@ -142,7 +142,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->Shoot(state, vecTargetPos);
@@ -161,7 +161,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->Reload();
@@ -180,7 +180,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->HolsterWeapon();
@@ -199,7 +199,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->Jump();
@@ -224,7 +224,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->GiveWeapon(weapon, ammo1, ammo2);
@@ -243,7 +243,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->DropWeapon();
@@ -265,7 +265,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->SetActiveWeapon(nWeaponId);
@@ -288,7 +288,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
 					pClientPlayer->TakeWeapon(weaponId);
@@ -307,16 +307,17 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			size_t size = 0;
 
-			GChar* mdl = Reader.ReadString(&size);
+			int32_t model;
+			Reader.ReadInt32(&model, 1);
 
 			if (nPlayerNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
+				CClientPlayerII* pClientPlayer = static_cast<CClientPlayerII*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
-					_glogprintf(L"Change skin for element #%d:\n\tModel: %s", pClientPlayer->GetId(), mdl);
+					_glogprintf(L"Change skin for element #%d:\n\tModel: %i", pClientPlayer->GetId(), model);
 
-					pClientPlayer->SetModel(mdl);
+					pClientPlayer->SetModel(model);
 				}
 			}
 		}
@@ -333,7 +334,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->Repair();
@@ -356,7 +357,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetSiren(state);
@@ -379,7 +380,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetEngine(state);
@@ -402,7 +403,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetLocked(state);
@@ -425,7 +426,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetRoof(state);
@@ -448,7 +449,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetLights(state);
@@ -471,7 +472,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetFuel(fuel);
@@ -494,7 +495,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetWheelAngle(wheelAngle);
@@ -517,7 +518,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetEngineRPM(engineRPM);
@@ -540,7 +541,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetSpeedLimit(speedLimit);
@@ -563,7 +564,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->SetEngineHealth(engineHealth);
@@ -583,7 +584,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->Explode();
@@ -640,10 +641,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			{
 				if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 				{
-					CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+					CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 					if (pClientHuman != nullptr)
 					{
-						CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+						CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 						if (pClientVehicle != nullptr)
 						{
 							if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
@@ -676,10 +677,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr) 
 				{
-					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+					CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
@@ -711,10 +712,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr)
 				{
-					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+					CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
@@ -746,10 +747,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr)
 				{
-					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+					CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
@@ -775,7 +776,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr)
 				{
 					pClientHuman->SetHealth((float)fHealth);
@@ -796,10 +797,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				CClientHumanII* pClientHuman = static_cast<CClientHumanII*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr)
 				{
-					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+					CClientVehicleII* pClientVehicle = static_cast<CClientVehicleII*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
@@ -823,7 +824,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 	}
 }
 
-void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
+void CMultiplayerII::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
 {
 	if (!g_pClientGame->m_bStopMultiplayerGame)
 	{
@@ -852,7 +853,7 @@ void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
 	}
 }
 
-void CMultiplayer::OnFinishConnecting(void)
+void CMultiplayerII::OnFinishConnecting(void)
 {
 	tHackEventDataDiscordUpdate Data = {};
 	Data.m_Size = sizeof(Data);
@@ -868,12 +869,12 @@ void CMultiplayer::OnFinishConnecting(void)
 	SendInitial();
 }
 
-void CMultiplayer::OnSetGameMode(const GChar* pszGameMode, size_t Length)
+void CMultiplayerII::OnSetGameMode(const GChar* pszGameMode, size_t Length)
 {
 	CClientNetGame::OnSetGameMode(pszGameMode,Length);
 }
 
-void CMultiplayer::OnSetServerName(const GChar* pszName, size_t Length)
+void CMultiplayerII::OnSetServerName(const GChar* pszName, size_t Length)
 {
 	CClientNetGame::OnSetServerName(pszName,Length);
 
@@ -883,7 +884,7 @@ void CMultiplayer::OnSetServerName(const GChar* pszName, size_t Length)
 	TriggerHackEvent(HACKEVENT_SETDISCORDDETAILS, &Data);
 }
 
-void CMultiplayer::UpdatePlayerCounts(size_t CurrentPlayers, size_t MaxPlayers)
+void CMultiplayerII::UpdatePlayerCounts(size_t CurrentPlayers, size_t MaxPlayers)
 {
 	CClientNetGame::UpdatePlayerCounts(CurrentPlayers, MaxPlayers);
 
@@ -894,26 +895,26 @@ void CMultiplayer::UpdatePlayerCounts(size_t CurrentPlayers, size_t MaxPlayers)
 	TriggerHackEvent(HACKEVENT_DISCORD_UPDATE, &Data);
 }
 
-void CMultiplayer::OnPeerJoin(CNetMachine* pPeer)
+void CMultiplayerII::OnPeerJoin(CNetMachine* pPeer)
 {
 }
 
-void CMultiplayer::OnPeerLeave(CNetMachine* pPeer)
+void CMultiplayerII::OnPeerLeave(CNetMachine* pPeer)
 {
 }
 
-void CMultiplayer::EnqueuePeerElement(CClientEntity* pElement)
+void CMultiplayerII::EnqueuePeerElement(CClientEntityII* pElement)
 {
 	if (pElement->GetId() == INVALID_NETWORK_ID)
 		m_PendingPeerElements.push_back(pElement);
 }
 
-bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
+bool CMultiplayerII::MigrateEntity(CClientEntityII* pElement)
 {
 	return false;
 }
 
-void CMultiplayer::ProcessNewPeerElements(void)
+void CMultiplayerII::ProcessNewPeerElements(void)
 {
 	for (auto it = m_PendingPeerElements.begin(); it != m_PendingPeerElements.end();)
 	{
@@ -937,7 +938,7 @@ void CMultiplayer::ProcessNewPeerElements(void)
 	}
 }
 
-void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
+void CMultiplayerII::SendLocalPlayerShoot(bool bState, CVector3D position)
 {
 	//if (pPed->IsLocal() || !pPed->IsSyncer())
 	//	return;
@@ -949,7 +950,7 @@ void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
+void CMultiplayerII::SendHumanHit(CClientHumanII* target, CClientHumanII* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
@@ -967,7 +968,7 @@ void CMultiplayer::SendHumanHit(CClientHuman* target, CClientHuman* attacker, CV
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientHuman* attacker)
+void CMultiplayerII::SendHumanDeath(CClientHumanII* target, CClientHumanII* attacker)
 {
 	if (target->IsLocal() || attacker->IsLocal())
 		return;
@@ -978,7 +979,7 @@ void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientHuman* attacker)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanDropWeapon(CClientHuman* target)
+void CMultiplayerII::SendHumanDropWeapon(CClientHumanII* target)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
@@ -988,7 +989,7 @@ void CMultiplayer::SendHumanDropWeapon(CClientHuman* target)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanChangeWeapon(CClientHuman* target, int8_t weapon)
+void CMultiplayerII::SendHumanChangeWeapon(CClientHumanII* target, int8_t weapon)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;

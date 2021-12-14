@@ -4,11 +4,11 @@
 #include "../ClientGame.h"
 #include "../Elements/ClientEntity.h"
 
-static bool FunctionEntityGetPosition(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntityGetPositionII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 	
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -26,11 +26,11 @@ static bool FunctionEntityGetPosition(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
-static bool FunctionEntitySetPosition(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntitySetPositionII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -46,11 +46,11 @@ static bool FunctionEntitySetPosition(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
-static bool FunctionEntityGetRotation(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntityGetRotationII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -68,11 +68,11 @@ static bool FunctionEntityGetRotation(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
-static bool FunctionEntitySetRotation(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntitySetRotationII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -88,11 +88,11 @@ static bool FunctionEntitySetRotation(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
-static bool FunctionEntityGetHeading(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntityGetHeadingII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -101,11 +101,11 @@ static bool FunctionEntityGetHeading(IScriptState* pState, int argc, void* pUser
 	return false;
 }
 
-static bool FunctionEntitySetHeading(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntitySetHeadingII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
@@ -121,48 +121,49 @@ static bool FunctionEntitySetHeading(IScriptState* pState, int argc, void* pUser
 	return false;
 }
 
-static bool FunctionEntityGetModel(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntityGetModelII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
 
-	const GChar* model = pClientEntity->GetModel();
+	uint32_t model = pClientEntity->GetModel();
 
-	pState->ReturnString(model);
+	pState->ReturnNumber(model);
 
 	return true;
 }
 
-static bool FunctionEntitySetModel(IScriptState* pState, int argc, void* pUser)
+static bool FunctionEntitySetModelII(IScriptState* pState, int argc, void* pUser)
 {
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+	CMafiaClientManagerII* pClientManager = (CMafiaClientManagerII*)pUser;
 
-	CClientEntity* pClientEntity;
+	CClientEntityII* pClientEntity;
 
 	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
 		return false;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
+	uint32_t model;
+	if (!pState->CheckNumber(0, model))
+		return false;
 
-	pClientEntity->SetModel(mdl);
+	pClientEntity->SetModel(model);
 
-	pState->ReturnString(mdl);
+	pState->ReturnNumber(model);
 
 	return true;
 }
 
-void CScriptingFunctions::RegisterEntityFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
+void CScriptingFunctionsII::RegisterEntityFunctions(Galactic3D::CScripting* pScripting, CClientGameII* pClientGame)
 {
 	auto pClientManager = pClientGame->m_pClientManager;
 
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionEntityGetPosition, FunctionEntitySetPosition);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("rotation"), ARGUMENT_VECTOR3D, FunctionEntityGetRotation, FunctionEntitySetRotation);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_VECTOR3D, FunctionEntityGetHeading, FunctionEntitySetHeading);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("model"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionEntityGetPositionII, FunctionEntitySetPositionII);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("rotation"), ARGUMENT_VECTOR3D, FunctionEntityGetRotationII, FunctionEntitySetRotationII);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_VECTOR3D, FunctionEntityGetHeadingII, FunctionEntitySetHeadingII);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("model"), ARGUMENT_INTEGER, FunctionEntityGetModelII, FunctionEntitySetModelII);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModelII, FunctionEntitySetModelII);
 }

@@ -129,7 +129,7 @@ RAWCODE HookRender2DStuff()
 	}
 }
 
-void CGameHooks::InstallHooks()
+void CGameHooksII::InstallHooks()
 {
 	M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event* data) {
 		auto ped = (M2::C_Human2*)data->arg1;
@@ -137,7 +137,7 @@ void CGameHooks::InstallHooks()
 		auto seat = (uint32_t)data->arg3;
 
 		g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
-		printf("[game-event] ped entering the car on seat: %d\n", seat);
+		printf("[game-event] ped entered the car on seat: %d\n", seat);
 	});
 
 	M2::AttachHandler(M2_EVENT_CAR_ENTER_REQUEST, [](m2sdk_event* data) {
@@ -145,7 +145,7 @@ void CGameHooks::InstallHooks()
 		auto car = (M2::C_Car*)data->arg2;
 		auto seat = (uint32_t)data->arg3;
 
-		g_pClientGame->HumanEnteringVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat);
+		g_pClientGame->HumanEnteringVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
 		printf("[game-event] ped entering the car on seat: %d\n", seat);
 	});
 }

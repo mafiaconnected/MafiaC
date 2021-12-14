@@ -7,7 +7,7 @@ __declspec(naked) void RETN4() {
     __asm retn 0x4
 }
 
-void CGameHacks::InstallHacks()
+void CGameHacksII::InstallHacks()
 {
 
 }

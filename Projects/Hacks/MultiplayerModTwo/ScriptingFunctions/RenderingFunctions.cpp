@@ -5,7 +5,7 @@
 
 using namespace Galactic3D;
 
-static bool FunctionLoadBMP(IScriptState* pState, int argc, void* pUser)
+static bool FunctionLoadBMPII(IScriptState* pState, int argc, void* pUser)
 {
 	Stream* pStream = pState->CheckStream(0);
 	if (!pStream)
@@ -16,7 +16,7 @@ static bool FunctionLoadBMP(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionLoadPNG(IScriptState* pState, int argc, void* pUser)
+static bool FunctionLoadPNGII(IScriptState* pState, int argc, void* pUser)
 {
 	Stream* pStream = pState->CheckStream(0);
 	if (!pStream)
@@ -27,7 +27,7 @@ static bool FunctionLoadPNG(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionDrawRectangle(IScriptState* pState, int argc, void* pUser)
+static bool FunctionDrawRectangleII(IScriptState* pState, int argc, void* pUser)
 {
 	Surface* pSurface;
 	if (!pState->CheckClass(g_pClientGame->m_pClientManager->m_pSurfaceClass,0,true,&pSurface))
@@ -74,7 +74,7 @@ static bool FunctionDrawRectangle(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGetCursorPosition(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGetCursorPositionII(IScriptState* pState, int argc, void* pUser)
 {
 	if (g_pClientGame->IsCursorEnabled())
 	{
@@ -87,13 +87,13 @@ static bool FunctionGetCursorPosition(IScriptState* pState, int argc, void* pUse
 	return true;
 }
 
-static bool FunctionIsCursorEnabled(IScriptState* pState, int argc, void* pUser)
+static bool FunctionIsCursorEnabledII(IScriptState* pState, int argc, void* pUser)
 {
 	pState->ReturnBoolean(g_pClientGame->IsCursorEnabled());
 	return true;
 }
 
-static bool FunctionShowCursor(IScriptState* pState, int argc, void* pUser)
+static bool FunctionShowCursorII(IScriptState* pState, int argc, void* pUser)
 {
 	bool bEnabled;
 	if (!pState->CheckBoolean(0,bEnabled))
@@ -109,16 +109,16 @@ static bool FunctionShowCursor(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-void CScriptingFunctions::RegisterRenderingFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
+void CScriptingFunctionsII::RegisterRenderingFunctions(Galactic3D::CScripting* pScripting, CClientGameII* pClientGame)
 {
 	auto pDrawing = pScripting->m_Global.AddNamespace(_gstr("graphics"));
-	pDrawing->RegisterFunction(_gstr("loadBMP"), _gstr("x"), FunctionLoadBMP, pClientGame);
-	pDrawing->RegisterFunction(_gstr("loadPNG"), _gstr("x"), FunctionLoadPNG, pClientGame);
-	pDrawing->RegisterFunction(_gstr("drawRectangle"), _gstr("xzz|iiiifzzzz"), FunctionDrawRectangle, pClientGame);
+	pDrawing->RegisterFunction(_gstr("loadBMP"), _gstr("x"), FunctionLoadBMPII, pClientGame);
+	pDrawing->RegisterFunction(_gstr("loadPNG"), _gstr("x"), FunctionLoadPNGII, pClientGame);
+	pDrawing->RegisterFunction(_gstr("drawRectangle"), _gstr("xzz|iiiifzzzz"), FunctionDrawRectangleII, pClientGame);
 	pDrawing->SetAlias(_gstr("drawing"));
 
 	auto pGUI = pScripting->m_Global.AddNamespace(_gstr("gui"));
-	pGUI->AddProperty(pClientGame, _gstr("cursorPosition"), ARGUMENT_VECTOR2D, FunctionGetCursorPosition);
-	pGUI->AddProperty(pClientGame, _gstr("cursorEnabled"), ARGUMENT_BOOLEAN, FunctionIsCursorEnabled);
-	pGUI->RegisterFunction(_gstr("showCursor"), _gstr("b|b"), FunctionShowCursor, pClientGame);
+	pGUI->AddProperty(pClientGame, _gstr("cursorPosition"), ARGUMENT_VECTOR2D, FunctionGetCursorPositionII);
+	pGUI->AddProperty(pClientGame, _gstr("cursorEnabled"), ARGUMENT_BOOLEAN, FunctionIsCursorEnabledII);
+	pGUI->RegisterFunction(_gstr("showCursor"), _gstr("b|b"), FunctionShowCursorII, pClientGame);
 }

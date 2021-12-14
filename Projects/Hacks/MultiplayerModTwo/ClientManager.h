@@ -5,12 +5,12 @@
 #include <Multiplayer/Multiplayer.h>
 #include <Multiplayer/ClientManager.h>
 
-class CMafiaClientManager;
+class CMafiaClientManagerII;
 
-class CClientEntity;
-class CClientHuman;
-class CClientPlayer;
-class CClientVehicle;
+class CClientEntityII;
+class CClientHumanII;
+class CClientPlayerII;
+class CClientVehicleII;
 
 // Changable limits
 #include <IncreasedLimits.h>
@@ -23,10 +23,10 @@ enum eMafiaElementType
 	ELEMENT_VEHICLE = ELEMENT_ENTITY | 32,
 };
 
-class CMafiaClientManager : public Galactic3D::CClientManager
+class CMafiaClientManagerII : public Galactic3D::CClientManager
 {
 public:
-	CMafiaClientManager(Galactic3D::Context* pContext, Galactic3D::CClientResourceMgr* pResourceMgr);
+	CMafiaClientManagerII(Galactic3D::Context* pContext, Galactic3D::CClientResourceMgr* pResourceMgr);
 
 	Galactic3D::ReflectedClass* m_pSurfaceClass;
 	Galactic3D::ReflectedClass* m_pTextureClass;
@@ -44,13 +44,13 @@ public:
 	virtual bool Disconnect(void) override;
 	virtual bool OnProcess(void);
 
-	virtual CClientHuman* FindHuman(M2::C_Human2* pHuman);
-	virtual CClientPlayer* FindPlayer(M2::C_Player2* pPlayer);
-	virtual CClientVehicle* FindVehicle(M2::C_Car* pVehicle);
+	virtual CClientHumanII* FindHuman(M2::C_Human2* pHuman);
+	virtual CClientPlayerII* FindPlayer(M2::C_Player2* pPlayer);
+	virtual CClientVehicleII* FindVehicle(M2::C_Car* pVehicle);
 	
-	Galactic3D::Weak<CClientVehicle> m_rgpVehicles[MAX_VEHICLES];
-	Galactic3D::Weak<CClientHuman> m_rgpPeds[MAX_PEDS];
-	Galactic3D::Weak<CClientPlayer> m_rgpPlayers[MAX_PEDS];
+	Galactic3D::Weak<CClientVehicleII> m_rgpVehicles[MAX_VEHICLES];
+	Galactic3D::Weak<CClientHumanII> m_rgpPeds[MAX_PEDS];
+	Galactic3D::Weak<CClientPlayerII> m_rgpPlayers[MAX_PEDS];
 };
 
 class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr
