@@ -215,6 +215,9 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 	
-	pScripting->m_Global.AddProperty(pClientManager, _gstr("cameraPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition);
-	pScripting->m_Global.AddProperty(pClientManager, _gstr("cameraLookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition);
+	auto pCameraNamespace = pScripting->m_Global.AddNamespace(_gstr("camera"));
+	pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition);
+	pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition);
+
+	//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 }
