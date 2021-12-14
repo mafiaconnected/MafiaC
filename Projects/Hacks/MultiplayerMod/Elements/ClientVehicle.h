@@ -35,6 +35,9 @@ public:
 	virtual void Despawn(void);
 	virtual void Remove(void);
 
+	virtual bool SetModel(const GChar* modelName) override;
+	virtual const GChar* GetModel() override;
+
 	void UpdateGameMatrix(void);
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;
@@ -42,6 +45,9 @@ public:
 
 	virtual bool SetRotation(const CVector3D& vecPos) override;
 	virtual bool GetRotation(CVector3D& vecPos) override;
+
+	virtual bool SetHeading(float heading) override;
+	virtual float GetHeading() override;
 
 	virtual bool SetVehicleRotation(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight);
 	virtual bool GetVehicleRotation(CVector3D& rotationFront, CVector3D& rotationUp, CVector3D& rotationRight);
