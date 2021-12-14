@@ -128,7 +128,7 @@ void CMafiaClientResourceMgr::RemoveThingsAssociatedWithResource(CResource* pRes
 	CClientResourceMgr::RemoveThingsAssociatedWithResource(pResource);
 }
 
-CClientVehicle* CMafiaClientManager::FindVehicle(MafiaSDK::C_Car* pVehicle)
+CClientVehicle* CMafiaClientManager::FindVehicle(M2::C_Car* pVehicle)
 {
 	if (pVehicle == nullptr)
 		return nullptr;
@@ -143,7 +143,7 @@ CClientVehicle* CMafiaClientManager::FindVehicle(MafiaSDK::C_Car* pVehicle)
 	return nullptr;
 }
 
-CClientHuman* CMafiaClientManager::FindHuman(MafiaSDK::C_Human* pHuman)
+CClientHuman* CMafiaClientManager::FindHuman(M2::C_Human2* pHuman)
 {
 	if (pHuman == nullptr)
 		return nullptr;
@@ -166,7 +166,7 @@ CClientHuman* CMafiaClientManager::FindHuman(MafiaSDK::C_Human* pHuman)
 	return nullptr;
 }
 
-CClientPlayer* CMafiaClientManager::FindPlayer(MafiaSDK::C_Player* pPlayer)
+CClientPlayer* CMafiaClientManager::FindPlayer(M2::C_Player2* pPlayer)
 {
 	if (pPlayer == nullptr)
 		return nullptr;

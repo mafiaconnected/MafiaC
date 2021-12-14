@@ -44,9 +44,9 @@ public:
 	virtual bool Disconnect(void) override;
 	virtual bool OnProcess(void);
 
-	virtual CClientHuman* FindHuman(MafiaSDK::C_Human* pHuman);
-	virtual CClientPlayer* FindPlayer(MafiaSDK::C_Player* pPlayer);
-	virtual CClientVehicle* FindVehicle(MafiaSDK::C_Car* pVehicle);
+	virtual CClientHuman* FindHuman(M2::C_Human2* pHuman);
+	virtual CClientPlayer* FindPlayer(M2::C_Player2* pPlayer);
+	virtual CClientVehicle* FindVehicle(M2::C_Car* pVehicle);
 	
 	Galactic3D::Weak<CClientVehicle> m_rgpVehicles[MAX_VEHICLES];
 	Galactic3D::Weak<CClientHuman> m_rgpPeds[MAX_PEDS];

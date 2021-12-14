@@ -20,7 +20,7 @@
 #define Byte unsigned char
 
 #if !defined(m2sdk_log)
-#define m2sdk_log(fmt, ...) 
+#define m2sdk_log(fmt, ...)
 #endif
 
 #define pad(p,n,s) Byte p##__##n##[s]
@@ -578,7 +578,7 @@ void M2::InitializeSDKHandlers()
     M2::C_CarActionBreakIn_Hooks::HookTestAction([&](C_Car * car) {
         return false;
     });
-    
+
     M2::C_CarActionTankFuel_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;

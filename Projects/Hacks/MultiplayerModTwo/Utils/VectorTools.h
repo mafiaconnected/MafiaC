@@ -119,8 +119,10 @@ public:
 	static CVector3D Slerp(const CVector3D& a, const CVector3D& b, float t);
 	static CVector3D Nlerp(const CVector3D& a, const CVector3D& b, float t);
 
-	static S_vector ConvertToMafiaVec(const CVector3D& vec);
-	static CVector3D ConvertFromMafiaVec(const S_vector& vec);
+	static Vector3 ConvertToMafiaVec(const CVector3D& vec);
+	static CVector3D ConvertFromMafiaVec(const Vector3& vec);
 
-	static void Rotate(double heading, double attitude, double bank, S_quat& quat);
+	static Quaternion CVecTools::ConvertVec3ToMafiaQuat(const CVector3D& vec)
+
+	//static void Rotate(double heading, double attitude, double bank, S_quat& quat);
 };

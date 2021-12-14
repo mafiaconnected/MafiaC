@@ -268,6 +268,8 @@ public:
 	void HumanHit(CClientHuman* humanTarget, CClientEntity* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
+
+	M2::eEntityType CClientGame::ToMafiaEntityType(int entityType);
 };
 
 extern CClientGame* g_pClientGame;

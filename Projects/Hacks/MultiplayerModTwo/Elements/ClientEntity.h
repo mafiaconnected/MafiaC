@@ -10,9 +10,9 @@ public:
 
 	CMafiaClientManager* m_pClientManager;
 
-	MafiaSDK::C_Actor* m_pEntity;
+	M2::C_Entity* m_pEntity;
 	CMatrix4x4 m_mat;
-	GChar m_szModel[64];
+	uint32_t m_Model;
 	CClientEntity* m_pRelativeElement;
 	unsigned int m_uiLastReceivedSyncTicks;
 	unsigned int m_uiLastSendSyncTicks;
@@ -40,8 +40,8 @@ public:
 	virtual void OnCreated(void);
 	virtual void Process(void);
 
-	virtual bool SetModel(const GChar* modelName);
-	virtual const GChar* GetModel();
+	virtual bool SetModel(uint32_t modelName);
+	virtual uint32_t GetModel();
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;

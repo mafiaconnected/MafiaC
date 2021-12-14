@@ -7,6 +7,8 @@
 #include "../Elements/ClientVehicle.h"
 #include <Utils/VectorTools.h>
 
+extern SDL_Window* g_pWindow;
+
 static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -79,61 +81,8 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterObject(pClientVehicle);
 	pClientVehicle->Release();
-	
+
 	pState->ReturnObject(pClientVehicle);
-	return true;
-}
-
-static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	const GChar* mapName = pState->CheckString(0);
-	if (!mapName) return false;
-	UTF8String mapName2(true, mapName);
-
-	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
-	MafiaSDK::GetMission()->MapLoad(mapName2);
-
-	return true;
-}
-
-static bool FunctionGameMessage(IScriptState* pState, int argc, void* pUser)
-{
-	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
-
-	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
-
-	const GChar* msg = pState->CheckString(0);
-	if (!msg) return false;
-	UTF8String message(true, msg);
-
-	uint32_t color = 0xFFFFFFFF;
-	if (!pState->CheckNumber(1, color))
-		return false;
-
-	MafiaSDK::GetIndicators()->ConsoleAddText(message.CString(), color);
-	return true;
-}
-
-static bool FunctionGameFadeScreen(IScriptState* pState, int argc, void* pUser)
-{
-	bool fadeIn = false;
-	if (!pState->CheckBoolean(0, fadeIn))
-		return false;
-
-	int32_t time = 250;
-
-	if (!pState->CheckNumber(1, time))
-		return false;
-
-	uint32_t color = 0xFFFFFFFF;
-
-	if (!pState->CheckNumber(2, color))
-		return false;
-
-
-	MafiaSDK::GetIndicators()->FadeInOutScreen(fadeIn, time, color);
 	return true;
 }
 
@@ -143,7 +92,7 @@ static bool FunctionGameEnableMap(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckBoolean(0, state))
 		return false;
 
-	MafiaSDK::GetIndicators()->MapEnable(state);
+	// Set map state with game sdk
 	return true;
 }
 
@@ -153,38 +102,7 @@ static bool FunctionGameSetTrafficEnabled(IScriptState* pState, int argc, void* 
 	if (!pState->CheckBoolean(0, state))
 		return false;
 
-	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(state);
-	return true;
-}
-
-static bool FunctionGameAnnounce(IScriptState* pState, int argc, void* pUser)
-{
-	const GChar* msg = pState->CheckString(0);
-	if (!msg) return false;
-	UTF8String message(true, msg);
-
-	float time = 1.5f;
-	if (!pState->CheckNumber(1, time))
-		return false;
-
-	MafiaSDK::GetIndicators()->RaceFlashText(message.CString(), time);
-	return true;
-}
-
-static bool FunctionGameShowCountdown(IScriptState* pState, int argc, void* pUser)
-{
-	int8_t flag = 0;
-	if (!pState->CheckNumber(0, flag))
-		return false;
-
-	MafiaSDK::GetIndicators()->RaceSetStartFlag(flag);
-	return true;
-}
-
-static bool FunctionGameGetMapName(IScriptState* pState, int argc, void* pUser)
-{
-	CString Name(false, MafiaSDK::GetCurrentMissionName());
-	pState->ReturnString(Name);
+	// Set traffic state with game sdk
 	return true;
 }
 
@@ -202,7 +120,7 @@ static bool FunctionGameCreateExplosion(IScriptState* pState, int argc, void* pU
 	if (!pState->CheckNumber(2, force))
 		return false;
 
-	MafiaSDK::GetMission()->GetGame()->NewExplosion(NULL, CVecTools::ConvertToMafiaVec(pos), radius, force, true, true, true, 1);
+	// Create explosion with game sdk
 	return true;
 }
 
@@ -214,10 +132,7 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 	if (!pState->CheckClass(pClientManager->m_pClientPlayerClass, 0, false, &pClientPlayer))
 		return false;
 
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetCar(NULL);
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetMode(true, 1);
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetPlayer(pClientPlayer->GetGamePlayer());
-	MafiaSDK::GetMission()->GetGame()->SetLocalPlayer(pClientPlayer->GetGamePlayer());
+	// Set local player with game sdk
 	return true;
 }
 
@@ -231,8 +146,7 @@ static bool FunctionGameSetCameraLookAt(IScriptState* pState, int argc, void* pU
 	if (!pState->CheckVector3D(0, lookAtPos))
 		return false;
 
-	//MafiaSDK::GetMission()->GetGame()->GetCamera()->LockAt(CVecTools::ConvertToMafiaVec(camPos), { 0,0,0 });
-	//MafiaSDK::GetMission()->GetGame()->GetCamera()->SetLookTo(CVecTools::ConvertToMafiaVec(lookAtPos), MafiaSDK::GetMission()->GetGame()->GetCamera()->GetInterface()->cameraFrame);
+	// Set camera lookat with game sdk
 	return true;
 }
 
@@ -245,19 +159,31 @@ static bool FunctionGetGame(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGetWidth(IScriptState* pState, int argc, void* pUser)
 {
-	pState->ReturnNumber(MafiaSDK::GetIGraph()->Scrn_sx());
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
+	pState->ReturnNumber(width);
 	return true;
 }
 
 static bool FunctionGetHeight(IScriptState* pState, int argc, void* pUser)
 {
-	pState->ReturnNumber(MafiaSDK::GetIGraph()->Scrn_sy());
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
+	pState->ReturnNumber(height);
 	return true;
 }
 
 static bool FunctionGetAspectRatio(IScriptState* pState, int argc, void* pUser)
 {
-	pState->ReturnNumber(MafiaSDK::GetIGraph()->Scrn_sx() / MafiaSDK::GetIGraph()->Scrn_sy());
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
+	pState->ReturnNumber(width / height);
 	return true;
 }
 
@@ -313,22 +239,12 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("WEAPON_BOTTLE"), 29);
 	pDefineHandlers->Define(_gstr("WEAPON_SWORD"), 31);
 	pDefineHandlers->Define(_gstr("WEAPON_DOGSHEAD"), 32);
-
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_NOREACT"), MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactOnWeapon);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_NOREACT_GUARDPLAYER"), MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactGuard);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_REACTALL"), MafiaSDK::C_Human_Enum::BehaviorStates::ReactsAll);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_REACTTOATTACKS_ATTACK"), MafiaSDK::C_Human_Enum::BehaviorStates::ReactsOnAttacksAttack);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_REACTTOATTACKS_AWAYORATTACK"), MafiaSDK::C_Human_Enum::BehaviorStates::ReactsOnAttacksAwayOrAttack);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_REACTTOPLAYER_AWAY"), MafiaSDK::C_Human_Enum::BehaviorStates::ReactsPlayerMovesAway);
-	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_REACTTOPLAYERHIT_ATTACK"), MafiaSDK::C_Human_Enum::BehaviorStates::ReactsPlayerOnHit);
 }
 
 void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
 	auto pGameNamespace = pScripting->m_Global.GetNamespace(_gstr("mafia"));
 	auto pClientManager = pClientGame->m_pClientManager;
-
-	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
 
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
@@ -347,23 +263,18 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	{
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
 		//pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv"), FunctionSetCameraLookAt, pClientGame);
 	}
 
 	{
 		auto pHUDNamespace = pGameNamespace->AddNamespace(_gstr("hud"));
-		pHUDNamespace->RegisterFunction(_gstr("message"), _gstr("si"), FunctionGameMessage, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
-		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
-		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s"), FunctionGameChangeMap, pClientManager);
 
 		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("svf"), FunctionGameCreatePlayer, pClientManager);

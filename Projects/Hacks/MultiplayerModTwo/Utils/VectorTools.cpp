@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VectorTools.h"
 
-using namespace MafiaSDK;
+using namespace Mafia2SDK;
 
 #define Clamp(value, min, max) if (value < min) value = min; else if (value > max) value = max;
 
@@ -84,7 +84,7 @@ bool CMatrix3x3::CloseEnough(const float& a, const float& b, const float& epsilo
 	return (epsilon > std::abs(a - b));
 }
 
-CVector3D CVecTools::ConvertFromMafiaVec(const S_vector& vec)
+CVector3D CVecTools::ConvertFromMafiaVec(const Vector3& vec)
 {
 	CVector3D v;
 
@@ -136,9 +136,9 @@ CVector3D CVecTools::Nlerp(const CVector3D& a, const CVector3D& b, float t)
 	return vec;
 }
 
-S_vector CVecTools::ConvertToMafiaVec(const CVector3D& vec)
+Vector3 CVecTools::ConvertToMafiaVec(const CVector3D& vec)
 {
-	S_vector v;
+	Vector3 v;
 	v.x = vec.x;
 	v.y = vec.y;
 	v.z = vec.z;
@@ -146,6 +146,17 @@ S_vector CVecTools::ConvertToMafiaVec(const CVector3D& vec)
 	return v;
 }
 
+Quaternion CVecTools::ConvertVec3ToMafiaQuat(const CVector3D& vec)
+{
+	Vector3 v;
+	v.x = vec.x;
+	v.y = vec.y;
+	v.z = vec.z;
+
+	return Quaternion(v);
+}
+
+/*
 void CVecTools::Rotate(double heading, double attitude, double bank, S_quat& quat) {
 	// Assuming the angles are in radians.
 	double c1 = cos(heading / 2.0f);
@@ -161,3 +172,4 @@ void CVecTools::Rotate(double heading, double attitude, double bank, S_quat& qua
 	quat.y = s1 * c2 * c3 + c1 * s2 * s3;
 	quat.z = c1 * s2 * c3 - s1 * c2 * s3;
 }
+*/

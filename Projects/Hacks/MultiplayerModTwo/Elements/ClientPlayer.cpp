@@ -33,7 +33,7 @@ int32_t CClientPlayer::GetMoney()
 	// return m_uiMoney;
 }
 
-MafiaSDK::C_Player* CClientPlayer::GetGamePlayer()
+M2::C_Player2* CClientPlayer::GetGamePlayer()
 {
-	return (MafiaSDK::C_Player*)GetGameHuman();
+	return (M2::C_Player2*)GetGameHuman();
 }

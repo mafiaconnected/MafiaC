@@ -18,7 +18,7 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_uiLastReceivedSyncTicks = OS::GetTicks();
 	m_uiLastSendSyncTicks = 0;
 	m_fPacketArrivalRatio = 0.0f;
-	m_szModel[0] = '\0';
+	m_Model = 0;
 	m_Position = CVector3D(0, 0, 0);
 	m_RelativePosition = CVector3D(0, 0, 0);
 	m_Rotation = CVector3D(0, 0, 0);
@@ -70,7 +70,7 @@ void CClientEntity::Delete(void)
 {
 	if (m_pEntity != nullptr)
 	{
-		MafiaSDK::GetMission()->DelActor(m_pEntity);
+		M2::Wrappers::DestroyEntity(m_pEntity, g_pClientGame->ToMafiaEntityType(m_Type));
 		m_pEntity = nullptr;
 	}
 }
@@ -80,13 +80,12 @@ bool CClientEntity::ReadCreatePacket(Stream* pStream)
     if (!CNetObject::ReadCreatePacket(pStream))
         return false;
 
-	tEntityCreatePacket Packet;
+	tMafia2EntityCreatePacket Packet;
 
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
 
-	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), Packet.model);
-
+	m_Model = Packet.model;
 	m_Position = Packet.position;
 	m_RelativePosition = Packet.positionRel;
 	m_Rotation = Packet.rotation;
@@ -100,7 +99,7 @@ bool CClientEntity::ReadSyncPacket(Stream* pStream)
 	if (!CNetObject::ReadSyncPacket(pStream))
 		return false;
 
-	tEntitySyncPacket Packet;
+	tMafia2EntitySyncPacket Packet;
 
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -118,10 +117,9 @@ bool CClientEntity::WriteCreatePacket(Stream* pStream)
 	if (!CNetObject::WriteCreatePacket(pStream))
 		return false;
 
-	tEntityCreatePacket Packet;
+	tMafia2EntityCreatePacket Packet;
 
-	_gstrcpy_s(Packet.model, ARRAY_COUNT(Packet.model), m_szModel);
-
+	Packet.model = m_Model;
 	Packet.position = m_Position;
 	Packet.positionRel = m_RelativePosition;
 	Packet.rotation = m_Rotation;
@@ -138,7 +136,7 @@ bool CClientEntity::WriteSyncPacket(Stream* pStream)
 	if (!CNetObject::WriteSyncPacket(pStream))
 		return false;
 
-	tEntitySyncPacket Packet;
+	tMafia2EntitySyncPacket Packet;
 
 	Packet.position = m_Position;
 	Packet.positionRel = m_RelativePosition;
@@ -197,14 +195,13 @@ void CClientEntity::Process(void)
 	}
 }
 
-bool CClientEntity::SetModel(const GChar* modelName)
+bool CClientEntity::SetModel(uint32_t model)
 {
-	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), modelName);
-
+	m_Model = model;
 	return true;
 }
 
-const GChar* CClientEntity::GetModel()
+uint32_t CClientEntity::GetModel()
 {
-	return m_szModel;
+	return m_Model;
 }

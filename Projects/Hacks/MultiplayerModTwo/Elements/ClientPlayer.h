@@ -7,7 +7,7 @@
 class CClientPlayer : public CClientHuman
 {
 private:
-	MafiaSDK::C_Player* m_MafiaPlayer;
+	M2::C_Player2* m_MafiaPlayer;
 
 public:
 	CClientPlayer(CMafiaClientManager* pClientManager);
@@ -19,5 +19,5 @@ public:
 	virtual void SetMoney(int32_t uiMoney);
 	virtual int32_t GetMoney();
 
-	virtual MafiaSDK::C_Player* GetGamePlayer();
+	virtual M2::C_Player2* GetGamePlayer();
 };

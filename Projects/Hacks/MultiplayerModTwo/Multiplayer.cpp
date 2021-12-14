@@ -68,11 +68,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				CClientPlayer* pClientPlayer = static_cast<CClientPlayer*>(m_pClientManager->FromId(nPlayerNetworkIndex, ELEMENT_PLAYER));
 				if (pClientPlayer != nullptr)
 				{
-					MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
-					pGame->GetCamera()->SetCar(NULL);
-					pGame->GetCamera()->SetMode(true, 1);
-					pGame->GetCamera()->SetPlayer(pClientPlayer->GetGameHuman());
-					pGame->SetLocalPlayer((MafiaSDK::C_Player*)pClientPlayer->GetGameHuman());
+					// Set player with M2 SDK
 
 					pClient->SetPlayer(pClientPlayer);
 					pClient->m_nPlayerObjectId = pClientPlayer->GetId();
@@ -81,13 +77,6 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 					m_pClientManager->SetLocalPlayer(pClientPlayer);
 				}
-
-				//_glogprintf(_gstr("CanSendSync: %i"), m_pClientManager->m_pLocalPlayer->CanSendSync(m_iLocalIndex));
-				//_glogprintf(_gstr("IsLocal: %i"), m_pClientManager->m_pLocalPlayer->IsLocal());
-				//_glogprintf(_gstr("IsDirty: %i"), m_pClientManager->m_pLocalPlayer->IsDirty(m_NetMachines.GetMachine(m_iLocalIndex)));
-				//_glogprintf(_gstr("IsCreatedFor: %i"), m_pClientManager->m_pLocalPlayer->IsCreatedFor(m_NetMachines.GetMachine(m_iLocalIndex)));
-				//_glogprintf(_gstr("m_bSendSync: %i"), m_pClientManager->m_pLocalPlayer->m_bSendSync);
-				//_glogprintf(_gstr("m_bIsServer: %i"), m_pClientManager->m_bIsServer);
 			}
 		}
 		break;
@@ -612,7 +601,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			Reader.ReadSingle(&radius, 1);
 			Reader.ReadSingle(&force, 1);
 
-			MafiaSDK::GetMission()->GetGame()->NewExplosion(nullptr, CVecTools::ConvertToMafiaVec(pos), radius, force, TRUE, TRUE, TRUE, 1);
+			// Create explosion
 		}
 		break;
 
@@ -625,81 +614,11 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 			UTF8String mapName(true, map);
 
-			//if (!strcmp(MafiaSDK::GetCurrentMissionName(), mapName.CString()))
-			//{
-			//	_glogprintf(_gstr("Not gonna actually reload the level"));
-			//
-			//	break;
-			//}
-
 			m_bRestartingGame = true;
 			g_pClientGame->OnEndInGame();
 
-			MafiaSDK::GetMission()->MapLoad(mapName);
+			// Set map with game sdk
 			break;
-		}
-		break;
-
-		case MAFIAPACKET_GUI_ADDMSG:
-		{
-			size_t size = 0;
-
-			const GChar* msg = Reader.ReadString(&size);
-			uint32_t color;
-
-			Reader.ReadUInt32(&color, 1);
-
-			UTF8String text(true, msg);
-
-			MafiaSDK::GetIndicators()->ConsoleAddText(text, color);
-		}
-		break;
-
-		case MAFIAPACKET_GUI_FADE:
-		{
-			uint8_t fadeInOut;
-			int time;
-			unsigned int color;
-
-			Reader.ReadUInt8(&fadeInOut, 1);
-			Reader.ReadInt32(&time, 1);
-			Reader.ReadUInt32(&color, 1);
-
-			MafiaSDK::GetIndicators()->FadeInOutScreen(fadeInOut, time, color);
-		}
-		break;
-
-		case MAFIAPACKET_GUI_ENABLEMAP:
-		{
-			uint8_t state;
-			Reader.ReadUInt8(&state, 1);
-
-			MafiaSDK::GetIndicators()->MapEnable(state);
-		}
-		break;
-
-		case MAFIAPACKET_GUI_ANNOUNCE:
-		{
-			size_t size = 0;
-
-			const GChar* msg = Reader.ReadString(&size);
-
-			float time = 0;
-			Reader.ReadSingle(&time, 1);
-
-			UTF8String text(true, msg);
-
-			MafiaSDK::GetIndicators()->RaceFlashText(text, time);
-		}
-		break;
-
-		case MAFIAPACKET_GUI_COUNTDOWN:
-		{
-			uint8_t flags = 0;
-
-			Reader.ReadUInt8(&flags, 1);
-
-			MafiaSDK::GetIndicators()->RaceSetStartFlag(flags);
 		}
 		break;
 
@@ -929,7 +848,6 @@ void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
 		char msg[128];
 		sprintf(msg, "Disconnected [%ws]", rgpszReasons[uiReason]);
 
-		//MafiaSDK::GetIndicators()->ConsoleAddText(msg, 0xFFFF0000);
 		g_pClientGame->m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[uiReason]);
 	}
 }
@@ -946,8 +864,6 @@ void CMultiplayer::OnFinishConnecting(void)
 	TriggerHackEvent(HACKEVENT_DISCORD_UPDATE, &Data);
 
 	g_pClientGame->m_pChatWindow->AddInfoMessage(_gstr("Joining..."));
-
-	//MafiaSDK::GetIndicators()->ConsoleAddText("Connected! Joining the game...", 0xFFFFFFFF);
 
 	SendInitial();
 }

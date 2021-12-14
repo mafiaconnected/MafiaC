@@ -22,11 +22,8 @@ using namespace Galactic3D;
 #include <LauncherVersion.h>
 #include "AdditionalPackets.h"
 
-#define MAFIA_SDK_IMPLEMENTATION // Note (Sevenisko): Must be propably defined in order to make some things in MSDK work
-#include <MafiaSDK.h>
+#define MAFIA_SDK_IMPLEMENTATION
+#include <m2sdk.h>
 
 extern tHack* g_pHack;
 extern Context* g_pContext;
-
-extern bool g_UseActorSkip;
-extern bool g_HijackSkip;

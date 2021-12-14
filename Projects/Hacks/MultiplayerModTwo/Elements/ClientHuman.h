@@ -16,7 +16,7 @@ public:
 class CClientHuman : public CClientEntity
 {
 private:
-	MafiaSDK::C_Human* m_MafiaHuman;
+	M2::C_Human2* m_MafiaHuman;
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
@@ -44,7 +44,7 @@ public:
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
 
-	virtual MafiaSDK::C_Human* GetGameHuman();
+	virtual M2::C_Human2* GetGameHuman();
 
 	void UpdateGameMatrix(void);
 
@@ -94,8 +94,8 @@ public:
 	void ExitVehicle(void);
 	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t byteSeat);
 
-	virtual bool SetModel(const GChar* modelName) override;
-	virtual const GChar* GetModel() override;
+	virtual bool SetModel(uint32_t modelName) override;
+	virtual uint32_t GetModel() override;
 
 	void PlayAnim(const char* animName);
 
@@ -120,7 +120,7 @@ public:
 	virtual int GetAnimationState();
 	virtual int GetAnimationStateLocal();
 
-	virtual void SetFromExistingEntity(MafiaSDK::C_Human* human);
+	virtual void SetFromExistingEntity(M2::C_Human2* human);
 
 	void SetBehavior(uint32_t iBehavior);
 

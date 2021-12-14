@@ -32,8 +32,8 @@ void CLoadScreen::Draw(Galactic3D::C2D* p2D)
 
 	if (loadProgress > 0.0f && loadProgress < 1.0f)
 	{
-		float scrWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
-		float scrHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
+		//float scrWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
+		//float scrHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
 
 		//p2D->Draw2DImage(backgroundTex, { 0, 0 }, { scrWidth, scrHeight });
 	}

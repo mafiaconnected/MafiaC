@@ -78,6 +78,39 @@ struct tEntitySyncPacket
 	CVector3D rotationRel;
 };
 
+struct tMafia2EntityCreatePacket
+{
+	uint32_t model;
+	CVector3D position;
+	CVector3D positionRel;
+	CVector3D rotation;
+	CVector3D rotationRel;
+};
+
+struct tMafia2EntitySyncPacket
+{
+	CVector3D position;
+	CVector3D positionRel;
+	CVector3D rotation;
+	CVector3D rotationRel;
+};
+
+struct tMafia2HumanCreatePacket
+{
+};
+
+struct tMafia2HumanSyncPacket
+{
+};
+
+struct tMafia2VehicleCreatePacket
+{
+};
+
+struct tMafia2VehicleSyncPacket
+{
+};
+
 struct tHumanCreatePacket
 {
 	float health;

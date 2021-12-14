@@ -12,9 +12,6 @@
 #include <curl/curl.h>
 #include <thread>
 
-#define REQUIRED_MAFIA_SHA256 "08398317C8DC423DBB3E559F0BA53C207A8EAF5BCEFA915DFF83B7A86416AB27"
-#define STEAM_MAFIA_SHA256 "08398317C8DC423DBB3E559F0BA53C207A8EAF5BCEFA915DFF83B7A86416AB27"
-
 tHack* g_pHack;
 Context* g_pContext;
 
@@ -23,6 +20,8 @@ CClientGame* g_pClientGame;
 extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
 C2D* g_p2D;
+
+extern SDL_Window* g_pWindow;
 
 static bool LoadTARArchive(CFileSystem* pFileSystem, Stream* pStream, const GChar* pszTarget, bool bCaseSensitive, bool bExclusive)
 {
@@ -51,6 +50,7 @@ static void Load(tHackEventDataLoad* pData)
 	g_pHack = pData->m_pHack;
 	g_pContext = pData->m_pContext;
 
+
 	{
 #if MAFIAC_ARCHIVE_EXTERNAL
 		LoadTARArchive(g_pContext->GetFileSystem(), _gstr("/MafiaC.tar"), _gstr("/"), true, false);
@@ -70,11 +70,11 @@ static void Load(tHackEventDataLoad* pData)
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	enet_initialize();
 
-	g_pClientGame = new CClientGame(g_pContext);
-	g_pClientGame->Initialise();
-
 	CGameHacks::InstallHacks();
 	CGameHooks::InstallHooks();
+
+	g_pClientGame = new CClientGame(g_pContext);
+	g_pClientGame->Initialise();
 }
 
 static void SetD3D8Device(tHackEventDataD3D8* pData)
@@ -146,15 +146,16 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		case HACKEVENT_POSTWNDPROC:
 			{
 				auto pEvent = (tHackEventDataWindowProcedure*)pData;
-				//assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
 				g_pClientGame->OnPostWndProc(pEvent->m_hWnd, pEvent->m_Msg, pEvent->m_wParam, pEvent->m_lParam, &pEvent->m_Result);
 			}
 			return HACKEVENTRESULT_NORMAL;
 			break;
 		case HACKEVENT_FRAME:
 			{
-				//assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
-				if (MafiaSDK::IsWindowFocused())
+				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+				Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+				if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 				{
 					g_pClientGame->OnFrame();
 				}
@@ -163,11 +164,8 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 			break;
 		case HACKEVENT_PROCESS:
 			{
-				//assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
-				//if (MafiaSDK::IsWindowFocused())
-				//{
-					g_pClientGame->OnProcess();
-				//}
+				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+				g_pClientGame->OnProcess();
 			}
 			return HACKEVENTRESULT_NORMAL;
 			break;
@@ -180,8 +178,7 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 			break;
 		case HACKEVENT_SDLEVENT:
 			{
-				//_glogerrorprintf(_gstr("SDL EVENT"));
-				//assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
 				g_pClientGame->OnEvent(((tHackEventDataSDLEvent*)pData)->m_pEvent);
 			}
 			return HACKEVENTRESULT_NORMAL;

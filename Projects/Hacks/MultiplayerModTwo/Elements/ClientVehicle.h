@@ -9,7 +9,7 @@
 class CClientVehicle : public CClientEntity
 {
 private:
-	MafiaSDK::C_Car* m_MafiaVehicle;
+	M2::C_Car* m_MafiaVehicle;
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
@@ -22,12 +22,14 @@ private:
 	bool m_Horn = false;
 	float m_EngineRPM = 0.0;
 
+	bool m_Siren = false;
+
 public:
 	CClientVehicle(CMafiaClientManager* pClientManager);
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
 
-	virtual MafiaSDK::C_Car* GetGameVehicle();
+	virtual M2::C_Car* GetGameVehicle();
 
 	virtual void Process(void) override;
 	virtual void Create(const GChar* model, const CVector3D& pos, const CVector3D& rot);
@@ -35,8 +37,8 @@ public:
 	virtual void Despawn(void);
 	virtual void Remove(void);
 
-	virtual bool SetModel(const GChar* modelName) override;
-	virtual const GChar* GetModel() override;
+	virtual bool SetModel(uint32_t model) override;
+	virtual uint32_t GetModel() override;
 
 	void UpdateGameMatrix(void);
 
@@ -114,7 +116,7 @@ public:
 	virtual bool Repair();
 	virtual bool Explode();
 
-	virtual void SetFromExistingEntity(MafiaSDK::C_Car* car);
+	virtual void SetFromExistingEntity(M2::C_Car* car);
 
 	virtual void CreateNetBlender() override;
 };

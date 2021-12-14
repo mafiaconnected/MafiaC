@@ -28,6 +28,8 @@ uint32_t g_uiSyncedTickCount = 0;
 
 using namespace Galactic3D;
 
+extern SDL_Window* g_pWindow;
+
 CMafiaCHtmlContainer::CMafiaCHtmlContainer(Context* pContext, CClientGame* pClientGame) : CHtmlContainer(pContext), m_pClientGame(pClientGame)
 {
 	m_pInternetRequestMgr = &pClientGame->m_InternetRequestMgr;
@@ -443,7 +445,9 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_CHAR:
 		{
 			wchar_t c = (wchar_t)wParam;
-			if (MafiaSDK::IsWindowFocused())
+			
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				OnCharacter(c);
 			}
@@ -471,7 +475,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		//}
 	case WM_SYSKEYUP:
 		{
-			if (MafiaSDK::IsWindowFocused())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				if (m_bHandledKeyEvent)
 				{
@@ -484,7 +489,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		break;
 	case WM_MOUSELEAVE:
 		{
-			if (MafiaSDK::IsWindowFocused())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				if (m_pGalacticFunctions != nullptr)
 					m_pGalacticFunctions->OnMouseLeave();
@@ -500,7 +506,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			}
 			UpdateCursorEnabled(true);
 
-			if (MafiaSDK::IsWindowFocused())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				if (m_pGalacticFunctions != nullptr)
 					m_pGalacticFunctions->OnFocus();
@@ -527,7 +534,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			m_bFocusedSupressInput = false;
 			UpdateCursorEnabled();
 
-			if (MafiaSDK::IsWindowFocused())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				//SetCursorClipped(false, false);
 				if (m_pGalacticFunctions != nullptr)
@@ -553,7 +561,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		break;
 	case WM_LBUTTONDOWN:
 		{
-			if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS && IsInputDisabled())
 			{
 				*pResult = 0;
 				return true;
@@ -566,7 +575,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		break;
 	case WM_RBUTTONDOWN:
 		{
-			if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS && IsInputDisabled())
 			{
 				*pResult = 0;
 				return true;
@@ -586,7 +596,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 			TrackMouseEvent(&EventTrack);
 
-			if (MafiaSDK::IsWindowFocused())
+			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
 			{
 				POINT Point;
 				if (GetCursorPos(&Point) == FALSE)
@@ -687,8 +698,11 @@ void CClientGame::OnStartInGame(bool bRestarted)
 
 	m_GUISystem.LoadPage(_gstr("/GUI/Main.xml"));
 
-	//float fScale = 1.0f/1600.0f* (float)MafiaSDK::GetIGraph()->Scrn_sx();
-	float fScale = 0.7f / 900.0f* (float)MafiaSDK::GetIGraph()->Scrn_sy();
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
+	float fScale = 0.7f / 900.0f* (float)height;
 	//fScale *= *m_CVars.m_pfChatScale;
 	float fScale2;
 	if (g_pClientGame->m_pContext->GetSettings()->Read(_gstr("Chat Window"), _gstr("Scale"), &fScale2))
@@ -742,7 +756,6 @@ void CClientGame::OnStartInGame(bool bRestarted)
 
 	if (bMultiplayerRestartingGame)
 	{
-		//MafiaSDK::GetIndicators()->ConsoleAddText("Successfully joined the game!", 0xFFFFFFFF);
 		m_pChatWindow->AddInfoMessage(_gstr("Connected!"));
 	}
 
@@ -965,11 +978,15 @@ void CClientGame::OnProcess(void)
 
 	m_LastFrameTicks = Ticks;
 
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
 	{
 		m_GUISystem.m_fLeft = 0.0f;
 		m_GUISystem.m_fTop = 0.0f;
-		m_GUISystem.m_fWidth = MafiaSDK::GetIGraph()->Scrn_sx();
-		m_GUISystem.m_fHeight = MafiaSDK::GetIGraph()->Scrn_sy();
+		m_GUISystem.m_fWidth = (float)width;
+		m_GUISystem.m_fHeight = (float)height;
 		m_GUISystem.m_fClipLeft = 0.0f;
 		m_GUISystem.m_fClipTop = 0.0f;
 		m_GUISystem.m_fClipRight = m_GUISystem.m_fWidth;
@@ -1036,7 +1053,8 @@ bool CClientGame::OnKeyUp(const SDL_Event& Event)
 {
 	//_glogprintf(_gstr("Key up (%i)"), Event.key.keysym);
 
-	if (!MafiaSDK::IsWindowFocused())
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
 		return false;
 
 	if (m_pCmdWindow != nullptr)
@@ -1055,12 +1073,11 @@ bool CClientGame::OnKeyUp(const SDL_Event& Event)
 	return false;
 }
 
-
-
 bool CClientGame::OnKeyDown(const SDL_Event& Event)
 {
 
-	if (!MafiaSDK::IsWindowFocused())
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
 		return false;
 
 	//if (Event.key.keysym.sym == SDLK_ESCAPE && IsInputDisabled())
@@ -1131,7 +1148,8 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 
 void CClientGame::OnCharacter(wchar_t c)
 {
-	if (!MafiaSDK::IsWindowFocused())
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
 		return;
 
 	if (GetMultiplayer() != nullptr)
@@ -1164,7 +1182,8 @@ void CClientGame::OnRender2DStuff(void)
 
 	m_pOnDrawnHUDEventType->Trigger();
 
-	if(!MafiaSDK::IsWindowFocused())
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
 	{
 		if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		{
@@ -1176,8 +1195,12 @@ void CClientGame::OnRender2DStuff(void)
 
 	//m_pOnDrawnHUDEventType->Trigger();
 
-	float fWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
-	float fHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
+	int width;
+	int height;
+	SDL_GetWindowSize(g_pWindow, &width, &height);
+
+	float fWidth = (float)width;
+	float fHeight = (float)height;
 
 	CMultiplayer* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
@@ -1300,12 +1323,9 @@ bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
 
 bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
-	//_glogprintf(_gstr("ClientGame Connect - Init"));
 	if (GetMultiplayer() != NULL)
 	{
-		//_glogprintf(_gstr("ClientGame Connect - Multiplayer NULL"));
 		StopMultiplayerGame();
-		//MafiaSDK::GetIndicators()->ConsoleAddText("Disconnected from server", 0xFFFFFFFF);
 		m_pChatWindow->AddMessage(_gstr("Disconnected!"), Galactic3D::COLOUR::Red);
 		return false;
 	}
@@ -1394,7 +1414,6 @@ void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
 		}
 
 		OnEndInGame();
-		MafiaSDK::GetMission()->MapLoad("FREERIDE");
 	}
 }
 
@@ -1446,8 +1465,9 @@ bool CClientGame::IsCursorEnabled(void)
 
 bool CClientGame::IsCursorEnabled2(void)
 {
-	if (!MafiaSDK::IsWindowFocused())
-		return false;
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+		return;
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return true;
 	if (m_GUISystem.m_pPage)
@@ -1470,7 +1490,8 @@ bool CClientGame::IsDebugMode(void)
 
 bool CClientGame::DontClipCursor()
 {
-	return !MafiaSDK::IsWindowFocused();
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	return !(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 }
 
 void CClientGame::SetCursorClipped(bool bClipped, bool bForce)
@@ -1496,28 +1517,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 	bool bCursorEnabled = IsCursorEnabled();
 	bool bCursorClipped = !bCursorEnabled;
 	SDL_ShowCursor(bCursorEnabled ? 1 : 0);
-
-	/*
-	if (DontClipCursor())
-		bCursorClipped = false;
-	if (bForce || m_bMouseClipped != bCursorClipped)
-		SetCursorClipped(bCursorClipped, false);
-	if (bForce || m_bCursorEnabled != bCursorEnabled)
-	{
-		m_bCursorEnabled = bCursorEnabled;
-
-		if (MafiaSDK::IsWindowFocused() && !m_bCursorEnabled)
-		{
-			POINT Point;
-			if (GetCursorPos(&Point))
-			{
-				MapWindowPoints(NULL, GHWND, &Point, 1);
-			}
-		}
-
-		SDL_ShowCursor(bCursorEnabled ? 1 : 0);
-	}
-	*/
 }
 
 void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
@@ -1574,7 +1573,8 @@ void CClientGame::EnableInput(bool bEnabled)
 
 void CClientGame::OnEvent(const SDL_Event *event)
 {
-	if (!MafiaSDK::IsWindowFocused())
+	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
+	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
 		return;
 
 	if (m_pResourceMgr == nullptr)
@@ -1927,4 +1927,27 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pCli
 void CClientGame::DestroyUninitializedGameElements() 
 {
 	
+}
+
+M2::eEntityType CClientGame::ToMafiaEntityType(int entityType) 
+{
+	switch (entityType) 
+	{
+		case ELEMENT_PLAYER: 
+		{
+			return M2::eEntityType::MOD_ENTITY_PLAYER;
+		}
+
+		case ELEMENT_PED:
+		{
+			return M2::eEntityType::MOD_ENTITY_PED;
+		}
+
+		case ELEMENT_VEHICLE:
+		{
+			return M2::eEntityType::MOD_ENTITY_CAR;
+		}
+	}
+
+	return;
 }
