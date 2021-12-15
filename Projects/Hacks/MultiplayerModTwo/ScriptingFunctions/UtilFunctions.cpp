@@ -114,7 +114,7 @@ static bool FunctionGetPlayersII(IScriptState* pState, int argc, void* pUser)
 static bool FunctionGetCameraPositionII(IScriptState* pState, int argc, void* pUser)
 {
 	M2::C_Camera* pCamera = M2::C_GameCamera::Get()->GetCamera(1);
-	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(pCamera->GetPos()));
+	pState->ReturnVector3D(CVecToolsII::ConvertFromMafiaVec(pCamera->GetPos()));
 	return true;
 }
 

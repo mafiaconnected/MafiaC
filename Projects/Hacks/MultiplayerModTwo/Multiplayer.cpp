@@ -7,7 +7,7 @@
 #include <Multiplayer/ChatWindow.h>
 #include "Utils/VectorTools.h"
 
-extern Uint32 g_uiSyncedTickCount;
+extern Uint32 g_uiSyncedTickCountII;
 
 using namespace Galactic3D;
 

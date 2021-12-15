@@ -11,7 +11,7 @@
 #include <Multiplayer/CmdWindow.h>
 #include <Audio/BassRenderer.h>
 #include <Audio/BassRenderer.hpp>
-//#include <Audio/FMODRenderer.h>
+#include <Audio/FMODRenderer.h>
 #include <LucasFont/LucasFont.h>
 #include <sstream>
 #include <SDL_scancode.h>
@@ -24,7 +24,7 @@
 #include "Hacks/Hooks.h"
 #include <LoadScreen.h>
 
-uint32_t g_uiSyncedTickCount = 0;
+uint32_t g_uiSyncedTickCountII = 0;
 
 using namespace Galactic3D;
 

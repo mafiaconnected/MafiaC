@@ -79,7 +79,7 @@ static bool FunctionGameCreateVehicleII(IScriptState* pState, int argc, void* pU
 		return false;
 
 	CClientVehicleII* pClientVehicle = reinterpret_cast<CClientVehicleII*>(pClientManager->Create(ELEMENT_VEHICLE));
-	CVector3D rot = CVecTools::ComputeDirEuler(angle);
+	CVector3D rot = CVecToolsII::ComputeDirEuler(angle);
 	pClientVehicle->Create(model, pos, rot);
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterObject(pClientVehicle);

@@ -33,14 +33,14 @@ Galactic3D::ReflectedClass* CClientHumanII::GetReflectedClass(void)
 bool CClientHumanII::GetPosition(CVector3D& vecPos)
 {
 	//auto bResult = CClientEntityII::GetPosition(vecPos);
-	vecPos = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetPos());
+	vecPos = CVecToolsII::ConvertFromMafiaVec(GetGameHuman()->GetPos());
 	return true;
 }
 
 bool CClientHumanII::SetPosition(const CVector3D& vecPos)
 {
 	auto bResult = CClientEntityII::SetPosition(vecPos);
-	GetGameHuman()->SetPos(CVecTools::ConvertToMafiaVec(vecPos));
+	GetGameHuman()->SetPos(CVecToolsII::ConvertToMafiaVec(vecPos));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -52,7 +52,7 @@ bool CClientHumanII::SetPosition(const CVector3D& vecPos)
 bool CClientHumanII::GetRotation(CVector3D& vecRot)
 {
 	if (GetGameHuman() == nullptr) return false;
-	vecRot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetRot().toEularAngles());
+	vecRot = CVecToolsII::ConvertFromMafiaVec(GetGameHuman()->GetRot().toEularAngles());
 	return true;
 }
 
@@ -61,7 +61,7 @@ bool CClientHumanII::SetHeading(float heading)
 	if (GetGameHuman() == nullptr) 
 		return false;
 
-	GetGameHuman()->SetRot(CVecTools::ConvertVec3ToMafiaQuat(CVecTools::ComputeDirVector(heading)));
+	GetGameHuman()->SetRot(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(heading)));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -83,7 +83,7 @@ bool CClientHumanII::SetRotation(const CVector3D& vecRot)
 	if (GetGameHuman() == nullptr) 
 		return false;
 
-	GetGameHuman()->SetRot(CVecTools::ConvertVec3ToMafiaQuat(vecRot));
+	GetGameHuman()->SetRot(CVecToolsII::ConvertVec3ToMafiaQuat(vecRot));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -160,16 +160,16 @@ void CClientHumanII::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	if (isLocal) 
 	{
 		pHuman = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, m_Model);
-		pHuman->SetPosition(CVecTools::ConvertToMafiaVec(pos));
-		pHuman->SetRotation(CVecTools::ConvertVec3ToMafiaQuat(CVecTools::ComputeDirVector(angle)));
+		pHuman->SetPosition(CVecToolsII::ConvertToMafiaVec(pos));
+		pHuman->SetRotation(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(angle)));
 		pHuman->Setup();
 		pHuman->Activate();
 	} 
 	else 
 	{
 		pHuman = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PLAYER, m_Model);
-		pHuman->SetPosition(CVecTools::ConvertToMafiaVec(pos));
-		pHuman->SetRotation(CVecTools::ConvertVec3ToMafiaQuat(CVecTools::ComputeDirVector(angle)));
+		pHuman->SetPosition(CVecToolsII::ConvertToMafiaVec(pos));
+		pHuman->SetRotation(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(angle)));
 		pHuman->Setup();
 		pHuman->Activate();
 	}

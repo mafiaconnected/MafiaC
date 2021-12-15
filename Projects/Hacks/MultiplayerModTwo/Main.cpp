@@ -19,7 +19,7 @@ CClientGameII* g_pClientGame;
 
 extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
-C2D* g_p2D;
+C2D* g_p2DII;
 
 extern SDL_Window* g_pWindow;
 
@@ -103,14 +103,14 @@ static void SetD3D9Device(tHackEventDataD3D9* pData)
 
 	g_pD3DDevice->CreateVertexDeclaration(vertexElements, &g_pD3D9->m_pDecl);
 
-	g_p2D = &g_pClientGame->m_p2D;
-	g_p2D->Set2DWorkaround(true);
+	g_p2DII = &g_pClientGame->m_p2D;
+	g_p2DII->Set2DWorkaround(true);
 
 	auto pMaterial = Strong<Material>::New(new Material);
 	pMaterial->SetCullMode(CULLMODE_NONE);
 	pMaterial->SetTextureWrap(TEXTUREWRAP_CLAMP, TEXTUREWRAP_CLAMP);
 
-	g_p2D->Set2DMaterial(pMaterial);
+	g_p2DII->Set2DMaterial(pMaterial);
 }
 
 HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)

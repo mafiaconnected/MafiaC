@@ -31,7 +31,7 @@ public:
 	CVector3D GetEuler();
 };
 
-class CVecTools
+class CVecToolsII
 {
 private:
 	
@@ -122,7 +122,7 @@ public:
 	static Vector3 ConvertToMafiaVec(const CVector3D& vec);
 	static CVector3D ConvertFromMafiaVec(const Vector3& vec);
 
-	static Quaternion CVecTools::ConvertVec3ToMafiaQuat(const CVector3D& vec);
+	static Quaternion CVecToolsII::ConvertVec3ToMafiaQuat(const CVector3D& vec);
 
 	//static void Rotate(double heading, double attitude, double bank, S_quat& quat);
 };

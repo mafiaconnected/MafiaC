@@ -73,7 +73,7 @@ bool CClientVehicleII::SetPosition(const CVector3D& vecPos)
 		return false;
 
 	CClientEntityII::SetPosition(vecPos);
-	GetGameVehicle()->SetPos(CVecTools::ConvertToMafiaVec(vecPos));
+	GetGameVehicle()->SetPos(CVecToolsII::ConvertToMafiaVec(vecPos));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -87,7 +87,7 @@ bool CClientVehicleII::GetPosition(CVector3D& vecPos)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	vecPos = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetPos());
+	vecPos = CVecToolsII::ConvertFromMafiaVec(GetGameVehicle()->GetPos());
 	return true;
 }
 
@@ -97,7 +97,7 @@ bool CClientVehicleII::SetRotation(const CVector3D& vecRot)
 		return false;
 
 	CClientEntityII::SetRotation(vecRot);
-	GetGameVehicle()->SetRot(CVecTools::ConvertVec3ToMafiaQuat(vecRot));
+	GetGameVehicle()->SetRot(CVecToolsII::ConvertVec3ToMafiaQuat(vecRot));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -111,7 +111,7 @@ bool CClientVehicleII::GetRotation(CVector3D& vecRot)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	vecRot = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetRot().toEularAngles());
+	vecRot = CVecToolsII::ConvertFromMafiaVec(GetGameVehicle()->GetRot().toEularAngles());
 	return true;
 }
 
@@ -120,7 +120,7 @@ bool CClientVehicleII::SetHeading(float heading)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	GetGameVehicle()->SetRot(CVecTools::ConvertVec3ToMafiaQuat(CVecTools::ComputeDirVector(heading)));
+	GetGameVehicle()->SetRot(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(heading)));
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)

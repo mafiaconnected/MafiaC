@@ -84,7 +84,7 @@ bool CMatrix3x3::CloseEnough(const float& a, const float& b, const float& epsilo
 	return (epsilon > std::abs(a - b));
 }
 
-CVector3D CVecTools::ConvertFromMafiaVec(const Vector3& vec)
+CVector3D CVecToolsII::ConvertFromMafiaVec(const Vector3& vec)
 {
 	CVector3D v;
 
@@ -95,14 +95,14 @@ CVector3D CVecTools::ConvertFromMafiaVec(const Vector3& vec)
 	return v;
 }
 
-float CVecTools::Lerp(float a, float b, float t)
+float CVecToolsII::Lerp(float a, float b, float t)
 {
 	Clamp(t, 0.0f, 1.0f);
 
 	return a + (b - a) * t;
 }
 
-CVector3D CVecTools::Lerp(const CVector3D& a, const CVector3D& b, float t)
+CVector3D CVecToolsII::Lerp(const CVector3D& a, const CVector3D& b, float t)
 {
 	CVector3D vec;
 
@@ -113,7 +113,7 @@ CVector3D CVecTools::Lerp(const CVector3D& a, const CVector3D& b, float t)
 	return vec;
 }
 
-CVector3D CVecTools::Slerp(const CVector3D& a, const CVector3D& b, float t)
+CVector3D CVecToolsII::Slerp(const CVector3D& a, const CVector3D& b, float t)
 {
 	float dot = a.dotProduct(b);
 
@@ -127,7 +127,7 @@ CVector3D CVecTools::Slerp(const CVector3D& a, const CVector3D& b, float t)
 	return ((a * cosf(euler)) + (relVec * sinf(euler)));
 }
 
-CVector3D CVecTools::Nlerp(const CVector3D& a, const CVector3D& b, float t)
+CVector3D CVecToolsII::Nlerp(const CVector3D& a, const CVector3D& b, float t)
 {
 	auto vec = Lerp(a, b, t);
 
@@ -136,7 +136,7 @@ CVector3D CVecTools::Nlerp(const CVector3D& a, const CVector3D& b, float t)
 	return vec;
 }
 
-Vector3 CVecTools::ConvertToMafiaVec(const CVector3D& vec)
+Vector3 CVecToolsII::ConvertToMafiaVec(const CVector3D& vec)
 {
 	Vector3 v;
 	v.x = vec.x;
@@ -146,7 +146,7 @@ Vector3 CVecTools::ConvertToMafiaVec(const CVector3D& vec)
 	return v;
 }
 
-Quaternion CVecTools::ConvertVec3ToMafiaQuat(const CVector3D& vec)
+Quaternion CVecToolsII::ConvertVec3ToMafiaQuat(const CVector3D& vec)
 {
 	Vector3 v;
 	v.x = vec.x;

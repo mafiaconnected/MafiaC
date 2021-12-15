@@ -21,7 +21,7 @@ extern IDirect3D9* WINAPI HookDirect3DCreate9(UINT SDKVersion);
 
 extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
-extern C2D* g_p2D;
+extern C2D* g_p2DII;
 extern SDL_Window* g_pWindow;
 
 static void OnGameInit()
@@ -60,7 +60,7 @@ static void OnGameTick()
 
 static void OnRender2DStuff()
 {
-	if (g_pD3D9 && g_p2D != nullptr)
+	if (g_pD3D9 && g_p2DII != nullptr)
 	{
 		g_pD3D9->SetAllStatesAgain();
 
@@ -68,13 +68,13 @@ static void OnRender2DStuff()
 		int height;
 		SDL_GetWindowSize(g_pWindow, &width, &height);
 
-		g_p2D->SetViewport(CVector2D(0, 0), CVector2D((float)width, (float)height));
-		if (g_p2D->Begin2D(g_pD3D9))
+		g_p2DII->SetViewport(CVector2D(0, 0), CVector2D((float)width, (float)height));
+		if (g_p2DII->Begin2D(g_pD3D9))
 		{
 			g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
 			g_pClientGame->OnRender2DStuff();
 			g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
-			g_p2D->End2D();
+			g_p2DII->End2D();
 		}
 	}
 }
