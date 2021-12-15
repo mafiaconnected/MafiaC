@@ -91,7 +91,7 @@ public:
 	bool m_bForceMultiplayerWorld;
 	class CMultiplayerII* m_pMultiplayer;
 	class CMultiplayerII* m_pNewMultiplayer;
-	class CMafiaClientResourceMgr* m_pResourceMgr;
+	class CMafiaClientResourceMgrII* m_pResourceMgr;
 	Galactic3D::CGalacticFunctions* m_pGalacticFunctions;
 	Galactic3D::Audio::CAudioScriptingFunctions* m_pAudioScriptingFunctions;
 	Galactic3D::CLucasFontFunctions m_LucasFontFunctions;

@@ -102,14 +102,14 @@ extern bool RegisterLuaVM(CScripting* pScripting);
 extern bool RegisterJSVM(CScripting* pScripting);
 extern bool RegisterSqVM(CScripting* pScripting);
 
-CMafiaClientResourceMgr::CMafiaClientResourceMgr(Galactic3D::Context* pContext) : CClientResourceMgr(pContext)
+CMafiaClientResourceMgrII::CMafiaClientResourceMgrII(Galactic3D::Context* pContext) : CClientResourceMgr(pContext)
 {
 	RegisterLuaVM(m_pScripting);
 	RegisterJSVM(m_pScripting);
 	RegisterSqVM(m_pScripting);
 }
 
-void CMafiaClientResourceMgr::RemoveThingsAssociatedWithResource(CResource* pResource)
+void CMafiaClientResourceMgrII::RemoveThingsAssociatedWithResource(CResource* pResource)
 {
 	if (g_pClientGame->m_GUISystem.m_pPage != nullptr)
 		g_pClientGame->m_GUISystem.m_pPage->m_Elements.Remove(pResource);

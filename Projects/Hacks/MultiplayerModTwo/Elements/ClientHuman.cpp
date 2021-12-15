@@ -157,22 +157,19 @@ void CClientHumanII::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	
 	M2::C_Entity* pHuman;
 
-	if (isLocal) 
-	{
-		pHuman = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PED, m_Model);
-		pHuman->SetPosition(CVecToolsII::ConvertToMafiaVec(pos));
-		pHuman->SetRotation(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(angle)));
-		pHuman->Setup();
-		pHuman->Activate();
-	} 
-	else 
-	{
-		pHuman = M2::Wrappers::CreateEntity(M2::eEntityType::MOD_ENTITY_PLAYER, m_Model);
-		pHuman->SetPosition(CVecToolsII::ConvertToMafiaVec(pos));
-		pHuman->SetRotation(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(angle)));
-		pHuman->Setup();
-		pHuman->Activate();
+	M2::eEntityType entityType;
+	if (isLocal) {
+		entityType = M2::eEntityType::MOD_ENTITY_PLAYER;
 	}
+	else {
+		entityType = M2::eEntityType::MOD_ENTITY_PED;
+	}
+
+	pHuman = M2::Wrappers::CreateEntity(entityType, m_Model);
+	pHuman->SetPosition(CVecToolsII::ConvertToMafiaVec(pos));
+	pHuman->SetRotation(CVecToolsII::ConvertVec3ToMafiaQuat(CVecToolsII::ComputeDirVector(angle)));
+	pHuman->Setup();
+	pHuman->Activate();
 
 	m_MafiaHuman = (M2::C_Human2*)pHuman;
 	return;

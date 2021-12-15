@@ -10,7 +10,7 @@
 #include <Multiplayer/ChatWindow.h>
 #include <Multiplayer/CmdWindow.h>
 #include <Audio/BassRenderer.h>
-#include <Audio/BassRenderer.hpp>
+//#include <Audio/BassRenderer.hpp>
 //#include <Audio/FMODRenderer.h>
 #include <LucasFont/LucasFont.h>
 #include <sstream>
@@ -280,7 +280,7 @@ void CClientGameII::InitialiseScripting(void)
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
 
-	m_pResourceMgr = new CMafiaClientResourceMgr(m_pContext);
+	m_pResourceMgr = new CMafiaClientResourceMgrII(m_pContext);
 
 	m_pOnEntityProcessEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnEntityProcess"), _gstr("Called whenever an entity is processed"), 1);
 	m_pOnEntityProcessEventType->m_bCanPreventDefault = true;

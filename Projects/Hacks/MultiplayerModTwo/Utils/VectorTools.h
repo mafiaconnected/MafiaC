@@ -1,36 +1,5 @@
 #pragma once
 
-class CMatrix3x3
-{
-private:
-	CVector3D m_rotX;
-	CVector3D m_rotY;
-	CVector3D m_rotZ;
-
-	static bool CloseEnough(const float& a, const float& b, const float& epsilon = std::numeric_limits<float>::epsilon());
-
-public:
-	CMatrix3x3(const CVector3D& euler);
-	CMatrix3x3(const CVector3D& front, const CVector3D& up, const CVector3D& right);
-	
-	CVector3D GetXAxis();
-	CVector3D GetYAxis();
-	CVector3D GetZAxis();
-
-	CVector3D operator[](int index)
-	{
-		switch (index)
-		{
-		case 0: return GetXAxis();
-		case 1: return GetYAxis();
-		case 2: return GetZAxis();
-		default: return { -1, -1, -1 };
-		}
-	}
-
-	CVector3D GetEuler();
-};
-
 class CVecToolsII
 {
 private:

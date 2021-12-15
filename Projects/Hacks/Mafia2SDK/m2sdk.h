@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 * Swag SDK for M2O
 */

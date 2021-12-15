@@ -53,10 +53,10 @@ public:
 	Galactic3D::Weak<CClientPlayerII> m_rgpPlayers[MAX_PEDS];
 };
 
-class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr
+class CMafiaClientResourceMgrII : public Galactic3D::CClientResourceMgr
 {
 public:
-	CMafiaClientResourceMgr(Galactic3D::Context* pContext);
+	CMafiaClientResourceMgrII(Galactic3D::Context* pContext);
 
 	virtual void RemoveThingsAssociatedWithResource(Galactic3D::CResource* pResource);
 };
