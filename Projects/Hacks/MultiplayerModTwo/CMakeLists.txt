@@ -2,7 +2,8 @@ file(GLOB_RECURSE SOURCES *.cpp *.h *.rc)
 
 group_sources("${SOURCES}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK/include")
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK/lib")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Direct3D9")
 
 if(MSVC)
@@ -45,4 +46,5 @@ target_link_libraries(
 	squirrel_static
 	tinyxml_static
 	crypto_static
-	ssl_static)
+	ssl_static
+	detours)

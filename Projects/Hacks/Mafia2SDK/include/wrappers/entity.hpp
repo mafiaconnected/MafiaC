@@ -17,9 +17,9 @@ namespace M2
 
     namespace Wrappers
     {
-        void PreloadModels();
-        C_Entity *CreateEntity(eEntityType type, int modelID);
-        bool DestroyEntity(C_Entity *entity, eEntityType type);
+        inline void PreloadModels();
+        inline C_Entity *CreateEntity(eEntityType type, int modelID);
+        inline bool DestroyEntity(C_Entity *entity, eEntityType type);
     };
 };
 
