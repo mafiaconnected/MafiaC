@@ -76,8 +76,7 @@ target_link_libraries(
 	psapi
 	dbghelp
 	iphlpapi
-	legacy_stdio_definitions
-	detours)
+	legacy_stdio_definitions)
 
 if(MSVC)
 	sign_me(MafiaC)

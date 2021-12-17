@@ -46,5 +46,4 @@ target_link_libraries(
 	squirrel_static
 	tinyxml_static
 	crypto_static
-	ssl_static
-	detours)
+	ssl_static)

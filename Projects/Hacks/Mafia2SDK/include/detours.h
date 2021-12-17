@@ -12,7 +12,7 @@
 #ifndef _DETOURS_H_
 #define _DETOURS_H_
 
-#pragma comment(lib, "detours.lib")
+//#pragma comment(lib, "detours.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -140,12 +140,12 @@ typedef struct _DETOUR_SECTION_HEADER
     DWORD       nSignature;
     DWORD       nDataOffset;
     DWORD       cbDataSize;
-    
+
     DWORD       nOriginalImportVirtualAddress;
     DWORD       nOriginalImportSize;
     DWORD       nOriginalBoundImportVirtualAddress;
     DWORD       nOriginalBoundImportSize;
-    
+
     DWORD       nOriginalIatVirtualAddress;
     DWORD       nOriginalIatSize;
     DWORD       nOriginalSizeOfImage;
@@ -313,7 +313,7 @@ typedef BOOL (WINAPI *PDETOUR_CREATE_PROCESS_ROUTINEW)
      LPCWSTR lpCurrentDirectory,
      LPSTARTUPINFOW lpStartupInfo,
      LPPROCESS_INFORMATION lpProcessInformation);
-                                  
+
 BOOL WINAPI DetourCreateProcessWithDllA(LPCSTR lpApplicationName,
                                         LPSTR lpCommandLine,
                                         LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -341,7 +341,7 @@ BOOL WINAPI DetourCreateProcessWithDllW(LPCWSTR lpApplicationName,
                                         LPCWSTR lpDllName,
                                         PDETOUR_CREATE_PROCESS_ROUTINEW
                                         pfCreateProcessW);
-                  
+
 #ifdef UNICODE
 #define DetourCreateProcessWithDll  DetourCreateProcessWithDllW
 #define PDETOUR_CREATE_PROCESS_ROUTINE     PDETOUR_CREATE_PROCESS_ROUTINEW
@@ -366,10 +366,10 @@ BOOL WINAPI DetourContinueProcessWithDllW(HANDLE hProcess, LPCWSTR lpDllName);
 
 /////////////////////////////////////////////////////////////////// Old Names.
 //
-#define ContinueProcessWithDll            DetourContinueProcessWithDll 
+#define ContinueProcessWithDll            DetourContinueProcessWithDll
 #define ContinueProcessWithDllA           DetourContinueProcessWithDllA
 #define ContinueProcessWithDllW           DetourContinueProcessWithDllW
-#define CreateProcessWithDll              DetourCreateProcessWithDll 
+#define CreateProcessWithDll              DetourCreateProcessWithDll
 #define CreateProcessWithDllA             DetourCreateProcessWithDllA
 #define CreateProcessWithDllW             DetourCreateProcessWithDllW
 #define DETOUR_TRAMPOLINE_WO_TARGET       DETOUR_TRAMPOLINE_EMPTY
