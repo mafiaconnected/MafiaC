@@ -46,15 +46,15 @@ static void OnGameInit()
 
 	CGameHacks::EnableGameMap(false);
 
-	// Disable the traffic
-	//if (!g_bTrafficEnabled)
-	//	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(false);
+	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
 
-	auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
-	auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
+	if(!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
+		auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
+		auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
 
-	if (bridge1) bridge1->Shutdown(true);
-	if (bridge2) bridge2->Shutdown(true);
+		if (bridge1) bridge1->Shutdown(true);
+		if (bridge2) bridge2->Shutdown(true);
+	}
 
 	CArguments Args;
 	Args.AddString((const GChar*)mName);
@@ -260,7 +260,6 @@ RAWCODECALL SceneCreateActor(void)
 		ObjTypes::Dog,
 		ObjTypes::Enemy,
 		ObjTypes::Pumpar,
-		ObjTypes::Trolley,
 		ObjTypes::Player
 	};
 
@@ -270,6 +269,15 @@ RAWCODECALL SceneCreateActor(void)
 			if (frame_ex)
 				frame_ex->SetOn(false);
 			return;
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Trolley && g_pSceneCreateActor_Frame != NULL) {
+			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
 		}
 	}
 
@@ -419,14 +427,13 @@ RAWCODE HookCarUpdate(void)
 }
 
 // Unfinished
-/*
 RAWCODE HookSceneCreateActor(void)
 {
 	_asm
 	{
-		mov g_pSceneCreateActor_Actor, ecx
+		mov g_pSceneCreateActor_Type, ecx
 		mov eax, [esp + 4]
-		mov g_pSceneCreateActor_Arg1, eax
+		mov g_pSceneCreateActor_Frame, eax
 		pushad
 	}
 	g_bCancelSceneCreateActor = false;
@@ -447,7 +454,6 @@ RAWCODE HookSceneCreateActor(void)
 		jmp g_ReturnSceneCreateActor
 	}
 }
-*/
 
 RAWCODE HookModelOpen(void)
 {
