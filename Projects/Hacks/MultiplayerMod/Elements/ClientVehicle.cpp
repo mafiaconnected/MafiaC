@@ -290,57 +290,43 @@ bool CClientVehicle::GetRotation(CVector3D& vecRot)
 	*/
 }
 
-S_quat rotate(double heading, double attitude, double bank) {
-	// Assuming the angles are in radians.
-	double c1 = cos(heading);
-	double s1 = sin(heading);
-	double c2 = cos(attitude);
-	double s2 = sin(attitude);
-	double c3 = cos(bank);
-	double s3 = sin(bank);
-	S_quat q;
-	q.w = sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
-	double w4 = (4.0 * q.w);
-	q.x = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
-	q.y = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
-	q.z = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
-	return q;
+bool CClientVehicle::SetHeading(float heading)
+{
+	if (GetGameVehicle() == nullptr)
+		return false;
+
+	//CClientEntity::SetRotation();
+
+	CVector3D rotationFront;
+	CVector3D rotationUp;
+	CVector3D rotationRight;
+
+	CClientVehicle::GetRotationMat(rotationFront, rotationUp, rotationRight);
+	CVector3D newRotationFront = CVecTools::ComputeDirVector(CVecTools::RadToDeg(heading));
+	SetRotationMat(newRotationFront, rotationUp, rotationRight);
+	
+	UpdateGameMatrix();
+
+	// Disable interpolation
+	if (m_pBlender != nullptr)
+		m_pBlender->ResetInterpolation();
+
+	return true;
 }
 
-S_quat CalculateRotation(CMatrix3x3& a) {
-	S_quat q;
-	float trace = a[0][0] + a[1][1] + a[2][2]; // I removed + 1.0f; see discussion with Ethan
-	if (trace > 0) {// I changed M_EPSILON to 0
-		float s = 0.5f / sqrtf(trace + 1.0f);
-		q.w = 0.25f / s;
-		q.x = (a[2][1] - a[1][2]) * s;
-		q.y = (a[0][2] - a[2][0]) * s;
-		q.z = (a[1][0] - a[0][1]) * s;
-	}
-	else {
-		if (a[0][0] > a[1][1] && a[0][0] > a[2][2]) {
-			float s = 2.0f * sqrtf(1.0f + a[0][0] - a[1][1] - a[2][2]);
-			q.w = (a[2][1] - a[1][2]) / s;
-			q.x = 0.25f * s;
-			q.y = (a[0][1] + a[1][0]) / s;
-			q.z = (a[0][2] + a[2][0]) / s;
-		}
-		else if (a[1][1] > a[2][2]) {
-			float s = 2.0f * sqrtf(1.0f + a[1][1] - a[0][0] - a[2][2]);
-			q.w = (a[0][2] - a[2][0]) / s;
-			q.x = (a[0][1] + a[1][0]) / s;
-			q.y = 0.25f * s;
-			q.z = (a[1][2] + a[2][1]) / s;
-		}
-		else {
-			float s = 2.0f * sqrtf(1.0f + a[2][2] - a[0][0] - a[1][1]);
-			q.w = (a[1][0] - a[0][1]) / s;
-			q.x = (a[0][2] + a[2][0]) / s;
-			q.y = (a[1][2] + a[2][1]) / s;
-			q.z = 0.25f * s;
-		}
-	}
-	return q;
+float CClientVehicle::GetHeading()
+{
+	if (GetGameVehicle() == nullptr)
+		return false;
+
+	CVector3D rotationFront;
+	CVector3D rotationUp;
+	CVector3D rotationRight;
+
+	CClientVehicle::GetRotationMat(rotationFront, rotationUp, rotationRight);
+
+	float heading = CVecTools::DegToRad(CVecTools::DirToRotation360(rotationFront));
+	return heading;
 }
 
 bool CClientVehicle::SetRotationMat(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight)
