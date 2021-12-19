@@ -24,6 +24,15 @@ namespace Galactic3D
 	class CClientDownloadManager;
 };
 
+enum eGameComponent
+{
+	GAMECOMPONENT_TRAFFIC,
+	GAMECOMPONENT_CIVILIANS,
+	GAMECOMPONENT_TRAINS,
+	GAMECOMPONENT_BRIDGES,
+	GAMECOMPONENT_SCRIPTS,
+};
+
 class CClientPlayer;
 
 class CMafiaCHtmlContainer : public CHtmlContainer
@@ -273,6 +282,8 @@ public:
 	bool OnTrafficCarCreate(MafiaSDK::C_Car* pCar);
 	//bool OnTrafficCarReset(MafiaSDK::C_Car* pCar);
 	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
+
+	bool IsGameComponentEnabled(eGameComponent GameComponent);
 };
 
 extern CClientGame* g_pClientGame;

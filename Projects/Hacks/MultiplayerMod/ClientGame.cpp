@@ -2004,3 +2004,23 @@ bool CClientGame::OnTrafficCarRespawn(CClientVehicle* pClientVehicle, MafiaSDK::
 
 	return true;
 }
+
+bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
+{
+	switch (GameComponent)
+	{
+	case GAMECOMPONENT_TRAFFIC:
+		return m_CVars.GetBoolean(_gstr("Traffic"), true);
+	case GAMECOMPONENT_CIVILIANS:
+		return m_CVars.GetBoolean(_gstr("Civilians"), true);
+	case GAMECOMPONENT_SCRIPTS:
+		return m_CVars.GetBoolean(_gstr("Scripts"), true);
+	case GAMECOMPONENT_BRIDGES:
+		return m_CVars.GetBoolean(_gstr("Bridges"), true);
+	case GAMECOMPONENT_TRAINS:
+		return m_CVars.GetBoolean(_gstr("Trains"), true);
+	default:
+		break;
+	}
+	return true;
+}
