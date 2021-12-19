@@ -3,6 +3,7 @@
 #include "../ClientManager.h"
 #include "../ClientGame.h"
 #include "../Elements/ClientHuman.h"
+#include <Utils/VectorTools.h>
 
 #pragma region Functions
 
@@ -376,8 +377,7 @@ static bool FunctionHumanGetHeading(IScriptState* pState, int argc, void* pUser)
 	}
 
 	float heading = pClientHuman->GetHeading();
-
-	pState->ReturnNumber(heading);
+	pState->ReturnNumber(CVecTools::DegToRad(heading));
 
 	return true;
 }
@@ -398,11 +398,10 @@ static bool FunctionHumanSetHeading(IScriptState* pState, int argc, void* pUser)
 	}
 
 	float heading = 0;
-
 	if (!pState->CheckNumber(0, heading))
 		return false;
 
-	pClientHuman->SetHeading(heading);
+	pClientHuman->SetHeading(CVecTools::RadToDeg(heading));
 
 	return true;
 }
@@ -651,8 +650,6 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 {
 	auto pClientManager = pClientGame->m_pClientManager;
 
-	//pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
-
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("kill"), _gstr("t"), FunctionHumanKill, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("respawn"), _gstr("tvf"), FunctionHumanRespawn, pClientManager);
 
@@ -670,8 +667,5 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
-
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
-
-	//pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
 }
