@@ -85,7 +85,7 @@ bool CClientHuman::SetHeading(float heading)
 	if (GetGameHuman() == nullptr)
 		return false;
 
-	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(heading));
+	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::RadToDeg(heading)));
 
 	UpdateGameMatrix();
 
@@ -103,7 +103,7 @@ float CClientHuman::GetHeading()
 
 	CVector3D rot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->entity.rotation);
 
-	return CVecTools::DirToRotation360(rot);
+	return CVecTools::DegToRad(CVecTools::DirToRotation360(rot));
 }
 
 bool CClientHuman::SetRotation(const CVector3D& vecRot)
