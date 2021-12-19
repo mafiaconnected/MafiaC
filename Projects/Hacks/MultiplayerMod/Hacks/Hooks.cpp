@@ -47,8 +47,8 @@ static void OnGameInit()
 	CGameHacks::EnableGameMap(false);
 
 	// Disable the traffic
-	if (!g_bTrafficEnabled)
-		MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(false);
+	//if (!g_bTrafficEnabled)
+	//	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(false);
 
 	auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
 	auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
@@ -216,8 +216,8 @@ RAWCODECALL ModelOpen(void)
 
 RAWCODECALL CarUpdate(void)
 {
-	if (!g_bTrafficEnabled)
-		return;
+	//if (!g_bTrafficEnabled)
+	//	return;
 
 	if (g_pClientGame->m_bCreateVehicleInvokedByGame)
 	{
