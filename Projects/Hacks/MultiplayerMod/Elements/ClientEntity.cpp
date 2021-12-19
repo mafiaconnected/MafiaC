@@ -54,6 +54,18 @@ bool CClientEntity::GetRotation(CVector3D& vecRotation)
 	return true;
 }
 
+float CClientEntity::GetHeading()
+{
+	// Override by human/vehicle/etc heading funcs
+	return 0.0;
+}
+
+bool CClientEntity::SetHeading(float heading)
+{
+	// Override by human/vehicle/etc heading funcs
+	return true;
+}
+
 void CClientEntity::Remove(void)
 {
 	CNetObject::Remove();
