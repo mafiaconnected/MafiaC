@@ -40,6 +40,9 @@ public:
 	virtual void Despawn(void);
 	virtual void Remove(void);
 
+	virtual bool SetModel(const GChar* modelName) override;
+	virtual const GChar* GetModel() override;
+
 	void UpdateGameMatrix(void);
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;

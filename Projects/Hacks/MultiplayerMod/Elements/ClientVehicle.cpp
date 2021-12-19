@@ -33,7 +33,7 @@ void CClientVehicle::Process(void)
 		m_pBlender->Interpolate();
 		GetGameVehicle()->GetInterface()->vehicle_interface.horn = m_Horn;
 		GetGameVehicle()->GetInterface()->vehicle_interface.engine_rpm = m_EngineRPM;
-		
+
 		/*
 	 	GetGameVehicle()->SetActive(true);
 		//GetGameVehicle()->SetActState(0); // Note: Commeted as it caused vehicle jerking.
@@ -55,7 +55,7 @@ void CClientVehicle::Process(void)
 			*(float*)(uiWheel + 0x18C) = 100.0f; // prevent wheel falling off
 		}
 	}
-	
+
 	//GetGameVehicle()->AI(g_pClientGame->m_pTime->m_fDeltaTime);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 
@@ -128,6 +128,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	SetPosition(pos2);
 	//SetRotation(rot);
 	SetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
+
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
 
@@ -163,13 +164,23 @@ void CClientVehicle::Despawn()
 	MafiaSDK::GetMission()->GetGame()->RemoveTemporaryActor((MafiaSDK::C_Actor*)GetGameVehicle());
 }
 
+bool CClientVehicle::SetModel(const GChar* modelName)
+{
+	return true;
+}
+
+const GChar* CClientVehicle::GetModel()
+{
+	return CClientEntity::GetModel();
+}
+
 void CClientVehicle::UpdateGameMatrix(void)
 {
 	if (m_MafiaVehicle->GetFrame() == nullptr)
 		return;
 
 	uint32_t frame = (uint32_t)m_MafiaVehicle->GetFrame();
-	
+
 	*(uint32_t*)(frame + 172) &= ~0x10;
 
 	__asm
@@ -372,7 +383,7 @@ bool CClientVehicle::SetRotationQuat(CQuaternion& quatRot)
 		return false;
 
 	*(CQuaternion*)(((uint32_t)m_MafiaVehicle) + 0x48) = quatRot;
-	
+
 	if (m_MafiaVehicle->GetFrame() != nullptr)
 	{
 		uint32_t uiFrame = (uint32_t)(m_MafiaVehicle->GetFrame()->GetInterface());
@@ -546,7 +557,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RotationFront = Packet.rotationFront;
 	m_RotationUp = Packet.rotationUp;
 	m_RotationRight = Packet.rotationRight;
-	
+
 	pGameVehicle->health = Packet.health;
 	pGameVehicle->engine_health = Packet.engineHealth;
 	pGameVehicle->fuel = Packet.fuel;
@@ -596,13 +607,13 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	if (!IsSyncer())
 	{
 		auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
-		
+
 		pBlender->SetTargetPosition(vecPos);
 		pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 		pBlender->SetTargetRotationQuat(Packet.quatRot);
 		pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
-		//pBlender->SetTargetWheelAngle(Packet.wheelAngle); 
+		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
 	}
 
 	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
@@ -1068,7 +1079,7 @@ void CClientVehicle::SetFromExistingEntity(MafiaSDK::C_Car* car)
 	wchar_t* wc = new wchar_t[cSize];
 	mbstowcs(wc, strModel.c_str(), cSize);
 	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), wc);
-	
+
 	m_mat.SetIdentity();
 	m_pRelativeElement = nullptr;
 	m_uiLastReceivedSyncTicks = 0;
@@ -1081,7 +1092,7 @@ void CClientVehicle::SetFromExistingEntity(MafiaSDK::C_Car* car)
 
 	// vehicle
 	m_MafiaVehicle = car;
-	
+
 	prevPos = m_Position;
 	targetPos = m_Position;
 

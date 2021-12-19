@@ -691,7 +691,7 @@ void CGameHooks::InstallHooks()
 	// Human Hooks
 	MafiaSDK::C_Human_Hooks::HookOnHumanHit(OnHumanHit);
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponChange(OnHumanWeaponChange);
-	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
+	//MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
