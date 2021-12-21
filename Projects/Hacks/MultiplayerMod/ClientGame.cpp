@@ -696,6 +696,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	if (m_pChatWindow == nullptr)
 	{
 		m_pChatWindow = new CChatWindow(m_pContext, &m_Fonts, fScale);
+		m_pChatWindow->SetForceShow(true);
 		m_pClientManager->m_pChatWindow = m_pChatWindow;
 		m_pChatWindow->m_dwChatInfoColor = Galactic3D::COLOUR(255, 205, 60, 60);
 
