@@ -1,7 +1,7 @@
 copy GTAC.tar "%dropbox%\MafiaC (Staff)\Builds\Vortrex\Client\"
 copy GTAC.tar "%dropbox%\MafiaC (Testers)\Builds\Vortrex\Client\"
 
-cd Lib\x86\v141_xp_static
+cd Lib\x86\v141_xp
 
 REM Staff Folder
 del "%dropbox%\MafiaC (Staff)\Builds\Vortrex\Client\*.exe"
