@@ -13,6 +13,7 @@ using namespace Galactic3D;
 CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
 {
 	m_Type = ELEMENT_PED;
+
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 	m_nVehicleSeatIndex = 0;
 	m_MafiaHuman = nullptr;

@@ -13,6 +13,7 @@ extern std::unordered_map<uint32_t, std::string> g_umapModelNames;
 CClientVehicle::CClientVehicle(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
 {
 	m_Type = ELEMENT_VEHICLE;
+
 	m_MafiaVehicle = nullptr;
 }
 

@@ -12,6 +12,10 @@ using namespace Galactic3D;
 CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(pClientManager), m_pClientManager(pClientManager)
 {
 	m_Type = ELEMENT_ENTITY;
+
+	m_Flags.m_bFindSyncer = true;
+	m_Flags.m_bSendSync = true;
+
 	m_pEntity = NULL;
 	m_mat.SetIdentity();
 	m_pRelativeElement = nullptr;
