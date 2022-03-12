@@ -24,6 +24,15 @@ namespace Galactic3D
 	class CClientDownloadManager;
 };
 
+enum eGameComponent
+{
+	GAMECOMPONENT_TRAFFIC,
+	GAMECOMPONENT_CIVILIANS,
+	GAMECOMPONENT_TRAINS,
+	GAMECOMPONENT_BRIDGES,
+	GAMECOMPONENT_SCRIPTS,
+};
+
 class CClientPlayer;
 
 class CMafiaCHtmlContainer : public CHtmlContainer
@@ -188,6 +197,7 @@ public:
 	bool m_bUseActorInvokedByGame = true;
 	bool m_bDoThrowCocotFromCarInvokedByGame = true;
 	bool m_bCreateActorInvokedByGame = true;
+	bool m_bCreateVehicleInvokedByGame = true;
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
@@ -268,6 +278,12 @@ public:
 	void HumanHit(CClientHuman* humanTarget, CClientEntity* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
+
+	bool OnTrafficCarCreate(MafiaSDK::C_Car* pCar);
+	//bool OnTrafficCarReset(MafiaSDK::C_Car* pCar);
+	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
+
+	bool IsGameComponentEnabled(eGameComponent GameComponent);
 };
 
 extern CClientGame* g_pClientGame;

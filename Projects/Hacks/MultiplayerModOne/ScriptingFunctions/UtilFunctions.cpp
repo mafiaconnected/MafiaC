@@ -12,6 +12,8 @@
 #include "IDirect3D9Hook.h"
 #include "CHookedDirect3D9Util.h"
 
+#include <Utils/VectorTools.h>
+
 extern IDirect3DDevice9* g_pD3DDevice;
 
 static bool FunctionSetChatWindowEnabled(IScriptState* pState, int argc, void* pUser)
@@ -59,7 +61,7 @@ static bool FunctionGetVehicles(IScriptState* pState, int argc, void* pUser)
 	auto pArray = new CArgumentArray();
 	for (auto pElement : pClientManager->m_rgpVehicles)
 	{
-		if (pElement != NULL && pElement.GetPointer() != nullptr)
+		if (pElement != nullptr && pElement.GetPointer() != nullptr)
 		{
 			pArray->AddObject((CClientVehicle*)pElement.GetPointer());
 		}
@@ -72,10 +74,11 @@ static bool FunctionGetVehicles(IScriptState* pState, int argc, void* pUser)
 static bool FunctionGetHumans(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
 	auto pArray = new CArgumentArray();
 	for (auto pElement : pClientManager->m_rgpPeds)
 	{
-		if (pElement != NULL && pElement.GetPointer() != nullptr)
+		if (pElement != nullptr && pElement.GetPointer() != nullptr)
 		{
 			pArray->AddObject((CClientHuman*)pElement.GetPointer());
 		}
@@ -83,7 +86,7 @@ static bool FunctionGetHumans(IScriptState* pState, int argc, void* pUser)
 
 	for (auto pElement : pClientManager->m_rgpPlayers)
 	{
-		if (pElement != NULL && pElement.GetPointer() != nullptr)
+		if (pElement != nullptr && pElement.GetPointer() != nullptr)
 		{
 			pArray->AddObject((CClientPlayer*)pElement.GetPointer());
 		}
@@ -99,7 +102,7 @@ static bool FunctionGetPlayers(IScriptState* pState, int argc, void* pUser)
 	auto pArray = new CArgumentArray();
 	for (auto pElement : pClientManager->m_rgpPlayers)
 	{
-		if (pElement != NULL && pElement.GetPointer() != nullptr)
+		if (pElement != nullptr && pElement.GetPointer() != nullptr)
 		{
 			pArray->AddObject((CClientPlayer*)pElement.GetPointer());
 		}
@@ -120,6 +123,22 @@ static bool FunctionGetCameraPosition(IScriptState* pState, int argc, void* pUse
 	vecCameraPosition.z = camMat3.m[3][2];
 
 	pState->ReturnVector3D(vecCameraPosition);
+	return true;
+}
+
+static bool FunctionSetCameraPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D pos;
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	D3DXMATRIX camMat3;
+	camMat3.m[3][0] = pos.x;
+	camMat3.m[3][1] = pos.y;
+	camMat3.m[3][2] = pos.z;
+
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	*(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548) = camMat3;
 	return true;
 }
 
@@ -145,6 +164,34 @@ static bool FunctionGetCameraLookAtPosition(IScriptState* pState, int argc, void
 	vecCameraLookAtPosition.z = lookAtInWorldSpace.z;
 
 	pState->ReturnVector3D(vecCameraLookAtPosition);
+	return true;
+}
+
+static bool FunctionSetCameraLookAtPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D lookAtPos;
+	if (!pState->CheckVector3D(0, lookAtPos))
+		return false;
+
+	CVector3D cameraPos;
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+	cameraPos.x = camMat3.m[3][0];
+	cameraPos.y = camMat3.m[3][1];
+	cameraPos.z = camMat3.m[3][2];
+
+	CVector3D rotation;
+	rotation.x = lookAtPos.x - cameraPos.x;
+	rotation.y = lookAtPos.y - cameraPos.y;
+	rotation.z = lookAtPos.z - cameraPos.z;
+
+	int ratio = (int)sqrtf(rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z);
+
+	rotation.x /= ratio;
+	rotation.y /= ratio;
+	rotation.z /= ratio;
+
+	MafiaSDK::GetCurrentCamera()->GetInterface()->rotation = CVecTools::ConvertToMafiaVec(rotation);
 	return true;
 }
 
@@ -205,19 +252,15 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	auto pClientManager = pClientGame->m_pClientManager;
 
 	pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
-
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
-
-	//pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
-	//pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
-	//pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
-
+	pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
+	pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
+	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 	
 	auto pCameraNamespace = pScripting->m_Global.AddNamespace(_gstr("camera"));
-	pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition);
-	pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition);
-
+	pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
+	pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
 	//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 }

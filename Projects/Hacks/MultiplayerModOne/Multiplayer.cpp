@@ -835,10 +835,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
 						{
-							if (!pClientHuman->IsSyncer())
-							{
-								g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
-							}
+						if (!pClientHuman->IsSyncer())
+						{
+							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+						}
 						}
 					}
 				}
@@ -864,7 +864,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			}
 		}
 		break;
-		
+
 		case MAFIAPACKET_HUMAN_JACKVEHICLE:
 		{
 			uint32_t nHumanNetworkIndex;
@@ -896,12 +896,65 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		}
 		break;
 
+		case MAFIAPACKET_ELEMENT_UPDATE_ID:
+		{
+			uint64_t nLocalElementId;
+			int32_t nServerElementId;
+
+			Reader.ReadUInt64(&nLocalElementId, 1);
+			Reader.ReadInt32(&nServerElementId, 1);
+
+			if (nServerElementId != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(FromGUID(nLocalElementId));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetId(nServerElementId);
+					pClientVehicle->DoAttachments();
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_ELEMENT_REMOVE:
+		{
+			int32_t nServerElementId;
+
+			Reader.ReadInt32(&nServerElementId, 1);
+
+			if (nServerElementId != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nServerElementId));
+				if (pClientVehicle != nullptr)
+				{
+					if (pClientVehicle->GetGameVehicle() != nullptr)
+						pClientVehicle->Despawn();
+
+					m_pClientManager->DestroyObject(pClientVehicle, false, false);
+				}
+			}
+		}
+		break;
+
 		default:
 		{
 
 		}
 		break;
 	}
+}
+
+CNetObject* FromGUID(uint64_t uiGuid)
+{
+	for (CNetObject* pNetObject : g_pClientGame->m_pClientManager->m_Objects)
+	{
+		if (uiGuid == pNetObject->GetGUID())
+		{
+			return pNetObject;
+		}
+	}
+
+	return nullptr;
 }
 
 void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
@@ -994,6 +1047,24 @@ void CMultiplayer::EnqueuePeerElement(CClientEntity* pElement)
 
 bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
 {
+	if (pElement->IsType(ELEMENT_VEHICLE))
+	{
+		auto pClientVehicle = static_cast<CClientVehicle*>(pElement);
+		auto pGameVehicle = pClientVehicle->GetGameVehicle();
+
+		if (pGameVehicle != nullptr)
+		{
+			Packet Packet(MAFIAPACKET_VEHICLE_CREATE);
+			Packet.Write<uint64_t>(pClientVehicle->GetGUID());
+			pClientVehicle->WriteCreatePacket(&Packet);
+			//pClientVehicle->WriteSyncPacket(&Packet);
+			SendHostPacket(&Packet);
+
+			//_glogprintf(_gstr("PEER2PEER: Sending vehicle %d modelIndex %d"), nRef, pVehicle->GetModelIndex());
+
+			return true;
+		}
+	}
 	return false;
 }
 

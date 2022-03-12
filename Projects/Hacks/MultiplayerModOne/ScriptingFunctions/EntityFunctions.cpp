@@ -162,7 +162,7 @@ void CScriptingFunctions::RegisterEntityFunctions(Galactic3D::CScripting* pScrip
 
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionEntityGetPosition, FunctionEntitySetPosition);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("rotation"), ARGUMENT_VECTOR3D, FunctionEntityGetRotation, FunctionEntitySetRotation);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_VECTOR3D, FunctionEntityGetHeading, FunctionEntitySetHeading);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionEntityGetHeading, FunctionEntitySetHeading);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("model"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel);
-	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel); // For GTAC compatibility
 }

@@ -12,6 +12,10 @@ using namespace Galactic3D;
 CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(pClientManager), m_pClientManager(pClientManager)
 {
 	m_Type = ELEMENT_ENTITY;
+
+	m_Flags.m_bFindSyncer = true;
+	m_Flags.m_bSendSync = true;
+
 	m_pEntity = NULL;
 	m_mat.SetIdentity();
 	m_pRelativeElement = nullptr;
@@ -51,6 +55,18 @@ bool CClientEntity::SetRotation(const CVector3D& vecRotation)
 bool CClientEntity::GetRotation(CVector3D& vecRotation)
 {
 	vecRotation = m_Rotation;
+	return true;
+}
+
+float CClientEntity::GetHeading()
+{
+	// Override by human/vehicle/etc heading funcs
+	return 0.0;
+}
+
+bool CClientEntity::SetHeading(float heading)
+{
+	// Override by human/vehicle/etc heading funcs
 	return true;
 }
 

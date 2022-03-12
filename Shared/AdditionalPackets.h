@@ -53,6 +53,9 @@ enum eMafiaPacket : unsigned int
 	MAFIAPACKET_VEHICLE_SETENGINERPM,
 	MAFIAPACKET_VEHICLE_SETWHEELANGLE,
 	MAFIAPACKET_VEHICLE_SETENGINEHEALTH,
+	MAFIAPACKET_ELEMENT_UPDATE_ID,
+	MAFIAPACKET_ELEMENT_REMOVE,
+	MAFIAPACKET_PLAYER_SETPOSITION
 };
 
 enum eElementCreatedBy : uint8_t
@@ -176,6 +179,7 @@ struct tVehicleSyncPacket
 	CVector3D rotationFront;
 	CVector3D rotationUp;
 	CVector3D rotationRight;
+	CQuaternion quatRot;
 	float health;
 	float engineHealth;
 	float fuel;

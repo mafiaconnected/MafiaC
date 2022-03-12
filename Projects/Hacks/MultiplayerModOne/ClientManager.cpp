@@ -79,6 +79,18 @@ CNetObject* CMafiaClientManager::Create(int Type)
 	return nullptr;
 }
 
+void CMafiaClientManager::Remove(CNetObject* pNetObject)
+{
+	for (int i = 0; i < MAX_VEHICLES; i++)
+	{
+		if (m_rgpVehicles[i] != nullptr && !m_rgpVehicles[i].IsNull() && m_rgpVehicles[i].GetPointer() == pNetObject)
+		{
+			m_rgpVehicles[i].SetNull();
+			return;
+		}
+	}
+}
+
 bool CMafiaClientManager::IsConnecting(void)
 {
 	if (IsConnected())

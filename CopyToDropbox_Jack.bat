@@ -2,7 +2,7 @@ copy GTAC.tar "%dropbox%\MafiaC\Client\"
 copy GTAC.tar "%dropbox%\MafiaC (Staff)\Builds\Jack\Client\"
 copy GTAC.tar "%dropbox%\MafiaC (Testers)\Builds\Jack\Client\"
 
-cd Lib\x86\v142_static
+cd Lib\x86\v142
 
 del "%dropbox%\MafiaC\Client\*.exe"
 del "%dropbox%\MafiaC\Client\*.dll"

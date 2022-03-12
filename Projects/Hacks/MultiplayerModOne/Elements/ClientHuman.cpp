@@ -13,6 +13,7 @@ using namespace Galactic3D;
 CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
 {
 	m_Type = ELEMENT_PED;
+
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 	m_nVehicleSeatIndex = 0;
 	m_MafiaHuman = nullptr;
@@ -60,7 +61,7 @@ bool CClientHuman::GetPosition(CVector3D& vecPos)
 bool CClientHuman::SetPosition(const CVector3D& vecPos)
 {
 	auto bResult = CClientEntity::SetPosition(vecPos);
-	
+
 	GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(vecPos);
 
 	UpdateGameMatrix();
@@ -82,10 +83,10 @@ bool CClientHuman::GetRotation(CVector3D& vecRot)
 
 bool CClientHuman::SetHeading(float heading)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
-	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(heading));
+	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::ComputeDirVector(CVecTools::RadToDeg(heading)));
 
 	UpdateGameMatrix();
 
@@ -98,17 +99,17 @@ bool CClientHuman::SetHeading(float heading)
 
 float CClientHuman::GetHeading()
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return 0.0f;
 
 	CVector3D rot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->entity.rotation);
 
-	return CVecTools::DirToRotation360(rot);
+	return CVecTools::DegToRad(CVecTools::DirToRotation360(rot));
 }
 
 bool CClientHuman::SetRotation(const CVector3D& vecRot)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	GetGameHuman()->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(CVecTools::EulerToDir(vecRot));
@@ -124,7 +125,7 @@ bool CClientHuman::SetRotation(const CVector3D& vecRot)
 
 bool CClientHuman::SetHealth(float fHealth)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	GetGameHuman()->GetInterface()->health = fHealth;
@@ -143,7 +144,7 @@ float CClientHuman::GetHealth()
 
 bool CClientHuman::SetVelocity(const CVector3D& vecVel)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	relPos = vecVel;
@@ -153,7 +154,7 @@ bool CClientHuman::SetVelocity(const CVector3D& vecVel)
 
 bool CClientHuman::GetVelocity(CVector3D& vecVel)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	vecVel = relPos;
@@ -163,7 +164,7 @@ bool CClientHuman::GetVelocity(CVector3D& vecVel)
 
 bool CClientHuman::SetRotationVelocity(const CVector3D& vecRotVel)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	relRot = vecRotVel;
@@ -173,7 +174,7 @@ bool CClientHuman::SetRotationVelocity(const CVector3D& vecRotVel)
 
 bool CClientHuman::GetRotationVelocity(CVector3D& vecRotVel)
 {
-	if (GetGameHuman() == nullptr) 
+	if (GetGameHuman() == nullptr)
 		return false;
 
 	vecRotVel = relRot;
@@ -183,7 +184,7 @@ bool CClientHuman::GetRotationVelocity(CVector3D& vecRotVel)
 
 void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 {
-	if (GetGameHuman() != nullptr) 
+	if (GetGameHuman() != nullptr)
 		Despawn();
 
 	auto pModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
@@ -197,7 +198,9 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 	pModel->Update();
 
+	g_pClientGame->m_bCreateActorInvokedByGame = false;
 	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy));
+	g_pClientGame->m_bCreateActorInvokedByGame = true;
 
 	m_MafiaHuman->Init(pModel);
 
@@ -447,7 +450,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	}
 
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
-	
+
 	if (!IsSyncer())
 	{
 		auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
@@ -529,7 +532,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	}
 
 	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
-	
+
 	/*
 	uint32_t uiGame0 = *(uint32_t*)0x63788C;
 	uint32_t v54 = *(uint32_t*)(uiGame0 + 16);
@@ -587,7 +590,7 @@ void CClientHuman::OnCreated(void)
 
 void CClientHuman::Process(void)
 {
-	if(!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
+	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
 		m_pBlender->Interpolate();
 	}
@@ -652,8 +655,8 @@ int8_t CClientHuman::GetVehicleSeat(void)
 
 	for (int8_t i = 0; i < 4; i++)
 	{
-		CClientHuman *pClientHuman = pClientVehicle->GetHumanInSeat(i);
-		if(pClientHuman != nullptr && this == pClientHuman)
+		CClientHuman* pClientHuman = pClientVehicle->GetHumanInSeat(i);
+		if (pClientHuman != nullptr && this == pClientHuman)
 		{
 			return i;
 		}
@@ -821,7 +824,7 @@ void CClientHuman::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, u
 
 		if (index >= 8)
 		{
-			if(this == m_pClientManager->m_pLocalPlayer.GetPointer()) MafiaSDK::GetIndicators()->ConsoleAddText("The inventory is full!", 0xFFFFFFFF);
+			if (this == m_pClientManager->m_pLocalPlayer.GetPointer()) MafiaSDK::GetIndicators()->ConsoleAddText("The inventory is full!", 0xFFFFFFFF);
 		}
 		else if (index >= 0)
 		{
@@ -919,7 +922,7 @@ void CClientHuman::DropWeapon()
 {
 	if (m_MafiaHuman == nullptr) return;
 
-	GetGameHuman()->Do_WeaponDrop();
+	m_MafiaHuman->Do_WeaponDrop();
 }
 
 int CClientHuman::GetAnimationState()
@@ -938,7 +941,7 @@ void CClientHuman::SetFromExistingEntity(MafiaSDK::C_Human* human) {
 
 void CClientHuman::SetBehavior(uint32_t iBehavior)
 {
-	
+
 }
 
 void CClientHuman::CreateNetBlender()
@@ -946,6 +949,6 @@ void CClientHuman::CreateNetBlender()
 	auto pBlender = new CNetBlenderHuman(this);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
-		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 0;
+		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
 	m_pBlender = pBlender;
 }

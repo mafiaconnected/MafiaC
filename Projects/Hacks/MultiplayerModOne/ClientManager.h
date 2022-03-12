@@ -39,6 +39,7 @@ public:
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
 	virtual CNetObject* Create(int Type) override;
+	virtual void Remove(CNetObject* pNetObject);
 	virtual bool IsConnecting(void) override;
 	virtual bool Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword) override;
 	virtual bool Disconnect(void) override;

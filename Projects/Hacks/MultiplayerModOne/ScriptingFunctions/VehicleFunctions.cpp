@@ -4,6 +4,7 @@
 #include "../ClientGame.h"
 #include "../Elements/ClientHuman.h"
 #include "../Elements/ClientVehicle.h"
+#include <Utils/VectorTools.h>
 
 #pragma region Functions
 static bool FunctionVehicleExplode(IScriptState* pState, int argc, void* pUser)
@@ -33,6 +34,44 @@ static bool FunctionVehicleRepair(IScriptState* pState, int argc, void* pUser)
 
 	if (pClientVehicle->Repair())
 		return true;
+
+	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
+static bool FunctionVehicleGetOccupant(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint8_t seat;
+	if (!pState->CheckNumber(0, seat))
+		return false;
+
+	pState->ReturnObject(pClientVehicle->GetHumanInSeat(seat));
+
+	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
+static bool FunctionVehicleGetOccupants(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	auto pArray = new CArgumentArray();
+	for (size_t i = 0; i < 4; i++)
+	{
+		pArray->AddObject(pClientVehicle->GetHumanInSeat(i));
+	}
 
 	pState->Error(_gstr("vehicle not spawned"));
 	return false;
@@ -834,6 +873,8 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("explode"), _gstr("t"), FunctionVehicleExplode, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("repair"), _gstr("t"), FunctionVehicleRepair, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupant"), _gstr("ti"), FunctionVehicleGetOccupant, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupants"), _gstr("t"), FunctionVehicleGetOccupants, pClientManager);
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("siren"), ARGUMENT_BOOLEAN, FunctionVehicleGetSiren, FunctionVehicleSetSiren);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("lights"), ARGUMENT_BOOLEAN, FunctionVehicleGetLights, FunctionVehicleSetLights);
