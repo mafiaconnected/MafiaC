@@ -39,6 +39,9 @@ target_link_libraries(
 	MafiaCNetworkShared
 	lua53_static
 	Direct3D11Renderer_static
+	RmlCore_static
+	RmlDebugger_static
+	RmlGUI_static
 	enet
 	pixman_static
 	cairo_static

@@ -9,6 +9,7 @@
 #endif
 #include <crtdbg.h>
 #include <LauncherVersion.h>
+#include <AdditionalPackets.h>
 
 CMafiaCModLauncher::CMafiaCModLauncher()
 {
@@ -23,6 +24,10 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 	m_bAllowLargeIcons = true;
 	m_bAllowLicenses = true;
 #endif
+
+	m_Launcher.m_Version.m_uiNetVersion = NETGAME_CURRENT_VERSION;
+
+	_gstrlcpy(m_szServerListing, _gstr("serverlisting.gtaconnected.com"), ARRAY_COUNT(m_szServerListing));
 
 	_gstrlcpy(m_szHacksFolder, _gstr(""), ARRAY_COUNT(m_szHacksFolder));
 
