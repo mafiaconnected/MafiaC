@@ -357,7 +357,7 @@ void CClientGame::ShutdownScripting(void)
 		delete m_pChatWindow;
 		m_pChatWindow = nullptr;
 	}
-	m_pClientManager->Forget();
+	//m_pClientManager->Forget();
 	m_pClientManager->Clear();
 	m_pResourceMgr->ClearAllResources();
 	delete m_pClientManager;
@@ -1943,11 +1943,11 @@ bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 
 	auto pClientVehicle = Strong<CClientVehicle>::New(m_pClientManager->Create(ELEMENT_VEHICLE));
 	pClientVehicle->SetFromExistingEntity(pCar);
-	m_pClientManager->RegisterObject(pClientVehicle);
+	//m_pClientManager->RegisterObject(pClientVehicle);
 
 	{
 		pClientVehicle->GenerateGUID();
-		pClientVehicle->SetSyncer(pMultiplayer->m_iLocalIndex);
+		pClientVehicle->SetSyncer(pMultiplayer->m_NetMachines.GetMachine(pMultiplayer->m_iLocalIndex));
 
 		if (pMultiplayer->m_bNetworkedEntities)
 		{
