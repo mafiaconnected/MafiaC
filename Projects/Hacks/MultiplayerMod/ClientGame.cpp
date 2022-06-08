@@ -140,6 +140,12 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_bFocused = true;
 	m_bFocusedSupressInput = false;
 	m_bCursorEnabled = false;
+
+#if MAFIAC_RMLUI
+	m_pRmlUi = new CRmlUi2(m_pContext);
+	m_pRmlUi->Initialise();
+#endif
+
 	m_bShowGameStatistics = false;
 	m_bFPSCounter = false;
 	//m_bMap = false;
@@ -152,6 +158,7 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_bDebugMode = false;
 	m_bTrainsEnabled = true;
 	m_bSupressNetworkedEntities = false;
+	m_iStopMultiplayerGameReason = -1;
 }
 
 CClientGame::~CClientGame(void)
@@ -379,6 +386,10 @@ void CClientGame::ShutdownScripting(void)
 	m_pResourceMgr = nullptr;
 	m_Fonts.DeleteHWResources();
 	m_SlotMgr.DeleteHWResources();
+
+#if MAFIAC_RMLUI
+	delete m_pRmlUi;
+#endif
 }
 
 static bool LoadSystemFontCB(const TCHAR* pszValueName, const TCHAR* pszValue)
@@ -459,7 +470,7 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		//if (wParam == VK_F5 && GetKeyState(VK_CONTROL) & 0x8000) { // Exit the game on Ctrl+Escape
 		//	ExitProcess(0);
 		//}
-		// 
+		//
 		//if(wParam == VK_RETURN) {
 		//	_glogprintf(_gstr("Chatbox submit"));
 		//	m_pResourceMgr->m_pCommandHandlers->PushLogger(m_pChatWindow);
@@ -705,6 +716,12 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	{
 		m_pChatWindow->SetEnabled(true);
 		m_pChatWindow->SetScale(fScale);
+	}
+
+	if (m_iStopMultiplayerGameReason >= 0)
+	{
+		ShowDisconnectReason();
+		m_iStopMultiplayerGameReason = -1;
 	}
 
 	{
@@ -985,6 +1002,12 @@ void CClientGame::OnProcess(void)
 
 	//_glogprintf(_gstr("OnProcess delta time (%f)"), (float)pTime->m_fDeltaTime);
 	m_GUISystem.Process((float)pTime->m_fDeltaTime);
+
+#if MAFIAC_RMLUI
+	m_pRmlUi->m_pRmlContext->SetDimensions(Rml::Vector2i(MafiaSDK::GetIGraph()->Scrn_sx(), MafiaSDK::GetIGraph()->Scrn_sy()));
+	m_pRmlUi->Process();
+#endif
+
 	m_InternetRequestMgr.Process();
 
 	if (m_pAudioScriptingFunctions != nullptr && m_pAudioScriptingFunctions->m_pSoundMgr != NULL)
@@ -1131,6 +1154,11 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 
 void CClientGame::OnCharacter(wchar_t c)
 {
+#if MAFIAC_RMLUI
+	if (c >= 32)
+		m_pRmlUi->m_pRmlContext->ProcessTextInput(Rml::Character(c));
+#endif
+
 	if (!MafiaSDK::IsWindowFocused())
 		return;
 
@@ -1248,6 +1276,10 @@ void CClientGame::OnRender2DStuff(void)
 	m_GUISystem.m_bFocused = true;
 
 	m_GUISystem.Render(m_pGalacticFunctions->m_p2D);
+
+#if MAFIAC_RMLUI
+	m_pRmlUi->Render();
+#endif
 }
 
 bool CClientGame::OnCameraProcess(void)
@@ -1592,6 +1624,10 @@ void CClientGame::OnEvent(const SDL_Event* event)
 			UpdateCursor(Cursor);
 		else
 			UpdateCursor(SDL_SYSTEM_CURSOR_ARROW);
+
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseMove(event->motion.x, event->motion.y, m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
 	}
 	break;
 	case SDL_MOUSEBUTTONDOWN:
@@ -1604,6 +1640,9 @@ void CClientGame::OnEvent(const SDL_Event* event)
 				SetMouseCapture(true);
 			}
 		}
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseButtonDown(m_pRmlUi->m_SystemInterface.TranslateMouseButton(event->button.button), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
 	}
 	break;
 	case SDL_MOUSEBUTTONUP:
@@ -1625,12 +1664,27 @@ void CClientGame::OnEvent(const SDL_Event* event)
 				}
 			}
 		}
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseButtonUp(m_pRmlUi->m_SystemInterface.TranslateMouseButton(event->button.button), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+	}
+	break;
+	case SDL_MOUSEWHEEL:
+	{
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseWheel(float(-event->wheel.y), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+		return;
 	}
 	break;
 	case SDL_KEYUP:
 	{
 		if (OnKeyUp(*event))
 			m_bHandledKeyEvent = true;
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessKeyUp(m_pRmlUi->m_SystemInterface.TranslateKey(event->key.keysym.sym), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+
 		return;
 	}
 	break;
@@ -1638,6 +1692,10 @@ void CClientGame::OnEvent(const SDL_Event* event)
 	{
 		if (OnKeyDown(*event))
 			m_bHandledKeyEvent = true;
+
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessKeyDown(m_pRmlUi->m_SystemInterface.TranslateKey(event->key.keysym.sym), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
 		return;
 	}
 	break;
@@ -2023,4 +2081,26 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		break;
 	}
 	return true;
+}
+
+void CClientGame::ShowDisconnectReason()
+{
+	const GChar* rgpszReasons[] = {
+		_gstr("TIMEOUT"),
+		_gstr("FULL"),
+		_gstr("UNSUPPORTED CLIENT"),
+		_gstr("UNSUPPORTED ENGINE"),
+		_gstr("WRONG PASSWORD"),
+		_gstr("UNSUPPORTED EXECUTABLE"),
+		_gstr("GRACEFUL"),
+		_gstr("BANNED"),
+		_gstr("FAILED"),
+		_gstr("INVALID NAME"),
+		_gstr("CRASH"),
+		_gstr("PUBLIC KEY MISMATCH"),
+		_gstr("NAME IN USE"),
+		_gstr("KICKED")
+	};
+	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
+	//CGTAUtil::ShowHelpMessage("Disconnected");
 }

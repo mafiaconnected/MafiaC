@@ -1,3 +1,3 @@
 #pragma once
 
-#define GTAC_RMLUI 0
+#define MAFIAC_RMLUI 0
