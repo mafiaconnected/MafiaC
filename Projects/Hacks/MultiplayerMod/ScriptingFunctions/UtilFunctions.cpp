@@ -32,6 +32,18 @@ static bool FunctionSetChatWindowEnabled(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+static bool FunctionGetChatWindowEnabled(IScriptState* pState, int argc, void* pUser)
+{
+	pState->ReturnBoolean(g_pClientGame->m_pChatWindow->IsEnabled());
+	return true;
+}
+
+static bool FunctionGetChatInputEnabled(IScriptState* pState, int argc, void* pUser)
+{
+	pState->ReturnBoolean(g_pClientGame->m_pCmdWindow->IsEnabled());
+	return true;
+}
+
 static bool FunctionIsScancodePressed(IScriptState* pState, int argc, void* pUser)
 {
 	Sint32 Scancode;
@@ -252,13 +264,16 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	auto pClientManager = pClientGame->m_pClientManager;
 
 	pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
+	pScripting->m_Global.AddProperty(pClientGame, _gstr("chatWindowEnabled"), ARGUMENT_BOOLEAN, FunctionGetChatWindowEnabled);
+	pScripting->m_Global.AddProperty(pClientGame, _gstr("chatInputEnabled"), ARGUMENT_BOOLEAN, FunctionGetChatInputEnabled);
+
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
 	pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
 	pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
 	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
-	
+
 	auto pCameraNamespace = pScripting->m_Global.AddNamespace(_gstr("camera"));
 	pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
 	pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
