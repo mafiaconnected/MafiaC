@@ -1031,12 +1031,12 @@ void CClientGame::OnProcess(void)
 	if (m_pMultiplayer != NULL)
 	{
 		m_pMultiplayer->ProcessNewPeerElements();
-		m_pMultiplayer->ProcessEachFrame(pTime);
+		m_pMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pNewMultiplayer != nullptr)
 	{
-		m_pNewMultiplayer->ProcessEachFrame(pTime);
+		m_pNewMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pGalacticFunctions != nullptr)
