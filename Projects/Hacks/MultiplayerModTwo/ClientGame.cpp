@@ -28,8 +28,6 @@ uint32_t g_uiSyncedTickCountII = 0;
 
 using namespace Galactic3D;
 
-extern SDL_Window* g_pWindow;
-
 CMafiaCHtmlContainerII::CMafiaCHtmlContainerII(Context* pContext, CClientGameII* pClientGame) : CHtmlContainer(pContext), m_pClientGame(pClientGame)
 {
 	m_pInternetRequestMgr = &pClientGame->m_InternetRequestMgr;
@@ -446,8 +444,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		{
 			wchar_t c = (wchar_t)wParam;
 			
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				OnCharacter(c);
 			}
@@ -474,23 +471,20 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		//	m_bEnableCmdWindowOnCharPress = true;
 		//}
 	case WM_SYSKEYUP:
+		if (M2::C_MafiaFramework::GetActive())
 		{
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (m_bHandledKeyEvent)
 			{
-				if (m_bHandledKeyEvent)
-				{
-					m_bHandledKeyEvent = false;
-					*pResult = 0;
-					return true;
-				}
+				m_bHandledKeyEvent = false;
+				*pResult = 0;
+				return true;
 			}
 		}
 		break;
+
 	case WM_MOUSELEAVE:
 		{
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				if (m_pGalacticFunctions != nullptr)
 					m_pGalacticFunctions->OnMouseLeave();
@@ -506,8 +500,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			}
 			UpdateCursorEnabled(true);
 
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				if (m_pGalacticFunctions != nullptr)
 					m_pGalacticFunctions->OnFocus();
@@ -534,8 +527,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			m_bFocusedSupressInput = false;
 			UpdateCursorEnabled();
 
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				//SetCursorClipped(false, false);
 				if (m_pGalacticFunctions != nullptr)
@@ -561,8 +553,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		break;
 	case WM_LBUTTONDOWN:
 		{
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS && IsInputDisabled())
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				*pResult = 0;
 				return true;
@@ -575,8 +566,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		break;
 	case WM_RBUTTONDOWN:
 		{
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS && IsInputDisabled())
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				*pResult = 0;
 				return true;
@@ -596,8 +586,7 @@ bool CClientGameII::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 			TrackMouseEvent(&EventTrack);
 
-			Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-			if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+			if (M2::C_MafiaFramework::GetActive())
 			{
 				POINT Point;
 				if (GetCursorPos(&Point) == FALSE)
@@ -698,9 +687,20 @@ void CClientGameII::OnStartInGame(bool bRestarted)
 
 	m_GUISystem.LoadPage(_gstr("/GUI/Main.xml"));
 
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
+
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	float fScale = 0.7f / 900.0f* (float)height;
 	//fScale *= *m_CVars.m_pfChatScale;
@@ -709,7 +709,7 @@ void CClientGameII::OnStartInGame(bool bRestarted)
 		fScale = fScale2;
 	if (m_pChatWindow == nullptr)
 	{
-		m_pChatWindow = new CChatWindow(m_pContext,&m_Fonts,fScale);
+		m_pChatWindow = new CChatWindow(m_pContext, &m_Fonts, fScale);
 		m_pClientManager->m_pChatWindow = m_pChatWindow;
 		m_pChatWindow->m_dwChatInfoColor = Galactic3D::COLOUR(255, 205, 60, 60);
 
@@ -978,9 +978,20 @@ void CClientGameII::OnProcess(void)
 
 	m_LastFrameTicks = Ticks;
 
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
+
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	{
 		m_GUISystem.m_fLeft = 0.0f;
@@ -1053,8 +1064,7 @@ bool CClientGameII::OnKeyUp(const SDL_Event& Event)
 {
 	//_glogprintf(_gstr("Key up (%i)"), Event.key.keysym);
 
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (!M2::C_MafiaFramework::GetActive())
 		return false;
 
 	if (m_pCmdWindow != nullptr)
@@ -1075,9 +1085,7 @@ bool CClientGameII::OnKeyUp(const SDL_Event& Event)
 
 bool CClientGameII::OnKeyDown(const SDL_Event& Event)
 {
-
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (!M2::C_MafiaFramework::GetActive())
 		return false;
 
 	//if (Event.key.keysym.sym == SDLK_ESCAPE && IsInputDisabled())
@@ -1148,8 +1156,7 @@ bool CClientGameII::OnKeyDown(const SDL_Event& Event)
 
 void CClientGameII::OnCharacter(wchar_t c)
 {
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (!M2::C_MafiaFramework::GetActive())
 		return;
 
 	if (GetMultiplayer() != nullptr)
@@ -1182,8 +1189,7 @@ void CClientGameII::OnRender2DStuff(void)
 
 	m_pOnDrawnHUDEventType->Trigger();
 
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (M2::C_MafiaFramework::GetActive())
 	{
 		if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		{
@@ -1195,19 +1201,27 @@ void CClientGameII::OnRender2DStuff(void)
 
 	//m_pOnDrawnHUDEventType->Trigger();
 
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
 
-	float fWidth = (float)width;
-	float fHeight = (float)height;
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	CMultiplayerII* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (!pMultiplayer->IsConnected())
 		{
-			m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, _gstr("Connecting ..."), CVector2D(0.0f, fHeight - (m_TextDrawing.m_fLargeSize * 2.0f)), fWidth, 0.975f, 0.0f, Galactic3D::COLOUR::Lime, false);
+			m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, _gstr("Connecting ..."), CVector2D(0.0f, (float)height - (m_TextDrawing.m_fLargeSize * 2.0f)), (float)width, 0.975f, 0.0f, Galactic3D::COLOUR::Lime, false);
 		}
 	}
 
@@ -1234,21 +1248,21 @@ void CClientGameII::OnRender2DStuff(void)
 			}
 		}
 
-		float fPadding = 10.0f / 800.0f * fWidth;
+		float fPadding = 10.0f / 800.0f * (float)width;
 
-		m_TextDrawing.MeasureText(1, vecSize, Machines.c_str(), fWidth - (fPadding * 2.0f), 0.0f, 0.0f, false);
-		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 1, Machines.c_str(), CVector2D(fWidth - vecSize.x - fPadding, 200.0f), fWidth - vecSize.x - (fPadding * 2.0f), 0.0f, 0.0f, Galactic3D::COLOUR::Lime, false, false, false, true);
+		m_TextDrawing.MeasureText(1, vecSize, Machines.c_str(), (float)width - (fPadding * 2.0f), 0.0f, 0.0f, false);
+		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 1, Machines.c_str(), CVector2D((float)width - vecSize.x - fPadding, 200.0f), (float)width - vecSize.x - (fPadding * 2.0f), 0.0f, 0.0f, Galactic3D::COLOUR::Lime, false, false, false, true);
 	}
 
 	if (m_bFPSCounter)
 	{
-		float fPadding = 10.0f / 800.0f * fWidth;
+		float fPadding = 10.0f / 800.0f * (float)width;
 
 		CVector2D vecSize;
 		GString FPS = _gtostring(m_FPSCounter.GetFPS());
 
-		m_TextDrawing.MeasureText(0, vecSize, FPS.c_str(), fWidth - fPadding, 0.0f, 0.0f, false);
-		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, FPS.c_str(), CVector2D(fPadding, 0.0f), fWidth - (fPadding * 2.0f), 1.0f, 0.0f, Galactic3D::COLOUR::Aqua, false, false, false, true);
+		m_TextDrawing.MeasureText(0, vecSize, FPS.c_str(), (float)width - fPadding, 0.0f, 0.0f, false);
+		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, FPS.c_str(), CVector2D(fPadding, 0.0f), (float)width - (fPadding * 2.0f), 1.0f, 0.0f, Galactic3D::COLOUR::Aqua, false, false, false, true);
 	}
 
 	if (m_pResourceMgr->m_pDownloadManager != NULL) // all codebase should support the download manager being NULL!
@@ -1256,11 +1270,11 @@ void CClientGameII::OnRender2DStuff(void)
 		if (m_pResourceMgr->m_pDownloadManager->ShouldShowProgress())
 		{
 			float fProgress = m_pResourceMgr->m_pDownloadManager->GetProgress();
-			CBufferedRectangle Rect(CVector2D(15.0f - 2.5f, fHeight - 50.0f - 2.5f), CVector2D(fWidth - 30.0f + 5.0f, 15.0f), Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, 0.0f, CVector2D(0.0f, 0.0f));
+			CBufferedRectangle Rect(CVector2D(15.0f - 2.5f, (float)height - 50.0f - 2.5f), CVector2D((float)width - 30.0f + 5.0f, 15.0f), Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
-			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D(fWidth - 30.0f, 10.0f), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), 0.0f, CVector2D(0.0f, 0.0f));
+			Rect = CBufferedRectangle(CVector2D(15.0f, (float)height - 50.0f), CVector2D((float)width - 30.0f, 10.0f), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
-			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D((fWidth - 30.0f)*fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
+			Rect = CBufferedRectangle(CVector2D(15.0f, (float)height - 50.0f), CVector2D(((float)width - 30.0f)*fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
 		}
 	}
@@ -1465,8 +1479,7 @@ bool CClientGameII::IsCursorEnabled(void)
 
 bool CClientGameII::IsCursorEnabled2(void)
 {
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (!M2::C_MafiaFramework::GetActive())
 		return false;
 
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
@@ -1491,8 +1504,7 @@ bool CClientGameII::IsDebugMode(void)
 
 bool CClientGameII::DontClipCursor()
 {
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	return !(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
+	return M2::C_MafiaFramework::GetActive();
 }
 
 void CClientGameII::SetCursorClipped(bool bClipped, bool bForce)
@@ -1574,8 +1586,7 @@ void CClientGameII::EnableInput(bool bEnabled)
 
 void CClientGameII::OnEvent(const SDL_Event *event)
 {
-	Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-	if (!(iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS))
+	if (!M2::C_MafiaFramework::GetActive())
 		return;
 
 	if (m_pResourceMgr == nullptr)

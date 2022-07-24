@@ -21,8 +21,6 @@ extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
 C2D* g_p2DII;
 
-extern SDL_Window* g_pWindow;
-
 static bool LoadTARArchive(CFileSystem* pFileSystem, Stream* pStream, const GChar* pszTarget, bool bCaseSensitive, bool bExclusive)
 {
 	CTARArchive* pArchive = new CTARArchive;
@@ -154,8 +152,7 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		case HACKEVENT_FRAME:
 			{
 				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
-				Uint32 iWindowFlags = SDL_GetWindowFlags(g_pWindow);
-				if (iWindowFlags & SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)
+				if (!M2::C_MafiaFramework::GetActive())
 				{
 					g_pClientGame->OnFrame();
 				}

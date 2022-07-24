@@ -156,15 +156,26 @@ static bool FunctionGameSetCameraLookAtII(IScriptState* pState, int argc, void* 
 static bool FunctionGetGameII(IScriptState* pState, int argc, void* pUser)
 {
 	CClientGameII* pClientGame = (CClientGameII*)pUser;
-	pState->ReturnNumber(GAME_MAFIA_ONE);
+	pState->ReturnNumber(GAME_MAFIA_TWO);
 	return true;
 }
 
 static bool FunctionGetWidthII(IScriptState* pState, int argc, void* pUser)
 {
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
+
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	pState->ReturnNumber(width);
 	return true;
@@ -172,9 +183,20 @@ static bool FunctionGetWidthII(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGetHeightII(IScriptState* pState, int argc, void* pUser)
 {
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
+
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	pState->ReturnNumber(height);
 	return true;
@@ -182,9 +204,20 @@ static bool FunctionGetHeightII(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGetAspectRatioII(IScriptState* pState, int argc, void* pUser)
 {
-	int width;
-	int height;
-	SDL_GetWindowSize(g_pWindow, &width, &height);
+	int width = 0;
+	int height = 0;
+
+	if (M2::C_MafiaFramework::GetActive())
+	{
+		HWND pWindow = GetActiveWindow();
+		RECT rect;
+
+		if (GetWindowRect(pWindow, &rect))
+		{
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;
+		}
+	}
 
 	pState->ReturnNumber(width / height);
 	return true;
