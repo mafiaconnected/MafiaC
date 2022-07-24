@@ -21,8 +21,7 @@ static void Load(tHackEventDataLoad* pData)
 
     HMODULE hD3D8 = GetModuleHandle(_T("d3d8.dll"));
 	HMODULE hLS3DF = GetModuleHandle(_T("LS3DF.dll"));
-	assert(hLS3DF);
-	assert(hD3D8);
+
     if (hD3D8 != nullptr && hLS3DF != nullptr)
     {
         CHacks::GetImportLookups(hLS3DF, "d3d8.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
