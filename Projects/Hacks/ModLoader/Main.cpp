@@ -31,10 +31,7 @@ static void Load(tHackEventDataLoad* pData)
     hRwData = GetModuleHandle(_T("rw_data.dll"));
 	HMODULE hGame = GetModuleHandle(_T("Game.exe"));
 	HMODULE hLS3DF = GetModuleHandle(_T("LS3DF.dll"));
-	assert(hGame);
-	assert(hLS3DF);
-	assert(hRwData);
-    if (hGame != nullptr)
+    if (hGame != nullptr && hRwData != nullptr && hLS3DF != nullptr)
     {
         CHacks::GetImportLookups(hGame, "rw_data.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
             if (pszName != nullptr)
