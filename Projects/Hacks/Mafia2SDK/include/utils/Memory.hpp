@@ -73,7 +73,7 @@ namespace Mem
     class Hooks
     {
     public:
-        static  void                * InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDetourAddress, BYTE byteType, int iSize = 5);
+        static  BYTE                * InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDetourAddress, BYTE byteType, int iSize = 5);
         static  void                UninstallDetourPatchInternal(uint32_t dwAddress, void ** pTrampoline, int iSize = 5);
 
         static  void                * InstallDetourPatch(char * szLibrary, char * szFunction, uint32_t dwFunctionAddress);
@@ -105,95 +105,151 @@ namespace Mem
     void Initialize(void);
 }
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
-
-void * Mem::Hooks::InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDetourAddress, BYTE byteType, int iSize)
+struct ProtectionInfo
 {
-    BYTE * pbyteAddr = (BYTE *)dwAddress;
+	DWORD dwAddress;
+	DWORD dwOldProtection;
+	int   iSize;
+};
 
-    // Allocate the trampoline memory
-    BYTE * pbyteTrampoline = (BYTE *)malloc(iSize + 5);
-    ScopedProtect((M2_Address)pbyteTrampoline, iSize + 5);
-    {
-        ScopedProtect((M2_Address)pbyteAddr, iSize + 5);
+ProtectionInfo Unprotect(DWORD dwAddress, int iSize)
+{
+	ProtectionInfo protectionInfo;
+	protectionInfo.dwAddress = dwAddress;
+	protectionInfo.iSize = iSize;
+#ifdef WIN32
+	VirtualProtect((void *)dwAddress, iSize, PAGE_EXECUTE_READWRITE, &protectionInfo.dwOldProtection);
+#else
+	mprotect((void *)((dwAddress / PAGESIZE) * PAGESIZE), PAGESIZE, (PROT_EXEC | PROT_READ | PROT_WRITE));
+#endif
+	return protectionInfo;
+}
 
-        memcpy(pbyteTrampoline, pbyteAddr, iSize);
-        pbyteTrampoline[iSize] = byteType;
-        *(void **)(&pbyteTrampoline[iSize + 1]) = (void *)((pbyteAddr + iSize) - (pbyteTrampoline + iSize) - 5);
-        pbyteAddr[0] = byteType;
-        *(void **)(&pbyteAddr[1]) = (void *)((BYTE *)dwDetourAddress - pbyteAddr - 5);
-    }
+void InstallCallHook(DWORD address, DWORD function)
+{
+	DWORD lpflOldProtect;
+	VirtualProtect((void*)address, 5, PAGE_EXECUTE_READWRITE, &lpflOldProtect);
+	*(BYTE*)(address) = 0xE8;
+	*(DWORD*)(address + 1) = (unsigned long)function - (address + 5);
+	VirtualProtect((void*)address, 5, lpflOldProtect, &lpflOldProtect);
+}
 
-    return pbyteTrampoline;
+void Reprotect(ProtectionInfo protectionInfo)
+{
+#ifdef WIN32
+	DWORD dwProtection;
+	VirtualProtect((void *)protectionInfo.dwAddress, protectionInfo.iSize, protectionInfo.dwOldProtection, &dwProtection);
+#else
+	//get old protection
+#endif
+}
+
+DWORD GetFunctionAddress(LPCWSTR szLibrary, char * szFunction)
+{
+	return (DWORD)GetProcAddress(LoadLibraryW(szLibrary), szFunction);
+}
+
+DWORD GetFunctionAddress(LPCWSTR szLibrary, unsigned int uOrdinal)
+{
+	return GetFunctionAddress(szLibrary, (char *)MAKELONG(uOrdinal, 0));
+}
+
+#ifdef MAFIA2_SDK_IMPLEMENTATION
+
+BYTE * Mem::Hooks::InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDetourAddress, BYTE byteType, int iSize)
+{
+	BYTE * pbyteTrampoline = (BYTE *)malloc(iSize + 5);
+	Unprotect((DWORD)pbyteTrampoline, (iSize + 5));
+	ProtectionInfo protectionInfo = Unprotect(dwAddress, (iSize + 5));
+	memcpy(pbyteTrampoline, (void *)dwAddress, iSize);
+	DWORD dwTrampoline = (DWORD)(pbyteTrampoline + iSize);
+	*(BYTE *)dwTrampoline = byteType;
+	*(DWORD *)(dwTrampoline + 1) = ((dwAddress + iSize) - dwTrampoline - 5);
+	*(BYTE *)dwAddress = byteType;
+	*(DWORD *)(dwAddress + 1) = (dwDetourAddress - dwAddress - 5);
+	Reprotect(protectionInfo);
+	return pbyteTrampoline;
 }
 
 void Mem::Hooks::UninstallDetourPatchInternal(uint32_t dwAddress, void ** pTrampoline, int iSize)
 {
-    BYTE * pTramp = (BYTE *)*pTrampoline;
-    BYTE * pbyteAddr = (BYTE *)dwAddress;
-
-    {
-        ScopedProtect((M2_Address)pbyteAddr, iSize);
-        memcpy(pbyteAddr, pTramp, iSize);
-    }
-
-    free(pTramp);
-    *pTrampoline = pbyteAddr;
+	ProtectionInfo protectionInfo = Unprotect(dwAddress, iSize);
+	memcpy((void *)dwAddress, pTrampoline, iSize);
+	Reprotect(protectionInfo);
+	free(pTrampoline);
 }
 
 void * Mem::Hooks::InstallDetourPatch(char * szLibrary, char * szFunction, uint32_t dwFunctionAddress)
 {
-    return DetourFunction(DetourFindFunction(szLibrary, szFunction), (BYTE *)dwFunctionAddress);
+	return InstallDetourPatchInternal(GetFunctionAddress((LPCWSTR)szLibrary, (char *)szFunction), dwFunctionAddress, JMP, 5);
 }
 
 void * Mem::Hooks::InstallDetourPatch(uint32_t dwAddress, uint32_t dwFunctionAddress)
 {
-    return DetourFunction((BYTE *)dwAddress, (BYTE *)dwFunctionAddress);
+	return InstallDetourPatchInternal(dwAddress, dwFunctionAddress, JMP, 5);
 }
 
 bool Mem::Hooks::UninstallDetourPatch(void * pTrampoline, uint32_t dwFunctionAddress)
 {
-    return DetourRemove((BYTE *)pTrampoline, (BYTE *)dwFunctionAddress);
+	ProtectionInfo protectionInfo = Unprotect(dwFunctionAddress, 5);
+	memcpy((void *)dwFunctionAddress, pTrampoline, 5);
+	Reprotect(protectionInfo);
+	free(pTrampoline);
+	return true;
+    //return DetourRemove((BYTE *)pTrampoline, (BYTE *)dwFunctionAddress);
 }
 
 void Mem::Utilites::PatchAddress(uint32_t dwAddress, BYTE *bPatch, size_t iSize)
 {
-    ScopedProtect(dwAddress, sizeof(iSize));
-    memcpy((void*)dwAddress, bPatch, iSize);
+	DWORD d, ds;
+
+	VirtualProtect((void*)dwAddress, iSize, PAGE_EXECUTE_READWRITE, &d);
+	memcpy((void*)dwAddress, bPatch, iSize);
+	VirtualProtect((void*)dwAddress, iSize, d, &ds);
 }
 
 void Mem::Utilites::PatchAddress(uint32_t dwAddress, uint32_t dwPatch)
 {
-    ScopedProtect(dwAddress, sizeof(uint32_t));
-    *(uint32_t *)(dwAddress) = dwPatch;
+	DWORD d, ds;
+
+	VirtualProtect((void*)dwAddress, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &d);
+	*(DWORD *)(dwAddress) = dwPatch;
+	VirtualProtect((void*)dwAddress, sizeof(DWORD), d, &ds);
 }
 
 void * Mem::Hooks::InstallCallPatch(uint32_t dwAddress, uint32_t dwCallAddress, int iSize)
 {
-    return InstallDetourPatchInternal(dwAddress, dwCallAddress, CALL, iSize);
+	return InstallDetourPatchInternal(dwAddress, dwCallAddress, CALL, iSize);
 }
 
 void * Mem::Hooks::InstallJmpPatch(uint32_t dwAddress, uint32_t dwJmpAddress, int iSize)
 {
-    return InstallDetourPatchInternal(dwAddress, dwJmpAddress, JMP, iSize);
+	return InstallDetourPatchInternal(dwAddress, dwJmpAddress, JMP, iSize);
 }
 
 M2_Address Mem::Hooks::InstallNotDumbJMP(M2_Address target_addr, M2_Address hookfnc_addr, size_t len)
 {
-    ScopedProtect(target_addr, len);
-    std::vector<Byte> patch_data(len, 0x90);
-    patch_data[0] = X86Instructions::JMP;
-    *reinterpret_cast<M2_Address *>(patch_data.data() + 1) = hookfnc_addr - (target_addr + 5);
-    std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
-    // zpl_memcopy(reinterpret_cast<std::vector<Byte>::value_type*>(target_addr), patch_data.data(), patch_data.size());
-    return target_addr + len;
+	return (M2_Address)InstallDetourPatchInternal(target_addr, hookfnc_addr, JMP, len);
+
+    //ScopedProtect(target_addr, len);
+    //std::vector<Byte> patch_data(len, 0x90);
+    //patch_data[0] = X86Instructions::JMP;
+    //*reinterpret_cast<M2_Address *>(patch_data.data() + 1) = hookfnc_addr - (target_addr + 5);
+    //std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
+    //// zpl_memcopy(reinterpret_cast<std::vector<Byte>::value_type*>(target_addr), patch_data.data(), patch_data.size());
+    //return target_addr + len;
 }
 
 
 void Mem::Utilites::InstallNopPatch(uint32_t dwAddress, int iSize)
 {
-    ScopedProtect(dwAddress, iSize);
-    memset((void *)dwAddress, NOP, iSize);
+	DWORD dwAddr = dwAddress;
+	ProtectionInfo protectionInfo = Unprotect(dwAddr, iSize);
+	memset((void *)dwAddr, NOP, iSize);
+	Reprotect(protectionInfo);
+
+    //ScopedProtect(dwAddress, iSize);
+    //memset((void *)dwAddress, NOP, iSize);
 }
 
 bool Mem::Utilites::bDataCompare(const unsigned char * pData, const unsigned char * bMask, const char * szMask)
@@ -257,4 +313,4 @@ void Mem::Initialize(void)
     }
 }
 
-#endif // MAFIA_SDK_IMPLEMENTATION
+#endif // MAFIA2_SDK_IMPLEMENTATION
