@@ -22,8 +22,12 @@ using namespace Galactic3D;
 #include <LauncherVersion.h>
 #include "AdditionalPackets.h"
 
-#define MAFIA_SDK_IMPLEMENTATION
+#ifndef MAFIA2_SDK_IMPLEMENTATION
+#define MAFIA2_SDK_IMPLEMENTATION
+#endif
 #include <m2sdk.h>
+
+//#pragma comment(lib, "m2sdk.lib")
 
 extern tHack* g_pHack;
 extern Context* g_pContext;
