@@ -240,30 +240,32 @@ HCURSOR WINAPI HookSetCursor(HCURSOR hCursor)
 	return nullptr;
 }
 
-static void InitialiseWindowHacks() 
+static void InitialiseWindowHacks()
 {
 	HMODULE hEngineModule = GetModuleHandleA("LS3DF.dll");
-	CHacks::GetImportLookups(hEngineModule, "user32.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
-		if (pszName != nullptr) {
-			/*if (strcmp(pszName, "RegisterClassA") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassA);
-			else if (strcmp(pszName, "RegisterClassW") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassW);*/
-			if (strcmp(pszName, "RegisterClassExA") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassExA);
-			/*else if (strcmp(pszName, "RegisterClassExW") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassExW);*/
-			else if (strcmp(pszName, "CreateWindowExA") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookCreateWindowExA);
-			/*else if (strcmp(pszName, "CreateWindowExW") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookCreateWindowExW);*/
-			else if (strcmp(pszName, "ShowCursor") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookShowCursor);
-			else if (strcmp(pszName, "SetCursor") == 0)
-				new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookSetCursor);
-		}
-		return true;
-	});
+	if (hEngineModule != nullptr) {
+		CHacks::GetImportLookups(hEngineModule, "user32.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
+			if (pszName != nullptr) {
+				/*if (strcmp(pszName, "RegisterClassA") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassA);
+				else if (strcmp(pszName, "RegisterClassW") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassW);*/
+				if (strcmp(pszName, "RegisterClassExA") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassExA);
+				/*else if (strcmp(pszName, "RegisterClassExW") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookRegisterClassExW);*/
+				else if (strcmp(pszName, "CreateWindowExA") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookCreateWindowExA);
+				/*else if (strcmp(pszName, "CreateWindowExW") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookCreateWindowExW);*/
+				else if (strcmp(pszName, "ShowCursor") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookShowCursor);
+				else if (strcmp(pszName, "SetCursor") == 0)
+					new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookSetCursor);
+			}
+			return true;
+		});
+	}
 }
 
 bool g_bHackEventTriggered_Load = false;
@@ -277,6 +279,7 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		g_bHackEventTriggered_Load = true;
 		tHackEventDataLoad* pData2 = static_cast<tHackEventDataLoad*>(pData);
 		g_pHack = pData2->m_pHack;
+
 		InitialiseWindowHacks();
 		return HACKEVENTRESULT_NORMAL;
 	}
