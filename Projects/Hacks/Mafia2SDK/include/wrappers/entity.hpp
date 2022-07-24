@@ -23,18 +23,19 @@ namespace M2
     };
 };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
 
 static M2::Wrappers::ModelManager *pModelManager = new M2::Wrappers::ModelManager();
 
-void M2::Wrappers::PreloadModels()
+inline void M2::Wrappers::PreloadModels()
 {
     if (!pModelManager) {
         return;
     }
     pModelManager->PreloadAllModels();
 }
-M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
+
+inline M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
 {
     if (!pModelManager) {
         return nullptr;
@@ -139,7 +140,7 @@ M2::C_Entity *M2::Wrappers::CreateEntity(eEntityType type, int modelID)
     return entity;
 }
 
-bool M2::Wrappers::DestroyEntity(C_Entity *entity, eEntityType type)
+inline bool M2::Wrappers::DestroyEntity(C_Entity *entity, eEntityType type)
 {
     if (entity == nullptr) {
         m2sdk_log("entity null\n");
@@ -163,4 +164,4 @@ bool M2::Wrappers::DestroyEntity(C_Entity *entity, eEntityType type)
 }
 
 
-#endif // MAFIA_SDK_IMPLEMENTATION
+#endif // MAFIA2_SDK_IMPLEMENTATION

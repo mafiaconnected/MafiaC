@@ -15,10 +15,10 @@ namespace M2
 
     };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_CarActionThrowFrom_Hooks
     {
-        void HookTestAction(std::function<bool(C_Car *)>);
+        inline void HookTestAction(std::function<bool(C_Car *)>);
 
         namespace FunctionPointers
         {
@@ -58,7 +58,7 @@ namespace M2
             }
         };
 
-        void HookTestAction(std::function<bool(C_Car *)> ptr)
+        inline void HookTestAction(std::function<bool(C_Car *)> ptr)
         {
             FunctionPointers::testAction = ptr;
             Mem::Hooks::InstallJmpPatch(0xA3F189, (DWORD)NakedFunctions::CCarActionThrowFrom__TestAction__Hook);

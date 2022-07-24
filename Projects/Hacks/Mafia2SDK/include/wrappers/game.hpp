@@ -25,7 +25,6 @@ namespace M2
             }
             else {
                 M2::C_RangeMeter::Get()->OpenSeason(140);
-
             }
         }
 

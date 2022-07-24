@@ -91,7 +91,7 @@ namespace M2
         }
     };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
 
     namespace C_Door_Hooks
     {
@@ -115,7 +115,7 @@ namespace M2
 
         namespace NakedFunctions
         {
-            __declspec(naked) void SolveContact()
+            inline void __declspec(naked) SolveContact()
             {
                 __asm {
                     sub esp, 10h;
@@ -123,7 +123,7 @@ namespace M2
 
                     pushad;
                 }
-                
+
                 static C_Door *instance = nullptr;
                 static S_ContactEventInfo info;
                 static void *infoPtr = nullptr;
@@ -152,7 +152,7 @@ namespace M2
             }
         }
 
-        void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const& ev, E_DoorContactType contactType)> ptr)
+        inline void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const& ev, E_DoorContactType contactType)> ptr)
         {
            FunctionPointers::solveContact = ptr;
 

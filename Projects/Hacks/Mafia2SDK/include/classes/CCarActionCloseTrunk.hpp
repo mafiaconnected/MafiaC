@@ -20,7 +20,7 @@ namespace M2
 
     };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_CarActionCloseTrunk_Hooks
     {
         void HookTestAction(std::function<bool(C_Car *)>);

@@ -62,14 +62,13 @@ typedef void (*m2sdk_callback)(void);
 typedef void (*m2sdk_callback_event)(m2sdk_event *);
 
 namespace M2 {
+    inline void Initialize(m2sdk_callback callback);
+    inline void InitializeSDKHandlers();
+    inline void Free();
 
-    void Initialize(m2sdk_callback callback);
-    void InitializeSDKHandlers();
-    void Free();
-
-    void AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback);
-    void DetachHandler(m2sdk_event_id id);
-    void TriggerHandler(m2sdk_event_id id, m2sdk_event *data);
+    inline void AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback);
+    inline void DetachHandler(m2sdk_event_id id);
+    inline void TriggerHandler(m2sdk_event_id id, m2sdk_event *data);
 
     template < typename T, typename I, M2_Address A > class GameClassWrapperStatic {
     public:
@@ -225,7 +224,7 @@ namespace M2 {
 #include "wrappers/radio.hpp"
 #include "wrappers/config.hpp"
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
 
 #define _SCL_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -444,28 +443,29 @@ void __declspec(naked) LoadCityPartsHook()
 // !
 // =======================================================================//
 
-std::unordered_map<m2sdk_event_id, m2sdk_callback_event> g_events;
-
-void M2::AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback) {
-    g_events[id] = callback;
+inline void M2::AttachHandler(m2sdk_event_id id, m2sdk_callback_event callback) {
+    std::unordered_map<m2sdk_event_id, m2sdk_callback_event> pEvents;
+    pEvents[id] = callback;
 }
 
-void M2::DetachHandler(m2sdk_event_id id) {
-    g_events[id] = nullptr;
+inline void M2::DetachHandler(m2sdk_event_id id) {
+    std::unordered_map<m2sdk_event_id, m2sdk_callback_event> pEvents;
+    pEvents[id] = nullptr;
 }
 
-void M2::TriggerHandler(m2sdk_event_id id, m2sdk_event *data) {
-    auto pair = g_events.find(id);
-    if (pair != g_events.end() && pair->second) {
+inline void M2::TriggerHandler(m2sdk_event_id id, m2sdk_event *data) {
+    std::unordered_map<m2sdk_event_id, m2sdk_callback_event> pEvents;
+    auto pair = pEvents.find(id);
+    if (pair != pEvents.end() && pair->second) {
         pair->second(data);
     }
 }
 
-extern void m2sdk_preinit();
+//extern void m2sdk_preinit();
 
-void M2::Initialize(m2sdk_callback callback) {
+inline void M2::Initialize(m2sdk_callback callback) {
     g_gamemodule_callback = callback;
-    m2sdk_preinit();
+    //m2sdk_preinit();
 
     Mem::Initialize();
 
@@ -531,7 +531,7 @@ void M2::Initialize(m2sdk_callback callback) {
     InitializeSDKHandlers();
 }
 
-void M2::InitializeSDKHandlers()
+inline void M2::InitializeSDKHandlers()
 {
     M2::C_Door_Hooks::HookSolveContact([&](C_Door *instance, S_ContactEventInfo const& ev, E_DoorContactType contactType) {
         //instance->Lock();
@@ -627,8 +627,8 @@ void M2::InitializeSDKHandlers()
     });
 }
 
-void M2::Free() {}
+inline void M2::Free() {}
 
-#endif // MAFIA_SDK_IMPLEMENTATION
+#endif // MAFIA2_SDK_IMPLEMENTATION
 
 #endif // M2SDK_H

@@ -145,7 +145,7 @@ namespace M2
         }
 	};
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_Human2_Hooks
     {
         void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)>);
@@ -178,7 +178,7 @@ namespace M2
         {
             DWORD MineDeathHook_JumpBack = 0x00990CFF;
             DWORD _CHuman2__SetupDeath = 0x0098C160;
-            void __declspec(naked) CHuman2__SetupDeath_Hook()
+            inline void __declspec(naked) CHuman2__SetupDeath_Hook()
             {
                 __asm {
                     pushad
@@ -198,7 +198,7 @@ namespace M2
 
             DWORD _CHuman2__DoDamage = 0x09907D0;
             DWORD _DoDamage__JumpBack = 0x042FC6F;
-            __declspec(naked) void CHuman2__DoDamage__Hook()
+            inline void __declspec(naked) CHuman2__DoDamage__Hook()
             {
                 __asm
                 {
@@ -218,13 +218,13 @@ namespace M2
             }
         };
 
-        void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
+        inline void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
         {
             FunctionPointers::setupDeath = ptr;
             Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)NakedFunctions::CHuman2__SetupDeath_Hook);
         }
 
-        void HookDoDamage(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
+        inline void HookDoDamage(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
         {
             FunctionPointers::doDamage = ptr;
             Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)NakedFunctions::CHuman2__DoDamage__Hook);

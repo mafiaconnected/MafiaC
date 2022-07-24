@@ -20,10 +20,10 @@ namespace M2
 
     };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_CarActionOpenTrunk_Hooks
     {
-        void HookTestAction(std::function<bool(C_Car *)>);
+        inline void HookTestAction(std::function<bool(C_Car *)>);
 
         namespace FunctionPointers
         {
@@ -65,7 +65,7 @@ namespace M2
             }
         };
 
-        void HookTestAction(std::function<bool(C_Car *)> ptr)
+        inline void HookTestAction(std::function<bool(C_Car *)> ptr)
         {
             FunctionPointers::testAction = ptr;
             Mem::Hooks::InstallJmpPatch(0xA3EC95, (DWORD)NakedFunctions::CCarActionOpenTrunk__TestAction__Hook);

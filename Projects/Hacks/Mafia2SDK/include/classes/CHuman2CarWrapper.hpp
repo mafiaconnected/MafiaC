@@ -42,10 +42,10 @@ namespace M2
         }
     };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_Human2CarWrapper_Hooks
     {
-        void HookIsFreeToGetIn(std::function<bool(C_Car *)>);
+        inline void HookIsFreeToGetIn(std::function<bool(C_Car *)>);
 
         namespace FunctionPointers
         {
@@ -69,7 +69,7 @@ namespace M2
             C_Car *tryCar = nullptr;
             C_Human2CarWrapper *carWrapper;
             bool tryAnswer = false;
-            void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
+            inline void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
             {
                 __asm {
                     mov carWrapper, esi;
@@ -88,7 +88,7 @@ namespace M2
             }
         };
 
-        void HookIsFreeToGetIn(std::function<bool(C_Car *)> ptr)
+        inline void HookIsFreeToGetIn(std::function<bool(C_Car *)> ptr)
         {
             FunctionPointers::isFreeToGetIn = ptr;
             Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)NakedFunctions::CHuman2CarWrapper__IsFreeToGetIn__Hook);

@@ -284,7 +284,7 @@ namespace M2
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x91DAF0, this, permission);
         }
-        
+
         void ScrSetCarAttackPermission(bool permission)
         {
             Mem::InvokeFunction<Mem::call_this, int>(0x91DAD0, this, permission);
@@ -442,7 +442,7 @@ namespace M2
 	};
 };
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
 
 namespace M2 {
 
@@ -484,4 +484,4 @@ namespace M2 {
     }
 }
 
-#endif // MAFIA_SDK_IMPLEMENTATION
+#endif // MAFIA2_SDK_IMPLEMENTATION

@@ -58,10 +58,10 @@ namespace M2
         }
 	};
 
-#ifdef MAFIA_SDK_IMPLEMENTATION
+#ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_Player2_Hooks
     {
-        void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)>);
+        inline void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)>);
 
         namespace FunctionPointers
         {
@@ -105,7 +105,7 @@ namespace M2
             }
         };
 
-        void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> ptr)
+        inline void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> ptr)
         {
             FunctionPointers::enterCar = ptr;
             Mem::Hooks::InstallJmpPatch(0x437935, (DWORD)NakedFunctions::CPlayer2__EnterCar);
