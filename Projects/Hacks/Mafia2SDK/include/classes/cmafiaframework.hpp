@@ -26,19 +26,34 @@ namespace M2
 			Mem::InvokeFunction<Mem::call_this, int>(0x58C0B0, this, active);
 		}
 
+		static bool GetActive()
+		{
+			return Mem::InvokeFunction<Mem::call_this, int>(0x58C0B0);
+		}
+
 		void SetAudioSilent(bool silent)
 		{
 			Mem::InvokeFunction<Mem::call_this, int>(0x05985E0, this, silent);
 		}
 
-		void SetMinized(bool minized)
+		void SetMinimized(bool minimized)
 		{
-			Mem::InvokeFunction<Mem::call_this, bool>(0x058C090, this, minized);
+			Mem::InvokeFunction<Mem::call_this, bool>(0x058C090, this, minimized);
 		}
 
-		void SetPause(bool pause)
+		static bool GetMinimized()
 		{
-			Mem::InvokeFunction<Mem::call_this, bool>(0x058C120, this, pause);
+			return Mem::InvokeFunction<Mem::call_this, bool>(0x058C0F0);
+		}
+
+		void SetPaused(bool paused)
+		{
+			Mem::InvokeFunction<Mem::call_this, bool>(0x058C120, this, paused);
+		}
+
+		static bool GetPaused()
+		{
+			return Mem::InvokeFunction<Mem::call_this, bool>(0x058C0F0);
 		}
 	};
 };
