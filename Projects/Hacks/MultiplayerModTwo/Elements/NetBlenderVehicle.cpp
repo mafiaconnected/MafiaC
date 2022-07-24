@@ -38,6 +38,8 @@ void CNetBlenderVehicleII::SetTargetRotation(CVector3D& frontNew, CVector3D& upN
 {
 	UpdateTargetRotation();
 
+	// This stuff is for Mafia 1. Needs updated to Mafia 2
+	/*
 	CVector3D frontLocal, upLocal, rightLocal;
 	GetVehicleRotation(frontLocal, upLocal, rightLocal);
 
@@ -47,10 +49,13 @@ void CNetBlenderVehicleII::SetTargetRotation(CVector3D& frontNew, CVector3D& upN
 	m_RotationFront.SetTarget(frontNew, vecErrorFront, m_uiDelay);
 	m_RotationUp.SetTarget(upNew, vecErrorUp, m_uiDelay);
 	m_RotationRight.SetTarget(rightNew, vecErrorRight, m_uiDelay);
+	*/
 }
 
 void CNetBlenderVehicleII::UpdateTargetRotation()
 {
+	// This stuff is for Mafia 1. Needs updated to Mafia 2
+	/*
 	CVector3D vecCurrentRotationFront;
 	CVector3D vecCurrentRotationUp;
 	CVector3D vecCurrentRotationRight;
@@ -77,6 +82,7 @@ void CNetBlenderVehicleII::UpdateTargetRotation()
 	}
 
 	SetVehicleRotation(vecNewRotationFront, vecNewRotationUp, vecNewRotationRight);
+	*/
 }
 
 
@@ -113,19 +119,6 @@ void CNetBlenderVehicleII::SetRotation(const CVector3D& vecRotation)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderVehicleII::GetVehicleRotation(CVector3D& vecRotationFront, CVector3D& vecRotationUp, CVector3D& vecRotationRight)
-{
-	m_pEntity->GetVehicleRotation(vecRotationFront, vecRotationUp, vecRotationRight);
-}
-
-void CNetBlenderVehicleII::SetVehicleRotation(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight)
-{
-	auto pBlender = m_pEntity->m_pBlender;
-	m_pEntity->m_pBlender = nullptr;
-	m_pEntity->SetVehicleRotation(vecRotationFront, vecRotationUp, vecRotationRight);
-	m_pEntity->m_pBlender = pBlender;
-}
-
 void CNetBlenderVehicleII::GetMoveSpeed(CVector3D& vecMoveSpeed)
 {
 	m_pEntity->GetVelocity(vecMoveSpeed);
@@ -146,6 +139,7 @@ void CNetBlenderVehicleII::SetTurnSpeed(const CVector3D& vecTurnSpeed)
 	m_pEntity->SetRotationVelocity(vecTurnSpeed);
 }
 
+/*
 float CNetBlenderVehicleII::GetEngineRPM()
 {
 	return m_pEntity->GetEngineRPM();
@@ -193,3 +187,4 @@ void CNetBlenderVehicleII::UpdateTargetEngineRPM()
 		SetWheelAngle(vecNewEngineRPM);
 	}
 }
+*/

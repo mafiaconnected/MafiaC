@@ -51,9 +51,6 @@ public:
 	virtual bool SetHeading(float heading) override;
 	virtual float GetHeading() override;
 
-	virtual bool SetVehicleRotation(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight);
-	virtual bool GetVehicleRotation(CVector3D& rotationFront, CVector3D& rotationUp, CVector3D& rotationRight);
-
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
 

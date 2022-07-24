@@ -32,9 +32,6 @@ public:
 	virtual void GetRotation(CVector3D& vecRotation) override;
 	virtual void SetRotation(const CVector3D& vecRotation) override;
 
-	virtual void GetVehicleRotation(CVector3D& vecRotationFront, CVector3D& vecRotationUp, CVector3D& vecRotationRight);
-	virtual void SetVehicleRotation(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight);
-
 	virtual void GetMoveSpeed(CVector3D& vecMoveSpeed) override;
 	virtual void SetMoveSpeed(const CVector3D& vecMoveSpeed) override;
 
@@ -47,11 +44,12 @@ public:
 
 	virtual float GetTargetWheelAngle();
 	virtual void SetTargetWheelAngle(float wheelAngle);
-	*/
+
 
 	virtual float GetEngineRPM();
 	virtual void SetEngineRPM(float engineRPM);
 
 	virtual float GetWheelAngle();
 	virtual void SetWheelAngle(float wheelAngle);
+	*/
 };
