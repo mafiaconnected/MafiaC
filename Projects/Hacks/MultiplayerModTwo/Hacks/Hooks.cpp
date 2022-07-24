@@ -22,11 +22,10 @@ extern IDirect3D9* WINAPI HookDirect3DCreate9(UINT SDKVersion);
 extern Direct3D9* g_pD3D9;
 extern IDirect3DDevice9* g_pD3DDevice;
 extern C2D* g_p2DII;
-extern SDL_Window* g_pWindow;
+//extern std::unordered_map<m2sdk_event_id, m2sdk_callback_event> g_events;
 
 static void OnGameInitII()
 {
-	
 	g_pClientGame->OnPreStartInGame(false);
 	g_pClientGame->OnStartInGame(false);
 
@@ -64,17 +63,28 @@ static void OnRender2DStuffII()
 	{
 		g_pD3D9->SetAllStatesAgain();
 
-		int width;
-		int height;
-		SDL_GetWindowSize(g_pWindow, &width, &height);
+		int width = 0;
+		int height = 0;
 
-		g_p2DII->SetViewport(CVector2D(0, 0), CVector2D((float)width, (float)height));
-		if (g_p2DII->Begin2D(g_pD3D9))
+		if (M2::C_MafiaFramework::GetActive())
 		{
-			g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
-			g_pClientGame->OnRender2DStuff();
-			g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
-			g_p2DII->End2D();
+			HWND pWindow = GetActiveWindow();
+			RECT rect;
+
+			if (GetWindowRect(pWindow, &rect))
+			{
+				width = rect.right - rect.left;
+				height = rect.bottom - rect.top;
+			}
+
+			g_p2DII->SetViewport(CVector2D(0, 0), CVector2D((float)width, (float)height));
+			if (g_p2DII->Begin2D(g_pD3D9))
+			{
+				g_pClientGame->m_pGalacticFunctions->m_p2D = &g_pClientGame->m_p2D;
+				g_pClientGame->OnRender2DStuff();
+				g_pClientGame->m_pOnDrawnHUDEventType->Trigger();
+				g_p2DII->End2D();
+			}
 		}
 	}
 }
@@ -149,105 +159,104 @@ void CGameHooksII::InstallHooks()
 	//	printf("[game-event] ped entering the car on seat: %d\n", seat);
 	//});
 
-    M2::AttachHandler(M2_EVENT_MOD_MESSAGE, [](m2sdk_event* data) {
-        auto message = (int)data->arg1;
+	M2::Initialize([]() {
+		M2::AttachHandler(M2_EVENT_MOD_MESSAGE, [](m2sdk_event* data) {
+			auto message = (int)data->arg1;
 
-        switch (message) {
-            case M2::E_PlayerMessage::MESSAGE_MOD_ENTER_CAR: {
-                auto ped = (M2::C_Human2*)data->arg1;
-                auto car = (M2::C_Car*)data->arg2;
-                auto seat = (uint32_t)data->arg3;
-                g_pClientGame->HumanEnteringVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
-            } 
-            break;
+			switch (message) {
+				case M2::E_PlayerMessage::MESSAGE_MOD_ENTER_CAR: {
+					auto ped = (M2::C_Human2*)data->arg1;
+					auto car = (M2::C_Car*)data->arg2;
+					auto seat = (uint32_t)data->arg3;
+					g_pClientGame->HumanEnteringVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
+				} break;
 
-            case M2::E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR: {
-                // Todo
-            } 
-            break;
+				case M2::E_PlayerMessage::MESSAGE_MOD_BREAKIN_CAR: {
+					// Todo
+				} break;
 
-            case M2::E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR: {
-                auto ped = (M2::C_Human2*)data->arg1;
-                auto car = (M2::C_Car*)data->arg2;
-                auto seat = (uint32_t)data->arg3;
-                g_pClientGame->HumanExitingVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
-            }
-            break;
-        }
-        });
+				case M2::E_PlayerMessage::MESSAGE_MOD_LEAVE_CAR: {
+					auto ped = (M2::C_Human2*)data->arg1;
+					auto car = (M2::C_Car*)data->arg2;
+					auto seat = (uint32_t)data->arg3;
+					g_pClientGame->HumanExitingVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
+				} break;
+			}
+		});
 
-    M2::AttachHandler(M2_EVENT_GAME_MESSAGE, [](m2sdk_event* data) {
-        auto message = (M2::C_EntityMessage*)data->arg1;
+		M2::AttachHandler(M2_EVENT_GAME_MESSAGE, [](m2sdk_event* data) {
+			auto message = (M2::C_EntityMessage*)data->arg1;
 
-        switch (message->m_dwMessage) {
-        case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE: {
-            auto ped = (M2::C_Human2*)data->arg1;
-            auto car = (M2::C_Car*)data->arg2;
-            auto seat = (uint32_t)data->arg3;
-            g_pClientGame->HumanExitedVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
-        } break;
+			switch (message->m_dwMessage) {
+				case M2::E_HumanMessage::MESSAGE_GAME_ENTER_EXIT_VEHICLE_DONE: {
+					auto ped = (M2::C_Human2*)data->arg1;
+					auto car = (M2::C_Car*)data->arg2;
+					auto seat = (uint32_t)data->arg3;
+					g_pClientGame->HumanExitedVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
+				} break;
 
-        default: {
-            //mod_log("[game-event] unknown event %d\n", (int)message->m_dwMessage);
-        } break;
-        }
-    });
+				default: {
+					//mod_log("[game-event] unknown event %d\n", (int)message->m_dwMessage);
+				} break;
+			}
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_ENTER_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-    });
+		M2::AttachHandler(M2_EVENT_CAR_ENTER_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_HOOD_OPEN_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-    });
+		M2::AttachHandler(M2_EVENT_CAR_HOOD_OPEN_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_HOOD_CLOSE_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-        });
+		M2::AttachHandler(M2_EVENT_CAR_HOOD_CLOSE_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_TRUNK_OPEN_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-    });
+		M2::AttachHandler(M2_EVENT_CAR_TRUNK_OPEN_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+			});
 
-    M2::AttachHandler(M2_EVENT_CAR_TRUNK_CLOSE_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-    });
+		M2::AttachHandler(M2_EVENT_CAR_TRUNK_CLOSE_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_FUELTANK_REQUEST, [](m2sdk_event* data) {
-        data->arg5 = (void*)true;
-    });
+		M2::AttachHandler(M2_EVENT_CAR_FUELTANK_REQUEST, [](m2sdk_event* data) {
+			data->arg5 = (void*)true;
+		});
 
-    M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event* data) {
-        auto ped = (M2::C_Human2*)data->arg1;
-        auto car = (M2::C_Car*)data->arg2;
-        auto seat = (uint32_t)data->arg3;
-        g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
-    });
+		M2::AttachHandler(M2_EVENT_CAR_ENTER, [](m2sdk_event* data) {
+			auto ped = (M2::C_Human2*)data->arg1;
+			auto car = (M2::C_Car*)data->arg2;
+			auto seat = (uint32_t)data->arg3;
+			g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
+		});
 
-    /*
-	M2::C_Player2_Hooks::HookAddSpecCommand([&](M2::E_SpecCommand type) {
-        switch (type)
-        {
-            case M2::E_SpecCommand::HOLSTER:
-                // OnPlayerHolsterWeapon
-                break;
+		/*
+		M2::C_Player2_Hooks::HookAddSpecCommand([&](M2::E_SpecCommand type) {
+			switch (type)
+			{
+				case M2::E_SpecCommand::HOLSTER:
+					// OnPlayerHolsterWeapon
+					break;
 
-            case M2::E_SpecCommand::RELOAD:
-                // OnPlayerReloadWeapon
-                break;
+				case M2::E_SpecCommand::RELOAD:
+					// OnPlayerReloadWeapon
+					break;
 
-            case M2::E_SpecCommand::SHOT:
-                // OnPlayerShoot
-                break;
+				case M2::E_SpecCommand::SHOT:
+					// OnPlayerShoot
+					break;
 
-            case M2::E_SpecCommand::SWITCH_NEXT:
-                // OnPlayerSwitchNextWeapon
-                break;
+				case M2::E_SpecCommand::SWITCH_NEXT:
+					// OnPlayerSwitchNextWeapon
+					break;
 
-            case M2::E_SpecCommand::SWITCH_PREV:
-                // OnPlayerSwitchPreviousWeapon
-                break;
-        }
-    });
-	*/
+				case M2::E_SpecCommand::SWITCH_PREV:
+					// OnPlayerSwitchPreviousWeapon
+					break;
+			}
+		});
+		*/
+	});
 }
