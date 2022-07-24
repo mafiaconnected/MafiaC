@@ -14,7 +14,7 @@ addEventHandler("OnMapLoaded", (event, mapName) => {
 	//	return false;
 	//}
 
-	game.setTrafficEnabled(true);
+	game.setTrafficEnabled(false);
 	game.createPlayer("TommyCOATHAT.i3d", new Vec3(-1981.51, -4.66, 29.37), 0.0);
 });
 
@@ -60,7 +60,7 @@ addCommandHandler("veh", (command, params, client) => {
 		return false;
 	}
 
-	let vehicle = game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(client.player.position, client.player.heading, 5), degToRad(client.player.heading));
+	let vehicle = game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(localPlayer.position, localPlayer.rotation.z, 5), localPlayer.rotation.z);
 
 	if(game.mapName == "FREERIDENOC") {
 		vehicle.lights = true;
@@ -170,7 +170,7 @@ function getSkinModelFromParams(params) {
 	//}
 
 	for(let i in skinModels) {
-		if(skinModels[i].toLowerCase().indexOf(params.toLowerCase()) == -1) {
+		if(skinModels[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
 			return skinModels[i];
 		}
 	}

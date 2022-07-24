@@ -287,7 +287,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (GetGameHuman() == nullptr)
 	{
 		// Note (Sevenisko): Spawn the PED only, the Multiplayer will take care of the local player assignment
-		Spawn(m_Position, CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation)), GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex);
+		Spawn(m_Position, CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation)), GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
 
 		IHuman = GetGameHuman()->GetInterface();
 	}

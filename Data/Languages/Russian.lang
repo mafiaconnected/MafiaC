@@ -1,4 +1,6 @@
 ﻿[Language]
+name=Russian
+native_name=Русский
 author=keyb0red
 
 [Common]
@@ -10,6 +12,9 @@ language_German=Немецкий
 language_Italian=Итальянский
 language_Spanish=Испанский
 language_Russian=Русский
+language_Arabic=Arabic
+language_Chinese=Chinese (Simplified)
+language_Persian=Persian
 
 # Tips
 tip_Close=Закрыть это окно

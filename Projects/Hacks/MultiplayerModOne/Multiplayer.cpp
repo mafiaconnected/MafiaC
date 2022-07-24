@@ -758,7 +758,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
 				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
-				if (pClientHuman != nullptr) 
+				if (pClientHuman != nullptr)
 				{
 					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
@@ -961,29 +961,11 @@ void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
 {
 	if (!g_pClientGame->m_bStopMultiplayerGame)
 	{
-		const GChar* rgpszReasons[] = {
-			_gstr("TIMEOUT"),
-			_gstr("FULL"),
-			_gstr("UNSUPPORTED CLIENT"),
-			_gstr("UNSUPPORTED ENGINE"),
-			_gstr("WRONG PASSWORD"),
-			_gstr("UNSUPPORTED EXECUTABLE"),
-			_gstr("GRACEFUL"),
-			_gstr("BANNED"),
-			_gstr("FAILED"),
-			_gstr("INVALID NAME"),
-			_gstr("CRASH"),
-			_gstr("PUBLIC KEY MISMATCH"),
-			_gstr("NAME IN USE"),
-			_gstr("KICKED")
-		};
 		g_pClientGame->StopMultiplayerGameWhenSafe(uiReason);
-
-		char msg[128];
-		sprintf(msg, "Disconnected [%ws]", rgpszReasons[uiReason]);
+		g_pClientGame->ShowDisconnectReason();
 
 		//MafiaSDK::GetIndicators()->ConsoleAddText(msg, 0xFFFF0000);
-		g_pClientGame->m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[uiReason]);
+		//g_pClientGame->m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[uiReason]);
 	}
 }
 

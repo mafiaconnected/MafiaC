@@ -10,6 +10,7 @@
 #include <LucasFont/LucasFont.h>
 #include <Network/InternetRequestMgr.h>
 #include "Elements/Elements.h"
+#include "RmlUi.h"
 //#include <GameVersion.h>
 
 //eGameVersion g_GameVersion;
@@ -185,6 +186,10 @@ public:
 	litehtml::context m_BrowserContext;
 	CHtmlView* m_pHtmlView;
 
+#if MAFIAC_RMLUI
+	CRmlUi2* m_pRmlUi;
+#endif
+
 	bool m_bCapured;
 
 	bool m_bSupressNetworkedEntities;
@@ -225,6 +230,8 @@ public:
 	void RegisterCommands();
 	void ResetWorld(void);
 	void LoadLobbyResource(void);
+
+	void ShowDisconnectReason();
 
 	void OnProcess(void);
 	void OnFrame(void);
