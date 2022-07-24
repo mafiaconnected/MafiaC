@@ -359,7 +359,7 @@ void CClientGameII::ShutdownScripting(void)
 		delete m_pChatWindow;
 		m_pChatWindow = nullptr;
 	}
-	m_pClientManager->Forget();
+	//m_pClientManager->Forget();
 	m_pClientManager->Clear();
 	m_pResourceMgr->ClearAllResources();
 	delete m_pClientManager;
@@ -1025,12 +1025,12 @@ void CClientGameII::OnProcess(void)
 	if (m_pMultiplayer != NULL)
 	{
 		m_pMultiplayer->ProcessNewPeerElements();
-		m_pMultiplayer->ProcessEachFrame(pTime);
+		m_pMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pNewMultiplayer != nullptr)
 	{
-		m_pNewMultiplayer->ProcessEachFrame(pTime);
+		m_pNewMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pGalacticFunctions != nullptr)

@@ -188,7 +188,7 @@ void CGameHooksII::InstallHooks()
         } break;
 
         default: {
-            mod_log("[game-event] unknown event %d\n", (int)message->m_dwMessage);
+            //mod_log("[game-event] unknown event %d\n", (int)message->m_dwMessage);
         } break;
         }
     });
@@ -224,7 +224,8 @@ void CGameHooksII::InstallHooks()
         g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
     });
 
-    M2::C_Player2_Hooks::HookAddSpecCommand([&](M2::E_SpecCommand type) {
+    /*
+	M2::C_Player2_Hooks::HookAddSpecCommand([&](M2::E_SpecCommand type) {
         switch (type)
         {
             case M2::E_SpecCommand::HOLSTER:
@@ -248,4 +249,5 @@ void CGameHooksII::InstallHooks()
                 break;
         }
     });
+	*/
 }
