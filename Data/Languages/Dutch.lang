@@ -1,7 +1,7 @@
 ﻿[Language]
-name=English
-native_name=English
-author=Jack Powell
+name=Dutch
+native_name=Dutch
+author=Nexel
 
 [Common]
 
@@ -15,6 +15,7 @@ language_Russian=Russian
 language_Arabic=Arabic
 language_Chinese=Chinese (Simplified)
 language_Persian=Persian
+language_Dutch=Dutch
 
 # Tips
 tip_Close=Close this window.

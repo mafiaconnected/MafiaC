@@ -1,7 +1,7 @@
-﻿[Language]
+[Language]
 name=Polish
 native_name=Polski
-author=Kewun,DaviD1985
+author=rww, Kunio, DaviD1985
 
 [Common]
 
@@ -12,12 +12,14 @@ language_German=Niemiecki
 language_Italian=Włoski
 language_Spanish=Hiszpański
 language_Russian=Rosyjski
-language_Latvian=Łotewski
+language_Arabic=Arabski
+language_Chinese=Chiński (Uproszczony)
+language_Persian=Perski
 
 # Wskazówki
-tip_Close=Zamknij to okno.
-tip_Okay=Zamknij to okno zapisując zmiany.
-tip_Cancel=Zamknij to okno bez zapisywania zmian.
+tip_Close=Zamknij
+tip_Okay=Zamknij i zapisz zmiany
+tip_Cancel=Zamknij bez zapisywania zmian
 
 # Kolumny
 column_Name=Nazwa
@@ -25,8 +27,8 @@ column_Title=Tytuł
 column_Version=Wersja
 column_ModifiedDate=Data modyfikacji
 column_Description=Opis
-column_Key=Klawisz
-column_Value=Wartość
+column_Key=Reguły
+column_Value=Wartości
 
 # Przyciski
 button_Okay=OK
@@ -41,27 +43,27 @@ button_Abort=Anuluj
 
 # Menu
 menu_File=&Plik
-menu_CheckForUpdates=Sprawdź aktualizacje...
+menu_CheckForUpdates=Sprawdzanie aktualizacji...
 menu_Exit=Z&amknij
 
 menu_Server=&Serwer
-menu_AddServer=Dodaj Serwer
-menu_DeleteServer=Usuń Serwer
+menu_AddServer=Dodaj serwer
+menu_DeleteServer=Usuń serwer
 
 menu_Tools=&Narzędzia
 menu_Settings=&Ustawienia...
 menu_ResetSettings=Resetuj ustawienia...
-menu_DesktopShortcut=Skrót na pulpicie
+menu_DesktopShortcut=Utwórz skrót na pulpicie
+
+menu_View=&Widok
+menu_Players=&Lista graczy
+menu_Rules=&Panel informacji serwera
+menu_FullWidthRules=Powiększ panel informacji serwera
 
 menu_Help=&Pomoc
-menu_RunDiagnostics=Uruchom diagnostykę ...
-menu_About=&Info ...
-menu_FullWidthRules=Full &Width Rules
-
-menu_Help=&Pomoc
-menu_RunDiagnostics=Uruchom diagnostykę...
-menu_About=&O ...
-menu_Licenses=Wyświetl &Licencje...
+menu_RunDiagnostics=Uruchom &diagnostykę...
+menu_About=&O GTAC
+menu_FullWidthRules=Powiększ panel informacji serwera
 
 # Ogólne/Multiplayer
 menu_LargeIcons=Duże ikony
@@ -71,8 +73,8 @@ menu_AddToFavourites=Dodaj do ulubionych
 menu_Favourite=Ulubiony
 menu_CopyServerIP=Skopiuj adres IP serwera
 menu_CopyAddress=Kopiuj adres
-menu_ViewPlayerMap=Zobacz mapę gracza...
-menu_VisitWebsite=Odwiedź witrynę internetową...
+menu_ViewPlayerMap=Zobacz mapę graczy...
+menu_VisitWebsite=Odwiedź stronę internetową...
 
 # Menu kontekstowe modów
 menu_ResetAll=Zresetuj wszystko
@@ -80,7 +82,7 @@ menu_DisableAll=Wyłącz wszystko
 menu_Delete=Usuń
 
 # Otwórz menu
-menu_LauncherSettings=&Ustawienia programu uruchamiającego
+menu_LauncherSettings=&Ustawienia przeglądarki...
 menu_GameSettings=&Ustawienia gry...
 menu_Resources=Zasoby
 menu_Crashes=Crashe
@@ -88,7 +90,7 @@ menu_Caches=Pamięć podręczna
 menu_Logs=Logi
 
 # Messages
-message_ConfirmResetSettings=Czy jesteś pewien czy chcesz przywrócić launchera do ustawień fabrycznych?\nTa akcja nie może zostać przywrócona, a launcher ulegnie restartowi.
+message_ConfirmResetSettings=Czy jesteś pewny, że chcesz przywrócić przeglądarke GTAConnected do ustawień domyślnych?\nTej czynności nie można cofnąć, a po zresetowaniu, przeglądarka zostanie uruchomiony ponownie.
 
 # Zakładki
 tab_Favourites=Ulubione
@@ -99,7 +101,7 @@ tab_Local=Lokalne
 tab_Mods=Modyfikacje
 
 # Status
-status_Disconnected=Odłączono
+status_Disconnected=Rozłączono
 status_Connecting=Łączenie
 status_Connected=Połączono z listą serwerów
 
@@ -108,10 +110,10 @@ label_Game=Gra:
 label_GameEXEPath=Ścieżka EXE gry:
 
 # Wskazówki
-tip_Games=Gra do włączenia
+tip_Games=Nazwa gry.
 tip_CloseLauncher=Zamknij to okno przy włączeniu gry.
 tip_Launch=Włącz grę.
-tip_BrowseForGame=Przeszukaj ścieżkę i plik EXE gry.
+tip_BrowseForGame=Wskaż lokację pliku EXE gry.
 tip_ShowInExplorer=Pokaż plik EXE gry w {0}.
 tip_GameEXEPath=Ścieżka do pliku EXE gry.
 
@@ -122,13 +124,13 @@ column_GameMode=Tryb Gry
 
 # Group Boxes
 group_Players=Gracze
-group_Rules=Zasady
+group_Rules=Informacje serwera
 
 # Przyciski
 button_OpenMenu=Otwórz...
-button_CloseLauncher=Zamknij Launchera
+button_CloseLauncher=Zamknij przeglądarke
 button_Launch=Start
-button_ShowInExplorer=Pokaż w Eksploratorze {0}
+button_ShowInExplorer=Pokaż w przeglądarce {0}
 button_BrowseForGame=Przeszukaj...
 
 [AboutWindow]
@@ -137,8 +139,8 @@ windowTitle=Info
 group_About=Info
 
 # Labels
-label_Product=Produkt:
-label_Copyright=Prawa autorskie \xC2\xA9 {0} {1}
+label_Product=Projekt:
+label_Copyright=Copyright © {0} {1}
 label_Version=Wersja:
 label_GitBranch=Git Branch:
 label_GitCommitHash=Git Commit Hash:
@@ -152,7 +154,7 @@ label_Developers=Deweloperzy:
 
 [SettingsWindow]
 
-windowTitle=Ustawienia launchera
+windowTitle=Ustawienia przeglądarki
 gameSettingsTitle=Ustawienia gry
 
 # Zakładki
@@ -161,67 +163,68 @@ tab_AdditionalResourcesFolders=Dodatkowe foldery z zasobami
 tab_AdditionalMods=Dodatkowe modyfikacje
 tab_Display=Ekran
 tab_Advanced=Zaawansowane
-tab_NonModHacks=Haki bez modów
+tab_NonModHacks=Non-mod Hacks
 tab_Licenses=Licencje
 tab_Language=Język
 tab_BugFixes=Poprawki błędów
-tab_Debug=Debuguj
+tab_Debug=Debugowanie
 
 # Etykiety
-label_Name=Pseudonim:
+label_Name=Nick:
 
 # Additional resource folders
-button_ResourceAdd=Dodaj zasób...
+button_ResourceAdd=Dodaj...
 tip_ResourceAdd=Dodaje nowy folder z zasobami.
 
 button_ResourceRemove=Usuń
 tip_ResourceRemove=Usuwa zaznaczony folder z zasobami.
 
 button_ResourceUp=Góra
-tip_ResourceUp=Przenosi folder z zasobami w górę
+tip_ResourceUp=Przenosi folder z zasobami do góry.
 
 button_ResourceDown=Dół
 tip_ResourceDown=Przenosi folder z zasobami w dół.
 
-tip_ResourceOpen=Otwórz folder z zasobami {0}.
+tip_ResourceOpen=Otwórz zaznaczony folder z zasobami {0}.
 button_ResourceOpen=Otwórz
 
 # Opcje
-opt_KeepSavedGamesSeparate=Zachowaj zapisane gry osobno
+opt_KeepSavedGamesSeparate=Zachowaj zapisy gry osobno
 opt_KeepScreenshotsSeparate=Zachowaj zrzuty ekranu osobno
-opt_SaveCrashDump=Zapisz logi crasha
+opt_SaveCrashDump=Zapiuj logi crashy
 opt_CheckForUpdates=Sprawdź aktualizacje
-opt_TerminateOnCrash=Wyłącz launcher przy crashu
+opt_Assertions=Asercje
+opt_DebugMode=Tryb debugowania
+opt_TerminateOnCrash=Wyłącz przeglądarke przy crashu
 opt_VerboseLogging=Logowanie dodatkowe
 opt_GameOutput=Pokaż wszelkie działania gry w konsoli
 opt_MultithreadedNetworking=Sieci wielowątkowe
 opt_SCM=SCM
 opt_DisableStoryMode=Wyłącz tryb fabularny
 
-opt_AlwaysUsePrimaryMonitorResolution=Zawsze używaj rozdzielczość pierwszego monitora
-opt_AutomaticAspectRatio=Automatyczny przedział ekranu
-opt_InvisibleObjectsFix=Napraw niewidzialne obiekty
-tip_InvisibleObjectsFix=Ta opcja naprawia niektóre obiekty które są traktowanie jako wielkie budowle..\nW Grand Theft Auto: III to zawiera magnesy na samochody w dokach Portland.\nW Liberty City - Pozostałośći są naprawiane przy ustawieniu dystansu renderowania na niższy.\nKiedy  ta naprawa jest zastosowana, nie mozna zobaczyc magnesow z daleka.\nPoprawną naprawą jest ustawienie nie-lodowych modeli jako lodowe.
-opt_VCTrails=Vice City ślady
-tip_VCTrails=Włącza ślady w Vice City
-opt_AutoSave=Automatyczny Zapis
+opt_AlwaysUsePrimaryMonitorResolution=Zawsze używaj rozdzielczości głównego monitora
+opt_AutomaticAspectRatio=Auto aspect ratio (aka. widescreen fix)
+tip_AutomaticAspectRatio=asdlong
+opt_VCTrails=Vice City trails (ślady)
+tip_VCTrails=Włącza dodatkowe efekty w Vice City, znane z PS2.
+opt_AutoSave=Automatyczny zapis
 opt_SyncAnimations=Synchronizuj animacje
 opt_AllowDirectConnections=Zezwalaj na połączenia bezpośrednie (peer-to-peer)
 
 [TestingWindow]
 
-windowTitle=Testowanie
-label_Message=Proszę wprowadź kod dostępu do testowania:
+windowTitle=Testing
+label_Message=Wprowadź hasło testera:
 
 [PasswordWindow]
 
-windowTitle=Hasło
-label_Message=Proszę wprowadź hasło do serwera:
+windowTitle=Podaj hasło
+label_Message=Wprowadź hasło, aby połączyć się z serwerem:
 
 [AddServerWindow]
 
-windowTitle=Dodaj Serwer
-label_Message=Wpisz od serwera IP:PORT...
+windowTitle=Dodaj serwer
+label_Message=Wprowadź adres serwera - IP:PORT
 
 [PlayerMapWindow]
 
