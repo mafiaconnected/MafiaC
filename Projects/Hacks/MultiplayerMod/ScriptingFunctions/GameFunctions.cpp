@@ -292,6 +292,13 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_THREE"), GAME_MAFIA_THREE);
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_ONE_DE"), GAME_MAFIA_ONE_DE);
 
+	// Script Compatibility
+	pDefineHandlers->Define(_gstr("GAME_GTA_III"), 1);
+	pDefineHandlers->Define(_gstr("GAME_GTA_VC"), 2);
+	pDefineHandlers->Define(_gstr("GAME_GTA_SA"), 3);
+	pDefineHandlers->Define(_gstr("GAME_GTA_IV"), 5);
+	pDefineHandlers->Define(_gstr("GAME_GTA_IV_EFLC"), 6);
+
 	pDefineHandlers->Define(_gstr("WEAPON_KNUCKLEDUSTER"), 2);
 	pDefineHandlers->Define(_gstr("WEAPON_KNIFE"), 3);
 	pDefineHandlers->Define(_gstr("WEAPON_BASEBALLBAT"), 4);
