@@ -35,16 +35,16 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
-
 	CVector3D pos = { 0, 0, 0 };
-	if (!pState->CheckVector3D(1, pos))
+	if (!pState->CheckVector3D(0, pos))
 		return false;
 
 	float angle = 0;
-	if (!pState->CheckNumber(2, angle))
+	if (!pState->CheckNumber(1, angle))
 		return false;
+
+	const GChar* mdl = pState->CheckString(2);
+	if (!mdl) return false;
 
 	CClientPlayer* pClientPlayer = reinterpret_cast<CClientPlayer*>(pClientManager->Create(ELEMENT_PLAYER));
 	pClientPlayer->SetModel(mdl);
@@ -372,8 +372,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s"), FunctionGameChangeMap, pClientManager);
 
-		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePlayer, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("svf"), FunctionGameCreatePlayer, pClientManager);
+		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tvfs"), FunctionGameCreatePlayer, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
 }
