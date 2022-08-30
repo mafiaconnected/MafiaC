@@ -376,8 +376,7 @@ static bool FunctionHumanGetHeading(IScriptState* pState, int argc, void* pUser)
 		return false;
 	}
 
-	float heading = pClientHuman->GetHeading();
-	pState->ReturnNumber(CVecTools::DegToRad(heading));
+	pState->ReturnNumber(pClientHuman->GetHeading());
 
 	return true;
 }
@@ -397,11 +396,11 @@ static bool FunctionHumanSetHeading(IScriptState* pState, int argc, void* pUser)
 		return false;
 	}
 
-	float heading = 0;
-	if (!pState->CheckNumber(0, heading))
+	float fHeading = 0;
+	if (!pState->CheckNumber(0, fHeading))
 		return false;
 
-	pClientHuman->SetHeading(CVecTools::RadToDeg(heading));
+	pClientHuman->SetHeading(fHeading);
 
 	return true;
 }
