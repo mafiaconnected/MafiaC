@@ -102,9 +102,10 @@ float CClientHuman::GetHeading()
 	if (GetGameHuman() == nullptr)
 		return 0.0f;
 
-	CVector3D rot = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->entity.rotation);
+	CVector3D vecRot;
+	GetRotation(vecRot);
 
-	return CVecTools::DegToRad(CVecTools::DirToRotation360(rot));
+	return CVecTools::DegToRad(CVecTools::DirToRotation360(vecRot));
 }
 
 bool CClientHuman::SetRotation(const CVector3D& vecRot)
@@ -282,26 +283,19 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
 
-	//_glogprintf(L"Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f - %f, %f, %f]\n\tRotation: [%f, %f, %f - %f, %f, %f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
+	_glogprintf(_gstr("Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f - %f, %f, %f]\n\tRotation: [%f, %f, %f - %f, %f, %f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z));
 
 	if (GetGameHuman() == nullptr)
 	{
-		// Note (Sevenisko): Spawn the PED only, the Multiplayer will take care of the local player assignment
-		Spawn(m_Position, CVecTools::DirToRotation180(CVecTools::EulerToDir(m_Rotation)), GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
-
-		IHuman = GetGameHuman()->GetInterface();
-	}
-	else
-	{
-		IHuman = GetGameHuman()->GetInterface();
-		IHuman->entity.position = CVecTools::ConvertToMafiaVec(m_Position);
-		IHuman->entity.rotation = CVecTools::ConvertToMafiaVec(m_Rotation);
+		bool isLocalPlayer = (GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
+		Spawn(m_Position, CVecTools::DirToRotation180(m_Rotation), isLocalPlayer);
 	}
 
-	auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
+	IHuman = GetGameHuman()->GetInterface();
 
-	pBlender->SetTargetPosition(m_Position);
-	pBlender->SetTargetRotation(m_Rotation);
+	//auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
+	//pBlender->SetTargetPosition(m_Position);
+	//pBlender->SetTargetRotation(m_Rotation);
 
 	IHuman->health = Packet.health;
 	m_nVehicleNetworkIndex = Packet.vehicleNetworkIndex;
