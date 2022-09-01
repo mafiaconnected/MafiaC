@@ -124,11 +124,13 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 		return;
 	}
 
+
+	// Set the position just a little higher ... some vehicles are spawning halfway into the ground :(
 	CVector3D pos2(pos);
 	pos2.z += 2.5f; // TODO
 	SetPosition(pos2);
-	//SetRotation(rot);
-	SetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
+	SetRotation(rot);
+	SetRotationMat(CVecTools::ComputeDirVector(CVecTools::RadToDeg(rot.y)), m_RotationUp, m_RotationRight);
 
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
@@ -137,7 +139,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 
 	m_pEntity = m_MafiaVehicle;
 
-	auto IVehicle = m_MafiaVehicle->GetInterface()->vehicle_interface;
+	//auto IVehicle = m_MafiaVehicle->GetInterface()->vehicle_interface;
 	//_glogprintf(_gstr("Created new vehicle for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tRotation: {%f, %f, %f}\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), model, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, IVehicle.health, IVehicle.engine_health, IVehicle.fuel, IVehicle.sound_enabled ? L"Yes" : L"No", IVehicle.engine_on ? L"Yes" : L"No", IVehicle.horn ? L"Yes" : L"No", IVehicle.siren ? L"Yes" : L"No", IVehicle.gear, IVehicle.engine_rpm, IVehicle.accelerating, IVehicle.break_val, IVehicle.hand_break, IVehicle.speed_limit, IVehicle.clutch, IVehicle.wheel_angle);
 
 	g_pClientGame->m_bCreateVehicleInvokedByGame = true;
@@ -305,6 +307,10 @@ bool CClientVehicle::SetHeading(float heading)
 	CClientVehicle::GetRotationMat(rotationFront, rotationUp, rotationRight);
 	CVector3D newRotationFront = CVecTools::ComputeDirVector(CVecTools::RadToDeg(heading));
 	SetRotationMat(newRotationFront, rotationUp, rotationRight);
+
+	m_RotationFront = newRotationFront;
+	m_RotationUp = rotationUp;
+	m_RotationRight = rotationRight;
 	
 	UpdateGameMatrix();
 
@@ -603,7 +609,7 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
 	}
 
-	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z);
+	_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRotation Front: [%f, %f, %f]\n\tRotation Up: [%f, %f, %f]\n\tRotation Right: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, m_RotationFront.x, m_RotationFront.y, m_RotationFront.z, m_RotationUp.x, m_RotationUp.y, m_RotationUp.z, m_RotationRight.x, m_RotationRight.y, m_RotationRight.z);
 
 	return true;
 }
@@ -653,6 +659,8 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
+
+	_glogprintf(_gstr("Sent sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRotation Front: [%f, %f, %f]\n\tRotation Up: [%f, %f, %f]\n\tRotation Right: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, m_RotationFront.x, m_RotationFront.y, m_RotationFront.z, m_RotationUp.x, m_RotationUp.y, m_RotationUp.z, m_RotationRight.x, m_RotationRight.y, m_RotationRight.z);
 
 	return true;
 }
