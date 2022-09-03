@@ -66,7 +66,9 @@ static void OnGameInit()
 
 static void OnGameExit()
 {
-
+	if (g_pClientGame->GetActiveMultiplayer() != nullptr) {
+		g_pClientGame->GetActiveMultiplayer()->Disconnect(DISCONNECT_GRACEFUL);
+	}
 }
 
 __declspec(naked) void OnGameExit_Hook()
@@ -550,21 +552,21 @@ static void OnLocalPlayerFallDown()
 
 static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1, const S_vector& v2, const S_vector& v3, float damage, MafiaSDK::C_Actor* attacker, unsigned int bodyPart, MafiaSDK::I3D_Frame* targetFrame)
 {
-	//auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
-	//auto entityAttacker = g_pClientGame->m_pClientManager->FindEntity(attacker);
+	auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
+	auto entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
 
-	//g_pClientGame->HumanHit(humanTarget, entityAttacker, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	g_pClientGame->HumanHit(humanTarget, entityAttacker, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
 
 	//if (humanTarget->GetHealth() <= 0) {
 	//	CArguments args;
 	//	args.AddObject(humanTarget);
-	//	args.AddObject(humanAttacker);
+	//	args.AddObject(entityAttacker);
 	//	g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
 	//
 	//	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	//	if (pMultiplayer != nullptr)
 	//	{
-	//		pMultiplayer->SendHumanDeath(humanTarget, humanAttacker);
+	//		pMultiplayer->SendHumanDeath(humanTarget, entityAttacker);
 	//	}
 	//}
 
@@ -697,11 +699,11 @@ void CGameHooks::InstallHooks()
 	// Human Hooks
 	MafiaSDK::C_Human_Hooks::HookOnHumanHit(OnHumanHit);
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponChange(OnHumanWeaponChange);
-	//MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
+	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	//new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
 
 	// Disable local player weapon drop
 	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
