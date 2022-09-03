@@ -287,7 +287,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	if (GetGameHuman() == nullptr)
 	{
-		bool isLocalPlayer = (GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
+		bool isLocalPlayer = IsType(ELEMENT_PLAYER) && (GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
 		Spawn(m_Position, CVecTools::DirToRotation180(m_Rotation), isLocalPlayer);
 	}
 
@@ -752,7 +752,7 @@ void CClientHuman::PlayAnim(const char* animName)
 void CClientHuman::Shoot(bool state, const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;
-
+	//_glogprintf(_gstr("Setting element #%d (human) to shoot at [%f, %f, %f] with state: %d"), GetId(), dstPos.x, dstPos.y, dstPos.z, state);
 	m_MafiaHuman->Do_Shoot(state, CVecTools::ConvertToMafiaVec(dstPos));
 }
 
@@ -766,7 +766,7 @@ void CClientHuman::Jump()
 void CClientHuman::ThrowGrenade(const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;
-
+	_glogprintf(_gstr("Setting element #%d (human) to throw grenade at [%f, %f, %f]"), GetId(), dstPos.x, dstPos.y, dstPos.z);
 	m_MafiaHuman->Do_ThrowGranade(CVecTools::ConvertToMafiaVec(dstPos));
 }
 
@@ -929,13 +929,18 @@ int CClientHuman::GetAnimationStateLocal()
 	return GetGameHuman()->GetInterface()->animStateLocal;
 }
 
+bool CClientHuman::IsShooting()
+{
+	return GetGameHuman()->GetInterface()->isShooting;
+}
+
 void CClientHuman::SetFromExistingEntity(MafiaSDK::C_Human* human) {
 	m_MafiaHuman = human;
 }
 
 void CClientHuman::SetBehavior(uint32_t iBehavior)
 {
-
+	m_MafiaHuman->SetBehavior((MafiaSDK::C_Human_Enum::BehaviorStates)iBehavior);
 }
 
 void CClientHuman::CreateNetBlender()
@@ -943,6 +948,6 @@ void CClientHuman::CreateNetBlender()
 	auto pBlender = new CNetBlenderHuman(this);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
-		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
+		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 20;
 	m_pBlender = pBlender;
 }
