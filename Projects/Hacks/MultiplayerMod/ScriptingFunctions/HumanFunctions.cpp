@@ -227,6 +227,44 @@ static bool FunctionHumanDropWeapon(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionHumanHolsterWeapon(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+	{
+		pState->Error(_gstr("human not spawned"));
+		return false;
+	}
+
+	pClientHuman->HolsterWeapon();
+
+	return true;
+}
+
+static bool FunctionHumanReloadWeapon(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+	{
+		pState->Error(_gstr("human not spawned"));
+		return false;
+	}
+
+	pClientHuman->Reload();
+
+	return true;
+}
+
 static bool FunctionHumanSetBehavior(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -310,6 +348,26 @@ static bool FunctionHumanGetAnimationStateLocal(IScriptState* pState, int argc, 
 	}
 
 	pState->ReturnNumber(pClientHuman->GetAnimationStateLocal());
+
+	return true;
+}
+
+static bool FunctionHumanIsShooting(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+	{
+		pState->Error(_gstr("human not spawned"));
+		return false;
+	}
+
+	pState->ReturnNumber(pClientHuman->IsShooting());
 
 	return true;
 }
@@ -657,12 +715,15 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationState"), ARGUMENT_INTEGER, FunctionHumanGetAnimationState);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationStateLocal"), ARGUMENT_INTEGER, FunctionHumanGetAnimationStateLocal);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("isShooting"), ARGUMENT_BOOLEAN, FunctionHumanIsShooting);
 
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("clearWeapons"), _gstr("t"), FunctionHumanClearWeapons, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("giveWeapon"), _gstr("tiii"), FunctionHumanGiveWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("hasWeapon"), _gstr("ti"), FunctionHumanHasWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("takeWeapon"), _gstr("ti"), FunctionHumanTakeWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("dropWeapon"), _gstr("t"), FunctionHumanDropWeapon, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("holsterWeapon"), _gstr("t"), FunctionHumanHolsterWeapon, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("reloadWeapon"), _gstr("t"), FunctionHumanReloadWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
