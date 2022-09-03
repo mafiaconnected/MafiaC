@@ -1527,7 +1527,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 	bool bCursorClipped = !bCursorEnabled;
 	SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 
-	/*
 	if (DontClipCursor())
 		bCursorClipped = false;
 	if (bForce || m_bMouseClipped != bCursorClipped)
@@ -1547,7 +1546,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 
 		SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 	}
-	*/
 }
 
 void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
@@ -1984,8 +1982,6 @@ void CClientGame::DestroyUninitializedGameElements()
 {
 
 }
-
-
 
 bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 {
