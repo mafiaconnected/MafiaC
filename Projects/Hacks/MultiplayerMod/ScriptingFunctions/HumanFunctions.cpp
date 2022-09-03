@@ -710,6 +710,8 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("kill"), _gstr("t"), FunctionHumanKill, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("respawn"), _gstr("tvf"), FunctionHumanRespawn, pClientManager);
 
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
+
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("vehicle"), ARGUMENT_OBJECT, FunctionHumanGetVehicle);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("skin"), ARGUMENT_STRING, FunctionHumanGetSkin, FunctionHumanSetSkin);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);

@@ -105,7 +105,7 @@ float CClientHuman::GetHeading()
 	CVector3D vecRot;
 	GetRotation(vecRot);
 
-	return CVecTools::DegToRad(CVecTools::DirToRotation360(vecRot));
+	return CVecTools::DegToRad(CVecTools::DirToRotation360(CVecTools::EulerToDir(vecRot)));
 }
 
 bool CClientHuman::SetRotation(const CVector3D& vecRot)
