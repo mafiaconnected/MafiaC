@@ -120,6 +120,8 @@ public:
 	virtual int GetAnimationState();
 	virtual int GetAnimationStateLocal();
 
+	bool IsShooting();
+
 	virtual void SetFromExistingEntity(MafiaSDK::C_Human* human);
 
 	void SetBehavior(uint32_t iBehavior);
