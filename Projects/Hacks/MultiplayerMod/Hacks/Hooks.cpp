@@ -258,10 +258,10 @@ RAWCODECALL SceneCreateActor(void)
 {
 	using ObjTypes = MafiaSDK::C_Mission_Enum::ObjectTypes;
 	std::vector<ObjTypes> forbidden_objects = {
-		ObjTypes::Car,
-		ObjTypes::Dog,
+		//ObjTypes::Car,
+		//ObjTypes::Dog,
 		ObjTypes::Enemy,
-		ObjTypes::Pumpar,
+		//ObjTypes::Pumpar,
 		ObjTypes::Player
 	};
 
@@ -274,7 +274,88 @@ RAWCODECALL SceneCreateActor(void)
 		}
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Trolley && g_pSceneCreateActor_Frame != NULL) {
-			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Door && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Pumpar && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Dog && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Plane && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::RailRoute && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::InitScript && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::Car && g_pSceneCreateActor_Frame != NULL) {
+			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::TrafficSetup && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return;
+			}
+		}
+
+		if (g_pSceneCreateActor_Type == ObjTypes::PedestrianSetup && g_pSceneCreateActor_Frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
@@ -555,7 +636,7 @@ static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1
 	auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
 	auto entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
 
-	g_pClientGame->HumanHit(humanTarget, entityAttacker, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
 
 	//if (humanTarget->GetHealth() <= 0) {
 	//	CArguments args;
