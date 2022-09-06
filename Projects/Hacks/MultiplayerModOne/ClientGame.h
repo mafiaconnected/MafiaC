@@ -32,6 +32,11 @@ enum eGameComponent
 	GAMECOMPONENT_TRAINS,
 	GAMECOMPONENT_BRIDGES,
 	GAMECOMPONENT_SCRIPTS,
+	GAMECOMPONENT_TROLLEYS,
+	GAMECOMPONENT_DOORS,
+	GAMECOMPONENT_DOGS,
+	GAMECOMPONENT_FUELSTATIONS, 
+	GAMECOMPONENT_PLANES,
 };
 
 class CClientPlayer;
@@ -282,7 +287,7 @@ public:
 	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
 	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat);
-	void HumanHit(CClientHuman* humanTarget, CClientEntity* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
+	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
 

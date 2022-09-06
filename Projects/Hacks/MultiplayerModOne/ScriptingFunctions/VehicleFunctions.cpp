@@ -827,6 +827,46 @@ static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pU
 	return false;
 }
 
+static bool FunctionVehicleGetHeading(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pState->ReturnNumber(pClientVehicle->GetHeading());
+
+	return true;
+}
+
+static bool FunctionVehicleSetHeading(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	float fHeading;
+	if (!pState->CheckNumber(0, fHeading))
+		return false;
+
+	if (pClientVehicle->SetHeading(fHeading))
+		return true;
+
+	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
 static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -870,6 +910,8 @@ static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUse
 void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
 	auto pClientManager = pClientGame->m_pClientManager;
+
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionVehicleGetHeading, FunctionVehicleSetHeading);
 
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("explode"), _gstr("t"), FunctionVehicleExplode, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("repair"), _gstr("t"), FunctionVehicleRepair, pClientManager);

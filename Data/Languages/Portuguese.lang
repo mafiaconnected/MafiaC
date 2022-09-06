@@ -1,0 +1,236 @@
+﻿[Language]
+name=Portuguese
+native_name=Português
+author=Pwned
+
+[Common]
+
+# Languages
+language_English=English
+language_French=French
+language_German=German
+language_Italian=Italian
+language_Spanish=Spanish
+language_Russian=Russian
+language_Arabic=Arabic
+language_Chinese=Chinese (Simplified)
+language_Persian=Persian
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
+
+# Tips
+tip_Close=Fechar esta janela.
+tip_Okay=Fechar esta janela salvando alterações.
+tip_Cancel=Fechar esta janela sem salvar alterações.
+
+# Columns
+column_Name=Nome
+column_Title=Título
+column_Version=Versão
+column_ModifiedDate=Data de Modificação
+column_Description=Descrição
+column_Key=Chave
+column_Value=Valor
+
+# Buttons
+button_Okay=OK
+button_Close=Fechar
+button_Cancel=Cancelar
+button_Yes=Sim
+button_No=Não
+button_Retry=Tentar novamente
+button_Abort=Abortar
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Ficheiro
+menu_CheckForUpdates=Verificar se há atualizações...
+menu_Exit=S&air
+
+menu_Server=&Servidor
+menu_AddServer=Adicionar Servidor
+menu_DeleteServer=Eliminar Servidor
+
+menu_Tools=Ferra&mentas
+menu_Settings=&Configurações...
+menu_ResetSettings=Redefinir todas as configurações...
+menu_DesktopShortcut=Atalho de ambiente de trabalho
+
+menu_View=&Ver
+menu_Players=&Jogadores
+menu_Rules=&Regras
+menu_FullWidthRules=Painel de Regras ao C&omprido
+
+menu_Help=Aj&uda
+menu_RunDiagnostics=Correr &Diagnóstico...
+menu_About=So&bre ...
+menu_Licenses=Ver &Licenças...
+
+# Generic/Multiplayer
+menu_LargeIcons=Ícones Grandes
+menu_Refresh=Atualizar
+menu_Connect=Conectar
+menu_AddToFavourites=Adicionar aos Favoritos
+menu_Favourite=Favorito
+menu_CopyServerIP=Copiar IP do Servidor
+menu_CopyAddress=Copiar Endereço
+menu_ViewPlayerMap=Ver Mapa do Jogador...
+menu_VisitWebsite=Visitar Website...
+
+# Mods context menu
+menu_ResetAll=Redefinir Todos
+menu_DisableAll=Desativar Todos
+menu_Delete=Eliminar
+
+# Open menu
+menu_LauncherSettings=Configurações do &Programa...
+menu_GameSettings=Co&nfigurações do Jogo...
+menu_Resources=Recursos
+menu_Crashes=Falhas
+menu_Caches=Caches
+menu_Logs=Histórico
+
+# Messages
+message_ConfirmResetSettings=Tem a certeza que pretende redefinir todas as configurações do programa para as configurações padrão?\nEsta ação não é reversível, o programa vai reiniciar.
+
+# Tabs
+tab_Favourites=Favoritos
+tab_Internet=Internet
+tab_Official=Oficial
+tab_History=Histórico
+tab_Local=Local
+tab_Mods=Mods
+
+# Status
+status_Disconnected=Desconectou
+status_Connecting=A Conectar
+status_Connected=Conectado à lista de servidores
+
+# Labels
+label_Game=Jogo:
+label_GameEXEPath=Caminho para o EXE do jogo:
+
+# Tips
+tip_Games=O jogo para iniciar.
+tip_CloseLauncher=Feche esta janela ao iniciar o jogo.
+tip_Launch=Iniciar o jogo.
+tip_BrowseForGame=Procurar o executável do jogo.
+tip_ShowInExplorer=Mostrar o executável do jogo em {0}.
+tip_GameEXEPath=O caminho para o executável do jogo.
+
+# Columns
+column_ServerName=Nome do Servidor
+column_Players=Jogadores
+column_GameMode=Modo de jogo
+
+# Group Boxes
+group_Players=Jogadores
+group_Rules=Regras
+
+# Buttons
+button_OpenMenu=Abrir...
+button_CloseLauncher=Fechar programa
+button_Launch=Iniciar
+button_ShowInExplorer=Mostrar em {0}
+button_BrowseForGame=Navegar...
+
+[AboutWindow]
+
+windowTitle=Sobre
+group_About=Sobre
+
+# Labels
+label_Product=Produto:
+label_Copyright=Copyright © {0} {1}
+label_Version=Versão:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Versão Packet:
+label_BuildDate=Data da Build:
+label_BuildTime=Hora da Build:
+label_Website=Website:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Falhas Esta Semana:
+label_Developers=Desenvolvedores:
+
+[SettingsWindow]
+
+windowTitle=Configurações do Programa
+gameSettingsTitle=Configurações do Jogo
+
+# Tabs
+tab_General=Geral
+tab_AdditionalResourcesFolders=Pastas de Recursos Adicionais
+tab_AdditionalMods=Mods Adicionais
+tab_Display=Ecrã
+tab_Advanced=Avançado
+tab_NonModHacks=Hacks não mods
+tab_Licenses=Licenças
+tab_Language=Língua
+tab_BugFixes=Correções de bugs
+tab_Debug=Debug
+
+# Labels
+label_Name=Nome:
+
+# Additional resource folders
+button_ResourceAdd=Adicionar...
+tip_ResourceAdd=Adiciona uma nova pasta de recursos.
+
+button_ResourceRemove=Remover
+tip_ResourceRemove=Remove a pasta de recursos selecionada.
+
+button_ResourceUp=Cima
+tip_ResourceUp=Move para cima a pasta de recursos selecionada.
+
+button_ResourceDown=Baixo
+tip_ResourceDown=Move para baixo a pasta de recursos selecionada.
+
+tip_ResourceOpen=Abre a pasta de recursos selecionada em {0}.
+button_ResourceOpen=Abrir
+
+# Options
+opt_KeepSavedGamesSeparate=Manter Jogos Salvos Separados
+opt_KeepScreenshotsSeparate=Manter As Capturas De Tela Separadas
+opt_SaveCrashDump=Salvar despejo de memória
+opt_CheckForUpdates=Verificar se há atualizações
+opt_Assertions=Asserções
+opt_DebugMode=Modo debug
+opt_TerminateOnCrash=Fechar durante um crash
+opt_VerboseLogging=Registro detalhado
+opt_GameOutput=Mostrar todo o output do jogo na consola
+opt_MultithreadedNetworking=Rede Multithread
+opt_SCM=SCM
+opt_DisableStoryMode=Desativar Modo História
+
+opt_AlwaysUsePrimaryMonitorResolution=Utilizar sempre a resolução do monitor principal
+opt_AutomaticAspectRatio=Proporção automática
+opt_VCTrails=Vice City trails
+tip_VCTrails=Liga trails no Vice City
+opt_AutoSave=Salvar Automaticamente
+opt_SyncAnimations=Sincronizar animações
+opt_AllowDirectConnections=Permitir conexões diretas (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=A Testar
+label_Message=Por favor insira o código de acesso em baixo para ativar as builds de teste:
+
+[PasswordWindow]
+
+windowTitle=Palavra-Passe
+label_Message=Por favor insira a palavra-passe para se conectar ao servidor:
+
+[AddServerWindow]
+
+windowTitle=Adicionar Servidor
+label_Message=Digite novo servidor HOST:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Mapa do Jogador
+
+# Menu
+menu_VCStyle=&Estilo Vice City

@@ -1527,7 +1527,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 	bool bCursorClipped = !bCursorEnabled;
 	SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 
-	/*
 	if (DontClipCursor())
 		bCursorClipped = false;
 	if (bForce || m_bMouseClipped != bCursorClipped)
@@ -1547,7 +1546,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 
 		SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 	}
-	*/
 }
 
 void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
@@ -1948,11 +1946,11 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pClientHumanAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
-	args.AddObject(pClientHumanAttacker);
+	//args.AddObject(pClientHumanAttacker);
 	args.AddVector3D(v1);
 	args.AddVector3D(v2);
 	args.AddVector3D(v3);
@@ -1969,7 +1967,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pCli
 
 		Packet Packet(MAFIAPACKET_HUMAN_HIT);
 		Packet.Write<int32_t>(pClientHumanTarget->GetId());
-		Packet.Write<int32_t>(pClientHumanAttacker->GetId());
+		//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
 		Packet.Write<CVector3D>(v1);
 		Packet.Write<CVector3D>(v2);
 		Packet.Write<CVector3D>(v3);
@@ -1984,8 +1982,6 @@ void CClientGame::DestroyUninitializedGameElements()
 {
 
 }
-
-
 
 bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 {
@@ -2075,8 +2071,18 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		return m_CVars.GetBoolean(_gstr("Scripts"), true);
 	case GAMECOMPONENT_BRIDGES:
 		return m_CVars.GetBoolean(_gstr("Bridges"), true);
+	case GAMECOMPONENT_TROLLEYS:
+		return m_CVars.GetBoolean(_gstr("Trains"), true);
 	case GAMECOMPONENT_TRAINS:
 		return m_CVars.GetBoolean(_gstr("Trains"), true);
+	case GAMECOMPONENT_DOGS:
+		return m_CVars.GetBoolean(_gstr("Dogs"), true);
+	case GAMECOMPONENT_FUELSTATIONS:
+		return m_CVars.GetBoolean(_gstr("FuelStations"), true);
+	case GAMECOMPONENT_DOORS:
+		return m_CVars.GetBoolean(_gstr("Doors"), true);
+	case GAMECOMPONENT_PLANES:
+		return m_CVars.GetBoolean(_gstr("Planes"), true);
 	default:
 		break;
 	}

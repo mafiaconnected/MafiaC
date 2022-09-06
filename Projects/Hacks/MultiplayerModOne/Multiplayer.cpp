@@ -119,7 +119,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			Reader.ReadInt32(&nPlayerNetworkIndex, 1);
 
 			CVector3D vecTargetPos;
-			Reader.ReadSingle((float*)&vecTargetPos, 3);
+			Reader.ReadVector3D(&vecTargetPos, 1);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
@@ -145,7 +145,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			Reader.ReadBoolean(state);
 
 			CVector3D vecTargetPos;
-			Reader.ReadSingle((float*)&vecTargetPos, 3);
+			Reader.ReadVector3D(&vecTargetPos, 1);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr)

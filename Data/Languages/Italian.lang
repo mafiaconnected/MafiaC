@@ -1,0 +1,237 @@
+﻿[Language]
+name=Italian
+native_name=Italian
+author=DuKe.
+
+[Common]
+
+# Languages
+language_English=inglese
+language_French=francese
+language_German=Tedesco
+language_Italian=Italiano
+language_Spanish=Spagnolo
+language_Russian=Russo
+language_Arabic=Arabo
+language_Chinese=Cinese (Simplified)
+language_Persian=Persiano
+language_Portuguese=portoghesi
+language_Polish=Polish
+language_French=French
+
+
+# Tips
+tip_Close=Chiudi questa finestra
+tip_Okay=Chiudi questa finestra salvando le modifiche.
+tip_Cancel=Chiudi questa finestra senza salvare le modifiche.
+
+# Columns
+column_Name=Nome
+column_Title=Titolo
+column_Version=Versione
+column_ModifiedDate=Data modificata
+column_Description=Descrizione
+column_Key=Chiave
+column_Value=Valore
+
+# Buttons
+button_Okay=OK
+button_Close=Chiudere
+button_Cancel=Annulla
+button_Yes=sì
+button_No=No
+button_Retry=Riprova
+button_Abort=Aborto
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Archivio
+menu_CheckForUpdates=Controlla gli aggiornamenti...
+menu_Exit=&Uscita
+
+menu_Server=&Server
+menu_AddServer=Aggiungi server
+menu_DeleteServer=Elimina server
+
+menu_Tools=&Strumenti
+menu_Settings=&Impostazioni.
+menu_ResetSettings=Resettare tutte le impostazioni....
+menu_DesktopShortcut=collegamento sul desktop
+
+menu_View=&Visualizzazione
+menu_Players=&Giocatori
+menu_Rules=&Regole
+menu_FullWidthRules=&Regole complete e di larghezza
+
+menu_Help=&Aiuto
+menu_RunDiagnostics=Esegui &Diagnostica...
+menu_About=&Di ...
+menu_Licenses=Visualizza e &Licenze......
+
+# Generic/Multiplayer
+menu_LargeIcons=Icone grandi
+menu_Refresh=ricaricare
+menu_Connect=Collegare
+menu_AddToFavourites=Aggiungi ai preferiti
+menu_Favourite=Preferito
+menu_CopyServerIP=Copia l'IP del server
+menu_CopyAddress=Copia indirizzo
+menu_ViewPlayerMap=Visualizza mappa giocatore...
+menu_VisitWebsite=Visita il sito web...
+
+# Mods context menu
+menu_ResetAll=Resetta tutto
+menu_DisableAll=Disabilitare tutto
+menu_Delete=Elimina
+
+# Open menu
+menu_LauncherSettings=&Impostazioni di avvio...
+menu_GameSettings=&Impostazioni di gioco...
+menu_Resources=Risorse
+menu_Crashes=App di crash
+menu_Caches=Cache
+menu_Logs=registri
+
+# Messages
+message_ConfirmResetSettings=Sei sicuro di voler ripristinare le impostazioni predefinite del programma di avvio?\nQuesta azione non può essere annullata, il programma di avvio si riavvierà.
+
+# Tabs
+tab_Favourites=Preferiti
+tab_Internet=Internet
+tab_Official=Ufficiale
+tab_History=Disco
+tab_Local=Locale
+tab_Mods=Mods
+
+# Status
+status_Disconnected=Disconnesso
+status_Connecting=collegamento
+status_Connected=Connesso all'elenco dei server
+
+# Labels
+label_Game=Gioco:
+label_GameEXEPath=Percorso EXE del gioco:
+
+# Tips
+tip_Games=Il gioco da lanciare.
+tip_CloseLauncher=Chiudi questa finestra all'avvio del gioco.
+tip_Launch=Fai partire il gioco.
+tip_BrowseForGame=Cerca l'eseguibile del gioco.
+tip_ShowInExplorer=Mostra l'eseguibile del gioco in {0}.
+tip_GameEXEPath=Il percorso dell'eseguibile del gioco.
+
+# Columns
+column_ServerName=Nome del server
+column_Players=Giocatori
+column_GameMode=Modalità di gioco
+
+# Group Boxes
+group_Players=Giocatori
+group_Rules=Regole
+
+# Buttons
+button_OpenMenu=Aprire...
+button_CloseLauncher=Chiudi Avvio applicazioni
+button_Launch=Lancio
+button_ShowInExplorer=Mostrare {0}
+button_BrowseForGame=Navigare...
+
+[AboutWindow]
+
+windowTitle=Di
+group_About=Di
+
+# Labels
+label_Product=Prodotto:
+label_Copyright=Diritto d'autore © {0} {1}
+label_Version=Versione:
+label_GitBranch=Git ramo:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Versione pacchetto:
+label_BuildDate=Data di costruzione:
+label_BuildTime=Tempo di costruzione:
+label_Website=Sito web:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Crash questa settimana:
+label_Developers=Sviluppatori
+
+[SettingsWindow]
+
+windowTitle=Impostazioni di avvio
+gameSettingsTitle=Impostazioni di gioco
+
+# Tabs
+tab_General=Generale
+tab_AdditionalResourcesFolders=Cartelle di risorse aggiuntive
+tab_AdditionalMods=Mod aggiuntivi
+tab_Display=Schermo
+tab_Advanced=Avanzate
+tab_NonModHacks=Hack non mod
+tab_Licenses=Licenze
+tab_Language=Lingua
+tab_BugFixes=Bug Correzioni
+tab_Debug=Debug
+
+# Labels
+label_Name=Nome
+
+# Additional resource folders
+button_ResourceAdd=Aggiungere...
+tip_ResourceAdd=Aggiunge una nuova cartella di risorse
+
+button_ResourceRemove=Remove
+tip_ResourceRemove=Rimuovere la cartella delle risorse attualmente selezionata.
+
+button_ResourceUp=Up
+tip_ResourceUp=Sposta in alto la cartella delle risorse attualmente selezionata
+
+button_ResourceDown=Down
+tip_ResourceDown=Sposta in basso la cartella delle risorse attualmente selezionata.
+
+tip_ResourceOpen=Apri la cartella delle risorse attualmente selezionata in {0}.
+button_ResourceOpen=Aprire
+
+# Options
+opt_KeepSavedGamesSeparate=Tieni separati i giochi salvati
+opt_KeepScreenshotsSeparate=Mantieni gli screenshot separati
+opt_SaveCrashDump=Salva il dump di crash
+opt_CheckForUpdates=Controlla gli aggiornamenti
+opt_Assertions=Affermazioni
+opt_DebugMode=Debug modalità
+opt_TerminateOnCrash=Termina in caso di crash
+opt_VerboseLogging=Registrazione dettagliata
+opt_GameOutput=Mostra tutto l'output di gioco nella console
+opt_MultithreadedNetworking=Rete multithread
+opt_SCM=SCM
+opt_DisableStoryMode=Disabilita la modalità Storia
+
+opt_AlwaysUsePrimaryMonitorResolution=Utilizzare sempre la risoluzione del monitor principale
+opt_AutomaticAspectRatio=Proporzioni automatiche
+opt_VCTrails=Sentieri di Vice City
+tip_VCTrails=Abilita i percorsi a Vice City
+opt_AutoSave=Salvataggio automatico
+opt_SyncAnimations=Sincronizza animazioni
+opt_AllowDirectConnections=Consenti connessioni dirette (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=Test
+label_Message=Inserisci il codice di accesso di seguito per abilitare le build di test:
+
+[PasswordWindow]
+
+windowTitle=Parola d'ordine
+label_Message=Si prega di inserire la password per connettersi al server:
+
+[AddServerWindow]
+
+windowTitle=Aggiungi server
+label_Message=Inserisci nuovo server HOST:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Mappa dei giocatori
+
+# Menu
+menu_VCStyle=Stile &Vice City

@@ -124,6 +124,70 @@ static bool FunctionGetPlayers(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionSetCameraLookAtOld(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D pos;
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CVector3D lookAtPos;
+	if (!pState->CheckVector3D(1, lookAtPos))
+		return false;
+
+	//MafiaSDK::GetMission()->GetGame()->GetCamera()->LockAt(CVecTools::ConvertToMafiaVec(pos), { 0,0,0 });
+	//MafiaSDK::GetMission()->GetGame()->GetCamera()->SetLookTo(CVecTools::ConvertToMafiaVec(lookAtPos), MafiaSDK::GetMission()->GetGame()->GetCamera()->GetInterface()->cameraFrame);
+	return true;
+}
+
+static bool FunctionGetCameraMatrix(IScriptState* pState, int argc, void* pUser)
+{
+	// UNFINISHED
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXMATRIX camMat1 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 356);
+	D3DXMATRIX camMat2 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 484);
+	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+	
+	CMatrix4x4 mat;
+
+	CVector3D vecPosition;
+	vecPosition.x = camMat3.m[3][0];
+	vecPosition.y = camMat3.m[3][1];
+	vecPosition.z = camMat3.m[3][2];
+	mat.SetTranslate(vecPosition);
+
+	CVector3D vecRotation;
+	vecPosition.x = camMat3.m[3][0];
+	vecPosition.y = camMat3.m[3][1];
+	vecPosition.z = camMat3.m[3][2];
+	mat.SetTranslate(vecPosition);
+
+	CVector3D vecCameraPosition;
+	vecCameraPosition.x = camMat3.m[3][0];
+	vecCameraPosition.y = camMat3.m[3][1];
+	vecCameraPosition.z = camMat3.m[3][2];
+
+	pState->ReturnVector3D(vecCameraPosition);
+	return true;
+}
+
+static bool FunctionSetCameraMatrix(IScriptState* pState, int argc, void* pUser)
+{
+	CMatrix4x4 mat;
+	if (!pState->CheckMatrix4x4(0, mat))
+		return false;
+
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+
+	CVector3D vecCameraPosition;
+	vecCameraPosition.x = camMat3.m[3][0];
+	vecCameraPosition.y = camMat3.m[3][1];
+	vecCameraPosition.z = camMat3.m[3][2];
+
+	pState->ReturnVector3D(vecCameraPosition);
+	return true;
+}
+
 static bool FunctionGetCameraPosition(IScriptState* pState, int argc, void* pUser)
 {
 	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
@@ -133,7 +197,7 @@ static bool FunctionGetCameraPosition(IScriptState* pState, int argc, void* pUse
 	vecCameraPosition.x = camMat3.m[3][0];
 	vecCameraPosition.y = camMat3.m[3][1];
 	vecCameraPosition.z = camMat3.m[3][2];
-
+	 
 	pState->ReturnVector3D(vecCameraPosition);
 	return true;
 }
@@ -151,6 +215,9 @@ static bool FunctionSetCameraPosition(IScriptState* pState, int argc, void* pUse
 
 	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
 	*(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548) = camMat3;
+
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
 	return true;
 }
 
@@ -204,15 +271,83 @@ static bool FunctionSetCameraLookAtPosition(IScriptState* pState, int argc, void
 	rotation.z /= ratio;
 
 	MafiaSDK::GetCurrentCamera()->GetInterface()->rotation = CVecTools::ConvertToMafiaVec(rotation);
+
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
 	return true;
 }
 
-static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
+static bool FunctionSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
 {
 	CVector3D pos;
 	if (!pState->CheckVector3D(0, pos))
 		return false;
 
+	CVector3D lookAtPos;
+	if (!pState->CheckVector3D(1, lookAtPos))
+		return false;
+
+	// Camera Position
+	D3DXMATRIX camMat3;
+	camMat3.m[3][0] = pos.x;
+	camMat3.m[3][1] = pos.y;
+	camMat3.m[3][2] = pos.z;
+
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	*(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548) = camMat3;
+
+	// Look At Position
+	CVector3D cameraPos;
+	cameraPos.x = camMat3.m[3][0];
+	cameraPos.y = camMat3.m[3][1];
+	cameraPos.z = camMat3.m[3][2];
+
+	CVector3D rotation;
+	rotation.x = lookAtPos.x - cameraPos.x;
+	rotation.y = lookAtPos.y - cameraPos.y;
+	rotation.z = lookAtPos.z - cameraPos.z;
+
+	int ratio = (int)sqrtf(rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z);
+
+	rotation.x /= ratio;
+	rotation.y /= ratio;
+	rotation.z /= ratio;
+
+	MafiaSDK::GetCurrentCamera()->GetInterface()->rotation = CVecTools::ConvertToMafiaVec(rotation);
+
+	MafiaSDK::GetMission()->GetGame()->GetCamera()->LockAt(CVecTools::ConvertToMafiaVec(pos), CVecTools::ConvertToMafiaVec(rotation));
+
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
+	return true;
+}
+
+static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D vecWorld;
+	if (!pState->CheckVector3D(0, vecWorld))
+		return false;
+
+	D3DXVECTOR3 out;
+	D3DVIEWPORT9 viewPort;
+	g_pD3DDevice->GetViewport(&viewPort);
+	D3DXVECTOR3 input = D3DXVECTOR3(vecWorld.x, vecWorld.y, vecWorld.z);
+	D3DXMATRIX mProjection, mView, mWorld;
+	g_pD3DDevice->GetTransform(D3DTS_VIEW, &mView);
+	D3DXMatrixIdentity(&mWorld);
+	//m_DirectDevice->GetTransform(D3DTS_WORLD,&mWorld);
+	g_pD3DDevice->GetTransform(D3DTS_PROJECTION, &mProjection);
+
+	D3DXVec3Project(&out, &input, &viewPort, &mProjection, &mView, &mWorld);
+
+	CVector3D vecScreen;
+	vecScreen.x = out.x;
+	vecScreen.y = out.y;
+	vecScreen.z = out.z;
+
+	pState->ReturnVector3D(vecScreen);
+
+	/*
 	D3DXVECTOR3 origin;
 	origin.x = pos.x;
 	origin.y = pos.y;
@@ -247,6 +382,16 @@ static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, v
 	vecScreen.z = 0.0f;
 
 	pState->ReturnVector3D(vecScreen);
+	*/
+	return true;
+}
+
+static bool FunctionRestoreCamera(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	MafiaSDK::GetMission()->GetGame()->GetCamera()->Unlock();
+	MafiaSDK::GetCurrentCamera()->Update();
 	return true;
 }
 
@@ -261,6 +406,7 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 
 void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
+	auto pGameNamespace = pScripting->m_Global.GetNamespace(_gstr("mafia"));
 	auto pClientManager = pClientGame->m_pClientManager;
 
 	pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
@@ -274,8 +420,17 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 
-	auto pCameraNamespace = pScripting->m_Global.AddNamespace(_gstr("camera"));
-	pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
-	pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
-	//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
+	{
+		auto pCameraNamespace = pGameNamespace->AddNamespace(_gstr("camera"));
+		pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
+		pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
+		pCameraNamespace->RegisterFunction(_gstr("restore"), _gstr(""), FunctionRestoreCamera);
+		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
+
+		// Compatibility with GTAC
+		//pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix); // TODO
+		//pGameNamespace->RegisterFunction(_gstr("setCameraMatrix"), _gstr("x"), FunctionSetCameraMatrix, pClientGame); // TODO
+		pGameNamespace->RegisterFunction(_gstr("restoreCamera"), _gstr("|b"), FunctionRestoreCamera);
+		pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv|b"), FunctionSetCameraLookAt);
+	}
 }

@@ -6,24 +6,28 @@
 #include "d3dx9.hpp"
 #include "d3d8to9.hpp"
 
-using namespace d3d8to9;
-
-PFN_D3DXAssembleShader d3d8to9::D3DXAssembleShader = nullptr;
-PFN_D3DXDisassembleShader d3d8to9::D3DXDisassembleShader = nullptr;
-PFN_D3DXLoadSurfaceFromSurface d3d8to9::D3DXLoadSurfaceFromSurface = nullptr;
+PFN_D3DXAssembleShader D3DXAssembleShader = nullptr;
+PFN_D3DXDisassembleShader D3DXDisassembleShader = nullptr;
+PFN_D3DXLoadSurfaceFromSurface D3DXLoadSurfaceFromSurface = nullptr;
 
 #ifndef D3D8TO9NOLOG
  // Very simple logging for the purpose of debugging only.
 std::ofstream LOG;
 #endif
 
-extern "C" Direct3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
+extern "C" IDirect3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
 {
 #ifndef D3D8TO9NOLOG
-	LOG.open("d3d8.log", std::ios::trunc);
+	static bool LogMessageFlag = true;
 
 	if (!LOG.is_open())
 	{
+		LOG.open("d3d8.log", std::ios::trunc);
+	}
+
+	if (!LOG.is_open() && LogMessageFlag)
+	{
+		LogMessageFlag = false;
 		MessageBox(nullptr, TEXT("Failed to open debug log file \"d3d8.log\"!"), nullptr, MB_ICONWARNING);
 	}
 
@@ -31,18 +35,7 @@ extern "C" Direct3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
 	LOG << "> Passing on to 'Direct3DCreate9':" << std::endl;
 #endif
 
-	HMODULE hD3D9 = LoadLibrary(TEXT("d3d9.dll"));
-	if (hD3D9 == nullptr)
-		return nullptr;
-
-	auto pDirect3DCreate9 = (decltype(Direct3DCreate9)*)GetProcAddress(hD3D9, "Direct3DCreate9");
-	if (pDirect3DCreate9 == nullptr)
-	{
-		FreeLibrary(hD3D9);
-		return nullptr;
-	}
-
-	IDirect3D9 *const d3d = pDirect3DCreate9(D3D_SDK_VERSION);
+	IDirect3D9 *const d3d = Direct3DCreate9(D3D_SDK_VERSION);
 
 	if (d3d == nullptr)
 	{
@@ -75,7 +68,6 @@ extern "C" Direct3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
 				return nullptr;
 			}
 		}
-
 	}
 
 	return new Direct3D8(d3d);

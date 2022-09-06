@@ -5,63 +5,51 @@
 
 #include "d3d8to9.hpp"
 
-// IDirect3DVertexBuffer8
 Direct3DVertexBuffer8::Direct3DVertexBuffer8(Direct3DDevice8 *Device, IDirect3DVertexBuffer9 *ProxyInterface) :
-	Device(Device), ProxyInterface(ProxyInterface), m_RefCount(1)
+	Device(Device), ProxyInterface(ProxyInterface)
 {
-	//Device->AddRef();
+	Device->ProxyAddressLookupTable->SaveAddress(this, ProxyInterface);
 }
 Direct3DVertexBuffer8::~Direct3DVertexBuffer8()
 {
-	ProxyInterface->Release();
-	//Device->Release();
 }
 
 HRESULT STDMETHODCALLTYPE Direct3DVertexBuffer8::QueryInterface(REFIID riid, void **ppvObj)
 {
 	if (ppvObj == nullptr)
-	{
 		return E_POINTER;
-	}
 
-	if (riid == __uuidof(this) ||
+	if (riid == __uuidof(IDirect3DVertexBuffer8) ||
 		riid == __uuidof(IUnknown) ||
-		riid == __uuidof(Direct3DResource8))
+		riid == __uuidof(IDirect3DResource8))
 	{
 		AddRef();
-
-		*ppvObj = this;
+		*ppvObj = static_cast<IDirect3DVertexBuffer8 *>(this);
 
 		return S_OK;
 	}
 
-	return ProxyInterface->QueryInterface(riid, ppvObj);
+	const HRESULT hr = ProxyInterface->QueryInterface(ConvertREFIID(riid), ppvObj);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppvObj, Device);
+
+	return hr;
 }
 ULONG STDMETHODCALLTYPE Direct3DVertexBuffer8::AddRef()
 {
-	m_RefCount++;
-	return m_RefCount;
+	return ProxyInterface->AddRef();
 }
 ULONG STDMETHODCALLTYPE Direct3DVertexBuffer8::Release()
 {
-	if (m_RefCount <= 1)
-	{
-		delete this;
-		return 0;
-	}
-	m_RefCount--;
-	return m_RefCount;
+	return ProxyInterface->Release();
 }
 
-HRESULT STDMETHODCALLTYPE Direct3DVertexBuffer8::GetDevice(Direct3DDevice8 **ppDevice)
+HRESULT STDMETHODCALLTYPE Direct3DVertexBuffer8::GetDevice(IDirect3DDevice8 **ppDevice)
 {
 	if (ppDevice == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	Device->AddRef();
-
 	*ppDevice = Device;
 
 	return D3D_OK;
@@ -102,7 +90,8 @@ HRESULT STDMETHODCALLTYPE Direct3DVertexBuffer8::Lock(UINT OffsetToLock, UINT Si
 		D3DVERTEXBUFFER_DESC desc;
 		ProxyInterface->GetDesc(&desc);
 
-		if ((desc.Usage & D3DUSAGE_DYNAMIC) == 0)
+		if ((desc.Usage & D3DUSAGE_DYNAMIC) == 0 ||
+			(desc.Usage & D3DUSAGE_WRITEONLY) == 0)
 		{
 			Flags ^= D3DLOCK_DISCARD;
 		}
