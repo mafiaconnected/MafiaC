@@ -13,8 +13,11 @@ language_Italian=Italian
 language_Spanish=الأسبانية
 language_Russian=الروسية
 language_Arabic=عرب
-language_Chinese=Chinese (Simplified)
-language_Persian=Persian
+language_Chinese=اللغة الصينية (المبسطة)
+language_Persian=اللغة الفارسية
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
 
 #نصائح
 tip_Close=إغلاق النافذه.

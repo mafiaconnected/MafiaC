@@ -1,0 +1,233 @@
+﻿[Language]
+name=Turkish
+native_name=Türkçe
+author=Alpays
+
+[Common]
+
+# Languages
+language_English=İngilizce
+language_French=Fransızca
+language_German=Almanca
+language_Italian=İtalyanca
+language_Spanish=İspanyolca
+language_Russian=Rusça
+language_Arabic=Arapça
+language_Chinese=Çince (Basitleştirilmiş)
+language_Persian=Farsça
+
+# Tips
+tip_Close=Pencereyi kapat.
+tip_Okay=Değişiklikleri kaydederek pencereyi kapat.
+tip_Cancel=Değişiklikleri kaydetmeyerek ve pencereyi kapat.
+
+# Columns
+column_Name=İsim
+column_Title=Başlık
+column_Version=Sürüm
+column_ModifiedDate=Değiştirme Tarihi
+column_Description=Açıklama
+column_Key=Değişken
+column_Value=Değer
+
+# Buttons
+button_Okay=Tamam
+button_Close=Kapat
+button_Cancel=İptal
+button_Yes=Evet
+button_No=Hayır
+button_Retry=Tekrar Dene
+button_Abort=İptal Et
+
+[LauncherWindow]
+
+# Menu
+menu_File=&Dosya
+menu_CheckForUpdates=Güncellemeleri kontrol et...
+menu_Exit=&Çıkış
+
+menu_Server=&Sunucu
+menu_AddServer=Sunucu Ekle
+menu_DeleteServer=Sunucu Sil
+
+menu_Tools=A&raçlar
+menu_Settings=&Ayarlar...
+menu_ResetSettings=Tüm ayarları sıfırla...
+menu_DesktopShortcut=Masaüstü kısayolu
+
+menu_View=&Görüntüle
+menu_Players=&Oyuncular
+menu_Rules=&Kurallar
+menu_FullWidthRules=&Tam Genişlikte Kurallar
+
+menu_Help=&Yardım
+menu_RunDiagnostics=Tanıları Çalı&ştır...
+menu_About=&Hakkında ...
+menu_Licenses=&Lisansları görüntüle...
+
+# Generic/Multiplayer
+menu_LargeIcons=Geniş İkonlar
+menu_Refresh=Yenile
+menu_Connect=Bağlan
+menu_AddToFavourites=Favorilere ekle
+menu_Favourite=Favori
+menu_CopyServerIP=Sunucu IP Adresini Kopyala
+menu_CopyAddress=Adresi Kopyala
+menu_ViewPlayerMap=Oyuncu Haritasını Görüntüle...
+menu_VisitWebsite=Web Sayfasını Ziyaret Et...
+
+# Mods context menu
+menu_ResetAll=Hepsini Sıfırla
+menu_DisableAll=Hepsini Devre Dışı Bırak
+menu_Delete=Sil
+
+# Open menu
+menu_LauncherSettings=&Başlatıcı Ayarları...
+menu_GameSettings=&Oyun Ayarları...
+menu_Resources=Kaynaklar
+menu_Crashes=Hatalar
+menu_Caches=Ön Bellek (Cache)
+menu_Logs=Loglar
+
+# Messages
+message_ConfirmResetSettings=Başlatıcı ayarlarını sıfırlamak istediğine emin misin?\nBu ayar geri alınamaz, başlatıcı tekrardan başlatılacak.
+
+# Tabs
+tab_Favourites=Favoriler
+tab_Internet=Internet
+tab_Official=Resmi
+tab_History=Geçmiş
+tab_Local=Yerel
+tab_Mods=Modlar
+
+# Status
+status_Disconnected=Bağlantı kesildi
+status_Connecting=Bağlanılıyor
+status_Connected=Sunucu listesiyle bağlantı kuruldu
+
+# Labels
+label_Game=Oyun:
+label_GameEXEPath=Oyun EXE Dizini:
+
+# Tips
+tip_Games=Başlatılacak oyun.
+tip_CloseLauncher=Oyunu açarken bu pencereyi kapat.
+tip_Launch=Oyunu başlat.
+tip_BrowseForGame=Oyun yürütülebilir (.exe) dosyasını ara.
+tip_ShowInExplorer=Oyun yürütülebilir (.exe) dosyasını {0}'da göster.
+tip_GameEXEPath=Oyun yürütülebilir (.exe) dosyasının dizini.
+
+# Columns
+column_ServerName=Sunucu Adı
+column_Players=Oyuncular
+column_GameMode=Oyun Modu
+
+# Group Boxes
+group_Players=Oyuncular
+group_Rules=Kurallar
+
+# Buttons
+button_OpenMenu=Aç...
+button_CloseLauncher=Başlatıcıyı kapat
+button_Launch=Başlat
+button_ShowInExplorer={0}'da göster
+button_BrowseForGame=Bul...
+
+[AboutWindow]
+
+windowTitle=Hakkında
+group_About=Hakkında
+
+# Labels
+label_Product=Ürün:
+label_Copyright=Copyright © {0} {1}
+label_Version=Sürüm:
+label_GitBranch=Git Branchı:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Paket Sürümü:
+label_BuildDate=Sürüm Tarihi:
+label_BuildTime=Sürüm Zamanı:
+label_Website=Web sayfası:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Bu haftaki crashlar:
+label_Developers=Geliştiriciler:
+
+[SettingsWindow]
+
+windowTitle=Başlatıcı Ayarları
+gameSettingsTitle=Oyun Ayarları
+
+# Tabs
+tab_General=Genel
+tab_AdditionalResourcesFolders=Ek Kaynak Dosyaları
+tab_AdditionalMods=Ek Modlar
+tab_Display=Ekran
+tab_Advanced=Gelişmiş
+tab_NonModHacks=Modsuz Hileler
+tab_Licenses=Lisanslar
+tab_Language=Dil
+tab_BugFixes=Hata Düzeltmeleri
+tab_Debug=Hata Ayıklama
+
+# Labels
+label_Name=İsim:
+
+# Additional resource folders
+button_ResourceAdd=Ekle...
+tip_ResourceAdd=Yeni kaynak klasörü ekler.
+
+button_ResourceRemove=Kaldır
+tip_ResourceRemove=Seçilmiş kaynak klasörünü kaldır.
+
+button_ResourceUp=Yukarı
+tip_ResourceUp=Seçilmiş kaynak klasörünü yukarı çıkar.
+
+button_ResourceDown=Aşağı
+tip_ResourceDown=Seçilmiş kaynak klasörünü aşağı indir.
+
+tip_ResourceOpen={0}'daki seçilmiş kaynak klasörünü aç.
+button_ResourceOpen=Aç
+
+# Options
+opt_KeepSavedGamesSeparate=Kaydedilmiş Oyunları Ayrı Tut
+opt_KeepScreenshotsSeparate=Ekran Görüntülerini Ayrı Tut
+opt_SaveCrashDump=Hata Raporunu Kaydet
+opt_CheckForUpdates=Güncellemeleri kontrol et
+opt_Assertions=Assertionlar
+opt_DebugMode=Hata Ayıklama Modu
+opt_TerminateOnCrash=Hata olduğunda sonlandır
+opt_VerboseLogging=Detaylı log
+opt_GameOutput=Tüm oyun çıktısını konsolda göster
+opt_MultithreadedNetworking=Çok parçacıklı (Multithreaded) Ağ
+opt_SCM=SCM
+opt_DisableStoryMode=Hikaye Modunu Devre Dışı Bırak
+
+opt_AlwaysUsePrimaryMonitorResolution=Her zaman birinci monitör çözünürlüğünü kullan
+opt_AutomaticAspectRatio=Otomatik En Boy oranı
+opt_VCTrails=Vice City izleri
+tip_VCTrails=Vice City'deki izleri etkinleştir
+opt_AutoSave=Otomatik kaydetme
+opt_SyncAnimations=Animasyonları senkronize et
+opt_AllowDirectConnections=Doğrudan bağlantıları etkinleştir (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=Test
+label_Message=Test sürümünü etkinleştirmek için lütfen aşağıya erişim kodunu girin:
+
+[PasswordWindow]
+
+windowTitle=Şifre
+label_Message=Lütfen sunucuya bağlanmak için şifreyi girin:
+
+[AddServerWindow]
+
+windowTitle=Sunucu ekle
+label_Message=Yeni sunucu ekle SUNUCU ADRESI:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Oyuncu Haritası
+
+# Menu
+menu_VCStyle=&Vice City tarzı
