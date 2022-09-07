@@ -7,6 +7,22 @@
 #include "../Elements/ClientVehicle.h"
 #include <Utils/VectorTools.h>
 
+static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CVector3D pos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CClientEntity* pClientEntity = reinterpret_cast<CClientEntity*>(pClientManager->Create(ELEMENT_ENTITY));
+	pClientEntity->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientEntity);
+	pState->ReturnObject(pClientEntity);
+
+	return true;
+}
+
 static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -323,6 +339,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 	auto pClientManager = pClientGame->m_pClientManager;
 
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
+
+	pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
 
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
