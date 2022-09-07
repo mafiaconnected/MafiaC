@@ -1117,3 +1117,8 @@ void CClientVehicle::CreateNetBlender()
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
 	m_pBlender = pBlender;
 }
+
+void CClientVehicle::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
+{
+	GetGameVehicle()->ForceAI(value1, value2, value3, value4);
+}

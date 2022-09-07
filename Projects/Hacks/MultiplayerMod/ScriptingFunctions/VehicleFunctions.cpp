@@ -905,6 +905,43 @@ static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUse
 	pState->ReturnNumber((uint32_t)pClientVehicle->GetGameVehicle());
 	return true;
 }
+
+static bool FunctionVehicleForceAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiValue1;
+	if (!pState->CheckNumber(0, uiValue1))
+		return false;
+
+	uint32_t uiValue2;
+	if (!pState->CheckNumber(1, uiValue2))
+		return false;
+
+	uint32_t uiValue3;
+	if (!pState->CheckNumber(2, uiValue3))
+		return false;
+
+	uint32_t uiValue4;
+	if (!pState->CheckNumber(3, uiValue4))
+		return false;
+
+	if (pClientVehicle == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientVehicle->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
+
+	return true;
+}
+
 #pragma endregion
 
 void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
@@ -933,6 +970,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineHealth"), ARGUMENT_FLOAT, FunctionVehicleGetEngineHealth, FunctionVehicleSetEngineHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineRPM"), ARGUMENT_FLOAT, FunctionVehicleGetEngineRPM, FunctionVehicleSetEngineRPM);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionVehicleForceAI, pClientManager);
 
 	// Debug
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
