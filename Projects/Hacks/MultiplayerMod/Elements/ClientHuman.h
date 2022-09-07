@@ -127,4 +127,6 @@ public:
 	void SetBehavior(uint32_t iBehavior);
 
 	virtual void CreateNetBlender() override;
+
+	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 };

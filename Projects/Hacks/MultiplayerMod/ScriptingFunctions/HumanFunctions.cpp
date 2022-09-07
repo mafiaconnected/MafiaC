@@ -701,6 +701,42 @@ static bool FunctionHumanPlayAnim(IScriptState* pState, int argc, void* pUser)
 	pState->Error(_gstr("human not spawned"));
 	return false;
 }
+
+static bool FunctionHumanForceAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	uint32_t uiValue1;
+	if (!pState->CheckNumber(0, uiValue1))
+		return false;
+
+	uint32_t uiValue2;
+	if (!pState->CheckNumber(1, uiValue2))
+		return false;
+
+	uint32_t uiValue3;
+	if (!pState->CheckNumber(2, uiValue3))
+		return false;
+
+	uint32_t uiValue4;
+	if (!pState->CheckNumber(3, uiValue4))
+		return false;
+
+	if (pClientHuman == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientHuman->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
+
+	return true;
+}
 #pragma endregion
 
 void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
@@ -730,4 +766,5 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionHumanForceAI, pClientManager);
 }

@@ -951,3 +951,9 @@ void CClientHuman::CreateNetBlender()
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 20;
 	m_pBlender = pBlender;
 }
+
+
+void CClientHuman::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
+{
+	GetGameHuman()->ForceAI(value1, value2, value3, value4);
+}
