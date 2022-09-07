@@ -276,6 +276,26 @@ static bool FunctionSetPlayerControl(IScriptState* pState, int argc, void* pUser
 	return true;
 }
 
+static bool FunctionGameSetMoney(IScriptState* pState, int argc, void* pUser)
+{
+	int uiScore = 0;
+	if (!pState->CheckNumber(0, uiScore))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreSet(uiScore);
+	return true;
+}
+
+static bool FunctionGameEnableMoney(IScriptState* pState, int argc, void* pUser)
+{
+	bool bEnabled = false;
+	if (!pState->CheckBoolean(0, bEnabled))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreOn(bEnabled);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -369,6 +389,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
