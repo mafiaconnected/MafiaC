@@ -2,7 +2,7 @@
 ## Developer Guide
 
 ### What you'll need
-* Git (like [Github Desktop](https://git-scm.com/downloads](https://desktop.github.com/) or just the [basic git](https://git-scm.com/downloads))
+* Git (like [Github Desktop](https://desktop.github.com/) or just the [basic git](https://git-scm.com/downloads))
 * [Visual Studio 2017](https://www.visualstudio.com/downloads/) (With XP Support and C++)
 * [DirectX SDK](https://www.microsoft.com/en-gb/download/details.aspx?id=6812)
 * [CMake](https://cmake.org/download/)
