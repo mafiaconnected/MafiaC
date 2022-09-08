@@ -22,7 +22,13 @@ Galactic and ModLauncher belong to Jack's Mini Network and are private sources, 
 * Use the "Update Submodule.bat" tool for the cmake modules
 * Use the "Compile_VS2017_XP.bat" bat file in both repo folders to build them
 
+### Branch Structure
+* `main` contains the current public release as-is, and is never committed to or modified directly.
+* `nightly` contains all the working changes for the next update, and is never committed to or modified directly
+* Any other branch are stuff that's being worked on, usually PR's.
+
 ### Notes
+* All changes are handled via pull requests.
 * The client is split into "Hacks" which is a rather poorly chosen word to describe the "modules" of the project.
 * The "MultiplayerMod" is the main module for the project. Each engine will have a different MultiplayerMod module (like MultiplayerModTwo for Mafia 2)
 * In the repo's root folder, there are "Configure" bat files to create the VS solution and cmake files.
