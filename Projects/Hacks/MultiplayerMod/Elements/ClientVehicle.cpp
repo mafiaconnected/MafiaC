@@ -124,13 +124,12 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 		return;
 	}
 
-
 	// Set the position just a little higher ... some vehicles are spawning halfway into the ground :(
 	CVector3D pos2(pos);
 	pos2.z += 2.5f; // TODO
 	SetPosition(pos2);
 	SetRotation(rot);
-	SetRotationMat(CVecTools::ComputeDirVector(CVecTools::RadToDeg(rot.y)), m_RotationUp, m_RotationRight);
+	SetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
