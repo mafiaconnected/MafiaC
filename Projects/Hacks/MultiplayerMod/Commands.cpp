@@ -193,7 +193,7 @@ void CClientGame::RegisterCommands()
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CVarCommandHandler(&m_CVars), _gstr("cvar"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new Galactic3D::CDumpDocumentationCommandHandler(m_pResourceMgr), _gstr("dumpdoc"));
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new CChatScaleCommandHandler, _gstr("chatscale"));
-	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new Galactic3D::CHelpCommandHandler, _gstr("help"));
+	//m_pResourceMgr->m_pCommandHandlers->AddCommandHandler(new Galactic3D::CHelpCommandHandler, _gstr("help"));
 
 #if MAFIAC_RMLUI
 	m_pResourceMgr->m_pCommandHandlers->AddCommandHandler([](const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient) {
