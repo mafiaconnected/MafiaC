@@ -303,12 +303,12 @@ Section "" SecLauncher
 
 	RMDir "$INSTDIR\Redistributable"
 
-	File "..\Lib\x86\v141_xp\Release\Launcher.exe"
-	File "..\Lib\x86\v141_xp\Release\Updater.exe"
-	File "..\Lib\x86\v141_xp\Release\*.dll"
+	File "..\Lib\x86\v141_xp\RelWithDebInfo\Launcher.exe"
+	File "..\Lib\x86\v141_xp\RelWithDebInfo\Updater.exe"
+	File "..\Lib\x86\v141_xp\RelWithDebInfo\*.dll"
 	SetOutPath "$INSTDIR"
 	File "cacert.pem"
-	File "..\Lib\x86\v141_xp\Release\MafiaC.tar"
+	File "..\Lib\x86\v141_xp\RelWithDebInfo\MafiaC.tar"
 	File "resources.xml"
 
 	;SetOutPath "$INSTDIR\resources"
