@@ -39,9 +39,9 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 
 #ifndef _DEBUG
 #if PUBLIC_RELEASE
-	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://mafiaconnected.com/external/Launcher-Default.xml"));
+	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://ota.mafiaconnected.com/Launcher-Default.xml"));
 #else
-	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://mafiaconnected.com/external/Launcher-Temp.xml"));
+	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://ota.mafiaconnected.com/Launcher-Beta.xml"));
 #endif
 #endif
 
