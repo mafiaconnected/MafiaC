@@ -833,4 +833,9 @@ void CGameHooks::InstallHooks()
 	// Hook I3D_Model::Open
 	new CHackJumpHack(g_pHack, (void*)0x100335A0, HookModelOpen, 5);
 	g_ReturnModelOpen = (void*)(0x100335A0 + 5);
+
+	// (From Mex) To fix the fullscreen game being suspended when using alt+tab
+	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
+	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
+	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
 }
