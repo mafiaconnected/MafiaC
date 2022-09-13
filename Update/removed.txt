@@ -1,0 +1,7 @@
+Engine\lua.dll
+Engine\GalacticC.dll
+Engine\CrashReporter.exe
+Hacks\DebugTest.dll
+Engine.dll
+CrashReporter.exe
+*.dll
