@@ -833,4 +833,9 @@ void CGameHooks::InstallHooks()
 	// Hook I3D_Model::Open
 	new CHackJumpHack(g_pHack, (void*)0x100335A0, HookModelOpen, 5);
 	g_ReturnModelOpen = (void*)(0x100335A0 + 5);
+
+
+	// Fix bug window border disappears and bugs out the bottom of the window
+	uint32_t ui = 0x90CA0000;
+	new CHackValueHack(g_pHack, (void*)(0x1006EA5F + 1), 4, (unsigned char*)&ui);
 }
