@@ -262,12 +262,14 @@ RAWCODECALL SceneCreateActor(void)
 		//ObjTypes::Dog,
 		ObjTypes::Enemy,
 		//ObjTypes::Pumpar,
-		ObjTypes::Player
+		//ObjTypes::Player
 	};
 
 	for (auto forbidden_type : forbidden_objects) {
 		if (g_pSceneCreateActor_Type == forbidden_type && g_pSceneCreateActor_Frame != NULL) {
+			g_bCancelSceneCreateActor = true;
 			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 			if (frame_ex)
 				frame_ex->SetOn(false);
 			return;
@@ -275,7 +277,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Trolley && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -284,7 +288,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Door && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -293,6 +299,8 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Pumpar && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
+				g_bCancelSceneCreateActor = true;
+
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
@@ -302,7 +310,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Dog && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -311,7 +321,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Plane && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -321,6 +333,7 @@ RAWCODECALL SceneCreateActor(void)
 		if (g_pSceneCreateActor_Type == ObjTypes::RailRoute && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -329,6 +342,8 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::InitScript && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+				g_bCancelSceneCreateActor = true;
+
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
@@ -337,8 +352,10 @@ RAWCODECALL SceneCreateActor(void)
 		}
 
 		if (g_pSceneCreateActor_Type == ObjTypes::Car && g_pSceneCreateActor_Frame != NULL) {
-			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -347,7 +364,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::TrafficSetup && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
@@ -356,7 +375,9 @@ RAWCODECALL SceneCreateActor(void)
 
 		if (g_pSceneCreateActor_Type == ObjTypes::PedestrianSetup && g_pSceneCreateActor_Frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
+				g_bCancelSceneCreateActor = true;
 				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return;
