@@ -22,6 +22,13 @@ namespace MafiaSDK
 	struct C_Camera_Interface
 	{
 		I3D_Frame cameraFrame;
+		//PADDING(C_Camera_Interface, _pad0, 0x4);
+		//PADDING(C_Camera_Interface, _pad1, 0x356);
+		//S_matrix camMat1;
+		//PADDING(C_Camera_Interface, _pad2, 0x128);
+		//S_matrix camMat2;
+		//PADDING(C_Camera_Interface, _pad3, 0x64);
+		//S_matrix camMat3;
 	};
 
 	namespace C_Camera_Enum
