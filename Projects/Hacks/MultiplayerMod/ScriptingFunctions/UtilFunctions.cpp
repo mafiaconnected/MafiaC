@@ -423,7 +423,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 
 		// Compatibility with GTAC
-		//pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix); // TODO
+		pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix, FunctionSetCameraMatrix); // TODO
 		//pGameNamespace->RegisterFunction(_gstr("setCameraMatrix"), _gstr("x"), FunctionSetCameraMatrix, pClientGame); // TODO
 		pGameNamespace->RegisterFunction(_gstr("restoreCamera"), _gstr("|b"), FunctionRestoreCamera);
 		pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv|b"), FunctionSetCameraLookAt);
