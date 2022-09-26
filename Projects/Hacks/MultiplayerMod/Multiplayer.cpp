@@ -632,8 +632,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			//	break;
 			//}
 
-			m_bRestartingGame = true;
-			g_pClientGame->OnEndInGame();
+			//m_bRestartingGame = true;
+			//g_pClientGame->OnEndInGame();
 
 			MafiaSDK::GetMission()->MapLoad(mapName);
 			break;
