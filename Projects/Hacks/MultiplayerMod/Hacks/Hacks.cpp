@@ -44,7 +44,4 @@ void CGameHacks::InstallHacks()
     // Patch global mutex (allows multiple game instances)
     MemoryPatcher::InstallNopPatch(0x5BEC27, 6);
     //new CHackNOPHack(g_pHack, 0x5BEC27, 6);
-
-	// Force enable game map
-	*(BOOL *)(0x006C406C) = true;
 }
