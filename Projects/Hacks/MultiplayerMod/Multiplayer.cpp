@@ -621,6 +621,9 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			size_t size = 0;
 			GChar* map = Reader.ReadString(&size);
 
+			bool forceRejoin = false;
+			Reader.ReadBoolean(forceRejoin);
+
 			_glogprintf(_gstr("Recieved map name from server: %s"), map);
 
 			UTF8String mapName(true, map);
@@ -631,9 +634,16 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			//
 			//	break;
 			//}
-
-			m_bRestartingGame = true;
-			g_pClientGame->OnEndInGame();
+			
+			if (forceRejoin) {
+				m_bRestartingGame = true;
+				g_pClientGame->OnEndInGame();
+				g_pClientGame->m_bChangingMaps = true;
+			}
+			else 
+			{
+				g_pClientGame->m_bChangingMaps = false;
+			}
 
 			MafiaSDK::GetMission()->MapLoad(mapName);
 			break;

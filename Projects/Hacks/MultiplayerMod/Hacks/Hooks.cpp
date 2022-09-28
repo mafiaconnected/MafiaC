@@ -41,7 +41,9 @@ static void OnGameInit()
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		pMultiplayer->Join(); // elements/resources are delayed until this call
+		if (!g_pClientGame->m_bChangingMaps) {
+			pMultiplayer->Join(); // elements/resources are delayed until this call
+		}
 	}
 
 	CGameHacks::EnableGameMap(false);
@@ -55,6 +57,8 @@ static void OnGameInit()
 		if (bridge1) bridge1->Shutdown(true);
 		if (bridge2) bridge2->Shutdown(true);
 	}
+
+	g_pClientGame->m_bChangingMaps = false;
 
 	CArguments Args;
 	Args.AddString((const GChar*)mName);
