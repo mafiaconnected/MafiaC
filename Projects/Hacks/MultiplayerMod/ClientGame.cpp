@@ -159,6 +159,7 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_bTrainsEnabled = true;
 	m_bSupressNetworkedEntities = false;
 	m_iStopMultiplayerGameReason = -1;
+	m_bReconnectOnDisconnect = false;
 }
 
 CClientGame::~CClientGame(void)
@@ -1421,10 +1422,26 @@ void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
 			// Clear out CClientManager here
 			m_pResourceMgr->ClearAllResources();
 			m_pClientManager->Clear();
+
+			if (m_pClientManager != nullptr && m_pClientManager->m_pLocalPlayer != nullptr)
+				m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->Despawn();
 		}
 
 		OnEndInGame();
-		MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		//MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		OnStartInGame(true);
+
+		if (m_bReconnectOnDisconnect)
+		{
+			m_bReconnectOnDisconnect = false;
+
+			if (m_bPreviousServerExists)
+			{
+				Connect(m_szPreviousHost, m_usPreviousPort, m_szPreviousPassword);
+			}
+		}
 	}
 }
 

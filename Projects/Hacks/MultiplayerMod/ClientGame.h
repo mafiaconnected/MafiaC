@@ -211,6 +211,8 @@ public:
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
+	bool m_bReconnectOnDisconnect = false;
+
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }

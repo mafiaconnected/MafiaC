@@ -68,32 +68,29 @@ void CReconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar*
 {
 	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 
-	GString Host;
-	uint16_t usPort;
-
 	if (pMultiplayer != nullptr)
 	{
-		Host = pMultiplayer->m_szHost;
-		usPort = pMultiplayer->m_usPort;
-
-		g_pClientGame->StopMultiplayerGame(DISCONNECT_GRACEFUL, true);
-	}
-
-	if (g_pClientGame->m_bPreviousServerExists)
-	{
-		g_pClientGame->Connect(g_pClientGame->m_szPreviousHost, g_pClientGame->m_usPreviousPort, g_pClientGame->m_szPreviousPassword);
+		g_pClientGame->m_bReconnectOnDisconnect = true;
+		g_pClientGame->StopMultiplayerGameWhenSafe(DISCONNECT_GRACEFUL);
 	}
 	else
 	{
-		if (!Host.empty())
-			g_pClientGame->Connect(Host.c_str(), usPort, nullptr);
+		if (g_pClientGame->m_bPreviousServerExists)
+		{
+			g_pClientGame->OnStartInGame(true);
+			g_pClientGame->Connect(g_pClientGame->m_szPreviousHost, g_pClientGame->m_usPreviousPort, g_pClientGame->m_szPreviousPassword);
+		}
+		else
+		{
+			m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_WARN, _gstr("Haven't connected to a server!"));
+		}
 	}
 }
 
 void CDisconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
-		g_pClientGame->StopMultiplayerGame();
+		g_pClientGame->StopMultiplayerGameWhenSafe(DISCONNECT_GRACEFUL);
 	else
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_WARN, _gstr("Not connected to a server!"));
 }
