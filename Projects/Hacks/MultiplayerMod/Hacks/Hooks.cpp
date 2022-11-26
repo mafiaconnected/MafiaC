@@ -784,13 +784,13 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6);
 
 	// Disable local player weapon drop
-	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6);
 
 	// Disable weapon drops
-	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6);
 
 	// Game Exit
 	new CHackJumpHack(g_pHack, (void*)0x00612485, (void*)OnGameExit_Hook, 6);
@@ -838,4 +838,8 @@ void CGameHooks::InstallHooks()
 	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
+
+	// Fix bug where window border disappears and bugs out the bottom of the window
+	uint32_t ui = 0x90CA0000;
+	new CHackValueHack(g_pHack, (void*)(0x1006EA5F + 1), 4, (unsigned char*)&ui);
 }
