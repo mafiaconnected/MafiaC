@@ -11,9 +11,9 @@ Galactic and ModLauncher belong to Jack's Mini Network and are private sources, 
 * [DirectX SDK](https://www.microsoft.com/en-gb/download/details.aspx?id=6812)
 * [CMake](https://cmake.org/download/)
 * [SpiderMonkey](https://github.com/jack9267/SpiderMonkey)
-* [Dependencies Source](https://github.com/jack9267/Dependencies) or [Dependencies SDK](https://www.dropbox.com/s/g4xynz3hwlq7nud/Dependencies-31-05-2022.exe?dl=1)
-* [Galactic SDK](https://dev.jacksmininetwork.co.uk/galactic/releases/)
-* [ModLauncher SDK](https://dev.jacksmininetwork.co.uk/modlauncher/releases/)
+* [Dependencies Source](https://github.com/jack9267/Dependencies) or [Latest Dependencies SDK](https://nightly.jacksmininetwork.co.uk/)
+* [Latest Galactic SDK](https://nightly.jacksmininetwork.co.uk/)
+* [Latest ModLauncher SDK](https://nightly.jacksmininetwork.co.uk/)
 * [NASM](https://www.nasm.us/pub/nasm/releasebuilds/?C=M;O=D)
 
 ### Setup instructions
