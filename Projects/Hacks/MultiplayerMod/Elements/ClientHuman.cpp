@@ -661,7 +661,7 @@ int8_t CClientHuman::GetVehicleSeat(void)
 
 void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	GetGameHuman()->Use_Actor((MafiaSDK::C_Actor*)pVehicle->GetGameVehicle(), iSeat, 0, 0);
 
@@ -670,7 +670,7 @@ void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
 
 void CClientHuman::RemoveFromVehicle(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
 		return;
@@ -692,7 +692,7 @@ void CClientHuman::RemoveFromVehicle(void)
 
 void CClientHuman::ExitVehicle(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);
 	GetGameHuman()->Use_Actor(GetOccupiedVehicle()->GetGameVehicle(), m_nVehicleSeatIndex, 2, 0);
 
@@ -702,7 +702,7 @@ void CClientHuman::ExitVehicle(void)
 
 bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
 		return false;

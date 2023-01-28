@@ -650,7 +650,7 @@ void CClientGame::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 void CClientGame::OnPreStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_LastFrameTicks = OS::GetTicks();
 
@@ -665,7 +665,7 @@ void CClientGame::OnPreStartInGame(bool bRestarted)
 
 void CClientGame::OnStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	bool bMultiplayerInProgress = m_pMultiplayer != nullptr;
 	bool bMultiplayerRestartingGame = false;
@@ -781,7 +781,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 
 void CClientGame::OnEndInGame(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_pHtmlContainer->m_Images.clear();
 
