@@ -155,7 +155,6 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_pTime = nullptr;
 	m_iIcon = IDI_LAUNCHER;
 	m_bD3D9 = true;
-	m_bDebugMode = false;
 	m_bTrainsEnabled = true;
 	m_bSupressNetworkedEntities = false;
 	m_iStopMultiplayerGameReason = -1;
@@ -1508,11 +1507,6 @@ bool CClientGame::IsCursorEnabled2(void)
 	if (m_pResourceMgr != nullptr && m_pResourceMgr->IsCursorEnabled())
 		return true;
 	return false;
-}
-
-bool CClientGame::IsDebugMode(void)
-{
-	return m_bDebugMode;
 }
 
 bool CClientGame::DontClipCursor()

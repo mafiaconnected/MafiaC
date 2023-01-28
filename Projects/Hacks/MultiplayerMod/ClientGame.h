@@ -141,7 +141,6 @@ public:
 	C2D m_p2D;
 
 	bool m_bD3D9;
-	bool m_bDebugMode;
 
 	POINT m_OldCursorPos;
 
@@ -263,7 +262,6 @@ public:
 	bool IsInputDisabled(void);
 	bool IsCursorEnabled(void);
 	bool IsCursorEnabled2(void);
-	bool IsDebugMode(void);
 	bool UsePlayerInfo();
 
 	bool DontClipCursor();
