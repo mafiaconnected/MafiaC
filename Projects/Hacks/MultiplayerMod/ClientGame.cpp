@@ -44,7 +44,7 @@ void CMafiaCHtmlContainer::on_anchor_click(const litehtml::tchar_t* url, const l
 {
 	CArguments Args;
 	Args.AddObject(m_pActiveView);
-	Args.AddObject(GetObjectFromElement((litehtml::element::ptr)el));
+	Args.AddObject(GetObjectFromElement(m_pActiveView, (litehtml::element::ptr)el));
 	Args.AddString(url);
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnGUIAnchorClickEventType->Trigger(Args, bPreventDefault);
