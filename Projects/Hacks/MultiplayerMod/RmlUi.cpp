@@ -7,13 +7,12 @@
 
 extern CRw2D Rw2D;
 
-CRmlRenderInterface::CRmlRenderInterface(Context* pContext) :
-	CRmlBaseRenderInterface(pContext),
-	m_bScissor(false)
+CRmlRwRenderInterface::CRmlRwRenderInterface(Context* pContext) :
+	CRmlBaseRenderInterface(pContext)
 {
 }
 
-void CRmlRenderInterface::RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Rml::Vector2f& translation)
+void CRmlRwRenderInterface::RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Rml::Vector2f& translation)
 {
 	static RwIm2DVertex rgVertices[10000];
 	static RwImVertexIndex rgIndices[10000];
@@ -24,7 +23,7 @@ void CRmlRenderInterface::RenderGeometry(Rml::Vertex* vertices, int num_vertices
 	float fZ = RwIm2DGetNearScreenZ();
 	float fRHW = 1.0f / CGTA::GetCurrentRWCamera()->nearPlane;
 
-	for (size_t i = 0; i < num_vertices; i++)
+	for (int i = 0; i < num_vertices; i++)
 	{
 		CVector3D::TransformCoordinate(CVector3D(vertices[i].position.x + translation.x, vertices[i].position.y + translation.y, fZ), m_matTransform, rgVertices[i].vec);
 		rgVertices[i].vec.x -= 0.5f;
@@ -35,7 +34,7 @@ void CRmlRenderInterface::RenderGeometry(Rml::Vertex* vertices, int num_vertices
 		rgVertices[i].v = vertices[i].tex_coord.y;
 	}
 
-	for (size_t i = 0; i < num_indices; i++)
+	for (int i = 0; i < num_indices; i++)
 	{
 		rgIndices[i] = indices[i];
 	}
@@ -57,37 +56,29 @@ void CRmlRenderInterface::RenderGeometry(Rml::Vertex* vertices, int num_vertices
 
 #include <d3d8.h>
 
-void CRmlRenderInterface::EnableScissorRegion(bool enable)
+void CRmlRwRenderInterface::UpdateScissor()
 {
-	if (!enable)
-	{
-		m_vecScissorPos = Rml::Vector2i(0, 0);
-		m_vecScissorSize = Rml::Vector2i(CGTA::GetWidth(), CGTA::GetHeight());
-		m_bScissor = true;
-	}
-
-	UpdateScissor();
-}
-
-void CRmlRenderInterface::SetScissorRegion(int x, int y, int width, int height)
-{
-	m_vecScissorPos = Rml::Vector2i(x, y);
-	m_vecScissorSize = Rml::Vector2i(width, height);
-	m_bScissor = true;
-
-	UpdateScissor();
-}
-
-void CRmlRenderInterface::UpdateScissor()
-{
+	auto pD3DDevice = CGTA::GetD3DDevice();
 	if (m_bScissor)
 	{
-		auto pD3DDevice = CGTA::GetD3DDevice();
 		D3DVIEWPORT8 Viewport;
 		Viewport.X = m_vecScissorPos.x;
 		Viewport.Y = m_vecScissorPos.y;
 		Viewport.Width = m_vecScissorSize.x;
 		Viewport.Height = m_vecScissorSize.y;
+		Viewport.MinZ = 0;
+		Viewport.MaxZ = 1;
+		pD3DDevice->SetViewport(&Viewport);
+	}
+	else
+	{
+		D3DVIEWPORT8 Viewport;
+		Viewport.X = 0;
+		Viewport.Y = 0;
+		Viewport.Width = CGTA::GetWidth();
+		Viewport.Height = CGTA::GetHeight();
+		Viewport.MinZ = 0;
+		Viewport.MaxZ = 1;
 		pD3DDevice->SetViewport(&Viewport);
 	}
 }
@@ -96,7 +87,7 @@ CRmlUi2::CRmlUi2(Context* pContext) :
 	CRmlUi(pContext),
 	m_pDocument(nullptr)
 {
-	m_pRenderInterface = new CRmlRenderInterface(pContext);
+	m_pRenderInterface = new CRmlRwRenderInterface(pContext);
 }
 
 CRmlUi2::~CRmlUi2()
