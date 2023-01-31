@@ -130,7 +130,10 @@ bool CClientHuman::SetHealth(float fHealth)
 		return false;
 
 	GetGameHuman()->GetInterface()->health = fHealth;
-	MafiaSDK::GetIndicators()->PlayerSetWingmanLives((int)(fHealth / 2));
+
+	if (m_isLocalPlayer) {
+		MafiaSDK::GetIndicators()->PlayerSetWingmanLives((int)(fHealth / 2.0f));
+	}
 
 	return true;
 }
