@@ -1330,12 +1330,9 @@ bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
 
 bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
-	//_glogprintf(_gstr("ClientGame Connect - Init"));
 	if (GetMultiplayer() != NULL)
 	{
-		//_glogprintf(_gstr("ClientGame Connect - Multiplayer NULL"));
 		StopMultiplayerGame();
-		//MafiaSDK::GetIndicators()->ConsoleAddText("Disconnected from server", 0xFFFFFFFF);
 		m_pChatWindow->AddMessage(_gstr("Disconnected!"), Galactic3D::COLOUR::Red);
 		return false;
 	}
@@ -1347,41 +1344,34 @@ bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GCh
 			return false;
 		}
 	}
-
+	//m_pResourceMgr->ClearAllResources();
 	m_pNewMultiplayer = new CMultiplayer(m_pClientManager, &m_CVars);
 
-	if (m_pNewMultiplayer->InitAsClient())
+	m_pCmdWindow->FlushBuffers();
+	m_pCmdWindow->Disable();
+
+	if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
 	{
-		m_pCmdWindow->FlushBuffers();
-		m_pCmdWindow->Disable();
-
-		if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
+		if (m_szPreviousHost != pszHost)
 		{
-			if (m_szPreviousHost != pszHost)
-			{
-				m_bPreviousServerExists = true;
-				_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
-				m_usPreviousPort = usPort;
-				if (pszPassword == nullptr)
-					m_szPreviousPassword[0] = '\0';
-				else
-					_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
-			}
-
-			m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
-			m_CVars.Clear();
-
-			return true;
+			m_bPreviousServerExists = true;
+			_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
+			m_usPreviousPort = usPort;
+			if (pszPassword == nullptr)
+				m_szPreviousPassword[0] = '\0';
+			else
+				_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
 		}
-		else
-		{
-			m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
-			delete m_pNewMultiplayer;
-			m_pNewMultiplayer = NULL;
-		}
+
+		m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
+
+		m_CVars.Clear();
+
+		return true;
 	}
 	else
 	{
+		m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
 		delete m_pNewMultiplayer;
 		m_pNewMultiplayer = NULL;
 	}
@@ -2119,5 +2109,4 @@ void CClientGame::ShowDisconnectReason()
 		_gstr("KICKED")
 	};
 	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
-	//CGTAUtil::ShowHelpMessage("Disconnected");
 }
