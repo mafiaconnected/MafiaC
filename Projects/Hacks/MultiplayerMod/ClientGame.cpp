@@ -710,7 +710,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 		m_pClientManager->m_pChatWindow = m_pChatWindow;
 		m_pChatWindow->m_dwChatInfoColor = Galactic3D::COLOUR(255, 205, 60, 60);
 
-		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_Version.m_szDisplayVersion);
+		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, __gstr(LAUNCHER_DISPLAY_VERSION));
 	}
 	else
 	{
