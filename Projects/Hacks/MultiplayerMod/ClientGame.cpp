@@ -899,7 +899,7 @@ void CClientGame::LoadLobbyResource(void)
 					}
 					else
 					{
-						CString LauncherPath(false, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.length());
+						CString LauncherPath(false, CHackSupport::m_pInstance->m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_LauncherPath.length());
 						GString ModulePath = LauncherPath;
 						CString Name(false, pszName);
 						PathUtil::AppendPath(ModulePath, Name.CString());
