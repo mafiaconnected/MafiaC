@@ -110,6 +110,12 @@ static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
 	if (!mapName) return false;
 	UTF8String mapName2(true, mapName);
 
+	bool bFullReload = true;
+	if (!pState->CheckBoolean(1, bFullReload))
+		return false;
+
+	g_pClientGame->m_bFullReload = false;
+
 	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
 	MafiaSDK::GetMission()->MapLoad(mapName2);
 
@@ -396,7 +402,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s"), FunctionGameChangeMap, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s|b"), FunctionGameChangeMap, pClientManager);
 
 		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tvfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
