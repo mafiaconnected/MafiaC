@@ -840,6 +840,6 @@ void CGameHooks::InstallHooks()
 	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
 
 	// Fix bug where window border disappears and bugs out the bottom of the window
-	uint32_t ui = 0x90CA0000;
-	new CHackValueHack(g_pHack, (void*)(0x1006EA5F + 1), 4, (unsigned char*)&ui);
+	//uint32_t ui = 0x90CA0000;
+	//new CHackValueHack(g_pHack, (void*)(0x1006EA5F + 1), 4, (unsigned char*)&ui);
 }
