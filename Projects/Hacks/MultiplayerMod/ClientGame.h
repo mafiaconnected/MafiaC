@@ -37,6 +37,7 @@ enum eGameComponent
 	GAMECOMPONENT_DOGS,
 	GAMECOMPONENT_FUELSTATIONS, 
 	GAMECOMPONENT_PLANES,
+	GAMECOMPONENT_BIGMAP,
 };
 
 class CClientPlayer;
@@ -211,6 +212,9 @@ public:
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
 	bool m_bReconnectOnDisconnect = false;
+
+	bool m_bFullReload = true;
+	bool m_bDontReloadScripts = false;
 
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }

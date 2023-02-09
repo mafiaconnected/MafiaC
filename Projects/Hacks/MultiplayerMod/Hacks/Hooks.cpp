@@ -35,25 +35,27 @@ static void OnGameInit()
 	// We don't want the game to be initialized in menu
 	if (!strcmp(mName, "00menu")) return;
 
-	g_pClientGame->OnPreStartInGame(false);
-	g_pClientGame->OnStartInGame(false);
+	if (g_pClientGame->m_bFullReload) {
+		g_pClientGame->OnPreStartInGame(false);
+		g_pClientGame->OnStartInGame(false);
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
-	if (pMultiplayer != nullptr)
-	{
-		pMultiplayer->Join(); // elements/resources are delayed until this call
-	}
+		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		if (pMultiplayer != nullptr)
+		{
+			pMultiplayer->Join(); // elements/resources are delayed until this call
+		}
 
-	CGameHacks::EnableGameMap(false);
+		CGameHacks::EnableGameMap(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BIGMAP));
 
-	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
+		MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
 
-	if(!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
-		auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
-		auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
+			auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
+			auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
 
-		if (bridge1) bridge1->Shutdown(true);
-		if (bridge2) bridge2->Shutdown(true);
+			if (bridge1) bridge1->Shutdown(true);
+			if (bridge2) bridge2->Shutdown(true);
+		}
 	}
 
 	CArguments Args;

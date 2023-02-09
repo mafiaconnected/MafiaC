@@ -281,6 +281,9 @@ void CClientGame::InitialiseCVars()
 
 void CClientGame::InitialiseScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
@@ -354,6 +357,9 @@ void CClientGame::InitialiseScripting(void)
 
 void CClientGame::ShutdownScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	if (m_pCmdWindow != nullptr)
 	{
 		delete m_pCmdWindow;
@@ -2084,6 +2090,8 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		return m_CVars.GetBoolean(_gstr("Doors"), true);
 	case GAMECOMPONENT_PLANES:
 		return m_CVars.GetBoolean(_gstr("Planes"), true);
+	case GAMECOMPONENT_BIGMAP:
+		return m_CVars.GetBoolean(_gstr("BigMap"), true);
 	default:
 		break;
 	}
