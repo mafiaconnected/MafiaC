@@ -98,6 +98,8 @@ public:
 	virtual const GChar* GetModel() override;
 
 	void PlayAnim(const char* animName);
+	void StopAnim();
+
 
 	void Shoot(bool state, const CVector3D& dstPos);
 	void Jump();

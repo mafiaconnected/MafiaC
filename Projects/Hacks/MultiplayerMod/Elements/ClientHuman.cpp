@@ -752,6 +752,13 @@ void CClientHuman::PlayAnim(const char* animName)
 	m_MafiaHuman->Do_PlayAnim(animName);
 }
 
+void CClientHuman::StopAnim()
+{
+	if (m_MafiaHuman == nullptr) return;
+
+	m_MafiaHuman->Do_StopAnim();
+}
+
 void CClientHuman::Shoot(bool state, const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;

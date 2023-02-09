@@ -696,9 +696,13 @@ static bool FunctionHumanPlayAnim(IScriptState* pState, int argc, void* pUser)
 	if (!animName)
 		return false;
 
-	pClientHuman->PlayAnim((const char*)animName);
+	if (pClientHuman->GetGameHuman() == nullptr)
+	{
+		pState->Error(_gstr("human not spawned"));
+		return false;
+	}
 
-	pState->Error(_gstr("human not spawned"));
+	pClientHuman->PlayAnim((const char*)animName);
 	return false;
 }
 
