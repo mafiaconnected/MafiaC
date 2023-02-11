@@ -354,6 +354,9 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	if (GetGameHuman() == nullptr)
 		return false;
 
+	//if (m_isLocalPlayer)
+	//	return false;
+
 	auto IHuman = GetGameHuman()->GetInterface();
 
 	tHumanSyncPacket Packet;
