@@ -245,7 +245,10 @@ void CClientHuman::Kill(void)
 {
 	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
 	// Note (Vortrex): Fixed with new death call, old way is moved to CClientHuman::InstantDeath
+	//GetGameHuman()->Death();
 	GetGameHuman()->Death();
+	GetGameHuman()->RecompileDeathPos();
+	GetGameHuman()->Do_DeadBodyDrop();
 }
 
 void CClientHuman::InstantDeath(void)

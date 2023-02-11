@@ -52,7 +52,6 @@ namespace MafiaSDK
     {
 		enum FunctionsAddresses
 		{
-			Death = 0x570570,
 			Hit = 0x5762A0,
 			Intern_UseCar = 0x57E020,
 			Intern_FromCar = 0x57E500,
@@ -92,7 +91,10 @@ namespace MafiaSDK
 			Go_BackRight = 0x0057DC10,
 			PoseSetPoseAimed = 0x00579EA0,
 			PoseSetPoseNormal = 0x00579630,
-			EraseDynColls = 0x00575ED0
+			EraseDynColls = 0x00575ED0,
+			Death = 0x570570,
+			RecompileDeathPos = 0x58B8D0,
+			Do_DeadBodyDrop = 0x58B7E0,
         };
 
         //Thanks for DjBozkosz Documentation
@@ -156,16 +158,6 @@ namespace MafiaSDK
         {
             return *(float*)((unsigned long)this + (0x640 + property * 4));
         }
-
-		void Death(void)
-		{
-			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Death;
-			__asm
-			{
-				mov ecx, this
-				call funcAddress
-			}
-		}
 
         int Hit(int hitType, const S_vector & unk1, const S_vector & unk2, const S_vector & unk3, float damage, MafiaSDK::C_Actor* atacker, unsigned long hittedPart, MafiaSDK::I3D_Frame* targetFrame)
         {
@@ -730,6 +722,36 @@ namespace MafiaSDK
                 call funcAddress
             }
         }
+
+		void Death(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Death;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
+
+		void RecompileDeathPos(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::RecompileDeathPos;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
+
+		void Do_DeadBodyDrop(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Do_DeadBodyDrop;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
     };
 
     namespace C_Human_Hooks
