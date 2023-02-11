@@ -1086,24 +1086,6 @@ void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
-{
-	if (target->IsLocal() || !target->IsSyncer())
-		return;
-
-	Packet Packet(MAFIAPACKET_HUMAN_HIT);
-	//Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
-	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
-	Packet.Write<CVector3D>(v1);
-	Packet.Write<CVector3D>(v2);
-	Packet.Write<CVector3D>(v3);
-	Packet.Write<int32_t>(hitType);
-	Packet.Write<float>(damage);
-	Packet.Write<int32_t>(bodyPart);
-	SendHostPacket(&Packet);
-}
-
 void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 {
 	if (target->IsLocal() || !target->IsSyncer())
