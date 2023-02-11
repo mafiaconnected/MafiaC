@@ -244,6 +244,14 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 void CClientHuman::Kill(void)
 {
 	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
+	// Note (Vortrex): Fixed with new death call, old way is moved to CClientHuman::InstantDeath
+	GetGameHuman()->Death();
+}
+
+void CClientHuman::InstantDeath(void)
+{
+	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
+	// Note (Vortrex): Fixed with new death call
 	GetGameHuman()->Intern_ForceDeath();
 }
 
@@ -964,7 +972,6 @@ void CClientHuman::CreateNetBlender()
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 20;
 	m_pBlender = pBlender;
 }
-
 
 void CClientHuman::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
 {

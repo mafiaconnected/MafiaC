@@ -71,6 +71,7 @@ public:
 
 	virtual void Spawn(const CVector3D& pos, float angle, bool isLocal);
 	virtual void Kill(void);
+	virtual void InstantDeath(void);
 	virtual void Despawn(void);
 
 	virtual bool Create(void);
