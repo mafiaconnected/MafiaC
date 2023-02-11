@@ -1953,35 +1953,42 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
 	//args.AddObject(pClientHumanAttacker);
-	args.AddVector3D(v1);
-	args.AddVector3D(v2);
-	args.AddVector3D(v3);
-	args.AddNumber(hitType);
-	args.AddNumber(damage);
-	args.AddNumber(bodyPart);
+	args.AddVector3D(vec1);
+	args.AddVector3D(vec2);
+	args.AddVector3D(vec3);
+	args.AddNumber(uiHitType);
+	args.AddNumber(fDamage);
+	args.AddNumber(uiBodyPart);
 	g_pClientGame->m_pOnHumanHitEventType->Trigger(args);
 
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		if (pClientHumanTarget->IsLocal() || !pClientHumanTarget->IsSyncer())
-			return;
+		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
+	}
 
-		Packet Packet(MAFIAPACKET_HUMAN_HIT);
-		Packet.Write<int32_t>(pClientHumanTarget->GetId());
-		//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
-		Packet.Write<CVector3D>(v1);
-		Packet.Write<CVector3D>(v2);
-		Packet.Write<CVector3D>(v3);
-		Packet.Write<int32_t>(hitType);
-		Packet.Write<float>(damage);
-		Packet.Write<int32_t>(bodyPart);
-		m_pMultiplayer->SendHostPacket(&Packet);
+	float fNewHealth = pClientHumanTarget->GetHealth() - fDamage;
+
+	pClientHumanTarget->SetHealth(fNewHealth);
+
+	if (fNewHealth <= 0.0f)
+	{
+		CArguments args;
+		args.AddObject(pClientHumanTarget);
+		//args.AddObject(entityAttacker);
+		g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
+
+		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		if (pMultiplayer != nullptr)
+		{
+			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
+			pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
+		}
 	}
 }
 

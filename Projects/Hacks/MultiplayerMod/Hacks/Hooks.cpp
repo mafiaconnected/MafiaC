@@ -635,23 +635,22 @@ static void OnLocalPlayerFallDown()
 
 static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1, const S_vector& v2, const S_vector& v3, float damage, MafiaSDK::C_Actor* attacker, unsigned int bodyPart, MafiaSDK::I3D_Frame* targetFrame)
 {
-	//auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
-	//auto entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
+	auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
 
-	//g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	/*
+	auto entityAttacker = nullptr;
 
-	//if (humanTarget->GetHealth() <= 0) {
-	//	CArguments args;
-	//	args.AddObject(humanTarget);
-	//	args.AddObject(entityAttacker);
-	//	g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
-	//
-	//	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
-	//	if (pMultiplayer != nullptr)
-	//	{
-	//		pMultiplayer->SendHumanDeath(humanTarget, entityAttacker);
-	//	}
-	//}
+	if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy || attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Player) {
+		entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
+	}
+	else if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Car) 
+	{
+		entityAttacker = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)attacker);
+		g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	}
+	*/
+		
+	g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
 
 	return 1;
 }
@@ -840,8 +839,4 @@ void CGameHooks::InstallHooks()
 	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
-
-	// Fix bug where window border disappears and bugs out the bottom of the window
-	//uint32_t ui = 0x90CA0000;
-	//new CHackValueHack(g_pHack, (void*)(0x1006EA5F + 1), 4, (unsigned char*)&ui);
 }
