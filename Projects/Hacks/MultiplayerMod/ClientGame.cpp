@@ -303,20 +303,20 @@ void CClientGame::InitialiseScripting(void)
 	m_pOnGUIClickEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnGUIClick"), _gstr("Called when a GUIElement is clicked on"), 1);
 
 	// Register MafiaC events here
-	m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
-	m_pOnExampleEventType->m_bCanPreventDefault = true;
-	m_pOnExampleEventType->m_iSource = 0;
-	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"));
-	m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
-	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"));
-	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"));
-	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"));
+	//m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
+	//m_pOnExampleEventType->m_bCanPreventDefault = true;
+	//m_pOnExampleEventType->m_iSource = 0;
+	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, false);
+	//m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
+	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"), 7, true);
+	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, false);
+	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, false);
 
-	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"));
-	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"));
-	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"));
-	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"));
-	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"));
+	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, false);
+	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, false);
+	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, false);
+	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, false);
+	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, false);
 
 	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr, false, false, false, false, false);
 	m_pGalacticFunctions->m_p2D = &m_p2D;
@@ -1955,6 +1955,7 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 
 void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
+	bool bPreventDefault = false;
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
 	//args.AddObject(pClientHumanAttacker);
@@ -1964,7 +1965,10 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 	args.AddNumber(uiHitType);
 	args.AddNumber(fDamage);
 	args.AddNumber(uiBodyPart);
-	g_pClientGame->m_pOnHumanHitEventType->Trigger(args);
+	g_pClientGame->m_pOnHumanHitEventType->Trigger(args, bPreventDefault);
+
+	if (bPreventDefault)
+		return;
 
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
@@ -1972,12 +1976,22 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
 	}
 
-	float fNewHealth = pClientHumanTarget->GetHealth() - fDamage;
+	float fOldHealth = pClientHumanTarget->GetHealth();
+	float fNewHealth = fOldHealth - fDamage;
+
+	if (fNewHealth <= 0.0f)
+	{
+		fNewHealth = 0.0f;
+	}
+
+	_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
 
 	pClientHumanTarget->SetHealth(fNewHealth);
 
 	if (fNewHealth <= 0.0f)
 	{
+		pClientHumanTarget->Kill();
+
 		CArguments args;
 		args.AddObject(pClientHumanTarget);
 		//args.AddObject(entityAttacker);
