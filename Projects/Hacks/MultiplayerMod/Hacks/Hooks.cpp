@@ -839,4 +839,12 @@ void CGameHooks::InstallHooks()
 	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
+
+	// Fix bug where window border disappears and bugs out the bottom of the window
+	//DWORD uiOldProt = 0;
+	//DWORD uiOldProt2 = 0;
+	//VirtualProtect((void*)0x1006EA60, 4, PAGE_EXECUTE_READWRITE, &uiOldProt);
+	//uint32_t ui = 0x90CA0000;
+	//new CHackValueHack(g_pHack, (void*)(0x1006EA60), 4, (unsigned char*)&ui);
+	//VirtualProtect((void*)0x1006EA60, 4, uiOldProt, &uiOldProt2);
 }
