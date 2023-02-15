@@ -256,7 +256,7 @@ RAWCODECALL CarUpdate(void)
 	}
 }
 
-RAWCODECALL SceneCreateActor(void)
+MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, DWORD frame)
 {
 	using ObjTypes = MafiaSDK::C_Mission_Enum::ObjectTypes;
 	std::vector<ObjTypes> forbidden_objects = {
@@ -268,105 +268,105 @@ RAWCODECALL SceneCreateActor(void)
 	};
 
 	for (auto forbidden_type : forbidden_objects) {
-		if (g_pSceneCreateActor_Type == forbidden_type && g_pSceneCreateActor_Frame != NULL) {
-			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+		if (type == forbidden_type && frame != NULL) {
+			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 			if (frame_ex)
 				frame_ex->SetOn(false);
-			return;
+			return nullptr;
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Trolley && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Trolley && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Door && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Door && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Pumpar && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Pumpar && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Dog && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Dog && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Plane && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Plane && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::RailRoute && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::RailRoute && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::InitScript && g_pSceneCreateActor_Frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return;
-			}
-		}
+		//if (type == ObjTypes::InitScript && frame != NULL) {
+		//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+		//		if (frame_ex)
+		//			frame_ex->SetOn(false);
+		//		return nullptr;
+		//	}
+		//}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Car && g_pSceneCreateActor_Frame != NULL) {
-			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return;
-			}
-		}
+		//if (type == ObjTypes::Car && frame != NULL) {
+		//	if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+		//		if (frame_ex)
+		//			frame_ex->SetOn(false);
+		//		return nullptr;
+		//	}
+		//}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::TrafficSetup && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::TrafficSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::PedestrianSetup && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::PedestrianSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 	}
 
-	MafiaSDK::GetMission()->CreateActor(g_pSceneCreateActor_Type);
+	return MafiaSDK::GetMission()->CreateActor(type);
 }
 
 RAWCODECALL HumanSetAimPose(void)
@@ -512,25 +512,8 @@ RAWCODE HookCarUpdate(void)
 }
 
 // Unfinished
-RAWCODE HookSceneCreateActor(void)
+RAWCODE HookSceneCreateActor()
 {
-	_asm
-	{
-		mov g_pSceneCreateActor_Type, ecx
-		mov eax, [esp + 4]
-		mov g_pSceneCreateActor_Frame, eax
-		pushad
-	}
-	g_bCancelSceneCreateActor = false;
-	SceneCreateActor();
-	if (g_bCancelSceneCreateActor)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
 	__asm {
 		push edi
 		push eax
@@ -824,8 +807,8 @@ void CGameHooks::InstallHooks()
 	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
 
 	// Hook SceneCreateActor
-	//new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
-	//g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
+	g_ReturnSceneCreateActor = (void*)(0x00544B07);
+	new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 8);
 
 	// Hook Car::Update
 	new CHackJumpHack(g_pHack, (void*)0x41FAC0, HookCarUpdate, 6);
