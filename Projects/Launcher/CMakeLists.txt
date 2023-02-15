@@ -112,8 +112,11 @@ if(MSVC)
 	copy_file_all_configurations_to("${CMAKE_SOURCE_DIR}/Setup/dbghelp.dll" ${DLLS_FOLDER})
 
 	copy_dependency_to("${DEPENDENCIES_LIBS}" SDL2 dll ${DLLS_FOLDER})
+	copy_dependency_to("${DEPENDENCIES_LIBS}" SDL2 pdb ${DLLS_FOLDER})
 	copy_dependency_to("${DEPENDENCIES_LIBS}" sqlite3 dll ${DLLS_FOLDER})
+	copy_dependency_to("${DEPENDENCIES_LIBS}" sqlite3 pdb ${DLLS_FOLDER})
 	copy_dependency_to("${DEPENDENCIES_LIBS}" enet dll ${DLLS_FOLDER})
+	copy_dependency_to("${DEPENDENCIES_LIBS}" enet pdb ${DLLS_FOLDER})
 
 	install(DIRECTORY "${DEPENDENCIES_LIBS}/Debug/" DESTINATION "${LIB_DIRECTORY}/Debug/${DLLS_FOLDER}" CONFIGURATIONS Debug FILES_MATCHING PATTERN "bass.dll")
 	install(DIRECTORY "${DEPENDENCIES_LIBS}/Release/" DESTINATION "${LIB_DIRECTORY}/Release/${DLLS_FOLDER}" CONFIGURATIONS Release FILES_MATCHING PATTERN "bass.dll")
