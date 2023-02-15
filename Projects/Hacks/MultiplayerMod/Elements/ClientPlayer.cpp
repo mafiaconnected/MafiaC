@@ -13,6 +13,9 @@ using namespace Galactic3D;
 CClientPlayer::CClientPlayer(CMafiaClientManager* pClientManager) : CClientHuman(pClientManager)
 {
 	m_Type = ELEMENT_PLAYER;
+
+	m_Flags.m_bAlwaysExistForSyncer = true;
+
 	m_uiMoney = 0;
 }
 

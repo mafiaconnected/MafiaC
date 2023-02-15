@@ -3,6 +3,7 @@
 #include "../ClientManager.h"
 #include "../ClientGame.h"
 #include "../Elements/ClientHuman.h"
+#include <Utils/VectorTools.h>
 
 #pragma region Functions
 
@@ -15,16 +16,12 @@ static bool FunctionHumanKill(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->Kill();
 
 	return true;
 }
-
 
 static bool FunctionHumanDespawn(IScriptState* pState, int argc, void* pUser)
 {
@@ -35,10 +32,7 @@ static bool FunctionHumanDespawn(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->Despawn();
 
@@ -63,10 +57,7 @@ static bool FunctionHumanSpawn(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->Spawn(pos, angle, pClientHuman == pClientManager->m_pLocalPlayer);
 
@@ -91,10 +82,7 @@ static bool FunctionHumanRespawn(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->Spawn(pos, angle, pClientHuman == pClientManager->m_pLocalPlayer);
 
@@ -120,10 +108,7 @@ static bool FunctionHumanClearWeapons(IScriptState* pState, int argc, void* pUse
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->ClearInventory();
 
@@ -151,10 +136,7 @@ static bool FunctionHumanGiveWeapon(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->GiveWeapon(usWeaponId, ammo1, ammo2);
 
@@ -174,10 +156,7 @@ static bool FunctionHumanHasWeapon(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnBoolean(pClientHuman->HasWeapon(usWeaponId));
 
@@ -197,10 +176,7 @@ static bool FunctionHumanTakeWeapon(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->TakeWeapon(usWeaponId);
 
@@ -216,12 +192,41 @@ static bool FunctionHumanDropWeapon(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->DropWeapon();
+
+	return true;
+}
+
+static bool FunctionHumanHolsterWeapon(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pClientHuman->HolsterWeapon();
+
+	return true;
+}
+
+static bool FunctionHumanReloadWeapon(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pClientHuman->Reload();
 
 	return true;
 }
@@ -239,10 +244,7 @@ static bool FunctionHumanSetBehavior(IScriptState* pState, int argc, void* pUser
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->SetBehavior(uiBehavior);
 	return true;
@@ -283,10 +285,7 @@ static bool FunctionHumanGetAnimationState(IScriptState* pState, int argc, void*
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnNumber(pClientHuman->GetAnimationState());
 
@@ -303,12 +302,26 @@ static bool FunctionHumanGetAnimationStateLocal(IScriptState* pState, int argc, 
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnNumber(pClientHuman->GetAnimationStateLocal());
+
+	return true;
+}
+
+static bool FunctionHumanIsShooting(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnNumber(pClientHuman->IsShooting());
 
 	return true;
 }
@@ -323,10 +336,7 @@ static bool FunctionHumanGetHealth(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	float health = pClientHuman->GetHealth();
 
@@ -345,10 +355,7 @@ static bool FunctionHumanSetHealth(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	float health = 0;
 
@@ -370,14 +377,9 @@ static bool FunctionHumanGetHeading(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
-	float heading = pClientHuman->GetHeading();
-
-	pState->ReturnNumber(heading);
+	pState->ReturnNumber(pClientHuman->GetHeading());
 
 	return true;
 }
@@ -392,17 +394,13 @@ static bool FunctionHumanSetHeading(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
-	float heading = 0;
-
-	if (!pState->CheckNumber(0, heading))
+	float fHeading = 0;
+	if (!pState->CheckNumber(0, fHeading))
 		return false;
 
-	pClientHuman->SetHeading(heading);
+	pClientHuman->SetHeading(fHeading);
 
 	return true;
 }
@@ -424,8 +422,6 @@ static bool FunctionHumanGetPosition(IScriptState* pState, int argc, void* pUser
 
 		return true;
 	}
-
-	pState->Error(_gstr("human not spawned"));
 	return false;
 }
 
@@ -445,7 +441,6 @@ static bool FunctionHumanSetPosition(IScriptState* pState, int argc, void* pUser
 	if (pClientHuman->SetPosition(pos))
 		return true;
 
-	pState->Error(_gstr("human not spawned"));
 	return false;
 }
 
@@ -467,7 +462,6 @@ static bool FunctionHumanGetRotation(IScriptState* pState, int argc, void* pUser
 		return true;
 	}
 
-	pState->Error(_gstr("human not spawned"));
 	return false;
 }
 
@@ -484,10 +478,12 @@ static bool FunctionHumanSetRotation(IScriptState* pState, int argc, void* pUser
 	if (!pState->CheckVector3D(0, rot))
 		return false;
 
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
 	if (pClientHuman->SetRotation(rot))
 		return true;
 
-	pState->Error(_gstr("human not spawned"));
 	return false;
 }
 
@@ -501,11 +497,7 @@ static bool FunctionHumanGetSkin(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	const GChar* model = pClientHuman->GetModel();
 
@@ -527,10 +519,12 @@ static bool FunctionHumanSetSkin(IScriptState* pState, int argc, void* pUser)
 	if (!mdl)
 		return false;
 
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
 	if (pClientHuman->SetModel(mdl))
 		return true;
 
-	pState->Error(_gstr("human not spawned"));
 	return false;
 }
 
@@ -544,11 +538,7 @@ static bool FunctionHumanGetVehicle(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	CClientVehicle* pVehicle = pClientHuman->GetOccupiedVehicle();
 
@@ -567,10 +557,7 @@ static bool FunctionHumanGetAddress(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnNumber((uint32_t)pClientHuman->GetGameHuman()->GetInterface());
 
@@ -593,10 +580,7 @@ static bool FunctionHumanWarpIntoVehicle(IScriptState* pState, int argc, void* p
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->WarpIntoVehicle(pClientVehicle, ucSeat);
 	return true;
@@ -618,10 +602,7 @@ static bool FunctionHumanRemoveFromVehicle(IScriptState* pState, int argc, void*
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
-	{
-		pState->Error(_gstr("human not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->RemoveFromVehicle();
 	return true;
@@ -640,10 +621,44 @@ static bool FunctionHumanPlayAnim(IScriptState* pState, int argc, void* pUser)
 	if (!animName)
 		return false;
 
-	pClientHuman->PlayAnim((const char*)animName);
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
 
-	pState->Error(_gstr("human not spawned"));
+	pClientHuman->PlayAnim((const char*)animName);
 	return false;
+}
+
+static bool FunctionHumanForceAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	uint32_t uiValue1;
+	if (!pState->CheckNumber(0, uiValue1))
+		return false;
+
+	uint32_t uiValue2;
+	if (!pState->CheckNumber(1, uiValue2))
+		return false;
+
+	uint32_t uiValue3;
+	if (!pState->CheckNumber(2, uiValue3))
+		return false;
+
+	uint32_t uiValue4;
+	if (!pState->CheckNumber(3, uiValue4))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pClientHuman->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
+
+	return true;
 }
 #pragma endregion
 
@@ -651,27 +666,28 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 {
 	auto pClientManager = pClientGame->m_pClientManager;
 
-	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
-
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("kill"), _gstr("t"), FunctionHumanKill, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("respawn"), _gstr("tvf"), FunctionHumanRespawn, pClientManager);
+
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
 
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("vehicle"), ARGUMENT_OBJECT, FunctionHumanGetVehicle);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("skin"), ARGUMENT_STRING, FunctionHumanGetSkin, FunctionHumanSetSkin);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationState"), ARGUMENT_INTEGER, FunctionHumanGetAnimationState);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationStateLocal"), ARGUMENT_INTEGER, FunctionHumanGetAnimationStateLocal);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("isShooting"), ARGUMENT_BOOLEAN, FunctionHumanIsShooting);
 
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("clearWeapons"), _gstr("t"), FunctionHumanClearWeapons, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("giveWeapon"), _gstr("tiii"), FunctionHumanGiveWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("hasWeapon"), _gstr("ti"), FunctionHumanHasWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("takeWeapon"), _gstr("ti"), FunctionHumanTakeWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("dropWeapon"), _gstr("t"), FunctionHumanDropWeapon, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("holsterWeapon"), _gstr("t"), FunctionHumanHolsterWeapon, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("reloadWeapon"), _gstr("t"), FunctionHumanReloadWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
-
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
-
-	//pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionHumanForceAI, pClientManager);
 }

@@ -4,6 +4,7 @@
 #include "../ClientGame.h"
 #include "../Elements/ClientHuman.h"
 #include "../Elements/ClientVehicle.h"
+#include <Utils/VectorTools.h>
 
 #pragma region Functions
 static bool FunctionVehicleExplode(IScriptState* pState, int argc, void* pUser)
@@ -38,6 +39,44 @@ static bool FunctionVehicleRepair(IScriptState* pState, int argc, void* pUser)
 	return false;
 }
 
+static bool FunctionVehicleGetOccupant(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint8_t seat;
+	if (!pState->CheckNumber(0, seat))
+		return false;
+
+	pState->ReturnObject(pClientVehicle->GetHumanInSeat(seat));
+
+	return false;
+}
+
+static bool FunctionVehicleGetOccupants(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	auto pArray = new CArgumentArray();
+	for (size_t i = 0; i < 4; i++)
+	{
+		pArray->AddObject(pClientVehicle->GetHumanInSeat(i));
+	}
+
+	pState->Return(pArray);
+
+	return false;
+}
+
 static bool FunctionVehicleDespawn(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -69,6 +108,12 @@ static bool FunctionVehicleGetPosition(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D pos = { 0, 0, 0 };
 
 	if (pClientVehicle->GetPosition(pos))
@@ -78,7 +123,6 @@ static bool FunctionVehicleGetPosition(IScriptState* pState, int argc, void* pUs
 		return true;
 	}
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -91,6 +135,12 @@ static bool FunctionVehicleSetPosition(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D pos;
 	if (!pState->CheckVector3D(0, pos))
 		return false;
@@ -98,7 +148,6 @@ static bool FunctionVehicleSetPosition(IScriptState* pState, int argc, void* pUs
 	if (pClientVehicle->SetPosition(pos))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -111,6 +160,12 @@ static bool FunctionVehicleGetRotation(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D rot = { 0, 0, 0 };
 
 	if (pClientVehicle->GetRotation(rot))
@@ -120,7 +175,6 @@ static bool FunctionVehicleGetRotation(IScriptState* pState, int argc, void* pUs
 		return true;
 	}
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -133,6 +187,12 @@ static bool FunctionVehicleSetRotation(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D rot;
 	if (!pState->CheckVector3D(0, rot))
 		return false;
@@ -140,7 +200,6 @@ static bool FunctionVehicleSetRotation(IScriptState* pState, int argc, void* pUs
 	if (pClientVehicle->SetRotation(rot))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -153,6 +212,12 @@ static bool FunctionVehicleGetRotVelocity(IScriptState* pState, int argc, void* 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D vel = { 0, 0, 0 };
 
 	if (pClientVehicle->GetRotationVelocity(vel))
@@ -162,7 +227,6 @@ static bool FunctionVehicleGetRotVelocity(IScriptState* pState, int argc, void* 
 		return true;
 	}
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -175,6 +239,12 @@ static bool FunctionVehicleSetRotVelocity(IScriptState* pState, int argc, void* 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D vel;
 	if (!pState->CheckVector3D(0, vel))
 		return false;
@@ -182,7 +252,6 @@ static bool FunctionVehicleSetRotVelocity(IScriptState* pState, int argc, void* 
 	if (pClientVehicle->SetRotationVelocity(vel))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -195,6 +264,12 @@ static bool FunctionVehicleGetVelocity(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D vel = { 0, 0, 0 };
 
 	if (pClientVehicle->GetVelocity(vel))
@@ -204,7 +279,6 @@ static bool FunctionVehicleGetVelocity(IScriptState* pState, int argc, void* pUs
 		return true;
 	}
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -217,6 +291,12 @@ static bool FunctionVehicleSetVelocity(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	CVector3D vel;
 	if (!pState->CheckVector3D(0, vel))
 		return false;
@@ -224,7 +304,6 @@ static bool FunctionVehicleSetVelocity(IScriptState* pState, int argc, void* pUs
 	if (pClientVehicle->SetVelocity(vel))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -257,6 +336,12 @@ static bool FunctionVehicleSetSiren(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	bool state;
 	if (!pState->CheckBoolean(0, state))
 		return false;
@@ -264,7 +349,6 @@ static bool FunctionVehicleSetSiren(IScriptState* pState, int argc, void* pUser)
 	if (pClientVehicle->SetSiren(state))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -276,6 +360,12 @@ static bool FunctionVehicleGetLocked(IScriptState* pState, int argc, void* pUser
 
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
 
 	if (pClientVehicle == nullptr)
 	{
@@ -297,6 +387,12 @@ static bool FunctionVehicleSetLocked(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	bool state;
 	if (!pState->CheckBoolean(0, state))
 		return false;
@@ -304,7 +400,6 @@ static bool FunctionVehicleSetLocked(IScriptState* pState, int argc, void* pUser
 	if (pClientVehicle->SetLocked(state))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -317,7 +412,7 @@ static bool FunctionVehicleGetLights(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -337,6 +432,12 @@ static bool FunctionVehicleSetLights(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	bool state;
 	if (!pState->CheckBoolean(0, state))
 		return false;
@@ -344,7 +445,6 @@ static bool FunctionVehicleSetLights(IScriptState* pState, int argc, void* pUser
 	if (pClientVehicle->SetLights(state))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -357,7 +457,7 @@ static bool FunctionVehicleGetEngine(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -377,6 +477,12 @@ static bool FunctionVehicleSetEngine(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	bool state;
 	if (!pState->CheckBoolean(0, state))
 		return false;
@@ -384,7 +490,6 @@ static bool FunctionVehicleSetEngine(IScriptState* pState, int argc, void* pUser
 	if (pClientVehicle->SetEngine(state))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -397,7 +502,7 @@ static bool FunctionVehicleGetRoof(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -417,6 +522,12 @@ static bool FunctionVehicleSetRoof(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	bool roof;
 	if (!pState->CheckBoolean(0, roof))
 		return false;
@@ -424,7 +535,6 @@ static bool FunctionVehicleSetRoof(IScriptState* pState, int argc, void* pUser)
 	if (pClientVehicle->SetRoof(roof))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -437,7 +547,7 @@ static bool FunctionVehicleGetFuel(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -457,6 +567,12 @@ static bool FunctionVehicleSetFuel(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float fuel;
 	if (!pState->CheckNumber(0, fuel))
 		return false;
@@ -464,7 +580,6 @@ static bool FunctionVehicleSetFuel(IScriptState* pState, int argc, void* pUser)
 	if (pClientVehicle->SetFuel(fuel))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -477,6 +592,12 @@ static bool FunctionVehicleSetWheelAngle(IScriptState* pState, int argc, void* p
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float wheelAngle;
 	if (!pState->CheckNumber(0, wheelAngle))
 		return false;
@@ -484,7 +605,6 @@ static bool FunctionVehicleSetWheelAngle(IScriptState* pState, int argc, void* p
 	if (pClientVehicle->SetWheelAngle(wheelAngle))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -497,7 +617,7 @@ static bool FunctionVehicleGetWheelAngle(IScriptState* pState, int argc, void* p
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -517,7 +637,7 @@ static bool FunctionVehicleGetSpeedLimit(IScriptState* pState, int argc, void* p
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -537,6 +657,12 @@ static bool FunctionVehicleSetSpeedLimit(IScriptState* pState, int argc, void* p
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float speedLimit;
 	if (!pState->CheckNumber(0, speedLimit))
 		return false;
@@ -544,7 +670,6 @@ static bool FunctionVehicleSetSpeedLimit(IScriptState* pState, int argc, void* p
 	if (pClientVehicle->SetSpeedLimit(speedLimit))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -557,7 +682,7 @@ static bool FunctionVehicleGetGear(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -577,6 +702,12 @@ static bool FunctionVehicleSetGear(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float gear;
 	if (!pState->CheckNumber(0, gear))
 		return false;
@@ -584,7 +715,6 @@ static bool FunctionVehicleSetGear(IScriptState* pState, int argc, void* pUser)
 	if (pClientVehicle->SetGear(gear))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -597,7 +727,7 @@ static bool FunctionVehicleGetOdometer(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -617,6 +747,12 @@ static bool FunctionVehicleSetOdometer(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float odometer;
 	if (!pState->CheckNumber(0, odometer))
 		return false;
@@ -624,7 +760,6 @@ static bool FunctionVehicleSetOdometer(IScriptState* pState, int argc, void* pUs
 	if (pClientVehicle->SetOdometer(odometer))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -637,7 +772,7 @@ static bool FunctionVehicleGetSpeed(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -657,6 +792,12 @@ static bool FunctionVehicleSetSpeed(IScriptState* pState, int argc, void* pUser)
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float speed;
 	if (!pState->CheckNumber(0, speed))
 		return false;
@@ -664,7 +805,6 @@ static bool FunctionVehicleSetSpeed(IScriptState* pState, int argc, void* pUser)
 	if (pClientVehicle->SetSpeed(speed))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -677,7 +817,7 @@ static bool FunctionVehicleGetEngineHealth(IScriptState* pState, int argc, void*
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -697,6 +837,12 @@ static bool FunctionVehicleSetEngineHealth(IScriptState* pState, int argc, void*
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float engineHealth;
 	if (!pState->CheckNumber(0, engineHealth))
 		return false;
@@ -704,7 +850,6 @@ static bool FunctionVehicleSetEngineHealth(IScriptState* pState, int argc, void*
 	if (pClientVehicle->SetEngineHealth(engineHealth))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -717,7 +862,7 @@ static bool FunctionVehicleGetHealth(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -737,6 +882,12 @@ static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float health;
 	if (!pState->CheckNumber(0, health))
 		return false;
@@ -744,7 +895,6 @@ static bool FunctionVehicleSetHealth(IScriptState* pState, int argc, void* pUser
 	if (pClientVehicle->SetHealth(health))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -757,7 +907,7 @@ static bool FunctionVehicleGetEngineRPM(IScriptState* pState, int argc, void* pU
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -777,6 +927,12 @@ static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pU
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	float engineRPM;
 	if (!pState->CheckNumber(0, engineRPM))
 		return false;
@@ -784,7 +940,51 @@ static bool FunctionVehicleSetEngineRPM(IScriptState* pState, int argc, void* pU
 	if (pClientVehicle->SetEngineRPM(engineRPM))
 		return true;
 
-	pState->Error(_gstr("vehicle not spawned"));
+	return false;
+}
+
+static bool FunctionVehicleGetHeading(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pState->ReturnNumber(pClientVehicle->GetHeading());
+
+	return true;
+}
+
+static bool FunctionVehicleSetHeading(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	float fHeading;
+	if (!pState->CheckNumber(0, fHeading))
+		return false;
+
+	if (pClientVehicle->SetHeading(fHeading))
+		return true;
+
 	return false;
 }
 
@@ -797,6 +997,12 @@ static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUs
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
 	uint8_t state;
 	if (!pState->CheckNumber(0, state))
 		return false;
@@ -804,7 +1010,6 @@ static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUs
 	if (pClientVehicle->GetGameVehicle() != nullptr)
 		pClientVehicle->GetGameVehicle()->SetActState(state);
 
-	pState->Error(_gstr("vehicle not spawned"));
 	return false;
 }
 
@@ -817,7 +1022,7 @@ static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUse
 	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
 		return false;
 
-	if (pClientVehicle == nullptr)
+	if (pClientVehicle->GetGameVehicle() == nullptr)
 	{
 		pState->Error(_gstr("vehicle not spawned"));
 		return false;
@@ -826,14 +1031,55 @@ static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUse
 	pState->ReturnNumber((uint32_t)pClientVehicle->GetGameVehicle());
 	return true;
 }
+
+static bool FunctionVehicleForceAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiValue1;
+	if (!pState->CheckNumber(0, uiValue1))
+		return false;
+
+	uint32_t uiValue2;
+	if (!pState->CheckNumber(1, uiValue2))
+		return false;
+
+	uint32_t uiValue3;
+	if (!pState->CheckNumber(2, uiValue3))
+		return false;
+
+	uint32_t uiValue4;
+	if (!pState->CheckNumber(3, uiValue4))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientVehicle->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
+
+	return true;
+}
+
 #pragma endregion
 
 void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
 	auto pClientManager = pClientGame->m_pClientManager;
 
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionVehicleGetHeading, FunctionVehicleSetHeading);
+
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("explode"), _gstr("t"), FunctionVehicleExplode, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("repair"), _gstr("t"), FunctionVehicleRepair, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupant"), _gstr("ti"), FunctionVehicleGetOccupant, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupants"), _gstr("t"), FunctionVehicleGetOccupants, pClientManager);
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("siren"), ARGUMENT_BOOLEAN, FunctionVehicleGetSiren, FunctionVehicleSetSiren);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("lights"), ARGUMENT_BOOLEAN, FunctionVehicleGetLights, FunctionVehicleSetLights);
@@ -850,6 +1096,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineHealth"), ARGUMENT_FLOAT, FunctionVehicleGetEngineHealth, FunctionVehicleSetEngineHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineRPM"), ARGUMENT_FLOAT, FunctionVehicleGetEngineRPM, FunctionVehicleSetEngineRPM);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionVehicleForceAI, pClientManager);
 
 	// Debug
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);

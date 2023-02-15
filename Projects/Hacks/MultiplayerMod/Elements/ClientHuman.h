@@ -54,8 +54,8 @@ public:
 	virtual bool SetRotation(const CVector3D& vecRot) override;
 	virtual bool GetRotation(CVector3D& vecRot) override;
 
-	virtual bool SetHeading(float heading);
-	virtual float GetHeading();
+	virtual bool SetHeading(float heading) override;
+	virtual float GetHeading() override;
 
 	virtual bool SetHealth(float fHealth);
 	virtual float GetHealth();
@@ -71,6 +71,7 @@ public:
 
 	virtual void Spawn(const CVector3D& pos, float angle, bool isLocal);
 	virtual void Kill(void);
+	virtual void InstantDeath(void);
 	virtual void Despawn(void);
 
 	virtual bool Create(void);
@@ -98,6 +99,8 @@ public:
 	virtual const GChar* GetModel() override;
 
 	void PlayAnim(const char* animName);
+	void StopAnim();
+
 
 	void Shoot(bool state, const CVector3D& dstPos);
 	void Jump();
@@ -120,9 +123,13 @@ public:
 	virtual int GetAnimationState();
 	virtual int GetAnimationStateLocal();
 
+	bool IsShooting();
+
 	virtual void SetFromExistingEntity(MafiaSDK::C_Human* human);
 
 	void SetBehavior(uint32_t iBehavior);
 
 	virtual void CreateNetBlender() override;
+
+	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 };

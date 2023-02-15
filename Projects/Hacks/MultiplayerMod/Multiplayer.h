@@ -10,6 +10,8 @@ class CClientVehicle;
 
 #define MAFIA_P2P_SERVER_IDS 1
 
+CNetObject* FromGUID(uint64_t uiGuid);
+
 class CMultiplayer : public Galactic3D::CClientNetGame
 {
 public:
@@ -38,8 +40,8 @@ public:
 	void ProcessNewPeerElements();
 
 	void SendLocalPlayerShoot(bool bState, CVector3D position);
-	void SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart);
-	void SendHumanDeath(CClientHuman* target, CClientHuman* attacker);
+	void SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart);
+	void SendHumanDeath(CClientHuman* target, CClientEntity* attacker);
 	void SendHumanDropWeapon(CClientHuman* target);
 	void SendHumanChangeWeapon(CClientHuman* target, int8_t weapon);
 };

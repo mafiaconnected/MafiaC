@@ -10,6 +10,7 @@
 #include <LucasFont/LucasFont.h>
 #include <Network/InternetRequestMgr.h>
 #include "Elements/Elements.h"
+#include "RmlUi.h"
 //#include <GameVersion.h>
 
 //eGameVersion g_GameVersion;
@@ -22,6 +23,21 @@ namespace Galactic3D
 	class CChatWindow;
 	class CCmdWindow2;
 	class CClientDownloadManager;
+};
+
+enum eGameComponent
+{
+	GAMECOMPONENT_TRAFFIC,
+	GAMECOMPONENT_CIVILIANS,
+	GAMECOMPONENT_TRAINS,
+	GAMECOMPONENT_BRIDGES,
+	GAMECOMPONENT_SCRIPTS,
+	GAMECOMPONENT_TROLLEYS,
+	GAMECOMPONENT_DOORS,
+	GAMECOMPONENT_DOGS,
+	GAMECOMPONENT_FUELSTATIONS, 
+	GAMECOMPONENT_PLANES,
+	GAMECOMPONENT_BIGMAP,
 };
 
 class CClientPlayer;
@@ -126,7 +142,6 @@ public:
 	C2D m_p2D;
 
 	bool m_bD3D9;
-	bool m_bDebugMode;
 
 	POINT m_OldCursorPos;
 
@@ -176,6 +191,10 @@ public:
 	litehtml::context m_BrowserContext;
 	CHtmlView* m_pHtmlView;
 
+#if MAFIAC_RMLUI
+	CRmlUi2* m_pRmlUi;
+#endif
+
 	bool m_bCapured;
 
 	bool m_bSupressNetworkedEntities;
@@ -188,8 +207,14 @@ public:
 	bool m_bUseActorInvokedByGame = true;
 	bool m_bDoThrowCocotFromCarInvokedByGame = true;
 	bool m_bCreateActorInvokedByGame = true;
+	bool m_bCreateVehicleInvokedByGame = true;
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
+
+	bool m_bReconnectOnDisconnect = false;
+
+	bool m_bFullReload = true;
+	bool m_bDontReloadScripts = false;
 
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
@@ -216,6 +241,8 @@ public:
 	void ResetWorld(void);
 	void LoadLobbyResource(void);
 
+	void ShowDisconnectReason();
+
 	void OnProcess(void);
 	void OnFrame(void);
 
@@ -239,7 +266,6 @@ public:
 	bool IsInputDisabled(void);
 	bool IsCursorEnabled(void);
 	bool IsCursorEnabled2(void);
-	bool IsDebugMode(void);
 	bool UsePlayerInfo();
 
 	bool DontClipCursor();
@@ -265,9 +291,15 @@ public:
 	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
 	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat);
-	void HumanHit(CClientHuman* humanTarget, CClientEntity* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
+	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
+
+	bool OnTrafficCarCreate(MafiaSDK::C_Car* pCar);
+	//bool OnTrafficCarReset(MafiaSDK::C_Car* pCar);
+	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
+
+	bool IsGameComponentEnabled(eGameComponent GameComponent);
 };
 
 extern CClientGame* g_pClientGame;

@@ -5,62 +5,50 @@
 
 #include "d3d8to9.hpp"
 
-// IDirect3DVolume8
 Direct3DVolume8::Direct3DVolume8(Direct3DDevice8 *Device, IDirect3DVolume9 *ProxyInterface) :
 	Device(Device), ProxyInterface(ProxyInterface)
 {
-	//Device->AddRef();
+	Device->ProxyAddressLookupTable->SaveAddress(this, ProxyInterface);
 }
 Direct3DVolume8::~Direct3DVolume8()
 {
-	ProxyInterface->Release();
-	//Device->Release();
 }
 
 HRESULT STDMETHODCALLTYPE Direct3DVolume8::QueryInterface(REFIID riid, void **ppvObj)
 {
 	if (ppvObj == nullptr)
-	{
 		return E_POINTER;
-	}
 
-	if (riid == __uuidof(this) ||
+	if (riid == __uuidof(IDirect3DVolume8) ||
 		riid == __uuidof(IUnknown))
 	{
 		AddRef();
-
-		*ppvObj = this;
+		*ppvObj = static_cast<IDirect3DVolume8 *>(this);
 
 		return S_OK;
 	}
 
-	return ProxyInterface->QueryInterface(riid, ppvObj);
+	const HRESULT hr = ProxyInterface->QueryInterface(ConvertREFIID(riid), ppvObj);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppvObj, Device);
+
+	return hr;
 }
 ULONG STDMETHODCALLTYPE Direct3DVolume8::AddRef()
 {
-	return InterlockedIncrement(&RefCount);
+	return ProxyInterface->AddRef();
 }
 ULONG STDMETHODCALLTYPE Direct3DVolume8::Release()
 {
-	const ULONG LastRefCount = InterlockedDecrement(&RefCount);
-
-	if (LastRefCount == 0)
-	{
-		delete this;
-	}
-
-	return LastRefCount;
+	return ProxyInterface->Release();
 }
 
-HRESULT STDMETHODCALLTYPE Direct3DVolume8::GetDevice(Direct3DDevice8 **ppDevice)
+HRESULT STDMETHODCALLTYPE Direct3DVolume8::GetDevice(IDirect3DDevice8 **ppDevice)
 {
 	if (ppDevice == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	Device->AddRef();
-
 	*ppDevice = Device;
 
 	return D3D_OK;
@@ -79,23 +67,22 @@ HRESULT STDMETHODCALLTYPE Direct3DVolume8::FreePrivateData(REFGUID refguid)
 }
 HRESULT STDMETHODCALLTYPE Direct3DVolume8::GetContainer(REFIID riid, void **ppContainer)
 {
-	return ProxyInterface->GetContainer(riid, ppContainer);
+	const HRESULT hr = ProxyInterface->GetContainer(ConvertREFIID(riid), ppContainer);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppContainer, Device);
+
+	return hr;
 }
 HRESULT STDMETHODCALLTYPE Direct3DVolume8::GetDesc(D3DVOLUME_DESC8 *pDesc)
 {
 	if (pDesc == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	D3DVOLUME_DESC VolumeDesc;
 
 	const HRESULT hr = ProxyInterface->GetDesc(&VolumeDesc);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	ConvertVolumeDesc(VolumeDesc, *pDesc);
 

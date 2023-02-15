@@ -12,6 +12,9 @@ language_German=German
 language_Italian=Italian
 language_Spanish=Spanish
 language_Russian=Russian
+language_Arabic=Arabic
+language_Chinese=Chinese (Simplified)
+language_Persian=Persian
 
 # Tips
 tip_Close=Close this window.
@@ -190,6 +193,7 @@ opt_KeepSavedGamesSeparate=Keep Saved Games Separate
 opt_KeepScreenshotsSeparate=Keep Screenshots Separate
 opt_SaveCrashDump=Save Crash Dump
 opt_CheckForUpdates=Check for updates
+opt_Assertions=Assertions
 opt_DebugMode=Debug mode
 opt_TerminateOnCrash=Terminate on crash
 opt_VerboseLogging=Verbose logging
@@ -200,8 +204,6 @@ opt_DisableStoryMode=Disable Story Mode
 
 opt_AlwaysUsePrimaryMonitorResolution=Always use primary monitor resolution
 opt_AutomaticAspectRatio=Automatic aspect ratio
-opt_InvisibleObjectsFix=Fix some invisible objects
-tip_InvisibleObjectsFix=This option fixes certain objects being treated as big buildings.\nIn Grand Theft Auto: III this includes the cranes at Portland Docks.\nIn Liberty City - The Leftovers Fix they attempt to fix this issue by reducing the draw distance so the game won't treat these objects as big buildings.\nWhile that fix works up close, it's wrong as the cranes can no longer be seen from far away.\nThe correct fix is to make non-lod objects not treated as a big building.
 opt_VCTrails=Vice City trails
 tip_VCTrails=Enables trails in Vice City
 opt_AutoSave=Auto save

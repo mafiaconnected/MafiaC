@@ -1,0 +1,236 @@
+﻿[Language]
+name=Persian
+native_name=فارسی
+author=DARHAM
+
+[Common]
+
+# Languages
+language_English=انگلیسی
+language_French=فرانسوی
+language_German=آلمانی
+language_Italian=ایتالیایی
+language_Spanish=اسپانیایی
+language_Russian=روسی
+language_Arabic=عربی
+language_Chinese=چینی (ساده)
+language_Persian=فارسی
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
+
+# Tips
+tip_Close=بستن پنجره
+tip_Okay=بستن پنجره و ذخیره تغییرات
+tip_Cancel=بستن پنجره بدون ذخیره تغییرات
+
+# Columns
+column_Name=نام
+column_Title=عنوان
+column_Version=نسخه
+column_ModifiedDate=آخرین تغییر
+column_Description=توضیحات
+column_Key=کلید
+column_Value=درباره سرور
+
+# Buttons
+button_Okay=تأیید
+button_Close=بستن
+button_Cancel=کنسل
+button_Yes=بله
+button_No=خیر
+button_Retry=تلاش مجدد
+button_Abort=صرف نظر
+
+[LauncherWindow]
+
+# Menu
+menu_File=&فایل
+menu_CheckForUpdates=بررسی آخرین نسخه
+menu_Exit=&خروج
+
+menu_Server=&سرور
+menu_AddServer=اضافه کردن سرور
+menu_DeleteServer=حذف سرور
+
+menu_Tools=&ابزار
+menu_Settings=&تنظیمات
+menu_ResetSettings=بازنشانی تنظیمات
+menu_DesktopShortcut=ایجاد شرتکات روی صفحه
+
+menu_View=&نمایش
+menu_Players=&بازیکنان
+menu_Rules=&قوانین
+menu_FullWidthRules=همه &و قوانین
+
+menu_Help=&کمک
+menu_RunDiagnostics=اجرا &تشخیص خودکار
+menu_About=& درباره
+menu_Licenses=دیدن &دسترسی ها
+
+# Generic/Multiplayer
+menu_LargeIcons=آیکون های بزرگ
+menu_Refresh=رفرش
+menu_Connect=اتصال
+menu_AddToFavourites=افزودن به موردعلاقه ها
+menu_Favourite=موردعلاقه ها
+menu_CopyServerIP=کپی آیپی سرور
+menu_CopyAddress=کپی آدرس سرور
+menu_ViewPlayerMap=دیدن مپ بازیکن
+menu_VisitWebsite=بازدید از سایت
+
+# Mods context menu
+menu_ResetAll=بازنشانی همه
+menu_DisableAll=غیرفعال کردن همه
+menu_Delete=حذف
+
+# Open menu
+menu_LauncherSettings=&تنظیمات لانچر
+menu_GameSettings=& تنظیمات گیم
+menu_Resources=ریسورس ها
+menu_Crashes=کرش ها
+menu_Caches=فایل های اضافه
+menu_Logs=سابقه
+
+# Messages
+message_ConfirmResetSettings=آیا مطمئنید که تمامی تنظیمات لانچر به حالت اول برگردد؟\nتنظیمات قبلی قابل دسترس نخواهد بود و لانچر ریستارت می شود
+
+# Tabs
+tab_Favourites=موردعلاقه ها
+tab_Internet=اینترنت
+tab_Official=خاص
+tab_History=سابقه
+tab_Local=لوکال
+tab_Mods=مود ها
+
+# Status
+status_Disconnected=خارج شده
+status_Connecting=در حال اتصال
+status_Connected=اتصال موفق به لیست سرور
+
+# Labels
+label_Game=گیم:
+label_GameEXEPath=گیم EXE فایل:
+
+# Tips
+tip_Games=گیم برای اجرا
+tip_CloseLauncher=این پنجره را وقتی بازی شروع شد ببند
+tip_Launch=شروع بازی
+tip_BrowseForGame=انتخاب گیم خود
+tip_ShowInExplorer=نمایش مسیر گیم خود {0}.
+tip_GameEXEPath=پج گیم
+
+# Columns
+column_ServerName=نام سرور
+column_Players=بازیکنان
+column_GameMode=گیم مود
+
+# Group Boxes
+group_Players=بازیکنان
+group_Rules=قوانین
+
+# Buttons
+button_OpenMenu=باز کردن
+button_CloseLauncher=بستن لانچر
+button_Launch=شروع
+button_ShowInExplorer=نمایش در {0}
+button_BrowseForGame=بیشتر
+
+[AboutWindow]
+
+windowTitle=عنوان
+group_About=درباره
+
+# Labels
+label_Product=حاصل:
+label_Copyright=کپی رایت © {0} {1}
+label_Version=نسخه:
+label_GitBranch=Git برنچ:
+label_GitCommitHash=Git سیستم کنترل:
+label_PacketVersion=نسخه پک:
+label_BuildDate=تاریخ ساخت:
+label_BuildTime=زمان ساخت:
+label_Website=وب‌سایت:
+label_Patreon=Patreon:
+label_CrashesThisWeek=کرش های این هفته:
+label_Developers=توسعه دهندگان:
+
+[SettingsWindow]
+
+windowTitle=تنظیمات لانچر
+gameSettingsTitle=تنظیمات گیم
+
+# Tabs
+tab_General=اصلی
+tab_AdditionalResourcesFolders=پوشه ریسورس های اضافه شده
+tab_AdditionalMods=پوشه مود های اضافه شده
+tab_Display=اجرا
+tab_Advanced=غیره
+tab_NonModHacks=مود های غیر از لانچر
+tab_Licenses=مجوز ها
+tab_Language=زبان
+tab_BugFixes=باگ های رفع شده
+tab_Debug=رفع باگ
+
+# Labels
+label_Name=نام:
+
+# Additional resource folders
+button_ResourceAdd=اضافه کردن
+tip_ResourceAdd=اضافه کردن پوشه ریسورس جدید
+
+button_ResourceRemove=حذف
+tip_ResourceRemove=حذف پوشه ریسورس های انتخاب شده
+
+button_ResourceUp=بالا
+tip_ResourceUp=انتقال پوشه ریسورس های انتخاب شده به بالا
+
+button_ResourceDown=پایین
+tip_ResourceDown=انتقال پوشه ریسورس های انتخاب شده به پایین
+
+tip_ResourceOpen=پوشه ریسورس های انتخاب شده را باز کن در {0}
+button_ResourceOpen=باز کردن
+
+# Options
+opt_KeepSavedGamesSeparate=نگهداری جدا از سیو های گیم
+opt_KeepScreenshotsSeparate=نگهداری جدا عکس های صفحه
+opt_SaveCrashDump=ذخیره لیست کرش ها
+opt_CheckForUpdates=بررسی آخرین نسخه
+opt_Assertions=اعلانات
+opt_DebugMode=رفع باگ مود
+opt_TerminateOnCrash=بستن هنگام کرش
+opt_VerboseLogging=اطلاعات بیشتر در سابقه
+opt_GameOutput=نمایش تمام اتفاقات در کنسول
+opt_MultithreadedNetworking=شبکه اختصاصی
+opt_SCM=SCM
+opt_DisableStoryMode=غیر فعال سازی استوری مود
+
+opt_AlwaysUsePrimaryMonitorResolution=همیشه از رزولوشن مانیتور اول کار استفاده کن
+opt_AutomaticAspectRatio=نسبت تصویر خودکار
+opt_VCTrails=تریل وایس سیتی
+tip_VCTrails=فعال کردن تریل در وایس سیتی
+opt_AutoSave=ذخیره خودکار
+opt_SyncAnimations=Sync animations
+opt_AllowDirectConnections=اجازه دایرکت مستقیم (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=تست
+label_Message=برای فعال کردن تستی حالت ساخت کد را در زیر وارد کنید:
+
+[PasswordWindow]
+
+windowTitle=رمز
+label_Message=لطفا رمز را برای اتصال به سرور وارد کنید:
+
+[AddServerWindow]
+
+windowTitle=اضافه کردن سرور
+label_Message=سرور جدید را وارد کنید هاست:پورت
+
+[PlayerMapWindow]
+
+windowTitle=مپ بازیکن
+
+# Menu
+menu_VCStyle=&ظاهر وایس سیتی

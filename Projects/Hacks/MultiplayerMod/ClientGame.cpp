@@ -44,7 +44,7 @@ void CMafiaCHtmlContainer::on_anchor_click(const litehtml::tchar_t* url, const l
 {
 	CArguments Args;
 	Args.AddObject(m_pActiveView);
-	Args.AddObject(GetObjectFromElement((litehtml::element::ptr)el));
+	Args.AddObject(GetObjectFromElement(m_pActiveView, (litehtml::element::ptr)el));
 	Args.AddString(url);
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnGUIAnchorClickEventType->Trigger(Args, bPreventDefault);
@@ -81,16 +81,16 @@ void CTextDrawing::MeasureText(size_t Font, CVector2D& vecSize, const GChar* psz
 	LucasGUI::CFontStack* pFontStack = nullptr;
 	switch (Font)
 	{
-		case 0:
-			fSize = m_fLargeSize;
-			pFontStack = &m_LargeFontStack;
-			break;
-		case 1:
-			fSize = m_fSmallSize;
-			pFontStack = &m_SmallFontStack;
-			break;
-		default:
-			break;
+	case 0:
+		fSize = m_fLargeSize;
+		pFontStack = &m_LargeFontStack;
+		break;
+	case 1:
+		fSize = m_fSmallSize;
+		pFontStack = &m_SmallFontStack;
+		break;
+	default:
+		break;
 	}
 	CDumbUtil::MeasureText(pFontStack, vecSize, pszText, fWidth, fAlign, fJustify, fSize, bWordWrap, bColourCodes);
 }
@@ -101,16 +101,16 @@ void CTextDrawing::RenderText(Galactic3D::I2D* p2D, size_t Font, const GChar* ps
 	LucasGUI::CFontStack* pFontStack = nullptr;
 	switch (Font)
 	{
-		case 0:
-			fSize = m_fLargeSize;
-			pFontStack = &m_LargeFontStack;
-			break;
-		case 1:
-			fSize = m_fSmallSize;
-			pFontStack = &m_SmallFontStack;
-			break;
-		default:
-			break;
+	case 0:
+		fSize = m_fLargeSize;
+		pFontStack = &m_LargeFontStack;
+		break;
+	case 1:
+		fSize = m_fSmallSize;
+		pFontStack = &m_SmallFontStack;
+		break;
+	default:
+		break;
 	}
 	CDumbUtil::RenderText(p2D, pFontStack, pszText, vecOffset, fWidth, fAlign, fJustify, fSize, Colour, bWordWrap, bColourCodes, bIgnoreColourCodes, bShadow);
 }
@@ -140,6 +140,12 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_bFocused = true;
 	m_bFocusedSupressInput = false;
 	m_bCursorEnabled = false;
+
+#if MAFIAC_RMLUI
+	m_pRmlUi = new CRmlUi2(m_pContext);
+	m_pRmlUi->Initialise();
+#endif
+
 	m_bShowGameStatistics = false;
 	m_bFPSCounter = false;
 	//m_bMap = false;
@@ -149,9 +155,10 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_pTime = nullptr;
 	m_iIcon = IDI_LAUNCHER;
 	m_bD3D9 = true;
-	m_bDebugMode = false;
 	m_bTrainsEnabled = true;
 	m_bSupressNetworkedEntities = false;
+	m_iStopMultiplayerGameReason = -1;
+	m_bReconnectOnDisconnect = false;
 }
 
 CClientGame::~CClientGame(void)
@@ -274,6 +281,9 @@ void CClientGame::InitialiseCVars()
 
 void CClientGame::InitialiseScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
@@ -293,22 +303,22 @@ void CClientGame::InitialiseScripting(void)
 	m_pOnGUIClickEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnGUIClick"), _gstr("Called when a GUIElement is clicked on"), 1);
 
 	// Register MafiaC events here
-	m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
-	m_pOnExampleEventType->m_bCanPreventDefault = true;
-	m_pOnExampleEventType->m_iSource = 0;
-	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"));
-	m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
-	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"));
-	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"));
-	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"));
+	//m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
+	//m_pOnExampleEventType->m_bCanPreventDefault = true;
+	//m_pOnExampleEventType->m_iSource = 0;
+	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, false);
+	//m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
+	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"), 7, true);
+	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, false);
+	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, false);
 
-	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"));
-	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"));
-	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"));
-	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"));
-	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"));
+	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, false);
+	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, false);
+	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, false);
+	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, false);
+	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, false);
 
-	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr,false,false,false,false,false);
+	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr, false, false, false, false, false);
 	m_pGalacticFunctions->m_p2D = &m_p2D;
 	m_pAudioScriptingFunctions = new Galactic3D::Audio::CAudioScriptingFunctions(m_pResourceMgr);
 	//m_pAudioScriptingFunctions->m_pSoundMgr = new Galactic3D::Audio::CSoundMgr;
@@ -329,10 +339,10 @@ void CClientGame::InitialiseScripting(void)
 		m_pDownloadManager->m_pResourceMgr = m_pResourceMgr;
 	m_pResourceMgr->m_pDownloadManager = m_pDownloadManager;
 
-	m_pClientManager = new CMafiaClientManager(m_pContext,m_pResourceMgr);
+	m_pClientManager = new CMafiaClientManager(m_pContext, m_pResourceMgr);
 	m_pClientManager->m_pChatWindow = m_pChatWindow;
 	CScriptingFunctions::RegisterDefines(m_pResourceMgr->m_pDefineHandlers);
-	CScriptingFunctions::RegisterFunctions(m_pResourceMgr->m_pScripting,this);
+	CScriptingFunctions::RegisterFunctions(m_pResourceMgr->m_pScripting, this);
 
 	m_pResourceMgr->DefineAllClasses();
 
@@ -347,6 +357,9 @@ void CClientGame::InitialiseScripting(void)
 
 void CClientGame::ShutdownScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	if (m_pCmdWindow != nullptr)
 	{
 		delete m_pCmdWindow;
@@ -357,7 +370,7 @@ void CClientGame::ShutdownScripting(void)
 		delete m_pChatWindow;
 		m_pChatWindow = nullptr;
 	}
-	m_pClientManager->Forget();
+	//m_pClientManager->Forget();
 	m_pClientManager->Clear();
 	m_pResourceMgr->ClearAllResources();
 	delete m_pClientManager;
@@ -379,6 +392,10 @@ void CClientGame::ShutdownScripting(void)
 	m_pResourceMgr = nullptr;
 	m_Fonts.DeleteHWResources();
 	m_SlotMgr.DeleteHWResources();
+
+#if MAFIAC_RMLUI
+	delete m_pRmlUi;
+#endif
 }
 
 static bool LoadSystemFontCB(const TCHAR* pszValueName, const TCHAR* pszValue)
@@ -417,7 +434,7 @@ void CClientGame::LoadFonts()
 				pClientGame->m_Fonts.LoadFont(pStream);
 			}
 			return true;
-		}, this);
+			}, this);
 	}
 
 	m_TextDrawing.Initialise(m_Fonts);
@@ -430,25 +447,25 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	switch (message)
 	{
 	case WM_CREATE:
-		{
-			m_Cursor = SDL_SYSTEM_CURSOR_ARROW;
-			m_bMouseClipped = false;
-			UpdateCursor();
-		}
-		break;
+	{
+		m_Cursor = SDL_SYSTEM_CURSOR_ARROW;
+		m_bMouseClipped = false;
+		UpdateCursor();
+	}
+	break;
 	case WM_DESTROY:
 		for (size_t i = 0; i < ARRAY_COUNT(m_rgpCursors); i++)
 			SDL_FreeCursor(m_rgpCursors[i]);
 		break;
 	case WM_CHAR:
+	{
+		wchar_t c = (wchar_t)wParam;
+		if (MafiaSDK::IsWindowFocused())
 		{
-			wchar_t c = (wchar_t)wParam;
-			if (MafiaSDK::IsWindowFocused())
-			{
-				OnCharacter(c);
-			}
+			OnCharacter(c);
 		}
-		break;
+	}
+	break;
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 	case WM_KEYUP:
@@ -459,7 +476,7 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		//if (wParam == VK_F5 && GetKeyState(VK_CONTROL) & 0x8000) { // Exit the game on Ctrl+Escape
 		//	ExitProcess(0);
 		//}
-		// 
+		//
 		//if(wParam == VK_RETURN) {
 		//	_glogprintf(_gstr("Chatbox submit"));
 		//	m_pResourceMgr->m_pCommandHandlers->PushLogger(m_pChatWindow);
@@ -470,135 +487,135 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		//	m_bEnableCmdWindowOnCharPress = true;
 		//}
 	case WM_SYSKEYUP:
+	{
+		if (MafiaSDK::IsWindowFocused())
 		{
-			if (MafiaSDK::IsWindowFocused())
+			if (m_bHandledKeyEvent)
 			{
-				if (m_bHandledKeyEvent)
-				{
-					m_bHandledKeyEvent = false;
-					*pResult = 0;
-					return true;
-				}
+				m_bHandledKeyEvent = false;
+				*pResult = 0;
+				return true;
 			}
 		}
-		break;
+	}
+	break;
 	case WM_MOUSELEAVE:
+	{
+		if (MafiaSDK::IsWindowFocused())
 		{
-			if (MafiaSDK::IsWindowFocused())
-			{
-				if (m_pGalacticFunctions != nullptr)
-					m_pGalacticFunctions->OnMouseLeave();
-				m_GUISystem.OnMouseLeave();
-			}
+			if (m_pGalacticFunctions != nullptr)
+				m_pGalacticFunctions->OnMouseLeave();
+			m_GUISystem.OnMouseLeave();
 		}
-		break;
+	}
+	break;
 	case WM_SETFOCUS:
+	{
+		if (DontClipCursor() || IsCursorEnabled2())
 		{
-			if (DontClipCursor() || IsCursorEnabled2())
-			{
-				m_bFocused = true;
-			}
-			UpdateCursorEnabled(true);
-
-			if (MafiaSDK::IsWindowFocused())
-			{
-				if (m_pGalacticFunctions != nullptr)
-					m_pGalacticFunctions->OnFocus();
-			}
-
-			m_GUISystem.m_bFocused = true;
+			m_bFocused = true;
 		}
-		break;
+		UpdateCursorEnabled(true);
+
+		if (MafiaSDK::IsWindowFocused())
+		{
+			if (m_pGalacticFunctions != nullptr)
+				m_pGalacticFunctions->OnFocus();
+		}
+
+		m_GUISystem.m_bFocused = true;
+	}
+	break;
 	case WM_SIZE:
+	{
+		if (m_bMouseClipped)
 		{
-			if (m_bMouseClipped)
-			{
-				RECT Rect;
-				GetClientRect(hWnd,&Rect);
-				MapWindowRect(hWnd,NULL,&Rect);
-				::ClipCursor(&Rect);
-				m_bMouseClipped = true;
-			}
+			RECT Rect;
+			GetClientRect(hWnd, &Rect);
+			MapWindowRect(hWnd, NULL, &Rect);
+			::ClipCursor(&Rect);
+			m_bMouseClipped = true;
 		}
-		break;
+	}
+	break;
 	case WM_KILLFOCUS:
-		{
-			m_bFocused = false;
-			m_bFocusedSupressInput = false;
-			UpdateCursorEnabled();
+	{
+		m_bFocused = false;
+		m_bFocusedSupressInput = false;
+		UpdateCursorEnabled();
 
-			if (MafiaSDK::IsWindowFocused())
-			{
-				//SetCursorClipped(false, false);
-				if (m_pGalacticFunctions != nullptr)
-					m_pGalacticFunctions->OnLostFocus();
-				m_GUISystem.OnLostFocus();
-			}
+		if (MafiaSDK::IsWindowFocused())
+		{
+			//SetCursorClipped(false, false);
+			if (m_pGalacticFunctions != nullptr)
+				m_pGalacticFunctions->OnLostFocus();
+			m_GUISystem.OnLostFocus();
 		}
-		break;
+	}
+	break;
 	case WM_SETCURSOR:
+	{
+		if (LOWORD(lParam) == HTCLIENT)
 		{
-			if (LOWORD(lParam) == HTCLIENT)
-			{
-				UpdateCursor();
-				*pResult = TRUE;
-				return true;
-			}
-			else
-			{
-				*pResult = DefWindowProcW(hWnd, message, wParam, lParam);
-				return true;
-			}
+			UpdateCursor();
+			*pResult = TRUE;
+			return true;
 		}
-		break;
+		else
+		{
+			*pResult = DefWindowProcW(hWnd, message, wParam, lParam);
+			return true;
+		}
+	}
+	break;
 	case WM_LBUTTONDOWN:
+	{
+		if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
 		{
-			if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
-			{
-				*pResult = 0;
-				return true;
-			}
+			*pResult = 0;
+			return true;
 		}
-		break;
+	}
+	break;
 	case WM_LBUTTONUP:
-		{
-		}
-		break;
+	{
+	}
+	break;
 	case WM_RBUTTONDOWN:
+	{
+		if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
 		{
-			if (MafiaSDK::IsWindowFocused() && IsInputDisabled())
-			{
-				*pResult = 0;
-				return true;
-			}
+			*pResult = 0;
+			return true;
 		}
-		break;
+	}
+	break;
 	case WM_RBUTTONUP:
-		{
-		}
-		break;
+	{
+	}
+	break;
 	case WM_MOUSEMOVE:
+	{
+		TRACKMOUSEEVENT EventTrack = {};
+		EventTrack.cbSize = sizeof(EventTrack);
+		EventTrack.dwFlags = TME_LEAVE;
+		EventTrack.hwndTrack = hWnd;
+
+		TrackMouseEvent(&EventTrack);
+
+		if (MafiaSDK::IsWindowFocused())
 		{
-			TRACKMOUSEEVENT EventTrack = {};
-			EventTrack.cbSize = sizeof(EventTrack);
-			EventTrack.dwFlags = TME_LEAVE;
-			EventTrack.hwndTrack = hWnd;
+			POINT Point;
+			if (GetCursorPos(&Point) == FALSE)
+				break;
+			MapWindowPoints(NULL, hWnd, &Point, 1);
 
-			TrackMouseEvent(&EventTrack);
-
-			if (MafiaSDK::IsWindowFocused())
-			{
-				POINT Point;
-				if (GetCursorPos(&Point) == FALSE)
-					break;
-				MapWindowPoints(NULL, hWnd, &Point, 1);
-
-				CVector2D vecPos;
-				vecPos.m_X = (float)GET_X_LPARAM(lParam);
-				vecPos.m_Y = (float)GET_Y_LPARAM(lParam);
-			}
+			CVector2D vecPos;
+			vecPos.m_X = (float)GET_X_LPARAM(lParam);
+			vecPos.m_Y = (float)GET_Y_LPARAM(lParam);
 		}
-		break;
+	}
+	break;
 	default:
 		break;
 	}
@@ -609,36 +626,36 @@ void CClientGame::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 {
 	switch (message)
 	{
-		case WM_SIZE:
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-			{
-				if (!m_bFocused)
-				{
-					m_bFocused = true;
-					m_bFocusedSupressInput = true;
-					UpdateCursorEnabled(true);
-					//SetCursorClipped(true);
-				}
-			}
-			break;
-		case WM_LBUTTONUP:
-		case WM_RBUTTONUP:
-			{
-				if (m_bFocusedSupressInput)
-					m_bFocusedSupressInput = false;
-				UpdateCursorEnabled(true);
-			}
-			break;
-		default:
-			break;
+	case WM_SIZE:
+		break;
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	{
+		if (!m_bFocused)
+		{
+			m_bFocused = true;
+			m_bFocusedSupressInput = true;
+			UpdateCursorEnabled(true);
+			//SetCursorClipped(true);
+		}
+	}
+	break;
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+	{
+		if (m_bFocusedSupressInput)
+			m_bFocusedSupressInput = false;
+		UpdateCursorEnabled(true);
+	}
+	break;
+	default:
+		break;
 	}
 }
 
 void CClientGame::OnPreStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_LastFrameTicks = OS::GetTicks();
 
@@ -653,7 +670,7 @@ void CClientGame::OnPreStartInGame(bool bRestarted)
 
 void CClientGame::OnStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	bool bMultiplayerInProgress = m_pMultiplayer != nullptr;
 	bool bMultiplayerRestartingGame = false;
@@ -688,23 +705,29 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	m_GUISystem.LoadPage(_gstr("/GUI/Main.xml"));
 
 	//float fScale = 1.0f/1600.0f* (float)MafiaSDK::GetIGraph()->Scrn_sx();
-	float fScale = 0.7f / 900.0f* (float)MafiaSDK::GetIGraph()->Scrn_sy();
+	float fScale = 0.7f / 900.0f * (float)MafiaSDK::GetIGraph()->Scrn_sy();
 	//fScale *= *m_CVars.m_pfChatScale;
 	float fScale2;
 	if (g_pClientGame->m_pContext->GetSettings()->Read(_gstr("Chat Window"), _gstr("Scale"), &fScale2))
 		fScale = fScale2;
 	if (m_pChatWindow == nullptr)
 	{
-		m_pChatWindow = new CChatWindow(m_pContext,&m_Fonts,fScale);
+		m_pChatWindow = new CChatWindow(m_pContext, &m_Fonts, fScale);
 		m_pClientManager->m_pChatWindow = m_pChatWindow;
 		m_pChatWindow->m_dwChatInfoColor = Galactic3D::COLOUR(255, 205, 60, 60);
 
-		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_Version.m_szDisplayVersion);
+		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, __gstr(LAUNCHER_DISPLAY_VERSION));
 	}
 	else
 	{
 		m_pChatWindow->SetEnabled(true);
 		m_pChatWindow->SetScale(fScale);
+	}
+
+	if (m_iStopMultiplayerGameReason >= 0)
+	{
+		ShowDisconnectReason();
+		m_iStopMultiplayerGameReason = -1;
 	}
 
 	{
@@ -763,7 +786,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 
 void CClientGame::OnEndInGame(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_pHtmlContainer->m_Images.clear();
 
@@ -857,7 +880,7 @@ void CClientGame::LoadLobbyResource(void)
 	for (auto it : m_pResourceMgr->m_Resources)
 		it.second->m_bPrivileged = true;
 
-	Stream* pStream = m_pContext->GetFileSystem()->Open(_gstr("/resources.xml"),false);
+	Stream* pStream = m_pContext->GetFileSystem()->Open(_gstr("/resources.xml"), false);
 	if (pStream != nullptr)
 	{
 		CElementChunk* pRootElement = CElementChunk::Load(pStream);
@@ -882,7 +905,7 @@ void CClientGame::LoadLobbyResource(void)
 					}
 					else
 					{
-						CString LauncherPath(false, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.length());
+						CString LauncherPath(false, CHackSupport::m_pInstance->m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_LauncherPath.length());
 						GString ModulePath = LauncherPath;
 						CString Name(false, pszName);
 						PathUtil::AppendPath(ModulePath, Name.CString());
@@ -985,6 +1008,12 @@ void CClientGame::OnProcess(void)
 
 	//_glogprintf(_gstr("OnProcess delta time (%f)"), (float)pTime->m_fDeltaTime);
 	m_GUISystem.Process((float)pTime->m_fDeltaTime);
+
+#if MAFIAC_RMLUI
+	m_pRmlUi->m_pRmlContext->SetDimensions(Rml::Vector2i(MafiaSDK::GetIGraph()->Scrn_sx(), MafiaSDK::GetIGraph()->Scrn_sy()));
+	m_pRmlUi->Process();
+#endif
+
 	m_InternetRequestMgr.Process();
 
 	if (m_pAudioScriptingFunctions != nullptr && m_pAudioScriptingFunctions->m_pSoundMgr != NULL)
@@ -1008,12 +1037,12 @@ void CClientGame::OnProcess(void)
 	if (m_pMultiplayer != NULL)
 	{
 		m_pMultiplayer->ProcessNewPeerElements();
-		m_pMultiplayer->ProcessEachFrame(pTime);
+		m_pMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pNewMultiplayer != nullptr)
 	{
-		m_pNewMultiplayer->ProcessEachFrame(pTime);
+		m_pNewMultiplayer->ProcessEachFrame();
 	}
 
 	if (m_pGalacticFunctions != nullptr)
@@ -1131,6 +1160,11 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 
 void CClientGame::OnCharacter(wchar_t c)
 {
+#if MAFIAC_RMLUI
+	if (c >= 32)
+		m_pRmlUi->m_pRmlContext->ProcessTextInput(Rml::Character(c));
+#endif
+
 	if (!MafiaSDK::IsWindowFocused())
 		return;
 
@@ -1162,9 +1196,7 @@ void CClientGame::OnRender2DStuff(void)
 {
 	CVector2D vecSize;
 
-	m_pOnDrawnHUDEventType->Trigger();
-
-	if(!MafiaSDK::IsWindowFocused())
+	if (!MafiaSDK::IsWindowFocused())
 	{
 		if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		{
@@ -1174,7 +1206,7 @@ void CClientGame::OnRender2DStuff(void)
 		return;
 	}
 
-	//m_pOnDrawnHUDEventType->Trigger();
+	m_pOnDrawnHUDEventType->Trigger();
 
 	float fWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
 	float fHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
@@ -1237,7 +1269,7 @@ void CClientGame::OnRender2DStuff(void)
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
 			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D(fWidth - 30.0f, 10.0f), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
-			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D((fWidth - 30.0f)*fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
+			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D((fWidth - 30.0f) * fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
 		}
 	}
@@ -1250,6 +1282,10 @@ void CClientGame::OnRender2DStuff(void)
 	m_GUISystem.m_bFocused = true;
 
 	m_GUISystem.Render(m_pGalacticFunctions->m_p2D);
+
+#if MAFIAC_RMLUI
+	m_pRmlUi->Render();
+#endif
 }
 
 bool CClientGame::OnCameraProcess(void)
@@ -1300,12 +1336,9 @@ bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
 
 bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
-	//_glogprintf(_gstr("ClientGame Connect - Init"));
 	if (GetMultiplayer() != NULL)
 	{
-		//_glogprintf(_gstr("ClientGame Connect - Multiplayer NULL"));
 		StopMultiplayerGame();
-		//MafiaSDK::GetIndicators()->ConsoleAddText("Disconnected from server", 0xFFFFFFFF);
 		m_pChatWindow->AddMessage(_gstr("Disconnected!"), Galactic3D::COLOUR::Red);
 		return false;
 	}
@@ -1317,41 +1350,34 @@ bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GCh
 			return false;
 		}
 	}
-
+	//m_pResourceMgr->ClearAllResources();
 	m_pNewMultiplayer = new CMultiplayer(m_pClientManager, &m_CVars);
 
-	if (m_pNewMultiplayer->InitAsClient())
+	m_pCmdWindow->FlushBuffers();
+	m_pCmdWindow->Disable();
+
+	if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
 	{
-		m_pCmdWindow->FlushBuffers();
-		m_pCmdWindow->Disable();
-
-		if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
+		if (m_szPreviousHost != pszHost)
 		{
-			if (m_szPreviousHost != pszHost)
-			{
-				m_bPreviousServerExists = true;
-				_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
-				m_usPreviousPort = usPort;
-				if (pszPassword == nullptr)
-					m_szPreviousPassword[0] = '\0';
-				else
-					_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
-			}
-
-			m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
-			m_CVars.Clear();
-
-			return true;
+			m_bPreviousServerExists = true;
+			_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
+			m_usPreviousPort = usPort;
+			if (pszPassword == nullptr)
+				m_szPreviousPassword[0] = '\0';
+			else
+				_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
 		}
-		else
-		{
-			m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
-			delete m_pNewMultiplayer;
-			m_pNewMultiplayer = NULL;
-		}
+
+		m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
+
+		m_CVars.Clear();
+
+		return true;
 	}
 	else
 	{
+		m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
 		delete m_pNewMultiplayer;
 		m_pNewMultiplayer = NULL;
 	}
@@ -1391,10 +1417,26 @@ void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
 			// Clear out CClientManager here
 			m_pResourceMgr->ClearAllResources();
 			m_pClientManager->Clear();
+
+			if (m_pClientManager != nullptr && m_pClientManager->m_pLocalPlayer != nullptr)
+				m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->Despawn();
 		}
 
 		OnEndInGame();
-		MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		//MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		OnStartInGame(true);
+
+		if (m_bReconnectOnDisconnect)
+		{
+			m_bReconnectOnDisconnect = false;
+
+			if (m_bPreviousServerExists)
+			{
+				Connect(m_szPreviousHost, m_usPreviousPort, m_szPreviousPassword);
+			}
+		}
 	}
 }
 
@@ -1463,11 +1505,6 @@ bool CClientGame::IsCursorEnabled2(void)
 	return false;
 }
 
-bool CClientGame::IsDebugMode(void)
-{
-	return m_bDebugMode;
-}
-
 bool CClientGame::DontClipCursor()
 {
 	return !MafiaSDK::IsWindowFocused();
@@ -1497,7 +1534,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 	bool bCursorClipped = !bCursorEnabled;
 	SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 
-	/*
 	if (DontClipCursor())
 		bCursorClipped = false;
 	if (bForce || m_bMouseClipped != bCursorClipped)
@@ -1517,7 +1553,6 @@ void CClientGame::UpdateCursorEnabled(bool bForce)
 
 		SDL_ShowCursor(bCursorEnabled ? 1 : 0);
 	}
-	*/
 }
 
 void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
@@ -1572,7 +1607,7 @@ void CClientGame::EnableInput(bool bEnabled)
 
 }
 
-void CClientGame::OnEvent(const SDL_Event *event)
+void CClientGame::OnEvent(const SDL_Event* event)
 {
 	if (!MafiaSDK::IsWindowFocused())
 		return;
@@ -1587,67 +1622,93 @@ void CClientGame::OnEvent(const SDL_Event *event)
 
 	switch (event->type)
 	{
-		case SDL_MOUSEMOTION:
-			{
-				SDL_SystemCursor Cursor;
-				if (m_GUISystem.GetCursor(CVector2D((float)event->motion.x, (float)event->motion.y), Cursor))
-					UpdateCursor(Cursor);
-				else
-					UpdateCursor(SDL_SYSTEM_CURSOR_ARROW);
-			}
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			{
-				if (event->button.which != SDL_TOUCH_MOUSEID)
-				{
-					// To allow drags to go outside the window
-					if (event->button.button == SDL_BUTTON_LEFT)
-					{
-						SetMouseCapture(true);
-					}
-				}
-			}
-			break;
-		case SDL_MOUSEBUTTONUP:
-			{
-				if (event->button.which != SDL_TOUCH_MOUSEID)
-				{
-					if (event->button.button == SDL_BUTTON_LEFT)
-					{
-						SetMouseCapture(false);
-						UpdateCursor(m_NewCursor);
+	case SDL_MOUSEMOTION:
+	{
+		SDL_SystemCursor Cursor;
+		if (m_GUISystem.GetCursor(CVector2D((float)event->motion.x, (float)event->motion.y), Cursor))
+			UpdateCursor(Cursor);
+		else
+			UpdateCursor(SDL_SYSTEM_CURSOR_ARROW);
 
-						{
-							SDL_SystemCursor Cursor;
-							int x, y;
-							SDL_GetMouseState(&x, &y);
-							m_GUISystem.OnMouseMove(CVector2D((float)x, (float)y));
-							if (m_GUISystem.GetCursor(CVector2D((float)x, (float)y), Cursor))
-								UpdateCursor(Cursor);
-						}
-					}
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseMove(event->motion.x, event->motion.y, m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+	}
+	break;
+	case SDL_MOUSEBUTTONDOWN:
+	{
+		if (event->button.which != SDL_TOUCH_MOUSEID)
+		{
+			// To allow drags to go outside the window
+			if (event->button.button == SDL_BUTTON_LEFT)
+			{
+				SetMouseCapture(true);
+			}
+		}
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseButtonDown(m_pRmlUi->m_SystemInterface.TranslateMouseButton(event->button.button), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+	}
+	break;
+	case SDL_MOUSEBUTTONUP:
+	{
+		if (event->button.which != SDL_TOUCH_MOUSEID)
+		{
+			if (event->button.button == SDL_BUTTON_LEFT)
+			{
+				SetMouseCapture(false);
+				UpdateCursor(m_NewCursor);
+
+				{
+					SDL_SystemCursor Cursor;
+					int x, y;
+					SDL_GetMouseState(&x, &y);
+					m_GUISystem.OnMouseMove(CVector2D((float)x, (float)y));
+					if (m_GUISystem.GetCursor(CVector2D((float)x, (float)y), Cursor))
+						UpdateCursor(Cursor);
 				}
 			}
-			break;
-		case SDL_KEYUP:
-			{
-				if (OnKeyUp(*event))
-					m_bHandledKeyEvent = true;
-				return;
-			}
-			break;
-		case SDL_KEYDOWN:
-			{
-				if (OnKeyDown(*event))
-					m_bHandledKeyEvent = true;
-				return;
-			}
-			break;
-		case SDL_WINDOWEVENT_FOCUS_LOST:
-		case SDL_WINDOWEVENT_LEAVE:
-			return;
-		default:
-			break;
+		}
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseButtonUp(m_pRmlUi->m_SystemInterface.TranslateMouseButton(event->button.button), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+	}
+	break;
+	case SDL_MOUSEWHEEL:
+	{
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessMouseWheel(float(-event->wheel.y), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+		return;
+	}
+	break;
+	case SDL_KEYUP:
+	{
+		if (OnKeyUp(*event))
+			m_bHandledKeyEvent = true;
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessKeyUp(m_pRmlUi->m_SystemInterface.TranslateKey(event->key.keysym.sym), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+
+		return;
+	}
+	break;
+	case SDL_KEYDOWN:
+	{
+		if (OnKeyDown(*event))
+			m_bHandledKeyEvent = true;
+
+#if MAFIAC_RMLUI
+		m_pRmlUi->m_pRmlContext->ProcessKeyDown(m_pRmlUi->m_SystemInterface.TranslateKey(event->key.keysym.sym), m_pRmlUi->m_SystemInterface.GetKeyModifiers());
+#endif
+		return;
+	}
+	break;
+	case SDL_WINDOWEVENT_FOCUS_LOST:
+	case SDL_WINDOWEVENT_LEAVE:
+		return;
+	default:
+		break;
 	}
 
 	m_pGalacticFunctions->OnEvent(*event);
@@ -1772,7 +1833,7 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		Packet.Write<int32_t>(iHopSeatsBool);
 		m_pMultiplayer->SendHostPacket(&Packet);
 	}
-	else 
+	else
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
 		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
@@ -1876,7 +1937,7 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	Args.AddNumber(iSeat);
 	m_pOnHumanJackVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsSyncer()) 
+	if (pClientHuman->IsSyncer())
 	{
 		Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
 		Packet.Write<int32_t>(pClientHuman->GetId());
@@ -1892,39 +1953,189 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pClientHumanAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
+	bool bPreventDefault = false;
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
-	args.AddObject(pClientHumanAttacker);
-	args.AddVector3D(v1);
-	args.AddVector3D(v2);
-	args.AddVector3D(v3);
-	args.AddNumber(hitType);
-	args.AddNumber(damage);
-	args.AddNumber(bodyPart);
-	g_pClientGame->m_pOnHumanHitEventType->Trigger(args);
+	//args.AddObject(pClientHumanAttacker);
+	args.AddVector3D(vec1);
+	args.AddVector3D(vec2);
+	args.AddVector3D(vec3);
+	args.AddNumber(uiHitType);
+	args.AddNumber(fDamage);
+	args.AddNumber(uiBodyPart);
+	g_pClientGame->m_pOnHumanHitEventType->Trigger(args, bPreventDefault);
+
+	if (bPreventDefault)
+		return;
 
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		if (pClientHumanTarget->IsLocal() || !pClientHumanTarget->IsSyncer())
-			return;
+		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
+	}
 
-		Packet Packet(MAFIAPACKET_HUMAN_HIT);
-		Packet.Write<int32_t>(pClientHumanTarget->GetId());
-		Packet.Write<int32_t>(pClientHumanAttacker->GetId());
-		Packet.Write<CVector3D>(v1);
-		Packet.Write<CVector3D>(v2);
-		Packet.Write<CVector3D>(v3);
-		Packet.Write<int32_t>(hitType);
-		Packet.Write<float>(damage);
-		Packet.Write<int32_t>(bodyPart);
-		m_pMultiplayer->SendHostPacket(&Packet);
+	float fOldHealth = pClientHumanTarget->GetHealth();
+	float fNewHealth = fOldHealth - fDamage;
+
+	if (fNewHealth <= 0.0f)
+	{
+		fNewHealth = 0.0f;
+	}
+
+	_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
+
+	pClientHumanTarget->SetHealth(fNewHealth);
+
+	if (fNewHealth <= 0.0f)
+	{
+		pClientHumanTarget->Kill();
+
+		CArguments args;
+		args.AddObject(pClientHumanTarget);
+		//args.AddObject(entityAttacker);
+		g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
+
+		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		if (pMultiplayer != nullptr)
+		{
+			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
+			pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
+		}
 	}
 }
 
-void CClientGame::DestroyUninitializedGameElements() 
+void CClientGame::DestroyUninitializedGameElements()
 {
-	
+
+}
+
+bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
+{
+	if (pCar == nullptr)
+		return false;
+
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer == nullptr || !pMultiplayer->IsConnected() || !pMultiplayer->IsJoined())
+		return false;
+
+	//if (m_bSupressNetworkedEntities)
+	//	return false;
+
+	auto pClientVehicle = Strong<CClientVehicle>::New(m_pClientManager->Create(ELEMENT_VEHICLE));
+	pClientVehicle->SetFromExistingEntity(pCar);
+	//m_pClientManager->RegisterObject(pClientVehicle);
+
+	{
+		pClientVehicle->GenerateGUID();
+		pClientVehicle->SetSyncer(pMultiplayer->m_NetMachines.GetMachine(pMultiplayer->m_iLocalIndex));
+
+		if (pMultiplayer->m_bNetworkedEntities)
+		{
+			pMultiplayer->EnqueuePeerElement(pClientVehicle);
+		}
+	}
+
+	return true;
+}
+
+/*
+bool CClientGame::OnTrafficCarReset(MafiaSDK::C_Car* pCar)
+{
+	if (pCar == nullptr)
+		return false;
+
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer == nullptr || !pMultiplayer->IsConnected() || !pMultiplayer->IsJoined())
+		return false;
+
+	//if (m_bSupressNetworkedEntities)
+	//	return true;
+
+	CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(pCar);
+	if (pClientVehicle == nullptr)
+		return false;
+
+	bool bHasServerId = pClientVehicle->GetId() != INVALID_NETWORK_ID;
+
+	Packet Packet(MAFIAPACKET_ELEMENT_REMOVE);
+	Packet.Write<uint8_t>(bHasServerId ? 1 : 0);
+	if (bHasServerId)
+		Packet.Write<uint32_t>(pClientVehicle->GetId());
+	else
+		Packet.Write<uint64_t>(pClientVehicle->GetGUID());
+	m_pMultiplayer->SendHostPacket(&Packet);
+
+	m_pClientManager->Remove(pClientVehicle);
+
+	pClientVehicle->m_bDontRemoveGameItem = true;
+	g_pClientGame->m_pClientManager->DestroyObject(pClientVehicle, true, false);
+	pClientVehicle->m_bDontRemoveGameItem = false;
+
+	//pClientVehicle->SetFromExistingEntity(pCar);
+	//pClientVehicle->SetSyncer(pMultiplayer->m_iLocalIndex);
+
+	return true;
+}
+*/
+
+bool CClientGame::OnTrafficCarRespawn(CClientVehicle* pClientVehicle, MafiaSDK::C_Car* pCar)
+{
+	pClientVehicle->SetFromExistingEntity(pCar);
+
+	return true;
+}
+
+bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
+{
+	switch (GameComponent)
+	{
+	case GAMECOMPONENT_TRAFFIC:
+		return m_CVars.GetBoolean(_gstr("Traffic"), true);
+	case GAMECOMPONENT_CIVILIANS:
+		return m_CVars.GetBoolean(_gstr("Civilians"), true);
+	case GAMECOMPONENT_SCRIPTS:
+		return m_CVars.GetBoolean(_gstr("Scripts"), true);
+	case GAMECOMPONENT_BRIDGES:
+		return m_CVars.GetBoolean(_gstr("Bridges"), true);
+	case GAMECOMPONENT_TROLLEYS:
+		return m_CVars.GetBoolean(_gstr("Trains"), true);
+	case GAMECOMPONENT_TRAINS:
+		return m_CVars.GetBoolean(_gstr("Trains"), true);
+	case GAMECOMPONENT_DOGS:
+		return m_CVars.GetBoolean(_gstr("Dogs"), true);
+	case GAMECOMPONENT_FUELSTATIONS:
+		return m_CVars.GetBoolean(_gstr("FuelStations"), true);
+	case GAMECOMPONENT_DOORS:
+		return m_CVars.GetBoolean(_gstr("Doors"), true);
+	case GAMECOMPONENT_PLANES:
+		return m_CVars.GetBoolean(_gstr("Planes"), true);
+	case GAMECOMPONENT_BIGMAP:
+		return m_CVars.GetBoolean(_gstr("BigMap"), true);
+	default:
+		break;
+	}
+	return true;
+}
+
+void CClientGame::ShowDisconnectReason()
+{
+	const GChar* rgpszReasons[] = {
+		_gstr("TIMEOUT"),
+		_gstr("FULL"),
+		_gstr("UNSUPPORTED CLIENT"),
+		_gstr("UNSUPPORTED ENGINE"),
+		_gstr("WRONG PASSWORD"),
+		_gstr("UNSUPPORTED EXECUTABLE"),
+		_gstr("GRACEFUL"),
+		_gstr("BANNED"),
+		_gstr("FAILED"),
+		_gstr("INVALID NAME"),
+		_gstr("CRASH"),
+		_gstr("PUBLIC KEY MISMATCH"),
+		_gstr("NAME IN USE"),
+		_gstr("KICKED")
+	};
+	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
 }

@@ -67,6 +67,8 @@ add_definitions(-DENGINE_STATIC)
 
 add_definitions(-DASMJIT_STATIC)
 
+add_definitions(-DRMLUI_STATIC_LIB)
+
 set(MAFIAC_ARCHIVE_EXTERNAL true)
 if(MAFIAC_ARCHIVE_EXTERNAL)
 	add_definitions(-DMAFIAC_ARCHIVE_EXTERNAL)

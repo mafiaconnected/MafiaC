@@ -1,5 +1,7 @@
 ﻿[Language]
-author=Sladernimo
+name=German
+native_name=Deutsch
+author=Sladernimo, Kyuubii
 
 [Common]
 
@@ -10,6 +12,12 @@ language_German=Deutsch
 language_Italian=Italienisch
 language_Spanish=Spanisch
 language_Russian=Russisch
+language_Arabic=Arabic
+language_Chinese=Chinese (Simplified)
+language_Persian=Persian
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
 
 # Tips
 tip_Close=Schließe das Fenster.
@@ -17,10 +25,13 @@ tip_Okay=Schließe das Fenster, Änderungen werden gespeichert.
 tip_Cancel=Schließe das Fenster, Änderungen werden NICHT gespeichert.
 
 # Columns
+column_Name=Name
 column_Title=Titel
 column_Version=Version
 column_ModifiedDate=Zuletzt geändert
 column_Description=Beschreibung
+column_Key=Schlüssel
+column_Value=Wert
 
 # Buttons
 button_Okay=Zustimmen
@@ -34,27 +45,39 @@ button_Abort=Abbrechen
 [LauncherWindow]
 
 # Menu
-menu_File=&Datei
+menu_File=Datei
 menu_CheckForUpdates=Nach Updates suchen...
-menu_Exit=S&chließen
+menu_Exit=Schließen
 
-menu_Server=&Server
+menu_Server=Server
 menu_AddServer=Server hinzufügen
 menu_DeleteServer=Server löschen
 
-menu_Tools=&Werkzeuge
-menu_Settings=&Einstellungen...
+menu_Tools=Werkzeuge
+menu_Settings=Einstellungen...
 menu_ResetSettings=Alle Einstellungen zurücksetzen...
 menu_DesktopShortcut=Desktop Verknüpfung
 
+menu_View=Ansicht
+menu_Players=Spieler
+menu_Rules=Regeln
+menu_FullWidthRules=Volle Breite Regeln
+
 menu_Help=&Hilfe
-menu_RunDiagnostics=Starte &Diagnose ...
-menu_About=&Über ...
+menu_RunDiagnostics=Starte Diagnose ...
+menu_About=Über ...
+menu_Licenses=Zeige Lizenzen...
 
 # Generic/Multiplayer
 menu_LargeIcons=Große Symbole
 menu_Refresh=Aktualisieren
 menu_Connect=Verbinden
+menu_AddToFavourites=Zu Favoriten hinzufügen
+menu_Favourite=Favorit
+menu_CopyServerIP=Kopiere Server IP
+menu_CopyAddress=Kopiere Adresse
+menu_ViewPlayerMap=Ansicht Spieler Karte...
+menu_VisitWebsite=Besuche Website...
 
 # Mods context menu
 menu_ResetAll=Alles zurücksetzen
@@ -62,10 +85,10 @@ menu_DisableAll=Alles deaktivieren
 menu_Delete=Löschen
 
 # Open menu
-menu_LauncherSettings=&Launcher Einstellungen...
-menu_GameSettings=&Spiel Einstellungen...
+menu_LauncherSettings=Launcher Einstellungen...
+menu_GameSettings=Spiel Einstellungen...
 menu_Resources=Resources
-menu_Crashes=Crashes
+menu_Crashes=Abstürze
 menu_Caches=Caches
 menu_Logs=Logs
 
@@ -83,7 +106,7 @@ tab_Mods=Modifikationen
 # Status
 status_Disconnected=Verbindung getrennt
 status_Connecting=Verbinde
-status_Connected=Verbunden zu masterlist
+status_Connected=Verbunden mit der Master List
 
 # Labels
 label_Game=Spiel:
@@ -102,6 +125,10 @@ column_ServerName=Server Name
 column_Players=Spieler
 column_GameMode=Spiel Modus
 
+# Group Boxes
+group_Players=Spieler
+group_Rules=Regeln
+
 # Buttons
 button_OpenMenu=Öffnen...
 button_CloseLauncher=Schließe Launcher
@@ -115,7 +142,7 @@ windowTitle=Über
 group_About=Über
 
 # Labels
-label_Product=Product:
+label_Product=Produkt:
 label_Copyright=Copyright \xC2\xA9 {0} {1}
 label_Version=Version:
 label_GitBranch=Git Branch:
@@ -125,8 +152,8 @@ label_BuildDate=Build Date:
 label_BuildTime=Build Time:
 label_Website=Website:
 label_Patreon=Patreon:
-label_CrashesThisWeek=Crashes This Week:
-label_Developers=Developers:
+label_CrashesThisWeek=Abstürze in dieser Woche:
+label_Developers=Entwickler:
 
 [SettingsWindow]
 
@@ -141,6 +168,9 @@ tab_Display=Anzeige
 tab_Advanced=Erweitert
 tab_NonModHacks=Non-mod Hacks
 tab_Licenses=Lizensen
+tab_Language=Sprache
+tab_BugFixes=Verbesserungen (Bug Fixes)
+tab_Debug=Debug
 
 # Labels
 label_Name=Name:
@@ -166,9 +196,12 @@ opt_KeepSavedGamesSeparate=Halte die Spielstände separiert
 opt_KeepScreenshotsSeparate=Halte die Screenshots separiert
 opt_SaveCrashDump=Speichere Crash Dump
 opt_CheckForUpdates=Nach Updates suchen
+opt_Assertions=Sicherstellungen
+opt_DebugMode=Debug-Modus
 opt_TerminateOnCrash=Bei Absturz beenden
 opt_VerboseLogging=Ausführliche Protokollierung
 opt_GameOutput=Zeige den Siel output in der Konsole an
+opt_MultithreadedNetworking=Multithreaded networking
 opt_SCM=SCM
 opt_DisableStoryMode=Deaktiviere den Story Modus
 
@@ -179,6 +212,8 @@ tip_InvisibleObjectsFix=Diese Option behebt einen Fehler, bei dem bestimmte Obje
 opt_VCTrails=Vice City trails
 tip_VCTrails=Aktiviert trails in Vice City
 opt_AutoSave=Automatisches Speichern
+opt_SyncAnimations=Synchronisiere Animationen
+opt_AllowDirectConnections=Erlaube direkte Verbindungen (peer-to-peer)
 
 [TestingWindow]
 
@@ -194,3 +229,10 @@ label_Message=Bitte geben Sie das Passwort ein, um sich mit dem Server zu verbin
 
 windowTitle=Server hinzufügen
 label_Message=Eingabe neuer Server HOST:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Spieler-Karte
+
+# Menu
+menu_VCStyle=Vice City - Stil

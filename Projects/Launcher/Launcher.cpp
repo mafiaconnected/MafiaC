@@ -9,6 +9,7 @@
 #endif
 #include <crtdbg.h>
 #include <LauncherVersion.h>
+#include <AdditionalPackets.h>
 
 CMafiaCModLauncher::CMafiaCModLauncher()
 {
@@ -24,6 +25,10 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 	m_bAllowLicenses = true;
 #endif
 
+	m_Launcher.m_Version.m_uiNetVersion = NETGAME_CURRENT_VERSION;
+
+	_gstrlcpy(m_szServerListing, _gstr("serverlisting.gtaconnected.com"), ARRAY_COUNT(m_szServerListing));
+
 	_gstrlcpy(m_szHacksFolder, _gstr(""), ARRAY_COUNT(m_szHacksFolder));
 
 	_gstrcpy_s(m_Launcher.m_szName, ARRAY_COUNT(m_Launcher.m_szName), _gstr("MafiaC"));
@@ -34,9 +39,9 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 
 #ifndef _DEBUG
 #if PUBLIC_RELEASE
-	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://mafiaconnected.com/external/Launcher-Default.xml"));
+	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://ota.mafiaconnected.com/Launcher-Default.xml"));
 #else
-	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://mafiaconnected.com/external/Launcher-Temp.xml"));
+	_gstrcpy_s(m_Launcher.m_szUpdateURL, ARRAY_COUNT(m_Launcher.m_szUpdateURL), _gstr("https://ota.mafiaconnected.com/Launcher-Beta.xml"));
 #endif
 #endif
 

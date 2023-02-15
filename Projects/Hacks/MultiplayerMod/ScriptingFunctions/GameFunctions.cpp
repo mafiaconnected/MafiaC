@@ -7,6 +7,22 @@
 #include "../Elements/ClientVehicle.h"
 #include <Utils/VectorTools.h>
 
+static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CVector3D pos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CClientEntity* pClientEntity = reinterpret_cast<CClientEntity*>(pClientManager->Create(ELEMENT_ENTITY));
+	pClientEntity->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientEntity);
+	pState->ReturnObject(pClientEntity);
+
+	return true;
+}
+
 static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -26,6 +42,7 @@ static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 	pClientHuman->SetModel(mdl);
 	pClientHuman->Spawn(pos, angle, false);
 	pClientHuman->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientHuman);
 	pState->ReturnObject(pClientHuman);
 
 	return true;
@@ -35,16 +52,16 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	const GChar* mdl = pState->CheckString(0);
-	if (!mdl) return false;
-
 	CVector3D pos = { 0, 0, 0 };
-	if (!pState->CheckVector3D(1, pos))
+	if (!pState->CheckVector3D(0, pos))
 		return false;
 
 	float angle = 0;
-	if (!pState->CheckNumber(2, angle))
+	if (!pState->CheckNumber(1, angle))
 		return false;
+
+	const GChar* mdl = pState->CheckString(2);
+	if (!mdl) return false;
 
 	CClientPlayer* pClientPlayer = reinterpret_cast<CClientPlayer*>(pClientManager->Create(ELEMENT_PLAYER));
 	pClientPlayer->SetModel(mdl);
@@ -53,6 +70,7 @@ static bool FunctionGameCreatePlayer(IScriptState* pState, int argc, void* pUser
 	pClientPlayer->Spawn(pos, angle, true);
 	pClientManager->SetLocalPlayer(pClientPlayer);
 	pClientPlayer->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientPlayer);
 	pState->ReturnObject(pClientPlayer);
 
 	return true;
@@ -74,12 +92,12 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 		return false;
 
 	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
-	CVector3D rot = CVecTools::ComputeDirEuler(angle);
+	CVector3D rot = CVecTools::ComputeDirEuler(CVecTools::RadToDeg(angle));
 	pClientVehicle->Create(mdl, pos, rot);
 	pClientVehicle->m_pResource = pState->GetResource();
-	pClientManager->RegisterObject(pClientVehicle);
+	pClientManager->RegisterNetObject(pClientVehicle);
 	pClientVehicle->Release();
-	
+
 	pState->ReturnObject(pClientVehicle);
 	return true;
 }
@@ -91,6 +109,12 @@ static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
 	const GChar* mapName = pState->CheckString(0);
 	if (!mapName) return false;
 	UTF8String mapName2(true, mapName);
+
+	bool bFullReload = true;
+	if (!pState->CheckBoolean(1, bFullReload))
+		return false;
+
+	g_pClientGame->m_bFullReload = false;
 
 	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
 	MafiaSDK::GetMission()->MapLoad(mapName2);
@@ -221,21 +245,6 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 	return true;
 }
 
-static bool FunctionGameSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
-{
-	CVector3D camPos = { 0, 0, 0 };
-	if (!pState->CheckVector3D(0, camPos))
-		return false;
-
-	CVector3D lookAtPos = { 0, 0, 0 };
-	if (!pState->CheckVector3D(0, lookAtPos))
-		return false;
-
-	//MafiaSDK::GetMission()->GetGame()->GetCamera()->LockAt(CVecTools::ConvertToMafiaVec(camPos), { 0,0,0 });
-	//MafiaSDK::GetMission()->GetGame()->GetCamera()->SetLookTo(CVecTools::ConvertToMafiaVec(lookAtPos), MafiaSDK::GetMission()->GetGame()->GetCamera()->GetInterface()->cameraFrame);
-	return true;
-}
-
 static bool FunctionGetGame(IScriptState* pState, int argc, void* pUser)
 {
 	CClientGame* pClientGame = (CClientGame*)pUser;
@@ -273,6 +282,26 @@ static bool FunctionSetPlayerControl(IScriptState* pState, int argc, void* pUser
 	return true;
 }
 
+static bool FunctionGameSetMoney(IScriptState* pState, int argc, void* pUser)
+{
+	int uiScore = 0;
+	if (!pState->CheckNumber(0, uiScore))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreSet(uiScore);
+	return true;
+}
+
+static bool FunctionGameEnableMoney(IScriptState* pState, int argc, void* pUser)
+{
+	bool bEnabled = false;
+	if (!pState->CheckBoolean(0, bEnabled))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreOn(bEnabled);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -291,6 +320,13 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_TWO"), GAME_MAFIA_TWO);
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_THREE"), GAME_MAFIA_THREE);
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_ONE_DE"), GAME_MAFIA_ONE_DE);
+
+	// Script Compatibility
+	pDefineHandlers->Define(_gstr("GAME_GTA_III"), 1);
+	pDefineHandlers->Define(_gstr("GAME_GTA_VC"), 2);
+	pDefineHandlers->Define(_gstr("GAME_GTA_SA"), 3);
+	pDefineHandlers->Define(_gstr("GAME_GTA_IV"), 5);
+	pDefineHandlers->Define(_gstr("GAME_GTA_IV_EFLC"), 6);
 
 	pDefineHandlers->Define(_gstr("WEAPON_KNUCKLEDUSTER"), 2);
 	pDefineHandlers->Define(_gstr("WEAPON_KNIFE"), 3);
@@ -330,6 +366,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
 
+	pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
+
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
 		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
@@ -349,7 +387,6 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
-		//pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv"), FunctionSetCameraLookAt, pClientGame);
 	}
 
 	{
@@ -358,15 +395,17 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s"), FunctionGameChangeMap, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s|b"), FunctionGameChangeMap, pClientManager);
 
-		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePlayer, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("svf"), FunctionGameCreatePlayer, pClientManager);
+		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tvfs"), FunctionGameCreatePlayer, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
 }

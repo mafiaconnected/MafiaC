@@ -4,15 +4,12 @@
  */
 
 #include "d3dx9.hpp"
-#include <d3dx9effect.h>
 #include "d3d8to9.hpp"
 #include <regex>
 #include <assert.h>
 
-//using namespace d3d8to9;
-
 IDirect3DDevice9* g_pD3D9Device = nullptr;
-ID3DXEffect* g_pEffect = nullptr;
+//ID3DXEffect* g_pEffect = nullptr;
 
 struct VertexShaderInfo
 {
@@ -20,67 +17,50 @@ struct VertexShaderInfo
 	IDirect3DVertexDeclaration9 *Declaration;
 };
 
-// IDirect3DDevice8
 Direct3DDevice8::Direct3DDevice8(Direct3D8 *d3d, IDirect3DDevice9 *ProxyInterface, BOOL EnableZBufferDiscarding) :
-	D3D(d3d), ProxyInterface(ProxyInterface), ZBufferDiscarding(EnableZBufferDiscarding), m_RefCount(1)
+	D3D(d3d), ProxyInterface(ProxyInterface), ZBufferDiscarding(EnableZBufferDiscarding)
 {
 	g_pD3D9Device = ProxyInterface;
-	//D3D->AddRef();
+	ProxyAddressLookupTable = new AddressLookupTable(this);
+	PaletteFlag = SupportsPalettes();
 }
 Direct3DDevice8::~Direct3DDevice8()
 {
-#ifndef D3D8TO9NOLOG
-	LOG << "Redirecting '" << "IDirect3DDevice8::~IDirect3DDevice8" << "(" << this << ")' ..." << std::endl;
-#endif
-
-	if (CurrentRenderTarget != nullptr)
-	{
-		CurrentRenderTarget->Release();
-		CurrentRenderTarget = nullptr;
-	}
-	if (CurrentDepthStencilSurface != nullptr)
-	{
-		CurrentDepthStencilSurface->Release();
-		CurrentDepthStencilSurface = nullptr;
-	}
-
-	ProxyInterface->Release();
-	//D3D->Release();
+	delete ProxyAddressLookupTable;
 }
 
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::QueryInterface(REFIID riid, void **ppvObj)
 {
 	if (ppvObj == nullptr)
-	{
 		return E_POINTER;
-	}
 
-	if (riid == __uuidof(this) ||
+	if (riid == __uuidof(IDirect3DDevice8) ||
 		riid == __uuidof(IUnknown))
 	{
 		AddRef();
-
-		*ppvObj = this;
+		*ppvObj = static_cast<IDirect3DDevice8 *>(this);
 
 		return S_OK;
 	}
 
-	return ProxyInterface->QueryInterface(riid, ppvObj);
+	const HRESULT hr = ProxyInterface->QueryInterface(ConvertREFIID(riid), ppvObj);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppvObj, this);
+
+	return hr;
 }
 ULONG STDMETHODCALLTYPE Direct3DDevice8::AddRef()
 {
-	m_RefCount++;
-	return m_RefCount;
+	return ProxyInterface->AddRef();
 }
 ULONG STDMETHODCALLTYPE Direct3DDevice8::Release()
 {
-	if (m_RefCount <= 1)
-	{
+	ULONG LastRefCount = ProxyInterface->Release();
+
+	if (LastRefCount == 0)
 		delete this;
-		return 0;
-	}
-	m_RefCount--;
-	return m_RefCount;
+
+	return LastRefCount;
 }
 
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::TestCooperativeLevel()
@@ -97,15 +77,12 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::ResourceManagerDiscardBytes(DWORD Byt
 
 	return ProxyInterface->EvictManagedResources();
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDirect3D(Direct3D8 **ppD3D8)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDirect3D(IDirect3D8 **ppD3D8)
 {
 	if (ppD3D8 == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	D3D->AddRef();
-
 	*ppD3D8 = D3D;
 
 	return D3D_OK;
@@ -113,18 +90,13 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDirect3D(Direct3D8 **ppD3D8)
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDeviceCaps(D3DCAPS8 *pCaps)
 {
 	if (pCaps == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	D3DCAPS9 DeviceCaps;
 
 	const HRESULT hr = ProxyInterface->GetDeviceCaps(&DeviceCaps);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	ConvertCaps(DeviceCaps, *pCaps);
 
@@ -138,14 +110,13 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetCreationParameters(D3DDEVICE_CREAT
 {
 	return ProxyInterface->GetCreationParameters(pParameters);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetCursorProperties(UINT XHotSpot, UINT YHotSpot, Direct3DSurface8 *pCursorBitmap)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetCursorProperties(UINT XHotSpot, UINT YHotSpot, IDirect3DSurface8 *pCursorBitmap)
 {
 	if (pCursorBitmap == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	return ProxyInterface->SetCursorProperties(XHotSpot, YHotSpot, pCursorBitmap->GetProxyInterface());
+	auto pCursorBitmapImpl = static_cast<Direct3DSurface8 *>(pCursorBitmap);
+	return ProxyInterface->SetCursorProperties(XHotSpot, YHotSpot, pCursorBitmapImpl->GetProxyInterface());
 }
 void STDMETHODCALLTYPE Direct3DDevice8::SetCursorPosition(UINT XScreenSpace, UINT YScreenSpace, DWORD Flags)
 {
@@ -155,30 +126,43 @@ BOOL STDMETHODCALLTYPE Direct3DDevice8::ShowCursor(BOOL bShow)
 {
 	return ProxyInterface->ShowCursor(bShow);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS8 *pPresentationParameters, Direct3DSwapChain8 **ppSwapChain)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS8 *pPresentationParameters, IDirect3DSwapChain8 **ppSwapChain)
 {
 #ifndef D3D8TO9NOLOG
 	LOG << "Redirecting '" << "IDirect3DDevice8::CreateAdditionalSwapChain" << "(" << this << ", " << pPresentationParameters << ", " << ppSwapChain << ")' ..." << std::endl;
 #endif
 
 	if (pPresentationParameters == nullptr || ppSwapChain == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppSwapChain = nullptr;
 
 	D3DPRESENT_PARAMETERS PresentParams;
 	ConvertPresentParameters(*pPresentationParameters, PresentParams);
 
+	// Get multisample quality level
+	if (PresentParams.MultiSampleType != D3DMULTISAMPLE_NONE)
+	{
+		DWORD QualityLevels = 0;
+		D3DDEVICE_CREATION_PARAMETERS CreationParams;
+		ProxyInterface->GetCreationParameters(&CreationParams);
+
+		if (D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal,
+			CreationParams.DeviceType, PresentParams.BackBufferFormat, PresentParams.Windowed,
+			PresentParams.MultiSampleType, &QualityLevels) == S_OK &&
+			D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal,
+				CreationParams.DeviceType, PresentParams.AutoDepthStencilFormat, PresentParams.Windowed,
+				PresentParams.MultiSampleType, &QualityLevels) == S_OK)
+		{
+			PresentParams.MultiSampleQuality = (QualityLevels != 0) ? QualityLevels - 1 : 0;
+		}
+	}
+
 	IDirect3DSwapChain9 *SwapChainInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateAdditionalSwapChain(&PresentParams, &SwapChainInterface);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppSwapChain = new Direct3DSwapChain8(this, SwapChainInterface);
 
@@ -191,62 +175,32 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::Reset(D3DPRESENT_PARAMETERS8 *pPresen
 #endif
 
 	if (pPresentationParameters == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
+
+	pCurrentRenderTarget = nullptr;
 
 	D3DPRESENT_PARAMETERS PresentParams;
 	ConvertPresentParameters(*pPresentationParameters, PresentParams);
 
-	if (CurrentRenderTarget != nullptr)
+	// Get multisample quality level
+	if (PresentParams.MultiSampleType != D3DMULTISAMPLE_NONE)
 	{
-		CurrentRenderTarget->Release();
-		CurrentRenderTarget = nullptr;
-	}
-	if (CurrentDepthStencilSurface != nullptr)
-	{
-		CurrentDepthStencilSurface->Release();
-		CurrentDepthStencilSurface = nullptr;
-	}
+		DWORD QualityLevels = 0;
+		D3DDEVICE_CREATION_PARAMETERS CreationParams;
+		ProxyInterface->GetCreationParameters(&CreationParams);
 
-	const HRESULT hr = ProxyInterface->Reset(&PresentParams);
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	// Set default render target
-	IDirect3DSurface9 *RenderTargetInterface = nullptr;
-	IDirect3DSurface9 *DepthStencilInterface = nullptr;
-
-	ProxyInterface->GetRenderTarget(0, &RenderTargetInterface);
-	ProxyInterface->GetDepthStencilSurface(&DepthStencilInterface);
-
-	Direct3DSurface8 *RenderTargetProxyObject = nullptr;
-	Direct3DSurface8 *DepthStencilProxyObject = nullptr;
-
-	if (RenderTargetInterface != nullptr)
-	{
-		RenderTargetProxyObject = new Direct3DSurface8(this, RenderTargetInterface);
-	}
-	if (DepthStencilInterface != nullptr)
-	{
-		DepthStencilProxyObject = new Direct3DSurface8(this, DepthStencilInterface);
+		if (D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal,
+			CreationParams.DeviceType, PresentParams.BackBufferFormat, PresentParams.Windowed,
+			PresentParams.MultiSampleType, &QualityLevels) == S_OK &&
+			D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal,
+				CreationParams.DeviceType, PresentParams.AutoDepthStencilFormat, PresentParams.Windowed,
+				PresentParams.MultiSampleType, &QualityLevels) == S_OK)
+		{
+			PresentParams.MultiSampleQuality = (QualityLevels != 0) ? QualityLevels - 1 : 0;
+		}
 	}
 
-	SetRenderTarget(RenderTargetProxyObject, DepthStencilProxyObject);
-
-	if (RenderTargetProxyObject != nullptr)
-	{
-		RenderTargetProxyObject->Release();
-	}
-	if (DepthStencilProxyObject != nullptr)
-	{
-		DepthStencilProxyObject->Release();
-	}
-
-	return D3D_OK;
+	return ProxyInterface->Reset(&PresentParams);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::Present(const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion)
 {
@@ -254,25 +208,20 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::Present(const RECT *pSourceRect, cons
 
 	return ProxyInterface->Present(pSourceRect, pDestRect, hDestWindowOverride, nullptr);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetBackBuffer(UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, Direct3DSurface8 **ppBackBuffer)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetBackBuffer(UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface8 **ppBackBuffer)
 {
 	if (ppBackBuffer == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppBackBuffer = nullptr;
 
 	IDirect3DSurface9 *SurfaceInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->GetBackBuffer(0, iBackBuffer, Type, &SurfaceInterface);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
-	*ppBackBuffer = new Direct3DSurface8(this, SurfaceInterface);
+	*ppBackBuffer = ProxyAddressLookupTable->FindAddress<Direct3DSurface8>(SurfaceInterface);
 
 	return D3D_OK;
 }
@@ -288,12 +237,10 @@ void STDMETHODCALLTYPE Direct3DDevice8::GetGammaRamp(D3DGAMMARAMP *pRamp)
 {
 	ProxyInterface->GetGammaRamp(0, pRamp);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, Direct3DTexture8 **ppTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DTexture8 **ppTexture)
 {
 	if (ppTexture == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppTexture = nullptr;
 
@@ -307,7 +254,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateTexture(UINT Width, UINT Height
 		{
 			Usage |= D3DUSAGE_RENDERTARGET;
 		}
-		else
+		else if (Usage != D3DUSAGE_DEPTHSTENCIL)
 		{
 			Usage |= D3DUSAGE_DYNAMIC;
 		}
@@ -316,180 +263,147 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateTexture(UINT Width, UINT Height
 	IDirect3DTexture9 *TextureInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateTexture(Width, Height, Levels, Usage, Format, Pool, &TextureInterface, nullptr);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppTexture = new Direct3DTexture8(this, TextureInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVolumeTexture(UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, Direct3DVolumeTexture8 **ppVolumeTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVolumeTexture(UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DVolumeTexture8 **ppVolumeTexture)
 {
 	if (ppVolumeTexture == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppVolumeTexture = nullptr;
 
 	IDirect3DVolumeTexture9 *TextureInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, &TextureInterface, nullptr);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppVolumeTexture = new Direct3DVolumeTexture8(this, TextureInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, Direct3DCubeTexture8 **ppCubeTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DCubeTexture8 **ppCubeTexture)
 {
 	if (ppCubeTexture == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppCubeTexture = nullptr;
 
 	IDirect3DCubeTexture9 *TextureInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, &TextureInterface, nullptr);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppCubeTexture = new Direct3DCubeTexture8(this, TextureInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexBuffer(UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, Direct3DVertexBuffer8 **ppVertexBuffer)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexBuffer(UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer8 **ppVertexBuffer)
 {
 	if (ppVertexBuffer == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppVertexBuffer = nullptr;
 
 	IDirect3DVertexBuffer9 *BufferInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateVertexBuffer(Length, Usage, FVF, Pool, &BufferInterface, nullptr);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppVertexBuffer = new Direct3DVertexBuffer8(this, BufferInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, Direct3DIndexBuffer8 **ppIndexBuffer)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool, IDirect3DIndexBuffer8 **ppIndexBuffer)
 {
 	if (ppIndexBuffer == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppIndexBuffer = nullptr;
 
 	IDirect3DIndexBuffer9 *BufferInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->CreateIndexBuffer(Length, Usage, Format, Pool, &BufferInterface, nullptr);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppIndexBuffer = new Direct3DIndexBuffer8(this, BufferInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, BOOL Lockable, Direct3DSurface8 **ppSurface)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, BOOL Lockable, IDirect3DSurface8 **ppSurface)
 {
 	if (ppSurface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppSurface = nullptr;
 
-	DWORD QualityLevels = 1;
-	D3DDEVICE_CREATION_PARAMETERS CreationParams;
-	ProxyInterface->GetCreationParameters(&CreationParams);
+	DWORD QualityLevels = 0;
 
-	HRESULT hr = D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal, CreationParams.DeviceType, Format, FALSE, MultiSample, &QualityLevels);
-
-	if (FAILED(hr))
+	// Get multisample quality level
+	if (MultiSample != D3DMULTISAMPLE_NONE)
 	{
-		return D3DERR_INVALIDCALL;
+		D3DDEVICE_CREATION_PARAMETERS CreationParams;
+		ProxyInterface->GetCreationParameters(&CreationParams);
+
+		D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal, CreationParams.DeviceType, Format, FALSE, MultiSample, &QualityLevels);
+		QualityLevels = (QualityLevels != 0) ? QualityLevels - 1 : 0;
 	}
 
 	IDirect3DSurface9 *SurfaceInterface = nullptr;
 
-	hr = ProxyInterface->CreateRenderTarget(Width, Height, Format, MultiSample, QualityLevels - 1, Lockable, &SurfaceInterface, nullptr);
-
+	const HRESULT hr = ProxyInterface->CreateRenderTarget(Width, Height, Format, MultiSample, QualityLevels, Lockable, &SurfaceInterface, nullptr);
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppSurface = new Direct3DSurface8(this, SurfaceInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, Direct3DSurface8 **ppSurface)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, IDirect3DSurface8 **ppSurface)
 {
 	if (ppSurface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppSurface = nullptr;
 
-	DWORD QualityLevels = 1;
-	D3DDEVICE_CREATION_PARAMETERS CreationParams;
-	ProxyInterface->GetCreationParameters(&CreationParams);
+	DWORD QualityLevels = 0;
 
-	HRESULT hr = D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal, CreationParams.DeviceType, Format, FALSE, MultiSample, &QualityLevels);
-
-	if (FAILED(hr))
+	// Get multisample quality level
+	if (MultiSample != D3DMULTISAMPLE_NONE)
 	{
-		return D3DERR_INVALIDCALL;
+		D3DDEVICE_CREATION_PARAMETERS CreationParams;
+		ProxyInterface->GetCreationParameters(&CreationParams);
+
+		D3D->GetProxyInterface()->CheckDeviceMultiSampleType(CreationParams.AdapterOrdinal, CreationParams.DeviceType, Format, FALSE, MultiSample, &QualityLevels);
+		QualityLevels = (QualityLevels != 0) ? QualityLevels - 1 : 0;
 	}
 
 	IDirect3DSurface9 *SurfaceInterface = nullptr;
 
-	hr = ProxyInterface->CreateDepthStencilSurface(Width, Height, Format, MultiSample, QualityLevels - 1, ZBufferDiscarding, &SurfaceInterface, nullptr);
-
+	const HRESULT hr = ProxyInterface->CreateDepthStencilSurface(Width, Height, Format, MultiSample, QualityLevels, ZBufferDiscarding, &SurfaceInterface, nullptr);
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	*ppSurface = new Direct3DSurface8(this, SurfaceInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateImageSurface(UINT Width, UINT Height, D3DFORMAT Format, Direct3DSurface8 **ppSurface)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateImageSurface(UINT Width, UINT Height, D3DFORMAT Format, IDirect3DSurface8 **ppSurface)
 {
 #ifndef D3D8TO9NOLOG
 	LOG << "Redirecting '" << "IDirect3DDevice8::CreateImageSurface" << "(" << this << ", " << Width << ", " << Height << ", " << Format << ", " << ppSurface << ")' ..." << std::endl;
 #endif
 
 	if (ppSurface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppSurface = nullptr;
 
@@ -498,7 +412,6 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateImageSurface(UINT Width, UINT H
 #ifndef D3D8TO9NOLOG
 		LOG << "> Replacing format 'D3DFMT_R8G8B8' with 'D3DFMT_X8R8G8B8' ..." << std::endl;
 #endif
-
 		Format = D3DFMT_X8R8G8B8;
 	}
 
@@ -506,12 +419,11 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateImageSurface(UINT Width, UINT H
 
 	const HRESULT hr = ProxyInterface->CreateOffscreenPlainSurface(Width, Height, Format, D3DPOOL_SYSTEMMEM, &SurfaceInterface, nullptr);
 
-	if (FAILED(hr))
+	if (FAILED(hr) && FAILED(ProxyInterface->CreateOffscreenPlainSurface(Width, Height, Format, D3DPOOL_SCRATCH, &SurfaceInterface, nullptr)))
 	{
 #ifndef D3D8TO9NOLOG
 		LOG << "> 'IDirect3DDevice9::CreateOffscreenPlainSurface' failed with error code " << std::hex << hr << std::dec << "!" << std::endl;
 #endif
-
 		return hr;
 	}
 
@@ -519,28 +431,25 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateImageSurface(UINT Width, UINT H
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::CopyRects(Direct3DSurface8 *pSourceSurface, const RECT *pSourceRectsArray, UINT cRects, Direct3DSurface8 *pDestinationSurface, const POINT *pDestPointsArray)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::CopyRects(IDirect3DSurface8 *pSourceSurface, const RECT *pSourceRectsArray, UINT cRects, IDirect3DSurface8 *pDestinationSurface, const POINT *pDestPointsArray)
 {
 	if (pSourceSurface == nullptr || pDestinationSurface == nullptr || pSourceSurface == pDestinationSurface)
-	{
 		return D3DERR_INVALIDCALL;
-	}
+
+	auto pSourceSurfaceImpl = static_cast<Direct3DSurface8 *>(pSourceSurface);
+	auto pDestinationSurfaceImpl = static_cast<Direct3DSurface8 *>(pDestinationSurface);
 
 	D3DSURFACE_DESC SourceDesc, DestinationDesc;
-	pSourceSurface->GetProxyInterface()->GetDesc(&SourceDesc);
-	pDestinationSurface->GetProxyInterface()->GetDesc(&DestinationDesc);
+	pSourceSurfaceImpl->GetProxyInterface()->GetDesc(&SourceDesc);
+	pDestinationSurfaceImpl->GetProxyInterface()->GetDesc(&DestinationDesc);
 
 	if (SourceDesc.Format != DestinationDesc.Format)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	HRESULT hr = D3DERR_INVALIDCALL;
 
 	if (cRects == 0)
-	{
-		cRects = 1;
-	}
+		cRects  = 1;
 
 	for (UINT i = 0; i < cRects; i++)
 	{
@@ -572,24 +481,32 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CopyRects(Direct3DSurface8 *pSourceSu
 
 		if (SourceDesc.Pool == D3DPOOL_MANAGED || DestinationDesc.Pool != D3DPOOL_DEFAULT)
 		{
-			if (d3d8to9::D3DXLoadSurfaceFromSurface != nullptr)
+			hr = D3DERR_INVALIDCALL;
+			if (D3DXLoadSurfaceFromSurface != nullptr)
 			{
-				hr = d3d8to9::D3DXLoadSurfaceFromSurface(pDestinationSurface->GetProxyInterface(), nullptr, &DestinationRect, pSourceSurface->GetProxyInterface(), nullptr, &SourceRect, D3DX_FILTER_NONE, 0);
-			}
-			else
-			{
-				hr = E_FAIL;
+				if (SUCCEEDED(D3DXLoadSurfaceFromSurface(pDestinationSurfaceImpl->GetProxyInterface(), nullptr, &DestinationRect, pSourceSurfaceImpl->GetProxyInterface(), nullptr, &SourceRect, D3DX_FILTER_NONE, 0)))
+				{
+					// Explicitly call AddDirtyRect on the surface
+					void *pContainer = nullptr;
+					if (SUCCEEDED(pDestinationSurfaceImpl->GetContainer(IID_IDirect3DTexture9, &pContainer)) && pContainer)
+					{
+						IDirect3DTexture9 *pTexture = (IDirect3DTexture9*)pContainer;
+						pTexture->AddDirtyRect(&DestinationRect);
+						pTexture->Release();
+					}
+					hr = D3D_OK;
+				}
 			}
 		}
 		else if (SourceDesc.Pool == D3DPOOL_DEFAULT)
 		{
-			hr = ProxyInterface->StretchRect(pSourceSurface->GetProxyInterface(), &SourceRect, pDestinationSurface->GetProxyInterface(), &DestinationRect, D3DTEXF_NONE);
+			hr = ProxyInterface->StretchRect(pSourceSurfaceImpl->GetProxyInterface(), &SourceRect, pDestinationSurfaceImpl->GetProxyInterface(), &DestinationRect, D3DTEXF_NONE);
 		}
 		else if (SourceDesc.Pool == D3DPOOL_SYSTEMMEM)
 		{
 			const POINT pt = { DestinationRect.left, DestinationRect.top };
 
-			hr = ProxyInterface->UpdateSurface(pSourceSurface->GetProxyInterface(), &SourceRect, pDestinationSurface->GetProxyInterface(), &pt);
+			hr = ProxyInterface->UpdateSurface(pSourceSurfaceImpl->GetProxyInterface(), &SourceRect, pDestinationSurfaceImpl->GetProxyInterface(), &pt);
 		}
 
 		if (FAILED(hr))
@@ -603,126 +520,98 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CopyRects(Direct3DSurface8 *pSourceSu
 
 	return hr;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::UpdateTexture(Direct3DBaseTexture8 *pSourceTexture, Direct3DBaseTexture8 *pDestinationTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::UpdateTexture(IDirect3DBaseTexture8 *pSourceTexture, IDirect3DBaseTexture8 *pDestinationTexture)
 {
 	if (pSourceTexture == nullptr || pDestinationTexture == nullptr || pSourceTexture->GetType() != pDestinationTexture->GetType())
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	IDirect3DBaseTexture9 *SourceBaseTextureInterface, *DestinationBaseTextureInterface;
 
 	switch (pSourceTexture->GetType())
 	{
-		case D3DRTYPE_TEXTURE:
-			SourceBaseTextureInterface = static_cast<Direct3DTexture8 *>(pSourceTexture)->GetProxyInterface();
-			DestinationBaseTextureInterface = static_cast<Direct3DTexture8 *>(pDestinationTexture)->GetProxyInterface();
-			break;
-		case D3DRTYPE_VOLUMETEXTURE:
-			SourceBaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pSourceTexture)->GetProxyInterface();
-			DestinationBaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pDestinationTexture)->GetProxyInterface();
-			break;
-		case D3DRTYPE_CUBETEXTURE:
-			SourceBaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pSourceTexture)->GetProxyInterface();
-			DestinationBaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pDestinationTexture)->GetProxyInterface();
-			break;
-		default:
-			return D3DERR_INVALIDCALL;
+	case D3DRTYPE_TEXTURE:
+		SourceBaseTextureInterface = static_cast<Direct3DTexture8 *>(pSourceTexture)->GetProxyInterface();
+		DestinationBaseTextureInterface = static_cast<Direct3DTexture8 *>(pDestinationTexture)->GetProxyInterface();
+		break;
+	case D3DRTYPE_VOLUMETEXTURE:
+		SourceBaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pSourceTexture)->GetProxyInterface();
+		DestinationBaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pDestinationTexture)->GetProxyInterface();
+		break;
+	case D3DRTYPE_CUBETEXTURE:
+		SourceBaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pSourceTexture)->GetProxyInterface();
+		DestinationBaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pDestinationTexture)->GetProxyInterface();
+		break;
+	default:
+		return D3DERR_INVALIDCALL;
 	}
 
 	return ProxyInterface->UpdateTexture(SourceBaseTextureInterface, DestinationBaseTextureInterface);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetFrontBuffer(Direct3DSurface8 *pDestSurface)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetFrontBuffer(IDirect3DSurface8 *pDestSurface)
 {
 	if (pDestSurface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	return ProxyInterface->GetFrontBufferData(0, pDestSurface->GetProxyInterface());
+	auto pDestSurfaceImpl = static_cast<Direct3DSurface8 *>(pDestSurface);
+	return ProxyInterface->GetFrontBufferData(0, pDestSurfaceImpl->GetProxyInterface());
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetRenderTarget(Direct3DSurface8 *pRenderTarget, Direct3DSurface8 *pNewZStencil)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetRenderTarget(IDirect3DSurface8 *pRenderTarget, IDirect3DSurface8 *pNewZStencil)
 {
 	HRESULT hr;
 
 	if (pRenderTarget != nullptr)
 	{
-		hr = ProxyInterface->SetRenderTarget(0, pRenderTarget->GetProxyInterface());
-
+		auto pRenderTargetImpl = static_cast<Direct3DSurface8 *>(pRenderTarget);
+		hr = ProxyInterface->SetRenderTarget(0, pRenderTargetImpl->GetProxyInterface());
 		if (FAILED(hr))
-		{
 			return hr;
-		}
 
-		if (CurrentRenderTarget != nullptr)
-		{
-			CurrentRenderTarget->Release();
-		}
-
-		CurrentRenderTarget = pRenderTarget;
-		CurrentRenderTarget->AddRef();
+		pCurrentRenderTarget = pRenderTargetImpl->GetProxyInterface();
 	}
 
 	if (pNewZStencil != nullptr)
 	{
-		hr = ProxyInterface->SetDepthStencilSurface(pNewZStencil->GetProxyInterface());
-
+		auto pNewZStencilImpl = static_cast<Direct3DSurface8 *>(pNewZStencil);
+		hr = ProxyInterface->SetDepthStencilSurface(pNewZStencilImpl->GetProxyInterface());
 		if (FAILED(hr))
-		{
 			return hr;
-		}
-
-		if (CurrentDepthStencilSurface != nullptr)
-		{
-			CurrentDepthStencilSurface->Release();
-		}
-
-		CurrentDepthStencilSurface = pNewZStencil;
-		CurrentDepthStencilSurface->AddRef();
 	}
 	else
 	{
 		ProxyInterface->SetDepthStencilSurface(nullptr);
-
-		if (CurrentDepthStencilSurface != nullptr)
-		{
-			CurrentDepthStencilSurface->Release();
-		}
-
-		CurrentDepthStencilSurface = nullptr;
 	}
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetRenderTarget(Direct3DSurface8 **ppRenderTarget)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetRenderTarget(IDirect3DSurface8 **ppRenderTarget)
 {
 	if (ppRenderTarget == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	if (CurrentRenderTarget != nullptr)
-	{
-		CurrentRenderTarget->AddRef();
-	}
+	IDirect3DSurface9 *SurfaceInterface = nullptr;
 
-	*ppRenderTarget = CurrentRenderTarget;
+	const HRESULT hr = ProxyInterface->GetRenderTarget(0, &SurfaceInterface);
+	if (FAILED(hr))
+		return hr;
+
+	pCurrentRenderTarget = SurfaceInterface;
+
+	*ppRenderTarget = ProxyAddressLookupTable->FindAddress<Direct3DSurface8>(SurfaceInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDepthStencilSurface(Direct3DSurface8 **ppZStencilSurface)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetDepthStencilSurface(IDirect3DSurface8 **ppZStencilSurface)
 {
 	if (ppZStencilSurface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	if (CurrentDepthStencilSurface != nullptr)
-	{
-		CurrentDepthStencilSurface->AddRef();
-	}
+	IDirect3DSurface9 *SurfaceInterface = nullptr;
 
-	*ppZStencilSurface = CurrentDepthStencilSurface;
+	const HRESULT hr = ProxyInterface->GetDepthStencilSurface(&SurfaceInterface);
+	if (FAILED(hr))
+		return hr;
+
+	*ppZStencilSurface = ProxyAddressLookupTable->FindAddress<Direct3DSurface8>(SurfaceInterface);
 
 	return D3D_OK;
 }
@@ -752,6 +641,14 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::MultiplyTransform(D3DTRANSFORMSTATETY
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetViewport(const D3DVIEWPORT8 *pViewport)
 {
+	if (pCurrentRenderTarget != nullptr)
+	{
+		D3DSURFACE_DESC Desc;
+
+		if (SUCCEEDED(pCurrentRenderTarget->GetDesc(&Desc)) && (pViewport->Height > Desc.Height || pViewport->Width > Desc.Width))
+			return D3DERR_INVALIDCALL;
+	}
+
 	return ProxyInterface->SetViewport(pViewport);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetViewport(D3DVIEWPORT8 *pViewport)
@@ -784,60 +681,77 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetLightEnable(DWORD Index, BOOL *pEn
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetClipPlane(DWORD Index, const float *pPlane)
 {
-	return ProxyInterface->SetClipPlane(Index, pPlane);
+	if (pPlane == nullptr || Index >= MAX_CLIP_PLANES)
+		return D3DERR_INVALIDCALL;
+
+	memcpy(StoredClipPlanes[Index], pPlane, sizeof(StoredClipPlanes[0]));
+	return D3D_OK;
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetClipPlane(DWORD Index, float *pPlane)
 {
-	return ProxyInterface->GetClipPlane(Index, pPlane);
+	if (pPlane == nullptr || Index >= MAX_CLIP_PLANES)
+		return D3DERR_INVALIDCALL;
+
+	memcpy(pPlane, StoredClipPlanes[Index], sizeof(StoredClipPlanes[0]));
+	return D3D_OK;
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)
 {
 	FLOAT Biased;
+	HRESULT hr;
 
 	switch (static_cast<DWORD>(State))
 	{
-		case D3DRS_LINEPATTERN:
-		case D3DRS_ZVISIBLE:
-		case D3DRS_EDGEANTIALIAS:
-		case D3DRS_PATCHSEGMENTS:
-			return D3DERR_INVALIDCALL;
-		case D3DRS_SOFTWAREVERTEXPROCESSING:
-			return ProxyInterface->SetSoftwareVertexProcessing(Value);
-		case D3DRS_ZBIAS:
-			Biased = static_cast<FLOAT>(Value) * -0.000005f;
-			Value = *reinterpret_cast<const DWORD *>(&Biased);
-		default:
-			return ProxyInterface->SetRenderState(State, Value);
+	case D3DRS_ZVISIBLE:
+		return D3DERR_INVALIDCALL;
+	case D3DRS_PATCHSEGMENTS:
+	case D3DRS_LINEPATTERN:
+	case D3DRS_SOFTWAREVERTEXPROCESSING:
+		return D3D_OK;
+	case D3DRS_EDGEANTIALIAS:
+		return ProxyInterface->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, Value);
+	case D3DRS_CLIPPLANEENABLE:
+		hr = ProxyInterface->SetRenderState(State, Value);
+		if (SUCCEEDED(hr))
+			ClipPlaneRenderState = Value;
+		return hr;
+	case D3DRS_ZBIAS:
+		Biased = static_cast<FLOAT>(Value) * -0.000005f;
+		memcpy(&Value, &Biased, sizeof(Value));
+		State = D3DRS_DEPTHBIAS;
+	default:
+		return ProxyInterface->SetRenderState(State, Value);
 	}
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetRenderState(D3DRENDERSTATETYPE State, DWORD *pValue)
 {
 	if (pValue == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	HRESULT hr;
 	*pValue = 0;
 
 	switch (static_cast<DWORD>(State))
 	{
-		case D3DRS_LINEPATTERN:
-		case D3DRS_ZVISIBLE:
-		case D3DRS_EDGEANTIALIAS:
-			return D3DERR_INVALIDCALL;
-		case D3DRS_ZBIAS:
-			hr = ProxyInterface->GetRenderState(D3DRS_DEPTHBIAS, pValue);
-			*pValue = static_cast<DWORD>(*reinterpret_cast<const FLOAT *>(pValue) * -500000.0f);
-			return hr;
-		case D3DRS_SOFTWAREVERTEXPROCESSING:
-			*pValue = ProxyInterface->GetSoftwareVertexProcessing();
-			return D3D_OK;
-		case D3DRS_PATCHSEGMENTS:
-			*pValue = 1;
-			return D3D_OK;
-		default:
-			return ProxyInterface->GetRenderState(State, pValue);
+	case D3DRS_ZVISIBLE:
+		return D3DERR_INVALIDCALL;
+	case D3DRS_LINEPATTERN:
+		*pValue = 0;
+		return D3D_OK;
+	case D3DRS_EDGEANTIALIAS:
+		return ProxyInterface->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, pValue);
+	case D3DRS_ZBIAS:
+		hr = ProxyInterface->GetRenderState(D3DRS_DEPTHBIAS, pValue);
+		*pValue = static_cast<DWORD>(*reinterpret_cast<const FLOAT *>(pValue) * -500000.0f);
+		return hr;
+	case D3DRS_SOFTWAREVERTEXPROCESSING:
+		*pValue = ProxyInterface->GetSoftwareVertexProcessing();
+		return D3D_OK;
+	case D3DRS_PATCHSEGMENTS:
+		*pValue = 1;
+		return D3D_OK;
+	default:
+		return ProxyInterface->GetRenderState(State, pValue);
 	}
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::BeginStateBlock()
@@ -847,36 +761,28 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::BeginStateBlock()
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::EndStateBlock(DWORD *pToken)
 {
 	if (pToken == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	return ProxyInterface->EndStateBlock(reinterpret_cast<IDirect3DStateBlock9 **>(pToken));
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::ApplyStateBlock(DWORD Token)
 {
 	if (Token == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	return reinterpret_cast<IDirect3DStateBlock9 *>(Token)->Apply();
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::CaptureStateBlock(DWORD Token)
 {
 	if (Token == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	return reinterpret_cast<IDirect3DStateBlock9 *>(Token)->Capture();
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DeleteStateBlock(DWORD Token)
 {
 	if (Token == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	reinterpret_cast<IDirect3DStateBlock9 *>(Token)->Release();
 
@@ -889,9 +795,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateStateBlock(D3DSTATEBLOCKTYPE Ty
 #endif
 
 	if (pToken == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	return ProxyInterface->CreateStateBlock(Type, reinterpret_cast<IDirect3DStateBlock9 **>(pToken));
 }
@@ -903,23 +807,18 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetClipStatus(D3DCLIPSTATUS8 *pClipSt
 {
 	return ProxyInterface->GetClipStatus(pClipStatus);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetTexture(DWORD Stage, Direct3DBaseTexture8 **ppTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetTexture(DWORD Stage, IDirect3DBaseTexture8 **ppTexture)
 {
 	if (ppTexture == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppTexture = nullptr;
 
 	IDirect3DBaseTexture9 *BaseTextureInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->GetTexture(Stage, &BaseTextureInterface);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	if (BaseTextureInterface != nullptr)
 	{
@@ -929,50 +828,45 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetTexture(DWORD Stage, Direct3DBaseT
 
 		switch (BaseTextureInterface->GetType())
 		{
-			case D3DRTYPE_TEXTURE:
-				BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&TextureInterface));
-				*ppTexture = new Direct3DTexture8(this, TextureInterface);
-				break;
-			case D3DRTYPE_VOLUMETEXTURE:
-				BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&VolumeTextureInterface));
-				*ppTexture = new Direct3DVolumeTexture8(this, VolumeTextureInterface);
-				break;
-			case D3DRTYPE_CUBETEXTURE:
-				BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&CubeTextureInterface));
-				*ppTexture = new Direct3DCubeTexture8(this, CubeTextureInterface);
-				break;
-			default:
-				BaseTextureInterface->Release();
-				return D3DERR_INVALIDCALL;
+		case D3DRTYPE_TEXTURE:
+			BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&TextureInterface));
+			*ppTexture = ProxyAddressLookupTable->FindAddress<Direct3DTexture8>(TextureInterface);
+			break;
+		case D3DRTYPE_VOLUMETEXTURE:
+			BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&VolumeTextureInterface));
+			*ppTexture = ProxyAddressLookupTable->FindAddress<Direct3DVolumeTexture8>(VolumeTextureInterface);
+			break;
+		case D3DRTYPE_CUBETEXTURE:
+			BaseTextureInterface->QueryInterface(IID_PPV_ARGS(&CubeTextureInterface));
+			*ppTexture = ProxyAddressLookupTable->FindAddress<Direct3DCubeTexture8>(CubeTextureInterface);
+			break;
+		default:
+			return D3DERR_INVALIDCALL;
 		}
-
-		BaseTextureInterface->Release();
 	}
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetTexture(DWORD Stage, Direct3DBaseTexture8 *pTexture)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetTexture(DWORD Stage, IDirect3DBaseTexture8 *pTexture)
 {
 	if (pTexture == nullptr)
-	{
 		return ProxyInterface->SetTexture(Stage, nullptr);
-	}
 
 	IDirect3DBaseTexture9 *BaseTextureInterface;
 
 	switch (pTexture->GetType())
 	{
-		case D3DRTYPE_TEXTURE:
-			BaseTextureInterface = static_cast<Direct3DTexture8 *>(pTexture)->GetProxyInterface();
-			break;
-		case D3DRTYPE_VOLUMETEXTURE:
-			BaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pTexture)->GetProxyInterface();
-			break;
-		case D3DRTYPE_CUBETEXTURE:
-			BaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pTexture)->GetProxyInterface();
-			break;
-		default:
-			return D3DERR_INVALIDCALL;
+	case D3DRTYPE_TEXTURE:
+		BaseTextureInterface = static_cast<Direct3DTexture8 *>(pTexture)->GetProxyInterface();
+		break;
+	case D3DRTYPE_VOLUMETEXTURE:
+		BaseTextureInterface = static_cast<Direct3DVolumeTexture8 *>(pTexture)->GetProxyInterface();
+		break;
+	case D3DRTYPE_CUBETEXTURE:
+		BaseTextureInterface = static_cast<Direct3DCubeTexture8 *>(pTexture)->GetProxyInterface();
+		break;
+	default:
+		return D3DERR_INVALIDCALL;
 	}
 
 	return ProxyInterface->SetTexture(Stage, BaseTextureInterface);
@@ -981,56 +875,56 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetTextureStageState(DWORD Stage, D3D
 {
 	switch (static_cast<DWORD>(Type))
 	{
-		case D3DTSS_ADDRESSU:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSU, pValue);
-		case D3DTSS_ADDRESSV:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSV, pValue);
-		case D3DTSS_ADDRESSW:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSW, pValue);
-		case D3DTSS_BORDERCOLOR:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_BORDERCOLOR, pValue);
-		case D3DTSS_MAGFILTER:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAGFILTER, pValue);
-		case D3DTSS_MINFILTER:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MINFILTER, pValue);
-		case D3DTSS_MIPFILTER:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MIPFILTER, pValue);
-		case D3DTSS_MIPMAPLODBIAS:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MIPMAPLODBIAS, pValue);
-		case D3DTSS_MAXMIPLEVEL:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAXMIPLEVEL, pValue);
-		case D3DTSS_MAXANISOTROPY:
-			return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAXANISOTROPY, pValue);
-		default:
-			return ProxyInterface->GetTextureStageState(Stage, Type, pValue);
+	case D3DTSS_ADDRESSU:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSU, pValue);
+	case D3DTSS_ADDRESSV:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSV, pValue);
+	case D3DTSS_ADDRESSW:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_ADDRESSW, pValue);
+	case D3DTSS_BORDERCOLOR:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_BORDERCOLOR, pValue);
+	case D3DTSS_MAGFILTER:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAGFILTER, pValue);
+	case D3DTSS_MINFILTER:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MINFILTER, pValue);
+	case D3DTSS_MIPFILTER:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MIPFILTER, pValue);
+	case D3DTSS_MIPMAPLODBIAS:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MIPMAPLODBIAS, pValue);
+	case D3DTSS_MAXMIPLEVEL:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAXMIPLEVEL, pValue);
+	case D3DTSS_MAXANISOTROPY:
+		return ProxyInterface->GetSamplerState(Stage, D3DSAMP_MAXANISOTROPY, pValue);
+	default:
+		return ProxyInterface->GetTextureStageState(Stage, Type, pValue);
 	}
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetTextureStageState(DWORD Stage, D3DTEXTURESTAGESTATETYPE Type, DWORD Value)
 {
 	switch (static_cast<DWORD>(Type))
 	{
-		case D3DTSS_ADDRESSU:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Value);
-		case D3DTSS_ADDRESSV:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Value);
-		case D3DTSS_ADDRESSW:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Value);
-		case D3DTSS_BORDERCOLOR:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_BORDERCOLOR, Value);
-		case D3DTSS_MAGFILTER:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Value);
-		case D3DTSS_MINFILTER:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MINFILTER, Value);
-		case D3DTSS_MIPFILTER:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MIPFILTER, Value);
-		case D3DTSS_MIPMAPLODBIAS:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MIPMAPLODBIAS, Value);
-		case D3DTSS_MAXMIPLEVEL:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAXMIPLEVEL, Value);
-		case D3DTSS_MAXANISOTROPY:
-			return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAXANISOTROPY, Value);
-		default:
-			return ProxyInterface->SetTextureStageState(Stage, Type, Value);
+	case D3DTSS_ADDRESSU:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Value);
+	case D3DTSS_ADDRESSV:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Value);
+	case D3DTSS_ADDRESSW:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Value);
+	case D3DTSS_BORDERCOLOR:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_BORDERCOLOR, Value);
+	case D3DTSS_MAGFILTER:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Value);
+	case D3DTSS_MINFILTER:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MINFILTER, Value);
+	case D3DTSS_MIPFILTER:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MIPFILTER, Value);
+	case D3DTSS_MIPMAPLODBIAS:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MIPMAPLODBIAS, Value);
+	case D3DTSS_MAXMIPLEVEL:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAXMIPLEVEL, Value);
+	case D3DTSS_MAXANISOTROPY:
+		return ProxyInterface->SetSamplerState(Stage, D3DSAMP_MAXANISOTROPY, Value);
+	default:
+		return ProxyInterface->SetTextureStageState(Stage, Type, Value);
 	}
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::ValidateDevice(DWORD *pNumPasses)
@@ -1051,112 +945,59 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetInfo(DWORD DevInfoID, void *pDevIn
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetPaletteEntries(UINT PaletteNumber, const PALETTEENTRY *pEntries)
 {
+	if (pEntries == nullptr)
+		return D3DERR_INVALIDCALL;
+
 	return ProxyInterface->SetPaletteEntries(PaletteNumber, pEntries);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetPaletteEntries(UINT PaletteNumber, PALETTEENTRY *pEntries)
 {
+	if (pEntries == nullptr)
+		return D3DERR_INVALIDCALL;
+
 	return ProxyInterface->GetPaletteEntries(PaletteNumber, pEntries);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetCurrentTexturePalette(UINT PaletteNumber)
 {
+	if (!PaletteFlag)
+		return D3DERR_INVALIDCALL;
+
 	return ProxyInterface->SetCurrentTexturePalette(PaletteNumber);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetCurrentTexturePalette(UINT *pPaletteNumber)
 {
+	if (!PaletteFlag)
+		return D3DERR_INVALIDCALL;
+
 	return ProxyInterface->GetCurrentTexturePalette(pPaletteNumber);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount)
 {
-	if (g_pEffect != nullptr)
-	{
-		HRESULT hr;
-		unsigned int uiPasses = 1;
-		g_pEffect->Begin(&uiPasses,0);
-		for (unsigned int uiPass=0; uiPass<uiPasses; uiPass++)
-		{
-			g_pEffect->BeginPass(uiPass);
-			hr = ProxyInterface->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
-			g_pEffect->EndPass();
-			if (FAILED(hr))
-				break;
-		}
-		g_pEffect->End();
-		return hr;
-	}
-	else
-		return ProxyInterface->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
+	ApplyClipPlanes();
+	return ProxyInterface->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT MinIndex, UINT NumVertices, UINT StartIndex, UINT PrimitiveCount)
 {
-	if (g_pEffect != nullptr)
-	{
-		HRESULT hr;
-		unsigned int uiPasses = 1;
-		g_pEffect->Begin(&uiPasses,0);
-		for (unsigned int uiPass=0; uiPass<uiPasses; uiPass++)
-		{
-			g_pEffect->BeginPass(uiPass);
-			hr = ProxyInterface->DrawIndexedPrimitive(PrimitiveType, CurrentBaseVertexIndex, MinIndex, NumVertices, StartIndex, PrimitiveCount);
-			g_pEffect->EndPass();
-			if (FAILED(hr))
-				break;
-		}
-		g_pEffect->End();
-		return hr;
-	}
-	else
-		return ProxyInterface->DrawIndexedPrimitive(PrimitiveType, CurrentBaseVertexIndex, MinIndex, NumVertices, StartIndex, PrimitiveCount);
+	ApplyClipPlanes();
+	return ProxyInterface->DrawIndexedPrimitive(PrimitiveType, CurrentBaseVertexIndex, MinIndex, NumVertices, StartIndex, PrimitiveCount);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT PrimitiveCount, const void *pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
-	if (g_pEffect != nullptr)
-	{
-		HRESULT hr;
-		unsigned int uiPasses = 1;
-		g_pEffect->Begin(&uiPasses,0);
-		for (unsigned int uiPass=0; uiPass<uiPasses; uiPass++)
-		{
-			g_pEffect->BeginPass(uiPass);
-			hr = ProxyInterface->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
-			g_pEffect->EndPass();
-			if (FAILED(hr))
-				break;
-		}
-		g_pEffect->End();
-		return hr;
-	}
-	else
-		return ProxyInterface->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+	ApplyClipPlanes();
+	return ProxyInterface->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex, UINT NumVertexIndices, UINT PrimitiveCount, const void *pIndexData, D3DFORMAT IndexDataFormat, const void *pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
-	if (g_pEffect != nullptr)
-	{
-		HRESULT hr;
-		unsigned int uiPasses = 1;
-		g_pEffect->Begin(&uiPasses,0);
-		for (unsigned int uiPass=0; uiPass<uiPasses; uiPass++)
-		{
-			g_pEffect->BeginPass(uiPass);
-			hr = ProxyInterface->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertexIndices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
-			g_pEffect->EndPass();
-			if (FAILED(hr))
-				break;
-		}
-		g_pEffect->End();
-		return hr;
-	}
-	else
-		return ProxyInterface->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertexIndices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
+	ApplyClipPlanes();
+	return ProxyInterface->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertexIndices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData, VertexStreamZeroStride);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount, Direct3DVertexBuffer8 *pDestBuffer, DWORD Flags)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount, IDirect3DVertexBuffer8 *pDestBuffer, DWORD Flags)
 {
 	if (pDestBuffer == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	return ProxyInterface->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBuffer->GetProxyInterface(), nullptr, Flags);
+	Direct3DVertexBuffer8 *pDestBufferImpl = static_cast<Direct3DVertexBuffer8 *>(pDestBuffer);
+	return ProxyInterface->ProcessVertices(SrcStartIndex, DestIndex, VertexCount, pDestBufferImpl->GetProxyInterface(), nullptr, Flags);
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDeclaration, const DWORD *pFunction, DWORD *pHandle, DWORD Usage)
 {
@@ -1167,9 +1008,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 #endif
 
 	if (pDeclaration == nullptr || pHandle == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*pHandle = 0;
 
@@ -1280,6 +1119,11 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 			VertexElements[ElementIndex].Usage = DeclAddressUsages[Address][0];
 			VertexElements[ElementIndex].UsageIndex = DeclAddressUsages[Address][1];
 
+			if (VertexElements[ElementIndex].Usage == D3DDECLUSAGE_BLENDINDICES)
+			{
+				VertexElements[ElementIndex].Method = D3DDECLMETHOD_DEFAULT;
+			}
+
 			VertexShaderInputs[ElementIndex++] = Address;
 		}
 		else if (TokenType == D3DVSD_TOKEN_TESSELLATOR && (Token & 0x10000000))
@@ -1291,6 +1135,11 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 			const DWORD Address = (Token & 0xF);
 			VertexElements[ElementIndex].Usage = DeclAddressUsages[Address][0];
 			VertexElements[ElementIndex].UsageIndex = DeclAddressUsages[Address][1];
+
+			if (VertexElements[ElementIndex].Usage == D3DDECLUSAGE_BLENDINDICES)
+			{
+				VertexElements[ElementIndex].Method = D3DDECLMETHOD_DEFAULT;
+			}
 
 			VertexShaderInputs[ElementIndex++] = Address;
 		}
@@ -1316,7 +1165,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 			LOG << "> Failed because token type '" << TokenType << "' is not supported!" << std::endl;
 #endif
 
-			return E_NOTIMPL;
+			return D3DERR_INVALIDCALL;
 		}
 
 		++pDeclaration;
@@ -1343,15 +1192,15 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 			return D3DERR_INVALIDCALL;
 		}
 
-		d3d8to9::ID3DXBuffer *Disassembly = nullptr, *Assembly = nullptr, *ErrorBuffer = nullptr;
+		ID3DXBuffer *Disassembly = nullptr, *Assembly = nullptr, *ErrorBuffer = nullptr;
 
-		if (d3d8to9::D3DXDisassembleShader != nullptr)
+		if (D3DXDisassembleShader != nullptr)
 		{
-			hr = d3d8to9::D3DXDisassembleShader(pFunction, FALSE, nullptr, &Disassembly);
+			hr = D3DXDisassembleShader(pFunction, FALSE, nullptr, &Disassembly);
 		}
 		else
 		{
-			hr = E_FAIL;
+			hr = D3DERR_INVALIDCALL;
 		}
 
 		if (FAILED(hr))
@@ -1364,6 +1213,11 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 		}
 
 		std::string SourceCode(static_cast<const char *>(Disassembly->GetBufferPointer()), Disassembly->GetBufferSize() - 1);
+
+#ifndef D3D8TO9NOLOG
+		LOG << "> Dumping original shader assembly:" << std::endl << std::endl << SourceCode << std::endl;
+#endif
+
 		const size_t VersionPosition = SourceCode.find("vs_1_");
 
 		assert(VersionPosition != std::string::npos);
@@ -1385,27 +1239,27 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 
 			switch (VertexElements[k].Usage)
 			{
-				case D3DDECLUSAGE_POSITION:
-					DeclCode += "dcl_position";
-					break;
-				case D3DDECLUSAGE_BLENDWEIGHT:
-					DeclCode += "dcl_blendweight";
-					break;
-				case D3DDECLUSAGE_BLENDINDICES:
-					DeclCode += "dcl_blendindices";
-					break;
-				case D3DDECLUSAGE_NORMAL:
-					DeclCode += "dcl_normal";
-					break;
-				case D3DDECLUSAGE_PSIZE:
-					DeclCode += "dcl_psize";
-					break;
-				case D3DDECLUSAGE_COLOR:
-					DeclCode += "dcl_color";
-					break;
-				case D3DDECLUSAGE_TEXCOORD:
-					DeclCode += "dcl_texcoord";
-					break;
+			case D3DDECLUSAGE_POSITION:
+				DeclCode += "dcl_position";
+				break;
+			case D3DDECLUSAGE_BLENDWEIGHT:
+				DeclCode += "dcl_blendweight";
+				break;
+			case D3DDECLUSAGE_BLENDINDICES:
+				DeclCode += "dcl_blendindices";
+				break;
+			case D3DDECLUSAGE_NORMAL:
+				DeclCode += "dcl_normal";
+				break;
+			case D3DDECLUSAGE_PSIZE:
+				DeclCode += "dcl_psize";
+				break;
+			case D3DDECLUSAGE_COLOR:
+				DeclCode += "dcl_color";
+				break;
+			case D3DDECLUSAGE_TEXCOORD:
+				DeclCode += "dcl_texcoord";
+				break;
 			}
 
 			if (VertexElements[k].UsageIndex > 0)
@@ -1420,56 +1274,110 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 		}
 
 		#pragma region Fill registers with default value
-		ConstantsCode += "    def c95, 0, 0, 0, 0\n";
-
 		SourceCode.insert(DeclPosition, ConstantsCode);
 
-		for (size_t j = 0; j < 2; j++)
-		{
-			const std::string reg = "oD" + std::to_string(j);
+		// Get number of arithmetic instructions used
+		const size_t InstructionPosition = SourceCode.find("instruction");
+		size_t InstructionCount = InstructionPosition > 2 && InstructionPosition < SourceCode.size() ? strtoul(SourceCode.substr(InstructionPosition - 4, 4).c_str(), nullptr, 10) : 0;
 
-			if (SourceCode.find(reg) != std::string::npos)
-			{
-				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c95 /* initialize output register " + reg + " */\n");
-			}
-		}
 		for (size_t j = 0; j < 8; j++)
 		{
 			const std::string reg = "oT" + std::to_string(j);
 
-			if (SourceCode.find(reg) != std::string::npos)
+			if (SourceCode.find(reg) != std::string::npos && InstructionCount < 128)
 			{
-				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c95 /* initialize output register " + reg + " */\n");
+				++InstructionCount;
+				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c0 /* initialize output register " + reg + " */\n");
+			}
+		}
+		for (size_t j = 0; j < 2; j++)
+		{
+			const std::string reg = "oD" + std::to_string(j);
+
+			if (SourceCode.find(reg) != std::string::npos && InstructionCount < 128)
+			{
+				++InstructionCount;
+				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c0 /* initialize output register " + reg + " */\n");
 			}
 		}
 		for (size_t j = 0; j < 12; j++)
 		{
 			const std::string reg = "r" + std::to_string(j);
 
-			if (SourceCode.find(reg) != std::string::npos)
+			if (SourceCode.find(reg) != std::string::npos && InstructionCount < 128)
 			{
-				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c95 /* initialize register " + reg + " */\n");
+				++InstructionCount;
+				SourceCode.insert(DeclPosition + ConstantsCode.size(), "    mov " + reg + ", c0 /* initialize register " + reg + " */\n");
 			}
 		}
 		#pragma endregion
 
 		SourceCode = std::regex_replace(SourceCode, std::regex("    \\/\\/ vs\\.1\\.1\\n((?! ).+\\n)+"), "");
+		SourceCode = std::regex_replace(SourceCode, std::regex("([^\\n]\\n)[\\s]*#line [0123456789]+.*\\n"), "$1");
 		SourceCode = std::regex_replace(SourceCode, std::regex("(oFog|oPts)\\.x"), "$1 /* removed swizzle */");
 		SourceCode = std::regex_replace(SourceCode, std::regex("(add|sub|mul|min|max) (oFog|oPts), ([cr][0-9]+), (.+)\\n"), "$1 $2, $3.x /* added swizzle */, $4\n");
 		SourceCode = std::regex_replace(SourceCode, std::regex("(add|sub|mul|min|max) (oFog|oPts), (.+), ([cr][0-9]+)\\n"), "$1 $2, $3, $4.x /* added swizzle */\n");
-		SourceCode = std::regex_replace(SourceCode, std::regex("mov (oFog|oPts)(.*), (-?)([crv][0-9]+)(?!\\.)"), "mov $1$2, $3$4.x /* select single component */");
+		SourceCode = std::regex_replace(SourceCode, std::regex("(mov|mad) (oFog|oPts)(.*), (-?)([crv][0-9]+(?![\\.0-9]))"), "$1 $2$3, $4$5.x /* select single component */");
+
+		// Destination register cannot be the same as first source register for m*x* instructions.
+		if (std::regex_search(SourceCode, std::regex("m.x.")))
+		{
+			// Check for unused register
+			size_t r;
+			for (r = 0; r < 12; r++)
+			{
+				if (SourceCode.find("r" + std::to_string(r)) == std::string::npos) break;
+			}
+
+			// Check if first source register is the same as the destination register
+			for (size_t j = 0; j < 12; j++)
+			{
+				const std::string reg = "(m.x.) (r" + std::to_string(j) + "), ((-?)r" + std::to_string(j) + "([\\.xyzw]*))(?![0-9])";
+
+				while (std::regex_search(SourceCode, std::regex(reg)))
+				{
+					// If there is enough remaining instructions and an unused register then update to use a temp register
+					if (r < 12 && InstructionCount < 128)
+					{
+						++InstructionCount;
+						SourceCode = std::regex_replace(SourceCode, std::regex(reg),
+							"mov r" + std::to_string(r) + ", $2 /* added line */\n    $1 $2, $4r" + std::to_string(r) + "$5 /* changed $3 to r" + std::to_string(r) + " */",
+							std::regex_constants::format_first_only);
+					}
+					// Disable line to prevent assembly error
+					else
+					{
+						SourceCode = std::regex_replace(SourceCode, std::regex("(.*" + reg + ".*)"), "/*$1*/ /* disabled this line */");
+						break;
+					}
+				}
+			}
+		}
+
+		// Vertex shader must minimally write all four components (xyzw) of oPos output register. (fix error X5350)
+		if (std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos\\.")) && !std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos,")))
+		{
+			bool xReg = std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos\\.[y|z|w]*x"));
+			bool yReg = std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos\\.[x|z|w]*y"));
+			bool zReg = std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos\\.[x|y|w]*z"));
+			bool wReg = std::regex_search(SourceCode, std::regex("    ([a-z2-4]*) oPos\\.[x|y|z]*w"));
+			if (!xReg || !yReg || !zReg || !wReg)
+			{
+				SourceCode = std::regex_replace(SourceCode, std::regex("    ([a-z2-4]*) (oPos\\.[x|y|z|w]*,) ([^\\n]*)\\n"), "    $1 oPos, $3 /* removed oPos swizzles */\n");
+			}
+		}
 
 #ifndef D3D8TO9NOLOG
 		LOG << "> Dumping translated shader assembly:" << std::endl << std::endl << SourceCode << std::endl;
 #endif
 
-		if (d3d8to9::D3DXAssembleShader != nullptr)
+		if (D3DXAssembleShader != nullptr)
 		{
-			hr = d3d8to9::D3DXAssembleShader(SourceCode.data(), static_cast<UINT>(SourceCode.size()), nullptr, nullptr, 0, &Assembly, &ErrorBuffer);
+			hr = D3DXAssembleShader(SourceCode.data(), static_cast<UINT>(SourceCode.size()), nullptr, nullptr, D3DXASM_FLAGS, &Assembly, &ErrorBuffer);
 		}
 		else
 		{
-			hr = E_FAIL;
+			hr = D3DERR_INVALIDCALL;
 		}
 
 		Disassembly->Release();
@@ -1481,7 +1389,6 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 #ifndef D3D8TO9NOLOG
 				LOG << "> Failed to reassemble shader:" << std::endl << std::endl << static_cast<const char *>(ErrorBuffer->GetBufferPointer()) << std::endl;
 #endif
-
 				ErrorBuffer->Release();
 			}
 			else
@@ -1525,11 +1432,8 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateVertexShader(const DWORD *pDecl
 #ifndef D3D8TO9NOLOG
 			LOG << "> 'IDirect3DDevice9::CreateVertexDeclaration' failed with error code " << std::hex << hr << std::dec << "!" << std::endl;
 #endif
-
 			if (ShaderInfo->Shader != nullptr)
-			{
 				ShaderInfo->Shader->Release();
-			}
 		}
 	}
 	else
@@ -1573,9 +1477,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetVertexShader(DWORD Handle)
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShader(DWORD *pHandle)
 {
 	if (pHandle == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	if (CurrentVertexShaderHandle == 0)
 	{
@@ -1584,33 +1486,24 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShader(DWORD *pHandle)
 	else
 	{
 		*pHandle = CurrentVertexShaderHandle;
-
 		return D3D_OK;
 	}
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DeleteVertexShader(DWORD Handle)
 {
 	if ((Handle & 0x80000000) == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	if (CurrentVertexShaderHandle == Handle)
-	{
 		SetVertexShader(0);
-	}
 
 	const DWORD HandleMagic = Handle << 1;
 	VertexShaderInfo *const ShaderInfo = reinterpret_cast<VertexShaderInfo *>(HandleMagic);
 
 	if (ShaderInfo->Shader != nullptr)
-	{
 		ShaderInfo->Shader->Release();
-	}
 	if (ShaderInfo->Declaration != nullptr)
-	{
 		ShaderInfo->Declaration->Release();
-	}
 
 	delete ShaderInfo;
 
@@ -1635,7 +1528,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShaderDeclaration(DWORD Hand
 	LOG << "> 'IDirect3DDevice8::GetVertexShaderDeclaration' is not implemented!" << std::endl;
 #endif
 
-	return E_NOTIMPL;
+	return D3DERR_INVALIDCALL;
 }
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShaderFunction(DWORD Handle, void *pData, DWORD *pSizeOfData)
 {
@@ -1644,17 +1537,13 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShaderFunction(DWORD Handle,
 #endif
 
 	if ((Handle & 0x80000000) == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	const DWORD HandleMagic = Handle << 1;
 	IDirect3DVertexShader9 *VertexShaderInterface = reinterpret_cast<VertexShaderInfo *>(HandleMagic)->Shader;
 
 	if (VertexShaderInterface == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 #ifndef D3D8TO9NOLOG
 	LOG << "> Returning translated shader byte code." << std::endl;
@@ -1662,81 +1551,61 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetVertexShaderFunction(DWORD Handle,
 
 	return VertexShaderInterface->GetFunction(pData, reinterpret_cast<UINT *>(pSizeOfData));
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetStreamSource(UINT StreamNumber, Direct3DVertexBuffer8 *pStreamData, UINT Stride)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetStreamSource(UINT StreamNumber, IDirect3DVertexBuffer8 *pStreamData, UINT Stride)
 {
 	if (pStreamData == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
-	return ProxyInterface->SetStreamSource(StreamNumber, pStreamData->GetProxyInterface(), 0, Stride);
+	auto pStreamDataImpl = static_cast<Direct3DVertexBuffer8 *>(pStreamData);
+	return ProxyInterface->SetStreamSource(StreamNumber, pStreamDataImpl->GetProxyInterface(), 0, Stride);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetStreamSource(UINT StreamNumber, Direct3DVertexBuffer8 **ppStreamData, UINT *pStride)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetStreamSource(UINT StreamNumber, IDirect3DVertexBuffer8 **ppStreamData, UINT *pStride)
 {
 	if (ppStreamData == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
-	else
-	{
-		*ppStreamData = nullptr;
-	}
+
+	*ppStreamData = nullptr;
 
 	UINT StreamOffset = 0;
 	IDirect3DVertexBuffer9 *VertexBufferInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->GetStreamSource(StreamNumber, &VertexBufferInterface, &StreamOffset, pStride);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	if (VertexBufferInterface != nullptr)
-	{
-		*ppStreamData = new Direct3DVertexBuffer8(this, VertexBufferInterface);
-	}
+		*ppStreamData = ProxyAddressLookupTable->FindAddress<Direct3DVertexBuffer8>(VertexBufferInterface);
 
 	return D3D_OK;
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetIndices(Direct3DIndexBuffer8 *pIndexData, UINT BaseVertexIndex)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetIndices(IDirect3DIndexBuffer8 *pIndexData, UINT BaseVertexIndex)
 {
 	if (pIndexData == nullptr || BaseVertexIndex > 0x7FFFFFFF)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	CurrentBaseVertexIndex = static_cast<INT>(BaseVertexIndex);
 
-	return ProxyInterface->SetIndices(pIndexData->GetProxyInterface());
+	auto pIndexDataImpl = static_cast<Direct3DIndexBuffer8 *>(pIndexData);
+	return ProxyInterface->SetIndices(pIndexDataImpl->GetProxyInterface());
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetIndices(Direct3DIndexBuffer8 **ppIndexData, UINT *pBaseVertexIndex)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetIndices(IDirect3DIndexBuffer8 **ppIndexData, UINT *pBaseVertexIndex)
 {
 	if (ppIndexData == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*ppIndexData = nullptr;
 
 	if (pBaseVertexIndex != nullptr)
-	{
 		*pBaseVertexIndex = static_cast<UINT>(CurrentBaseVertexIndex);
-	}
 
 	IDirect3DIndexBuffer9 *IntexBufferInterface = nullptr;
 
 	const HRESULT hr = ProxyInterface->GetIndices(&IntexBufferInterface);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	if (IntexBufferInterface != nullptr)
-	{
-		*ppIndexData = new Direct3DIndexBuffer8(this, IntexBufferInterface);
-	}
+		*ppIndexData = ProxyAddressLookupTable->FindAddress<Direct3DIndexBuffer8>(IntexBufferInterface);
 
 	return D3D_OK;
 }
@@ -1747,9 +1616,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreatePixelShader(const DWORD *pFunct
 #endif
 
 	if (pFunction == nullptr || pHandle == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*pHandle = 0;
 
@@ -1762,25 +1629,21 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreatePixelShader(const DWORD *pFunct
 #ifndef D3D8TO9NOLOG
 		LOG << "> Failed because of version mismatch ('" << std::showbase << std::hex << *pFunction << std::dec << std::noshowbase << "')! Only 'ps_1_x' shaders are supported." << std::endl;
 #endif
-
 		return D3DERR_INVALIDCALL;
 	}
 
-	d3d8to9::ID3DXBuffer *Disassembly = nullptr, *Assembly = nullptr, *ErrorBuffer = nullptr;
+	ID3DXBuffer *Disassembly = nullptr, *Assembly = nullptr, *ErrorBuffer = nullptr;
 
-	HRESULT hr = E_FAIL;
+	HRESULT hr = D3DERR_INVALIDCALL;
 
-	if (d3d8to9::D3DXDisassembleShader != nullptr)
-	{
-		hr = d3d8to9::D3DXDisassembleShader(pFunction, FALSE, nullptr, &Disassembly);
-	}
+	if (D3DXDisassembleShader != nullptr)
+		hr = D3DXDisassembleShader(pFunction, FALSE, nullptr, &Disassembly);
 
 	if (FAILED(hr))
 	{
 #ifndef D3D8TO9NOLOG
 		LOG << "> Failed to disassemble shader with error code " << std::hex << hr << std::dec << "!" << std::endl;
 #endif
-
 		return hr;
 	}
 
@@ -1798,21 +1661,354 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreatePixelShader(const DWORD *pFunct
 		SourceCode.replace(VersionPosition, 6, "ps_1_1");
 	}
 
-	SourceCode = std::regex_replace(SourceCode, std::regex("    \\/\\/ ps\\.1\\.[1-4]\\n((?! ).+\\n)+"), "");
-	SourceCode = std::regex_replace(SourceCode, std::regex("(1?-)(c[0-9]+)"), "$2 /* removed modifier $1 */");
-	SourceCode = std::regex_replace(SourceCode, std::regex("(c[0-9]+)(_bx2|_bias)"), "$1 /* removed modifier $2 */");
+	// Get number of arithmetic instructions used
+	const size_t ArithmeticPosition = SourceCode.find("arithmetic");
+	size_t ArithmeticCount = ArithmeticPosition > 2 && ArithmeticPosition < SourceCode.size() ? strtoul(SourceCode.substr(ArithmeticPosition - 2, 2).c_str(), nullptr, 10) : 0;
+	ArithmeticCount = (ArithmeticCount != 0) ? ArithmeticCount : 10;	// Default to 10
+
+	// Remove lines when "    // ps.1.1" string is found and the next line does not start with a space
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("    \\/\\/ ps\\.1\\.[1-4]\\n((?! ).+\\n)+"),
+		"");
+
+	// Remove debug lines
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("([^\\n]\\n)[\\s]*#line [0123456789]+.*\\n"),
+		"$1");
+
+	// Fix '-' modifier for constant values when using 'add' arithmetic by changing it to use 'sub'
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("(add)([_satxd248]*) (r[0-9][\\.wxyz]*), ((1-|)[crtv][0-9][\\.wxyz_abdis2]*), (-)(c[0-9][\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]|)(?![_\\.wxyz])"),
+		"sub$2 $3, $4, $7$8 /* changed 'add' to 'sub' removed modifier $6 */");
+
+	// Create temporary varables for ps_1_4
+	std::string SourceCode14 = SourceCode;
+	int ArithmeticCount14 = ArithmeticCount;
+
+	// Fix modifiers for constant values by using any remaining arithmetic places to add an instruction to move the constant value to a temporary register
+	while (std::regex_search(SourceCode, std::regex("-c[0-9]|c[0-9][\\.wxyz]*_")) && ArithmeticCount < 8)
+	{
+		// Make sure that the dest register is not already being used
+		std::string tmpLine = "\n" + std::regex_replace(SourceCode, std::regex("1?-(c[0-9])[\\._a-z0-9]*|(c[0-9])[\\.wxyz]*_[a-z0-9]*"), "-$1$2") + "\n";
+		size_t start = tmpLine.substr(0, tmpLine.find("-c")).rfind("\n") + 1;
+		tmpLine = tmpLine.substr(start, tmpLine.find("\n", start) - start);
+		const std::string destReg = std::regex_replace(tmpLine, std::regex("[ \\+]+[a-z_\\.0-9]+ (r[0-9]).*-c[0-9].*"),"$1");
+		const std::string sourceReg = std::regex_replace(tmpLine, std::regex("[ \\+]+[a-z_\\.0-9]+ r[0-9][\\._a-z0-9]*, (.*)-c[0-9](.*)"), "$1$2");
+		if (sourceReg.find(destReg) != std::string::npos)
+		{
+			break;
+		}
+
+		// Replace one constant modifier using the dest register as a temporary register
+		size_t SourceSize = SourceCode.size();
+		SourceCode = std::regex_replace(SourceCode,
+			std::regex("    (...)(_[_satxd248]*|) (r[0-9])([\\.wxyz]*), (1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?(1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?(1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?((1?-)(c[0-9])([\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]|)|(1?-?)(c[0-9])([\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]))(?![_\\.wxyz])"),
+			"    mov $3$4, $10$11$14$15 /* added line */\n    $1$2 $3$4, $5$6$9$13$3$12$16 /* changed $10$11$14$15 to $3 */", std::regex_constants::format_first_only);
+		// Replace one constant modifier on coissued commands using the dest register as a temporary register
+		if (SourceSize == SourceCode.size())
+		{
+			SourceCode = std::regex_replace(SourceCode,
+				std::regex("(    .*\\n)  \\+ (...)(_[_satxd248]*|) (r[0-9])([\\.wxyz]*), (1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?(1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?(1?-?[crtv][0-9][\\.wxyz_abdis2]*, )?((1?-)(c[0-9])([\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]|)|(1?-?)(c[0-9])([\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]))(?![_\\.wxyz])"),
+				"    mov $4$5, $11$12$15$16 /* added line */\n$1  + $2$3 $4$5, $6$7$10$14$4$13$17 /* changed $11$12$15$16 to $4 */", std::regex_constants::format_first_only);
+		}
+
+		if (SourceSize == SourceCode.size())
+			break;
+
+		ArithmeticCount++;
+	}
+
+	// Check if this should be converted to ps_1_4
+	if (std::regex_search(SourceCode, std::regex("-c[0-9]|c[0-9][\\.wxyz]*_")) &&	// Check for modifiers on constants
+		!std::regex_search(SourceCode, std::regex("tex[bcdmr]")) &&					// Verify unsupported instructions are not used
+		std::regex_search(SourceCode, std::regex("ps_1_[0-3]")))					// Verify PixelShader is using version 1.0 to 1.3
+	{
+		bool ConvertError = false;
+		bool RegisterUsed[7] = { false, false, false, false, false, false, true };
+
+		struct MyStrings
+		{
+			std::string dest;
+			std::string source;
+		};
+
+		std::vector<MyStrings> ReplaceReg;
+		std::string NewSourceCode = "    ps_1_4 /* converted */\n";
+
+		// Ensure at least one command will be above the phase marker
+		bool PhaseMarkerSet = (ArithmeticCount14 >= 8);
+		if (SourceCode14.find("def c") == std::string::npos && !PhaseMarkerSet)
+		{
+			for (size_t j = 0; j < 8; j++)
+			{
+				const std::string reg = "c" + std::to_string(j);
+
+				if (SourceCode14.find(reg) == std::string::npos)
+				{
+					PhaseMarkerSet = true;
+					NewSourceCode.append("    def " + reg + ", 0, 0, 0, 0 /* added line */\n");
+					break;
+				}
+			}
+		}
+
+		// Update registers to use different numbers from textures
+		size_t FirstReg = 0;
+		for (size_t j = 0; j < 2; j++)
+		{
+			const std::string reg = "r" + std::to_string(j);
+
+			if (SourceCode14.find(reg) != std::string::npos)
+			{
+				while (SourceCode14.find("t" + std::to_string(FirstReg)) != std::string::npos ||
+					(SourceCode14.find("r" + std::to_string(FirstReg)) != std::string::npos && j != FirstReg))
+				{
+					FirstReg++;
+				}
+				SourceCode14 = std::regex_replace(SourceCode14, std::regex(reg), "r" + std::to_string(FirstReg));
+				FirstReg++;
+			}
+		}
+
+		// Set phase location
+		size_t PhasePosition = NewSourceCode.length();
+		size_t TexturePosition = 0;
+
+		// Loop through each line
+		size_t LinePosition = 1;
+		std::string NewLine = SourceCode14;
+		while (true)
+		{
+			// Get next line
+			size_t tmpLinePos = SourceCode14.find("\n", LinePosition) + 1;
+			if (tmpLinePos == std::string::npos || tmpLinePos < LinePosition)
+			{
+				break;
+			}
+			LinePosition = tmpLinePos;
+			NewLine = SourceCode14.substr(LinePosition, SourceCode14.length());
+			tmpLinePos = NewLine.find("\n");
+			if (tmpLinePos != std::string::npos)
+			{
+				NewLine.resize(tmpLinePos);
+			}
+
+			// Skip 'ps_x_x' lines
+			if (std::regex_search(NewLine, std::regex("ps_._.")))
+			{
+				// Do nothing
+			}
+
+			// Check for 'def' and add before 'phase' statement
+			else if (NewLine.find("def c") != std::string::npos)
+			{
+				PhaseMarkerSet = true;
+				const std::string tmpLine = NewLine + "\n";
+				NewSourceCode.insert(PhasePosition, tmpLine);
+				PhasePosition += tmpLine.length();
+			}
+
+			// Check for 'tex' and update to 'texld'
+			else if (NewLine.find("tex t") != std::string::npos)
+			{
+				const std::string regNum = std::regex_replace(NewLine, std::regex(".*tex t([0-9]).*"), "$1");
+				const std::string tmpLine = "    texld r" + regNum + ", t" + regNum + "\n";
+
+				// Mark as a texture register and add 'texld' statement before or after the 'phase' statement
+				const unsigned long Num = strtoul(regNum.c_str(), nullptr, 10);
+				RegisterUsed[(Num < 6) ? Num : 6] = true;
+				NewSourceCode.insert(PhasePosition, tmpLine);
+				if (PhaseMarkerSet)
+				{
+					TexturePosition += tmpLine.length();
+				}
+				else
+				{
+					PhaseMarkerSet = true;
+					PhasePosition += tmpLine.length();
+				}
+			}
+
+			// Other instructions
+			else
+			{
+				// Check for constant modifiers and update them to use unused temp register
+				if (std::regex_search(NewLine, std::regex("-c[0-9]|c[0-9][\\.wxyz]*_")))
+				{
+					for (size_t j = 0; j < 6; j++)
+					{
+						std::string reg = "r" + std::to_string(j);
+
+						if (NewSourceCode.find(reg) == std::string::npos)
+						{
+							const std::string constReg = std::regex_replace(NewLine, std::regex(".*-(c[0-9]).*|.*(c[0-9])[\\.wxyz]*_.*"), "$1$2");
+
+							// Check if this constant has modifiers in more than one line
+							if (std::regex_search(SourceCode14.substr(LinePosition + NewLine.length(), SourceCode14.length()), std::regex("-" + constReg + "|" + constReg + "[\\.wxyz]*_")))
+							{
+								// Find an unused register
+								while (j < 6 &&
+									(NewSourceCode.find("r" + std::to_string(j)) != std::string::npos ||
+									SourceCode14.find("r" + std::to_string(j)) != std::string::npos))
+								{
+									j++;
+								}
+								// Replace all constants with the unused register
+								if (j < 6)
+								{
+									reg = "r" + std::to_string(j);
+									SourceCode14 = std::regex_replace(SourceCode14, std::regex(constReg), reg);
+								}
+							}
+
+							const std::string tmpLine = "    mov " + reg + ", " + constReg + "\n";
+
+							// Update the constant in this line and add 'mov' statement before or after the 'phase' statement
+							NewLine = std::regex_replace(NewLine, std::regex(constReg), reg);
+							if (ArithmeticCount14 < 8)
+							{
+								NewSourceCode.insert(PhasePosition + TexturePosition, tmpLine);
+								ArithmeticCount14++;
+							}
+							else
+							{
+								PhaseMarkerSet = true;
+								NewSourceCode.insert(PhasePosition, tmpLine);
+								PhasePosition += tmpLine.length();
+							}
+							break;
+						}
+					}
+				}
+
+				// Update register from vector once it is used for the last time
+				if (ReplaceReg.size() > 0)
+				{
+					for (size_t x = 0; x < ReplaceReg.size(); x++)
+					{
+						// Check if register is used in this line
+						if (NewLine.find(ReplaceReg[x].dest) != std::string::npos)
+						{
+							// Get position of all lines after this line
+							size_t start = LinePosition + NewLine.length();
+							// Move position to next line if the first line is a co-issed command
+							start = (SourceCode14.substr(start, 4).find("+") == std::string::npos) ? start : SourceCode14.find("\n", start + 1);
+
+							// Check if register is used in the code after this position
+							if (SourceCode14.find(ReplaceReg[x].dest, start) == std::string::npos)
+							{
+								// Update dest register using source register from the vector
+								NewLine = std::regex_replace(NewLine, std::regex("([ \\+]+[a-z_\\.0-9]+ )r[0-9](.*)"), "$1" + ReplaceReg[x].source + "$2");
+								ReplaceReg.erase(ReplaceReg.begin() + x);
+								break;
+							}
+						}
+					}
+				}
+
+				// Check if texture is no longer being used and update the dest register
+				if (std::regex_search(NewLine, std::regex("t[0-9]")))
+				{
+					const std::string texNum = std::regex_replace(NewLine, std::regex(".*t([0-9]).*"), "$1");
+
+					// Get position of all lines after this line
+					size_t start = LinePosition + NewLine.length();
+					// Move position to next line if the first line is a co-issed command
+					start = (SourceCode14.substr(start, 4).find("+") == std::string::npos) ? start : SourceCode14.find("\n", start + 1);
+
+					// Check if texture is used in the code after this position
+					if (SourceCode14.find("t" + texNum, start) == std::string::npos)
+					{
+						const std::string destRegNum = std::regex_replace(NewLine, std::regex("[ \\+]+[a-z_\\.0-9]+ r([0-9]).*"), "$1");
+
+						// Check if destination register is already being used by a texture register
+						const unsigned long Num = strtoul(destRegNum.c_str(), nullptr, 10);
+						if (!RegisterUsed[(Num < 6) ? Num : 6])
+						{
+							// Check if line is using more than one texture and error out
+							if (std::regex_search(std::regex_replace(NewLine, std::regex("t" + texNum), "r" + texNum), std::regex("t[0-9]")))
+							{
+								ConvertError = true;
+								break;
+							}
+							// Check if this is the first or last time the register is used
+							if (NewSourceCode.find("r" + destRegNum) == std::string::npos ||
+								SourceCode14.find("r" + destRegNum, start) == std::string::npos)
+							{
+								// Update dest register using texture register
+								NewLine = std::regex_replace(NewLine, std::regex("([ \\+]+[a-z_\\.0-9]+ )r[0-9](.*)"), "$1r" + texNum + "$2");
+								// Update code replacing all regsiters after the marked position with the texture register
+								const std::string tempSourceCode = std::regex_replace(SourceCode14.substr(start, SourceCode14.length()), std::regex("r" + destRegNum), "r" + texNum);
+								SourceCode14.resize(start);
+								SourceCode14.append(tempSourceCode);
+							}
+							else
+							{
+								// If register is still being used then add registers to vector to be replaced later
+								RegisterUsed[(Num < 6) ? Num : 6] = true;
+								MyStrings tempReplaceReg;
+								tempReplaceReg.dest = "r" + destRegNum;
+								tempReplaceReg.source = "r" + texNum;
+								ReplaceReg.push_back(tempReplaceReg);
+							}
+						}
+					}
+				}
+
+				// Add line to SourceCode
+				NewLine = std::regex_replace(NewLine, std::regex("t([0-9])"), "r$1") + "\n";
+				NewSourceCode.append(NewLine);
+			}
+		}
+
+		// Add 'phase' instruction
+		NewSourceCode.insert(PhasePosition, "    phase\n");
+
+		// If no errors were encountered then check if code assembles
+		if (!ConvertError)
+		{
+			// Test if ps_1_4 assembles
+			if (SUCCEEDED(D3DXAssembleShader(NewSourceCode.data(), static_cast<UINT>(NewSourceCode.size()), nullptr, nullptr, 0, &Assembly, &ErrorBuffer)))
+			{
+				SourceCode = NewSourceCode;
+			}
+			else
+			{
+#ifndef D3D8TO9NOLOG
+				LOG << "> Failed to convert shader to ps_1_4" << std::endl;
+				LOG << "> Dumping translated shader assembly:" << std::endl << std::endl << NewSourceCode << std::endl;
+				LOG << "> Failed to reassemble shader:" << std::endl << std::endl << static_cast<const char *>(ErrorBuffer->GetBufferPointer()) << std::endl;
+#endif
+			}
+		}
+	}
+
+	// Change '-' modifier for constant values when using 'mad' arithmetic by changing it to use 'sub'
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("(mad)([_satxd248]*) (r[0-9][\\.wxyz]*), (1?-?[crtv][0-9][\\.wxyz_abdis2]*), (1?-?[crtv][0-9][\\.wxyz_abdis2]*), (-)(c[0-9][\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa]|)(?![_\\.wxyz])"),
+		"sub$2 $3, $4, $7$8 /* changed 'mad' to 'sub' removed $5 removed modifier $6 */");
+
+	// Remove trailing modifiers for constant values
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("(c[0-9][\\.wxyz]*)(_bx2|_bias|_x2|_d[zbwa])"),
+		"$1 /* removed modifier $2 */");
+
+	// Remove remaining modifiers for constant values
+	SourceCode = std::regex_replace(SourceCode,
+		std::regex("(1?-)(c[0-9][\\.wxyz]*(?![\\.wxyz]))"),
+		"$2 /* removed modifier $1 */");
 
 #ifndef D3D8TO9NOLOG
 	LOG << "> Dumping translated shader assembly:" << std::endl << std::endl << SourceCode << std::endl;
 #endif
 
-	if (d3d8to9::D3DXAssembleShader != nullptr)
+	if (D3DXAssembleShader != nullptr)
 	{
-		hr = d3d8to9::D3DXAssembleShader(SourceCode.data(), static_cast<UINT>(SourceCode.size()), nullptr, nullptr, 0, &Assembly, &ErrorBuffer);
+		hr = D3DXAssembleShader(SourceCode.data(), static_cast<UINT>(SourceCode.size()), nullptr, nullptr, D3DXASM_FLAGS, &Assembly, &ErrorBuffer);
 	}
 	else
 	{
-		hr = E_FAIL;
+		hr = D3DERR_INVALIDCALL;
 	}
 
 	Disassembly->Release();
@@ -1824,7 +2020,6 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreatePixelShader(const DWORD *pFunct
 #ifndef D3D8TO9NOLOG
 			LOG << "> Failed to reassemble shader:" << std::endl << std::endl << static_cast<const char *>(ErrorBuffer->GetBufferPointer()) << std::endl;
 #endif
-
 			ErrorBuffer->Release();
 		}
 		else
@@ -1857,9 +2052,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::SetPixelShader(DWORD Handle)
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetPixelShader(DWORD *pHandle)
 {
 	if (pHandle == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	*pHandle = CurrentPixelShaderHandle;
 
@@ -1868,14 +2061,10 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetPixelShader(DWORD *pHandle)
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DeletePixelShader(DWORD Handle)
 {
 	if (Handle == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	if (CurrentPixelShaderHandle == Handle)
-	{
 		SetPixelShader(0);
-	}
 
 	reinterpret_cast<IDirect3DPixelShader9 *>(Handle)->Release();
 
@@ -1896,9 +2085,7 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::GetPixelShaderFunction(DWORD Handle, 
 #endif
 
 	if (Handle == 0)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	IDirect3DPixelShader9 *const PixelShaderInterface = reinterpret_cast<IDirect3DPixelShader9 *>(Handle);
 
@@ -1919,4 +2106,16 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::DrawTriPatch(UINT Handle, const float
 HRESULT STDMETHODCALLTYPE Direct3DDevice8::DeletePatch(UINT Handle)
 {
 	return ProxyInterface->DeletePatch(Handle);
+}
+
+void Direct3DDevice8::ApplyClipPlanes()
+{
+	DWORD index = 0;
+	for (const auto plane : StoredClipPlanes)
+	{
+		if ((ClipPlaneRenderState & (1 << index)) != 0)
+			ProxyInterface->SetClipPlane(index, plane);
+
+		index++;
+	}
 }

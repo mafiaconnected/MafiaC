@@ -14,40 +14,40 @@ addEventHandler("OnMapLoaded", (event, mapName) => {
 	//	return false;
 	//}
 
-	game.setTrafficEnabled(true);
-	game.createPlayer("TommyCOATHAT.i3d", new Vec3(-1981.51, -4.66, 29.37), 0.0);
+	game.setTrafficEnabled(false);
+	game.createPlayer(new Vec3(-1981.51, -4.66, 29.37), 0.0, "TommyCOATHAT.i3d");
 });
 
 // ===========================================================================
 
 addEventHandler("OnProcess", (event, deltaTime) => {
-	if(godMode) {
+	if (godMode) {
 		localPlayer.health = 200;
 	}
 });
 
 // ===========================================================================
 
-addEventHandler("OnPedEnteringVehicle", function(event, ped, vehicle, seat) {
-    message(`You are entering a vehicle`);
+addEventHandler("OnPedEnteringVehicle", function (event, ped, vehicle, seat) {
+	message(`You are entering a vehicle`);
 });
 
 // ===========================================================================
 
-addEventHandler("OnPedEnteredVehicle", function(event, ped, vehicle, seat) {
-    message(`You entered a vehicle`);
+addEventHandler("OnPedEnteredVehicle", function (event, ped, vehicle, seat) {
+	message(`You entered a vehicle`);
 });
 
 // ===========================================================================
 
-addEventHandler("OnPedExitingVehicle", function(event, ped, vehicle, seat) {
-    message(`You are exiting a vehicle`);
+addEventHandler("OnPedExitingVehicle", function (event, ped, vehicle, seat) {
+	message(`You are exiting a vehicle`);
 });
 
 // ===========================================================================
 
-addEventHandler("OnPedExitedVehicle", function(event, ped, vehicle, seat) {
-    message(`You have exited a vehicle`);
+addEventHandler("OnPedExitedVehicle", function (event, ped, vehicle, seat) {
+	message(`You have exited a vehicle`);
 });
 
 // ===========================================================================
@@ -55,20 +55,20 @@ addEventHandler("OnPedExitedVehicle", function(event, ped, vehicle, seat) {
 addCommandHandler("veh", (command, params, client) => {
 	let model = getVehicleModelFromParams(params);
 
-	if(!model) {
+	if (!model) {
 		message("That vehicle model is invalid!");
 		return false;
 	}
 
-	let vehicle = game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(client.player.position, client.player.heading, 5), degToRad(client.player.heading));
+	let vehicle = game.createVehicle(`${model}.i3d`, getPosInFrontOfPos(localPlayer.position, localPlayer.rotation.z, 5), localPlayer.rotation.z);
 
-	if(game.mapName == "FREERIDENOC") {
+	if (game.mapName == "FREERIDENOC") {
 		vehicle.lights = true;
 	} else {
 		vehicle.lights = false;
 	}
 
-    message(`You spawned a ${vehicleNames[vehicleModels.indexOf(model)]}`, COLOUR_YELLOW);
+	message(`You spawned a ${vehicleNames[vehicleModels.indexOf(model)]}`, COLOUR_YELLOW);
 });
 
 // ===========================================================================
@@ -87,8 +87,14 @@ addCommandHandler("god", (command, params) => {
 
 // ===========================================================================
 
+addCommandHandler("anim", (command, params) => {
+	localPlayer.addAnimation(params);
+});
+
+// ===========================================================================
+
 addCommandHandler("siren", (command, params) => {
-	if(localPlayer.vehicle == null) {
+	if (localPlayer.vehicle == null) {
 		message("You need to be in a vehicle!");
 		return false;
 	}
@@ -99,7 +105,7 @@ addCommandHandler("siren", (command, params) => {
 // ===========================================================================
 
 addCommandHandler("engine", (command, params) => {
-	if(localPlayer.vehicle == null) {
+	if (localPlayer.vehicle == null) {
 		message("You need to be in a vehicle!");
 		return false;
 	}
@@ -110,7 +116,7 @@ addCommandHandler("engine", (command, params) => {
 // ===========================================================================
 
 addCommandHandler("lights", (command, params) => {
-	if(localPlayer.vehicle == null) {
+	if (localPlayer.vehicle == null) {
 		message("You need to be in a vehicle!");
 		return false;
 	}
@@ -121,7 +127,7 @@ addCommandHandler("lights", (command, params) => {
 // ===========================================================================
 
 addCommandHandler("locked", (command, params) => {
-	if(localPlayer.vehicle == null) {
+	if (localPlayer.vehicle == null) {
 		message("You need to be in a vehicle!");
 		return false;
 	}
@@ -134,7 +140,7 @@ addCommandHandler("locked", (command, params) => {
 addCommandHandler("skin", (command, params) => {
 	let model = getSkinModelFromParams(params);
 
-	if(!model) {
+	if (!model) {
 		message("That ped model is invalid!");
 		return false;
 	}
@@ -145,14 +151,14 @@ addCommandHandler("skin", (command, params) => {
 // ===========================================================================
 
 function getVehicleModelFromParams(params) {
-	for(let i in vehicleNames) {
-		if(vehicleNames[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
+	for (let i in vehicleNames) {
+		if (vehicleNames[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
 			return vehicleModels[i];
 		}
 	}
 
-	for(let i in vehicleModels) {
-		if(vehicleModels[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
+	for (let i in vehicleModels) {
+		if (vehicleModels[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
 			return vehicleModels[i];
 		}
 	}
@@ -169,8 +175,8 @@ function getSkinModelFromParams(params) {
 	//	}
 	//}
 
-	for(let i in skinModels) {
-		if(skinModels[i].toLowerCase().indexOf(params.toLowerCase()) == -1) {
+	for (let i in skinModels) {
+		if (skinModels[i].toLowerCase().indexOf(params.toLowerCase()) != -1) {
 			return skinModels[i];
 		}
 	}
@@ -865,18 +871,18 @@ let weaponNames = {
 // ===========================================================================
 
 function getPosInFrontOfPos(pos, angle, distance) {
-    while(angle < 0.0)
-        angle += 360.0;
-    while(angle > 360.0)
-        angle -= 360.0;
+	while (angle < 0.0)
+		angle += 360.0;
+	while (angle > 360.0)
+		angle -= 360.0;
 
-    angle = degToRad(angle);
+	angle = degToRad(angle);
 
-    let x = (pos.x+((Math.cos(angle-(Math.PI/2)))*distance));
-    let y = pos.y;
-    let z = (pos.z+((Math.sin(angle+(Math.PI/2)))*distance))
+	let x = (pos.x + ((Math.cos(angle - (Math.PI / 2))) * distance));
+	let y = pos.y;
+	let z = (pos.z + ((Math.sin(angle + (Math.PI / 2))) * distance))
 
-    return new Vec3(x, y, z);
+	return new Vec3(x, y, z);
 }
 
 // ===========================================================================

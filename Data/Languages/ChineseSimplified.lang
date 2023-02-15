@@ -1,0 +1,236 @@
+﻿[Language]
+name=Chinese (Simplified)
+native_name=中文(简体)
+author=NotthingToSay
+
+[Common]
+
+# Languages
+language_English=英语
+language_French=法语
+language_German=德语
+language_Italian=意大利语
+language_Spanish=西班牙语
+language_Russian=俄语
+language_Chinese=中文
+language_Arabic=阿拉伯语
+language_Persian=波斯语
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
+
+# Tips
+tip_Close=关闭窗口。
+tip_Okay=关闭窗口并保存配置。
+tip_Cancel=关闭窗口但不保存配置。
+
+# Columns
+column_Name=名字
+column_Title=标题
+column_Version=版本号
+column_ModifiedDate=修改日期
+column_Description=描述
+column_Key=项目
+column_Value=描述
+
+# Buttons
+button_Okay=确定
+button_Close=关闭
+button_Cancel=取消
+button_Yes=是
+button_No=否
+button_Retry=重试
+button_Abort=终止
+
+[LauncherWindow]
+
+# Menu
+menu_File=文件(&F)
+menu_CheckForUpdates=检查更新...
+menu_Exit=关闭(&X)
+
+menu_Server=服务器(&S)
+menu_AddServer=添加服务器
+menu_DeleteServer=删除服务器
+
+menu_Tools=工具(&T)
+menu_Settings=设置(&S)...
+menu_ResetSettings=重置所有设置...
+menu_DesktopShortcut=添加到桌面快捷方式
+
+menu_View=查看(&V)
+menu_Players=显示玩家列表(&P)
+menu_Rules=显示规则列表(&R)
+menu_FullWidthRules=规则列表全宽显示
+
+menu_Help=帮助(&H)
+menu_RunDiagnostics=运行诊断(&D)...
+menu_About=关于(&A)...
+menu_Licenses=查看 许可证(&L)...
+
+# Generic/Multiplayer
+menu_LargeIcons=大图标
+menu_Refresh=刷新
+menu_Connect=连接
+menu_AddToFavourites=添加至收藏夹
+menu_Favourite=收藏夹
+menu_CopyServerIP=复制服务器IP地址
+menu_CopyAddress=复制地址
+menu_ViewPlayerMap=查看玩家地图...
+menu_VisitWebsite=访问网站...
+
+# Mods context menu
+menu_ResetAll=重置所有
+menu_DisableAll=禁用所有
+menu_Delete=删除
+
+# Open menu
+menu_LauncherSettings=启动器设置(&L)...
+menu_GameSettings=游戏设置(&G)...
+menu_Resources=资源
+menu_Crashes=崩溃
+menu_Caches=缓存
+menu_Logs=日志
+
+# Messages
+message_ConfirmResetSettings=确定要重置启动器配置吗？\n此操作无法恢复，稍后启动器将重启。
+
+# Tabs
+tab_Favourites=收藏夹
+tab_Internet=互联网
+tab_Official=官方
+tab_History=历史
+tab_Local=本地
+tab_Mods=Mod
+
+# Status
+status_Disconnected=连接已断开
+status_Connecting=正在连接...
+status_Connected=已连接到服务器列表
+
+# Labels
+label_Game=游戏:
+label_GameEXEPath=游戏主程序目录:
+
+# Tips
+tip_Games=即将启动的游戏。
+tip_CloseLauncher=启动游戏后启动器将直接关闭，而不是隐藏。
+tip_Launch=启动目标游戏。
+tip_BrowseForGame=浏览游戏主程序路径。
+tip_ShowInExplorer=在资源管理器中显示游戏主程序目录。
+tip_GameEXEPath=游戏主程序路径。
+
+# Columns
+column_ServerName=服务器名称
+column_Players=玩家
+column_GameMode=游戏模式
+
+# Group Boxes
+group_Players=在线玩家列表
+group_Rules=规则
+
+# Buttons
+button_OpenMenu=打开...
+button_CloseLauncher=启动后关闭程序
+button_Launch=启动
+button_ShowInExplorer=在{0}中显示
+button_BrowseForGame=浏览...
+
+[AboutWindow]
+
+windowTitle=关于
+group_About=关于
+
+# Labels
+label_Product=制作:
+label_Copyright=Copyright © {0} {1}
+label_Version=版本:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=封装版本:
+label_BuildDate=创建日期:
+label_BuildTime=创建时间:
+label_Website=官网:
+label_Patreon=Patreon:
+label_CrashesThisWeek=这周的崩溃:
+label_Developers=开发人员:
+
+[SettingsWindow]
+
+windowTitle=启动器设置
+gameSettingsTitle=游戏设置
+
+# Tabs
+tab_General=常规
+tab_AdditionalResourcesFolders=附加资源文件夹
+tab_AdditionalMods=附加Mod
+tab_Display=显示
+tab_Advanced=高级
+tab_NonModHacks=纯净模式
+tab_Licenses=许可证
+tab_Language=语言
+tab_BugFixes=Bug 修复
+tab_Debug=调试
+
+# Labels
+label_Name=名字:
+
+# Additional resource folders
+button_ResourceAdd=添加...
+tip_ResourceAdd=添加新的资源文件夹。
+
+button_ResourceRemove=移除
+tip_ResourceRemove=移除选中的资源文件夹。
+
+button_ResourceUp=向上
+tip_ResourceUp=向上移动当前选定的资源文件夹。
+
+button_ResourceDown=向下
+tip_ResourceDown=向下移动当前选定的资源文件夹。
+
+tip_ResourceOpen=在{0}中打开当前选定的资源文件夹。
+button_ResourceOpen=打开
+
+# Options
+opt_KeepSavedGamesSeparate=存档独立保存
+opt_KeepScreenshotsSeparate=截图独立保存
+opt_SaveCrashDump=保存崩溃转储
+opt_CheckForUpdates=检查更新
+opt_Assertions=断言
+opt_DebugMode=调试模式
+opt_TerminateOnCrash=崩溃时终止游戏
+opt_VerboseLogging=详细日志记录
+opt_GameOutput=在控制台中显示所有游戏输出
+opt_MultithreadedNetworking=多线程网络
+opt_SCM=SCM
+opt_DisableStoryMode=禁用故事模式
+
+opt_AlwaysUsePrimaryMonitorResolution=始终使用主屏幕分辨率
+opt_AutomaticAspectRatio=自动调整屏幕比例
+opt_VCTrails=罪恶都市模糊效果
+tip_VCTrails=开启罪恶都市中的模糊效果
+opt_AutoSave=自动存档
+opt_SyncAnimations=同步动作
+opt_AllowDirectConnections=允许直接连接(peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=测试
+label_Message=请输入访问码以使用测试构建:
+
+[PasswordWindow]
+
+windowTitle=密码
+label_Message=请输入密码以进入服务器:
+
+[AddServerWindow]
+
+windowTitle=添加服务器...
+label_Message=添加新的服务器 主机:端口号...
+
+[PlayerMapWindow]
+
+windowTitle=玩家地图
+
+# Menu
+menu_VCStyle=罪恶都市风格(&V)

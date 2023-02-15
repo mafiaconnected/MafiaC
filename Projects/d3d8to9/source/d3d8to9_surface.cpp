@@ -5,60 +5,48 @@
 
 #include "d3d8to9.hpp"
 
-// IDirect3DSurface8
 Direct3DSurface8::Direct3DSurface8(Direct3DDevice8 *Device, IDirect3DSurface9 *ProxyInterface) :
-	Device(Device), ProxyInterface(ProxyInterface), m_RefCount(1)
+	Device(Device), ProxyInterface(ProxyInterface)
 {
-	//Device->AddRef();
+	Device->ProxyAddressLookupTable->SaveAddress(this, ProxyInterface);
 }
 Direct3DSurface8::~Direct3DSurface8()
 {
-	ProxyInterface->Release();
-	//Device->Release();
 }
 
 HRESULT STDMETHODCALLTYPE Direct3DSurface8::QueryInterface(REFIID riid, void **ppvObj)
 {
 	if (ppvObj == nullptr)
-	{
 		return E_POINTER;
-	}
 
-	if (riid == __uuidof(this) ||
+	if (riid == __uuidof(IDirect3DSurface8) ||
 		riid == __uuidof(IUnknown))
 	{
 		AddRef();
-
-		*ppvObj = this;
+		*ppvObj = static_cast<IDirect3DSurface8 *>(this);
 
 		return S_OK;
 	}
 
-	return ProxyInterface->QueryInterface(riid, ppvObj);
+	const HRESULT hr = ProxyInterface->QueryInterface(ConvertREFIID(riid), ppvObj);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppvObj, Device);
+
+	return hr;
 }
 ULONG STDMETHODCALLTYPE Direct3DSurface8::AddRef()
 {
-	m_RefCount++;
-	return m_RefCount;
-
+	return ProxyInterface->AddRef();
 }
 ULONG STDMETHODCALLTYPE Direct3DSurface8::Release()
 {
-	if (m_RefCount <= 1)
-	{
-		delete this;
-		return 0;
-	}
-	m_RefCount--;
-	return m_RefCount;
+	return ProxyInterface->Release();
 }
 
-HRESULT STDMETHODCALLTYPE Direct3DSurface8::GetDevice(Direct3DDevice8 **ppDevice)
+HRESULT STDMETHODCALLTYPE Direct3DSurface8::GetDevice(IDirect3DDevice8 **ppDevice)
 {
 	if (ppDevice == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	Device->AddRef();
 
@@ -80,23 +68,22 @@ HRESULT STDMETHODCALLTYPE Direct3DSurface8::FreePrivateData(REFGUID refguid)
 }
 HRESULT STDMETHODCALLTYPE Direct3DSurface8::GetContainer(REFIID riid, void **ppContainer)
 {
-	return ProxyInterface->GetContainer(riid, ppContainer);
+	const HRESULT hr = ProxyInterface->GetContainer(ConvertREFIID(riid), ppContainer);
+	if (SUCCEEDED(hr))
+		GenericQueryInterface(riid, ppContainer, Device);
+
+	return hr;
 }
 HRESULT STDMETHODCALLTYPE Direct3DSurface8::GetDesc(D3DSURFACE_DESC8 *pDesc)
 {
 	if (pDesc == nullptr)
-	{
 		return D3DERR_INVALIDCALL;
-	}
 
 	D3DSURFACE_DESC SurfaceDesc;
 
 	const HRESULT hr = ProxyInterface->GetDesc(&SurfaceDesc);
-
 	if (FAILED(hr))
-	{
 		return hr;
-	}
 
 	ConvertSurfaceDesc(SurfaceDesc, *pDesc);
 

@@ -119,7 +119,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			Reader.ReadInt32(&nPlayerNetworkIndex, 1);
 
 			CVector3D vecTargetPos;
-			Reader.ReadSingle((float*)&vecTargetPos, 3);
+			Reader.ReadVector3D(&vecTargetPos, 1);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
@@ -145,7 +145,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			Reader.ReadBoolean(state);
 
 			CVector3D vecTargetPos;
-			Reader.ReadSingle((float*)&vecTargetPos, 3);
+			Reader.ReadVector3D(&vecTargetPos, 1);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr)
@@ -758,7 +758,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
 				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
-				if (pClientHuman != nullptr) 
+				if (pClientHuman != nullptr)
 				{
 					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 					if (pClientVehicle != nullptr)
@@ -835,10 +835,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
 						{
-							if (!pClientHuman->IsSyncer())
-							{
-								g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
-							}
+						if (!pClientHuman->IsSyncer())
+						{
+							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+						}
 						}
 					}
 				}
@@ -864,7 +864,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			}
 		}
 		break;
-		
+
 		case MAFIAPACKET_HUMAN_JACKVEHICLE:
 		{
 			uint32_t nHumanNetworkIndex;
@@ -896,6 +896,46 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		}
 		break;
 
+		case MAFIAPACKET_ELEMENT_UPDATE_ID:
+		{
+			uint64_t nLocalElementId;
+			int32_t nServerElementId;
+
+			Reader.ReadUInt64(&nLocalElementId, 1);
+			Reader.ReadInt32(&nServerElementId, 1);
+
+			if (nServerElementId != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(FromGUID(nLocalElementId));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetId(nServerElementId);
+					pClientVehicle->DoAttachments();
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_ELEMENT_REMOVE:
+		{
+			int32_t nServerElementId;
+
+			Reader.ReadInt32(&nServerElementId, 1);
+
+			if (nServerElementId != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nServerElementId));
+				if (pClientVehicle != nullptr)
+				{
+					if (pClientVehicle->GetGameVehicle() != nullptr)
+						pClientVehicle->Despawn();
+
+					m_pClientManager->DestroyObject(pClientVehicle, false, false);
+				}
+			}
+		}
+		break;
+
 		default:
 		{
 
@@ -904,33 +944,28 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 	}
 }
 
+CNetObject* FromGUID(uint64_t uiGuid)
+{
+	for (CNetObject* pNetObject : g_pClientGame->m_pClientManager->m_Objects)
+	{
+		if (uiGuid == pNetObject->GetGUID())
+		{
+			return pNetObject;
+		}
+	}
+
+	return nullptr;
+}
+
 void CMultiplayer::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason)
 {
 	if (!g_pClientGame->m_bStopMultiplayerGame)
 	{
-		const GChar* rgpszReasons[] = {
-			_gstr("TIMEOUT"),
-			_gstr("FULL"),
-			_gstr("UNSUPPORTED CLIENT"),
-			_gstr("UNSUPPORTED ENGINE"),
-			_gstr("WRONG PASSWORD"),
-			_gstr("UNSUPPORTED EXECUTABLE"),
-			_gstr("GRACEFUL"),
-			_gstr("BANNED"),
-			_gstr("FAILED"),
-			_gstr("INVALID NAME"),
-			_gstr("CRASH"),
-			_gstr("PUBLIC KEY MISMATCH"),
-			_gstr("NAME IN USE"),
-			_gstr("KICKED")
-		};
 		g_pClientGame->StopMultiplayerGameWhenSafe(uiReason);
-
-		char msg[128];
-		sprintf(msg, "Disconnected [%ws]", rgpszReasons[uiReason]);
+		g_pClientGame->ShowDisconnectReason();
 
 		//MafiaSDK::GetIndicators()->ConsoleAddText(msg, 0xFFFF0000);
-		g_pClientGame->m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[uiReason]);
+		//g_pClientGame->m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[uiReason]);
 	}
 }
 
@@ -994,6 +1029,24 @@ void CMultiplayer::EnqueuePeerElement(CClientEntity* pElement)
 
 bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
 {
+	if (pElement->IsType(ELEMENT_VEHICLE))
+	{
+		auto pClientVehicle = static_cast<CClientVehicle*>(pElement);
+		auto pGameVehicle = pClientVehicle->GetGameVehicle();
+
+		if (pGameVehicle != nullptr)
+		{
+			Packet Packet(MAFIAPACKET_VEHICLE_CREATE);
+			Packet.Write<uint64_t>(pClientVehicle->GetGUID());
+			pClientVehicle->WriteCreatePacket(&Packet);
+			//pClientVehicle->WriteSyncPacket(&Packet);
+			SendHostPacket(&Packet);
+
+			//_glogprintf(_gstr("PEER2PEER: Sending vehicle %d modelIndex %d"), nRef, pVehicle->GetModelIndex());
+
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -1033,32 +1086,38 @@ void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
+void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
+{
+	if (target->IsLocal() || !target->IsSyncer())
+		return;
+
+	Packet Packet(MAFIAPACKET_HUMAN_DIE);
+	Packet.Write<int32_t>(target->GetId());
+	if (attacker != nullptr) {
+		Packet.Write<int32_t>(attacker->GetId());
+	}
+	else 
+	{
+		Packet.Write<int32_t>(INVALID_NETWORK_ID);
+	}
+	Packet.Write<int32_t>(INVALID_NETWORK_ID);
+	SendHostPacket(&Packet);
+}
+
+void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
 
 	Packet Packet(MAFIAPACKET_HUMAN_HIT);
-	//Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
 	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
+	//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
 	Packet.Write<CVector3D>(v1);
 	Packet.Write<CVector3D>(v2);
 	Packet.Write<CVector3D>(v3);
 	Packet.Write<int32_t>(hitType);
 	Packet.Write<float>(damage);
 	Packet.Write<int32_t>(bodyPart);
-	SendHostPacket(&Packet);
-}
-
-void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientHuman* attacker)
-{
-	if (target->IsLocal() || attacker->IsLocal())
-		return;
-
-	Packet Packet(MAFIAPACKET_HUMAN_DIE);
-	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
 	SendHostPacket(&Packet);
 }
 

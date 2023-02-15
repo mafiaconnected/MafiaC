@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "resource.h"
 
+#include <LauncherVersion.h>
+
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 
@@ -64,7 +66,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 	{
 		GChar szTitle[128];
-		_gsnprintf(szTitle, ARRAY_COUNT(szTitle), _gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_Version.m_szDisplayVersion);
+		_gsnprintf(szTitle, ARRAY_COUNT(szTitle), _gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, __gstr(LAUNCHER_DISPLAY_VERSION));
 
 		// Set title
 		UTF16String Title2(false, szTitle);
@@ -107,9 +109,11 @@ static HICON GetIcon(HMODULE hModule, bool bSmall)
 	return (HICON)LoadImage(hModule, MAKEINTRESOURCE(IDI_LAUNCHER), IMAGE_ICON, GetSystemMetrics(bSmall ? SM_CXSMICON : SM_CXICON), GetSystemMetrics(bSmall ? SM_CYSMICON : SM_CYICON), LR_DEFAULTCOLOR);
 }
 
-static void GetIcons(HICON& hLargeIcon, HICON& hSmallIcon) {
-	auto hModule = LoadLibraryEx(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherExePath.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE);
-	if (hModule != nullptr) {
+static void GetIcons(HICON& hLargeIcon, HICON& hSmallIcon)
+{
+	auto hModule = LoadLibraryEx(CHackSupport::m_pInstance->m_LauncherExePath.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE);
+	if (hModule != nullptr)
+	{
 		hLargeIcon = GetIcon(hModule, false);
 		hSmallIcon = GetIcon(hModule, true);
 		FreeModule(hModule);

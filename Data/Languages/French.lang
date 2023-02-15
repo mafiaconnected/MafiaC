@@ -1,0 +1,236 @@
+﻿[Language]
+name=French
+native_name=French
+author=KvT Kara
+
+[Common]
+
+# Languages
+language_English=English
+language_French=French
+language_German=German
+language_Italian=Italian
+language_Spanish=Spanish
+language_Russian=Russian
+language_Arabic=Arabic
+language_Chinese=Chinese (Simplified)
+language_Persian=Persian
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
+
+# Tips
+tip_Close=Close this window.
+tip_Okay=Close this window saving changes.
+tip_Cancel=Close this window without saving changes.
+
+# Columns
+column_Name=Name
+column_Title=Title
+column_Version=Version
+column_ModifiedDate=Modified Date
+column_Description=Description
+column_Key=Key
+column_Value=Value
+
+# Buttons
+button_Okay=OK
+button_Close=Close
+button_Cancel=Cancel
+button_Yes=Yes
+button_No=No
+button_Retry=Retry
+button_Abort=Abort
+
+[LauncherWindow]
+
+# Menu
+menu_File=&File
+menu_CheckForUpdates=Check for updates...
+menu_Exit=E&xit
+
+menu_Server=&Server
+menu_AddServer=Add Server
+menu_DeleteServer=Delete Server
+
+menu_Tools=&Tools
+menu_Settings=&Settings...
+menu_ResetSettings=Reset all settings...
+menu_DesktopShortcut=Desktop shortcut
+
+menu_View=&View
+menu_Players=&Players
+menu_Rules=&Rules
+menu_FullWidthRules=Full &Width Rules
+
+menu_Help=&Help
+menu_RunDiagnostics=Run &Diagnostics...
+menu_About=&About ...
+menu_Licenses=View &Licenses...
+
+# Generic/Multiplayer
+menu_LargeIcons=Large Icons
+menu_Refresh=Refresh
+menu_Connect=Connect
+menu_AddToFavourites=Add To Favourites
+menu_Favourite=Favourite
+menu_CopyServerIP=Copy Server IP
+menu_CopyAddress=Copy Address
+menu_ViewPlayerMap=View Player Map...
+menu_VisitWebsite=Visit Website...
+
+# Mods context menu
+menu_ResetAll=Reset All
+menu_DisableAll=Disable All
+menu_Delete=Delete
+
+# Open menu
+menu_LauncherSettings=&Launcher Settings...
+menu_GameSettings=&Game Settings...
+menu_Resources=Resources
+menu_Crashes=Crashes
+menu_Caches=Caches
+menu_Logs=Logs
+
+# Messages
+message_ConfirmResetSettings=Are you sure you wish to reset the launcher settings to defaults?\nThis action cannot be reversed, the launcher will restart.
+
+# Tabs
+tab_Favourites=Favourites
+tab_Internet=Internet
+tab_Official=Official
+tab_History=History
+tab_Local=Local
+tab_Mods=Mods
+
+# Status
+status_Disconnected=Disconnected
+status_Connecting=Connecting
+status_Connected=Connected to server listing
+
+# Labels
+label_Game=Game:
+label_GameEXEPath=Game EXE Path:
+
+# Tips
+tip_Games=The game to launch.
+tip_CloseLauncher=Close this window when launching the game.
+tip_Launch=Launch the game.
+tip_BrowseForGame=Browse for the game executable.
+tip_ShowInExplorer=Show the game executable in {0}.
+tip_GameEXEPath=The path to the game executable.
+
+# Columns
+column_ServerName=Server Name
+column_Players=Players
+column_GameMode=Game Mode
+
+# Group Boxes
+group_Players=Players
+group_Rules=Rules
+
+# Buttons
+button_OpenMenu=Open...
+button_CloseLauncher=Close Launcher
+button_Launch=Launch
+button_ShowInExplorer=Show In {0}
+button_BrowseForGame=Browse...
+
+[AboutWindow]
+
+windowTitle=About
+group_About=About
+
+# Labels
+label_Product=Product:
+label_Copyright=Copyright © {0} {1}
+label_Version=Version:
+label_GitBranch=Git Branch:
+label_GitCommitHash=Git Commit Hash:
+label_PacketVersion=Packet Version:
+label_BuildDate=Build Date:
+label_BuildTime=Build Time:
+label_Website=Website:
+label_Patreon=Patreon:
+label_CrashesThisWeek=Crashes This Week:
+label_Developers=Developers:
+
+[SettingsWindow]
+
+windowTitle=Launcher Settings
+gameSettingsTitle=Game Settings
+
+# Tabs
+tab_General=General
+tab_AdditionalResourcesFolders=Additional Resources Folders
+tab_AdditionalMods=Additional Mods
+tab_Display=Display
+tab_Advanced=Advanced
+tab_NonModHacks=Non-mod Hacks
+tab_Licenses=Licenses
+tab_Language=Language
+tab_BugFixes=Bug Fixes
+tab_Debug=Debug
+
+# Labels
+label_Name=Name:
+
+# Additional resource folders
+button_ResourceAdd=Add...
+tip_ResourceAdd=Adds a new resource folder.
+
+button_ResourceRemove=Remove
+tip_ResourceRemove=Remove the currently selected resource folder.
+
+button_ResourceUp=Up
+tip_ResourceUp=Move the currently selected resource folder up.
+
+button_ResourceDown=Down
+tip_ResourceDown=Move the currently selected resource folder down.
+
+tip_ResourceOpen=Open the currently selected resource folder in {0}.
+button_ResourceOpen=Open
+
+# Options
+opt_KeepSavedGamesSeparate=Keep Saved Games Separate
+opt_KeepScreenshotsSeparate=Keep Screenshots Separate
+opt_SaveCrashDump=Save Crash Dump
+opt_CheckForUpdates=Check for updates
+opt_Assertions=Assertions
+opt_DebugMode=Debug mode
+opt_TerminateOnCrash=Terminate on crash
+opt_VerboseLogging=Verbose logging
+opt_GameOutput=Show all game output in console
+opt_MultithreadedNetworking=Multithreaded networking
+opt_SCM=SCM
+opt_DisableStoryMode=Disable Story Mode
+
+opt_AlwaysUsePrimaryMonitorResolution=Always use primary monitor resolution
+opt_AutomaticAspectRatio=Automatic aspect ratio
+opt_VCTrails=Vice City trails
+tip_VCTrails=Enables trails in Vice City
+opt_AutoSave=Auto save
+opt_SyncAnimations=Sync animations
+opt_AllowDirectConnections=Allow direct connections (peer-to-peer)
+
+[TestingWindow]
+
+windowTitle=Testing
+label_Message=Please enter the access code below to enable testing builds:
+
+[PasswordWindow]
+
+windowTitle=Password
+label_Message=Please enter the password to connect to the server:
+
+[AddServerWindow]
+
+windowTitle=Add Server
+label_Message=Enter new server HOST:PORT...
+
+[PlayerMapWindow]
+
+windowTitle=Player Map
+
+# Menu
+menu_VCStyle=&Vice City style

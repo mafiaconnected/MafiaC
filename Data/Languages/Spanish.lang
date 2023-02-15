@@ -1,5 +1,7 @@
 ﻿[Language]
-author=Lucy
+name=Spanish
+native_name=Español
+author=Lucy, PerikiyoXD, EliasDR
 
 [Common]
 
@@ -10,6 +12,12 @@ language_German=Alemán
 language_Italian=Italiano
 language_Spanish=Español
 language_Russian=Ruso
+language_Arabic=Arábico
+language_Chinese=Chino (Simplificado)
+language_Persian=Pérsico
+language_Portuguese=Portuguese
+language_Polish=Polish
+language_French=French
 
 # Tips
 tip_Close=Cerrar esta ventana.
@@ -17,10 +25,13 @@ tip_Okay=Cerrar esta ventana guardando los cambios.
 tip_Cancel=Cerrar esta ventana sin guardar cambios.
 
 # Columns
+column_Name=Nombre
 column_Title=Título
 column_Version=Versión
 column_ModifiedDate=Fecha modificada
 column_Description=Descripción
+column_Key=Clave
+column_Value=Valor
 
 # Buttons
 button_Okay=OK
@@ -38,18 +49,35 @@ menu_File=&Archivo
 menu_CheckForUpdates=Comprobar actualizaciones...
 menu_Exit=S&alir
 
+menu_Server=&Servidores
+menu_AddServer=Añadir servidor
+menu_DeleteServer=Eliminar servidor
+
 menu_Tools=&Herramientas
 menu_Settings=&Ajustes...
 menu_ResetSettings=Resetear los ajustes...
+menu_DesktopShortcut=Acceso directo de escritorio
+
+menu_View=&Vista
+menu_Players=&Jugadores
+menu_Rules=&Reglas
+menu_FullWidthRules=Reglas &Ampliadas
 
 menu_Help=&Ayuda
 menu_RunDiagnostics=Iniciar &Diagnóstico ...
 menu_About=&Sobre ...
+menu_Licenses=Ver &Licencias...
 
 # Generic/Multiplayer
 menu_LargeIcons=Iconos largos
 menu_Refresh=Refrescar
 menu_Connect=Conectar
+menu_AddToFavourites=Agregar a Favoritos
+menu_Favourite=Favoritos
+menu_CopyServerIP=Copiar IP del Servidor
+menu_CopyAddress=Copiar Dirección IP
+menu_ViewPlayerMap=Ver Mapa de Jugadores...
+menu_VisitWebsite=Visitar Sitio Web...
 
 # Mods context menu
 menu_ResetAll=Resetear todo
@@ -96,6 +124,10 @@ column_ServerName=Nombre del servidor
 column_Players=Jugadores
 column_GameMode=Modo de juego
 
+# Group Boxes
+group_Players=Jugadores
+group_Rules=Reglas
+
 # Buttons
 button_OpenMenu=Abrir...
 button_CloseLauncher=Cerrar launcher
@@ -112,14 +144,14 @@ group_About=Sobre
 label_Product=Producto:
 label_Copyright=Copyright \xC2\xA9 {0} {1}
 label_Version=Versión:
-label_GitBranch=Git Branch:
-label_GitCommitHash=Git Commit Hash:
-label_PacketVersion=Packet Version:
-label_BuildDate=Fecha de la build:
-label_BuildTime=Hora de la build:
+label_GitBranch=Rama de Git:
+label_GitCommitHash=Hash de rama de Git:
+label_PacketVersion=Version de paquetes:
+label_BuildDate=Fecha de la compilación:
+label_BuildTime=Hora de la compilación:
 label_Website=Sitio web:
 label_Patreon=Patreon:
-label_CrashesThisWeek=Crashes This Week:
+label_CrashesThisWeek=Crashes esta semana:
 label_Developers=Desarrolladores:
 
 [SettingsWindow]
@@ -135,6 +167,9 @@ tab_Display=Display
 tab_Advanced=Advanced
 tab_NonModHacks=Non-mod Hacks
 tab_Licenses=Licenses
+tab_Language=Lenguaje
+tab_BugFixes=Arreglo de Bugs
+tab_Debug=Depuración
 
 # Labels
 label_Name=Nombre:
@@ -160,9 +195,12 @@ opt_KeepSavedGamesSeparate=Mantener partidas guardadas separadas
 opt_KeepScreenshotsSeparate=Mantener capturas separadas
 opt_SaveCrashDump=Guardar Crash Dump
 opt_CheckForUpdates=Buscar actualizaciones
+opt_Assertions=Aserciones
+opt_DebugMode=Modo Depuración
 opt_TerminateOnCrash=Terminar en cierre inesperados
 opt_VerboseLogging=Registros detallados
 opt_GameOutput=Mostrar output del juego en la consola
+opt_MultithreadedNetworking=Conexión Multihilo
 opt_SCM=SCM
 opt_DisableStoryMode=Desactivar modo historia
 
@@ -173,13 +211,22 @@ tip_InvisibleObjectsFix=Esta opción arregla ciertos objetos siendo tratatos com
 opt_VCTrails=Vice City trails
 tip_VCTrails=Activa los rastros ('trails') en Vice City
 opt_AutoSave=Auto guardado
+opt_SyncAnimations=Sinc. animacions
+opt_AllowDirectConnections=Permitir conexiones directas (compi-a-compi [p2p])
 
 [TestingWindow]
 
-windowTitle=Testing
-label_Message=Please enter the access code below to enable testing builds:
+windowTitle=Pruebas
+label_Message=Por favor, introduzca la contraseña a continuación para habilitar las compilaciones de prueba:
 
 [PasswordWindow]
 
 windowTitle=Contraseña
 label_Message=Introduzca la contraseña del servidor a conectarse:
+
+[PlayerMapWindow]
+
+windowTitle=Mapa de Jugadores
+
+# Menu
+menu_VCStyle=&estilo Vice City
