@@ -14,6 +14,8 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 {
 	m_Type = ELEMENT_PED;
 
+	bool m_isLocalPlayer = false;
+
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 	m_nVehicleSeatIndex = 0;
 	m_MafiaHuman = nullptr;
@@ -22,6 +24,8 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 	m_bExitedVehicleEvent = false;
 	m_bExitingVehicleEvent = false;
 	m_bEnteringVehicleEvent = false;
+
+	CClientVehicle* m_pVehicleEvent = nullptr;
 
 	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
@@ -334,13 +338,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		{
 			if (iAnimTimeLeft > 0)
 			{
-				__asm
-				{
-					push 0
-					mov ecx, IHuman
-					mov eax, 0x57F830 // C_human::Do_Aimed
-					call eax
-				}
+				GetGameHuman()->Do_Aimed();
 			}
 		}
 
@@ -418,12 +416,12 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			{
 				if (IHuman->playersCar == nullptr)
 				{
-					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
 				}
 				else if (pVehicle->GetGameVehicle() != IHuman->playersCar)
 				{
 					RemoveFromVehicle();
-					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
 				}
 			}
 		}
@@ -591,7 +589,9 @@ void CClientHuman::OnCreated(void)
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 	{
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
-		WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+		if (pVehicle != nullptr) {
+			WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+		}
 	}
 
 	CArguments Args(1);
