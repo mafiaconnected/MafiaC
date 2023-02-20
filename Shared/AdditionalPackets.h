@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef WIN32
 #pragma pack(push,1)
-#endif
 
 #define NETGAME_CURRENT_VERSION 1
 #define NETGAME_CURRENT_VERSION_STRING "1"
@@ -167,6 +165,4 @@ struct tVehicleSyncPacket
 	CVector3D rotSpeed;
 };
 
-#ifdef WIN32
 #pragma pack(pop)
-#endif
