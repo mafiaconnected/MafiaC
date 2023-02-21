@@ -25,20 +25,20 @@ private:
 public:
 	CClientHuman(CMafiaClientManager* pClientManager);
 
-	bool m_isLocalPlayer = false;
+	bool m_isLocalPlayer;
 
 	int32_t m_nVehicleNetworkIndex;
 	uint32_t m_nVehicleSeatIndex;
 
-	bool m_bEnteredVehicleEvent = true;
-	bool m_bEnteringVehicleEvent = false;
+	bool m_bEnteredVehicleEvent;
+	bool m_bEnteringVehicleEvent;
 
-	bool m_bExitedVehicleEvent = false;
-	bool m_bExitingVehicleEvent = false;
+	bool m_bExitedVehicleEvent;
+	bool m_bExitingVehicleEvent;
 
 	CVector3D m_vecCamera;
 
-	CClientVehicle* m_pVehicleEvent = nullptr;
+	CClientVehicle* m_pVehicleEvent;
 	
 	Galactic3D::Weak<CClientVehicle> m_pCurrentVehicle;
 
@@ -71,6 +71,7 @@ public:
 
 	virtual void Spawn(const CVector3D& pos, float angle, bool isLocal);
 	virtual void Kill(void);
+	virtual void InstantDeath(void);
 	virtual void Despawn(void);
 
 	virtual bool Create(void);
@@ -88,7 +89,7 @@ public:
 
 	bool IsInVehicle(void);
 	bool IsInVehicle(CClientVehicle* pClientVehicle);
-	bool IsInVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat);
+	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t ucSeat);
 	void EnterVehicle(CClientVehicle* pVehicle, uint8_t ucSeat);
 	void RemoveFromVehicle(void);
 	void ExitVehicle(void);
@@ -98,6 +99,8 @@ public:
 	virtual const GChar* GetModel() override;
 
 	void PlayAnim(const char* animName);
+	void StopAnim();
+
 
 	void Shoot(bool state, const CVector3D& dstPos);
 	void Jump();
@@ -127,4 +130,6 @@ public:
 	void SetBehavior(uint32_t iBehavior);
 
 	virtual void CreateNetBlender() override;
+
+	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 };

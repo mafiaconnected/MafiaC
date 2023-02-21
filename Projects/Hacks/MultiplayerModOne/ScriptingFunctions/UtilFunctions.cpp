@@ -322,67 +322,62 @@ static bool FunctionSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
+// Found on the internet
+inline auto WorldToScreen2(D3DXVECTOR3 pos, float matrix[16], int windowWidth, int windowHeight) -> D3DXVECTOR3
 {
-	CVector3D vecWorld;
-	if (!pState->CheckVector3D(0, vecWorld))
-		return false;
+	D3DXVECTOR3 screen;
 
-	D3DXVECTOR3 out;
-	D3DVIEWPORT9 viewPort;
-	g_pD3DDevice->GetViewport(&viewPort);
-	D3DXVECTOR3 input = D3DXVECTOR3(vecWorld.x, vecWorld.y, vecWorld.z);
-	D3DXMATRIX mProjection, mView, mWorld;
-	g_pD3DDevice->GetTransform(D3DTS_VIEW, &mView);
-	D3DXMatrixIdentity(&mWorld);
-	//m_DirectDevice->GetTransform(D3DTS_WORLD,&mWorld);
-	g_pD3DDevice->GetTransform(D3DTS_PROJECTION, &mProjection);
+	//Matrix-vector Product, multiplying world(eye) coordinates by projection matrix = clipCoords
+	D3DXVECTOR4 clipCoords;
+	clipCoords.x = pos.x*matrix[0] + pos.y*matrix[1] + pos.z*matrix[2] + matrix[3];
+	clipCoords.y = pos.x*matrix[4] + pos.y*matrix[5] + pos.z*matrix[6] + matrix[7];
+	clipCoords.z = pos.x*matrix[8] + pos.y*matrix[9] + pos.z*matrix[10] + matrix[11];
+	clipCoords.w = pos.x*matrix[12] + pos.y*matrix[13] + pos.z*matrix[14] + matrix[15];
 
-	D3DXVec3Project(&out, &input, &viewPort, &mProjection, &mView, &mWorld);
+	if (clipCoords.w < 0.1f)
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	CVector3D vecScreen;
-	vecScreen.x = out.x;
-	vecScreen.y = out.y;
-	vecScreen.z = out.z;
+	//perspective division, dividing by clip.W = Normalized Device Coordinates
+	D3DXVECTOR3 NDC;
+	NDC.x = clipCoords.x / clipCoords.w;
+	NDC.y = clipCoords.y / clipCoords.w;
+	NDC.z = clipCoords.z / clipCoords.w;
 
-	pState->ReturnVector3D(vecScreen);
+	screen.x = (((float)windowWidth) / 2.0f * NDC.x) + (NDC.x + ((float)windowWidth) / 2.0f);
+	screen.y = -(((float)windowHeight) / 2.0f * NDC.y) + (NDC.y + ((float)windowHeight) / 2.0f);
+	screen.z = 0.0f;
+	return screen;
+}
 
-	/*
-	D3DXVECTOR3 origin;
-	origin.x = pos.x;
-	origin.y = pos.y;
-	origin.z = pos.z;
-
-	D3DXMATRIX world;
-	D3DXMatrixIdentity(&world);
+// Mex's Version (working)
+inline auto WorldToScreen1(D3DXVECTOR3 input) -> D3DXVECTOR3
+{
+	uint32_t cam = *(uint32_t*)0x101C4CF8;
+	uint32_t viewProj = cam + 484;
 
 	D3DVIEWPORT9 vp;
-	if (g_pD3DDevice->GetViewport(&vp) != D3D_OK)
+	vp = *(D3DVIEWPORT9*)0x101C5590;
+
+	D3DXMATRIX VIEWPROJ;
+	D3DXMatrixTranspose(&VIEWPROJ, (D3DXMATRIX*)viewProj);
+
+	return WorldToScreen2(input, VIEWPROJ, vp.Width, vp.Height);
+}
+
+static bool FunctionGetScreenFromWorldPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CVector3D pos;
+	if (!pState->CheckVector3D(0, pos))
 		return false;
 
-	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	D3DXVECTOR3 world;
+	world.x = pos.x;
+	world.y = pos.y;
+	world.z = pos.z;
 
-	D3DXMATRIX camMat1 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 356);
-	D3DXMATRIX camMat2 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 484);
-
-	D3DXMATRIX Projection;
-	D3DXMatrixPerspectiveFovLH(&Projection, 0.4f * 3.14f, ((float)vp.Width) / ((float)vp.Height), 1.0f, 1000.0f);
-
-	D3DXMATRIX WVP1 = world * camMat1 * Projection;
-	D3DXMATRIX WVP2 = world * camMat2 * Projection;
-
-	D3DXVECTOR3 screenCoord1(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 screenCoord2(0.0f, 0.0f, 0.0f);
-	D3DXVec3TransformCoord(&screenCoord1, &origin, &WVP1);
-	D3DXVec3TransformCoord(&screenCoord2, &origin, &WVP2);
-
-	CVector3D vecScreen;
-	vecScreen.x = (screenCoord1.x + 0.5f) * (float)vp.Width;
-	vecScreen.y = ((-screenCoord2.y + 1.0f) / 3.0f) * (float)vp.Height;
-	vecScreen.z = 0.0f;
-
-	pState->ReturnVector3D(vecScreen);
-	*/
+	D3DXVECTOR3 screen = WorldToScreen1(world);
+	CVector3D screen2(screen.x, screen.y, screen.z);
+	pState->ReturnVector3D(screen2);
 	return true;
 }
 
@@ -428,7 +423,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 
 		// Compatibility with GTAC
-		//pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix); // TODO
+		pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix, FunctionSetCameraMatrix); // TODO
 		//pGameNamespace->RegisterFunction(_gstr("setCameraMatrix"), _gstr("x"), FunctionSetCameraMatrix, pClientGame); // TODO
 		pGameNamespace->RegisterFunction(_gstr("restoreCamera"), _gstr("|b"), FunctionRestoreCamera);
 		pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv|b"), FunctionSetCameraLookAt);

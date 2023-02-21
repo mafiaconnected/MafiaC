@@ -44,7 +44,7 @@ void CMafiaCHtmlContainer::on_anchor_click(const litehtml::tchar_t* url, const l
 {
 	CArguments Args;
 	Args.AddObject(m_pActiveView);
-	Args.AddObject(GetObjectFromElement((litehtml::element::ptr)el));
+	Args.AddObject(GetObjectFromElement(m_pActiveView, (litehtml::element::ptr)el));
 	Args.AddString(url);
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnGUIAnchorClickEventType->Trigger(Args, bPreventDefault);
@@ -155,10 +155,10 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	m_pTime = nullptr;
 	m_iIcon = IDI_LAUNCHER;
 	m_bD3D9 = true;
-	m_bDebugMode = false;
 	m_bTrainsEnabled = true;
 	m_bSupressNetworkedEntities = false;
 	m_iStopMultiplayerGameReason = -1;
+	m_bReconnectOnDisconnect = false;
 }
 
 CClientGame::~CClientGame(void)
@@ -281,6 +281,9 @@ void CClientGame::InitialiseCVars()
 
 void CClientGame::InitialiseScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
@@ -300,20 +303,20 @@ void CClientGame::InitialiseScripting(void)
 	m_pOnGUIClickEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnGUIClick"), _gstr("Called when a GUIElement is clicked on"), 1);
 
 	// Register MafiaC events here
-	m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
-	m_pOnExampleEventType->m_bCanPreventDefault = true;
-	m_pOnExampleEventType->m_iSource = 0;
-	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"));
-	m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
-	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"));
-	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"));
-	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"));
+	//m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
+	//m_pOnExampleEventType->m_bCanPreventDefault = true;
+	//m_pOnExampleEventType->m_iSource = 0;
+	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, false);
+	//m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
+	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"), 7, true);
+	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, false);
+	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, false);
 
-	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"));
-	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"));
-	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"));
-	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"));
-	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"));
+	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, false);
+	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, false);
+	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, false);
+	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, false);
+	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, false);
 
 	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr, false, false, false, false, false);
 	m_pGalacticFunctions->m_p2D = &m_p2D;
@@ -354,6 +357,9 @@ void CClientGame::InitialiseScripting(void)
 
 void CClientGame::ShutdownScripting(void)
 {
+	if (!m_bFullReload)
+		return;
+
 	if (m_pCmdWindow != nullptr)
 	{
 		delete m_pCmdWindow;
@@ -649,7 +655,7 @@ void CClientGame::OnPostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 void CClientGame::OnPreStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_LastFrameTicks = OS::GetTicks();
 
@@ -664,7 +670,7 @@ void CClientGame::OnPreStartInGame(bool bRestarted)
 
 void CClientGame::OnStartInGame(bool bRestarted)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	bool bMultiplayerInProgress = m_pMultiplayer != nullptr;
 	bool bMultiplayerRestartingGame = false;
@@ -710,7 +716,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 		m_pClientManager->m_pChatWindow = m_pChatWindow;
 		m_pChatWindow->m_dwChatInfoColor = Galactic3D::COLOUR(255, 205, 60, 60);
 
-		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_Version.m_szDisplayVersion);
+		m_pChatWindow->AddInfoMessage(_gstr("%s %s"), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Launcher.m_szTitle, __gstr(LAUNCHER_DISPLAY_VERSION));
 	}
 	else
 	{
@@ -780,7 +786,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 
 void CClientGame::OnEndInGame(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	m_pHtmlContainer->m_Images.clear();
 
@@ -899,7 +905,7 @@ void CClientGame::LoadLobbyResource(void)
 					}
 					else
 					{
-						CString LauncherPath(false, CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherPath.length());
+						CString LauncherPath(false, CHackSupport::m_pInstance->m_LauncherPath.c_str(), CHackSupport::m_pInstance->m_LauncherPath.length());
 						GString ModulePath = LauncherPath;
 						CString Name(false, pszName);
 						PathUtil::AppendPath(ModulePath, Name.CString());
@@ -1330,12 +1336,9 @@ bool CClientGame::Connect(const GString& str, const GChar* pszPassword)
 
 bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword)
 {
-	//_glogprintf(_gstr("ClientGame Connect - Init"));
 	if (GetMultiplayer() != NULL)
 	{
-		//_glogprintf(_gstr("ClientGame Connect - Multiplayer NULL"));
 		StopMultiplayerGame();
-		//MafiaSDK::GetIndicators()->ConsoleAddText("Disconnected from server", 0xFFFFFFFF);
 		m_pChatWindow->AddMessage(_gstr("Disconnected!"), Galactic3D::COLOUR::Red);
 		return false;
 	}
@@ -1347,41 +1350,34 @@ bool CClientGame::Connect(const GChar* pszHost, unsigned short usPort, const GCh
 			return false;
 		}
 	}
-
+	//m_pResourceMgr->ClearAllResources();
 	m_pNewMultiplayer = new CMultiplayer(m_pClientManager, &m_CVars);
 
-	if (m_pNewMultiplayer->InitAsClient())
+	m_pCmdWindow->FlushBuffers();
+	m_pCmdWindow->Disable();
+
+	if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
 	{
-		m_pCmdWindow->FlushBuffers();
-		m_pCmdWindow->Disable();
-
-		if (m_pNewMultiplayer->Connect(pszHost, usPort, pszPassword))
+		if (m_szPreviousHost != pszHost)
 		{
-			if (m_szPreviousHost != pszHost)
-			{
-				m_bPreviousServerExists = true;
-				_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
-				m_usPreviousPort = usPort;
-				if (pszPassword == nullptr)
-					m_szPreviousPassword[0] = '\0';
-				else
-					_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
-			}
-
-			m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
-			m_CVars.Clear();
-
-			return true;
+			m_bPreviousServerExists = true;
+			_gstrlcpy(m_szPreviousHost, pszHost, ARRAY_COUNT(m_szPreviousHost));
+			m_usPreviousPort = usPort;
+			if (pszPassword == nullptr)
+				m_szPreviousPassword[0] = '\0';
+			else
+				_gstrlcpy(m_szPreviousPassword, pszPassword, ARRAY_COUNT(m_szPreviousPassword));
 		}
-		else
-		{
-			m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
-			delete m_pNewMultiplayer;
-			m_pNewMultiplayer = NULL;
-		}
+
+		m_pChatWindow->AddInfoMessage(_gstr("Connecting to %s:%d..."), pszHost, (unsigned int)usPort);
+
+		m_CVars.Clear();
+
+		return true;
 	}
 	else
 	{
+		m_pChatWindow->AddMessage(_gstr("Failed to connect!"), Galactic3D::COLOUR::Red);
 		delete m_pNewMultiplayer;
 		m_pNewMultiplayer = NULL;
 	}
@@ -1421,10 +1417,26 @@ void CClientGame::StopMultiplayerGame(int iReason, bool bPreventRestart)
 			// Clear out CClientManager here
 			m_pResourceMgr->ClearAllResources();
 			m_pClientManager->Clear();
+
+			if (m_pClientManager != nullptr && m_pClientManager->m_pLocalPlayer != nullptr)
+				m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->Despawn();
 		}
 
 		OnEndInGame();
-		MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		//MafiaSDK::GetMission()->MapLoad("FREERIDE");
+
+		OnStartInGame(true);
+
+		if (m_bReconnectOnDisconnect)
+		{
+			m_bReconnectOnDisconnect = false;
+
+			if (m_bPreviousServerExists)
+			{
+				Connect(m_szPreviousHost, m_usPreviousPort, m_szPreviousPassword);
+			}
+		}
 	}
 }
 
@@ -1491,11 +1503,6 @@ bool CClientGame::IsCursorEnabled2(void)
 	if (m_pResourceMgr != nullptr && m_pResourceMgr->IsCursorEnabled())
 		return true;
 	return false;
-}
-
-bool CClientGame::IsDebugMode(void)
-{
-	return m_bDebugMode;
 }
 
 bool CClientGame::DontClipCursor()
@@ -1946,35 +1953,56 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
+	bool bPreventDefault = false;
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
 	//args.AddObject(pClientHumanAttacker);
-	args.AddVector3D(v1);
-	args.AddVector3D(v2);
-	args.AddVector3D(v3);
-	args.AddNumber(hitType);
-	args.AddNumber(damage);
-	args.AddNumber(bodyPart);
-	g_pClientGame->m_pOnHumanHitEventType->Trigger(args);
+	args.AddVector3D(vec1);
+	args.AddVector3D(vec2);
+	args.AddVector3D(vec3);
+	args.AddNumber(uiHitType);
+	args.AddNumber(fDamage);
+	args.AddNumber(uiBodyPart);
+	g_pClientGame->m_pOnHumanHitEventType->Trigger(args, bPreventDefault);
+
+	if (bPreventDefault)
+		return;
 
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		if (pClientHumanTarget->IsLocal() || !pClientHumanTarget->IsSyncer())
-			return;
+		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
+	}
 
-		Packet Packet(MAFIAPACKET_HUMAN_HIT);
-		Packet.Write<int32_t>(pClientHumanTarget->GetId());
-		//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
-		Packet.Write<CVector3D>(v1);
-		Packet.Write<CVector3D>(v2);
-		Packet.Write<CVector3D>(v3);
-		Packet.Write<int32_t>(hitType);
-		Packet.Write<float>(damage);
-		Packet.Write<int32_t>(bodyPart);
-		m_pMultiplayer->SendHostPacket(&Packet);
+	float fOldHealth = pClientHumanTarget->GetHealth();
+	float fNewHealth = fOldHealth - fDamage;
+
+	if (fNewHealth <= 0.0f)
+	{
+		fNewHealth = 0.0f;
+	}
+
+	_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
+
+	pClientHumanTarget->SetHealth(fNewHealth);
+
+	if (fNewHealth <= 0.0f)
+	{
+		pClientHumanTarget->Kill();
+
+		CArguments args;
+		args.AddObject(pClientHumanTarget);
+		//args.AddObject(entityAttacker);
+		g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
+
+		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		if (pMultiplayer != nullptr)
+		{
+			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
+			pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
+		}
 	}
 }
 
@@ -2083,6 +2111,8 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		return m_CVars.GetBoolean(_gstr("Doors"), true);
 	case GAMECOMPONENT_PLANES:
 		return m_CVars.GetBoolean(_gstr("Planes"), true);
+	case GAMECOMPONENT_BIGMAP:
+		return m_CVars.GetBoolean(_gstr("BigMap"), true);
 	default:
 		break;
 	}
@@ -2108,5 +2138,4 @@ void CClientGame::ShowDisconnectReason()
 		_gstr("KICKED")
 	};
 	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
-	//CGTAUtil::ShowHelpMessage("Disconnected");
 }

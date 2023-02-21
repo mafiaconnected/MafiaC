@@ -37,6 +37,7 @@ enum eGameComponent
 	GAMECOMPONENT_DOGS,
 	GAMECOMPONENT_FUELSTATIONS, 
 	GAMECOMPONENT_PLANES,
+	GAMECOMPONENT_BIGMAP,
 };
 
 class CClientPlayer;
@@ -141,7 +142,6 @@ public:
 	C2D m_p2D;
 
 	bool m_bD3D9;
-	bool m_bDebugMode;
 
 	POINT m_OldCursorPos;
 
@@ -211,6 +211,11 @@ public:
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
+	bool m_bReconnectOnDisconnect = false;
+
+	bool m_bFullReload = true;
+	bool m_bDontReloadScripts = false;
+
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
@@ -261,7 +266,6 @@ public:
 	bool IsInputDisabled(void);
 	bool IsCursorEnabled(void);
 	bool IsCursorEnabled2(void);
-	bool IsDebugMode(void);
 	bool UsePlayerInfo();
 
 	bool DontClipCursor();

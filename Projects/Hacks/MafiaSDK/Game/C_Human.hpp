@@ -50,48 +50,51 @@ namespace MafiaSDK
 
     namespace C_Human_Enum
     {
-        enum FunctionsAddresses
-        {
-            Hit = 0x5762A0,
-            Intern_UseCar = 0x57E020,
-            Intern_FromCar = 0x57E500,
-            Intern_ForceDeath = 0x5878D0,
-            RepairWeaponPosition = 0x57E980,
-            ChangeWeaponModel = 0x57EC20,
-            Do_ChangeWeapon = 0x57F550,
-            Do_WeaponDrop = 0x585D90,
-            Use_Actor = 0x582180,
-            Do_Shoot = 0x583590,
-            Do_ThrowGranade = 0x583F40,
-            Do_Reload = 0x585B40,
-            Do_Holster = 0x585C60,
-            Do_Jump = 0x586190,
-            Do_PlayAnim = 0x585E80,
-            Do_ThrowCocotFromCar = 0x587D70,
-            EineMeineKleineAutoInLuft = 0x58A5A0,
-            NewScream = 0x58B470,
-            Intern_ChangeModel = 0x587190,
-            Do_StopAnim = 0x57D2E0,
-            Do_Breath = 0x57D310,
-            Do_Aimed = 0x57F830,
-            Do_Crouched = 0x57F8A0,
-            G_Inventory_Insert = 0x6092B0,
-            G_Inventory_Remove = 0x6095E0,
-            G_Inventory_GetWeaponInRightHand = 0x607B80,
-            G_Inventory_GetWeaponInLeftHand = 0x607BB0,
-            G_Inventory_GetAmmo = 0x609D20,
-            InventoryTruncate = 0x005878D0,
-            Go_Front = 0x0057D360,
-            Go_Back = 0x0057D430,
-            Go_Left = 0x0057D4D0,
-            Go_Right = 0x0057D5A0,
-            Go_FrontLeft = 0x0057D670,
-            Go_FrontRight = 0x0057D860,
-            Go_BackLeft = 0x0057DA50,
-            Go_BackRight = 0x0057DC10,
-            PoseSetPoseAimed = 0x00579EA0,
-            PoseSetPoseNormal = 0x00579630,
-            EraseDynColls = 0x00575ED0
+		enum FunctionsAddresses
+		{
+			Hit = 0x5762A0,
+			Intern_UseCar = 0x57E020,
+			Intern_FromCar = 0x57E500,
+			Intern_ForceDeath = 0x5878D0,
+			RepairWeaponPosition = 0x57E980,
+			ChangeWeaponModel = 0x57EC20,
+			Do_ChangeWeapon = 0x57F550,
+			Do_WeaponDrop = 0x585D90,
+			Use_Actor = 0x582180,
+			Do_Shoot = 0x583590,
+			Do_ThrowGranade = 0x583F40,
+			Do_Reload = 0x585B40,
+			Do_Holster = 0x585C60,
+			Do_Jump = 0x586190,
+			Do_PlayAnim = 0x585E80,
+			Do_ThrowCocotFromCar = 0x587D70,
+			EineMeineKleineAutoInLuft = 0x58A5A0,
+			NewScream = 0x58B470,
+			Intern_ChangeModel = 0x587190,
+			Do_StopAnim = 0x57D2E0,
+			Do_Breath = 0x57D310,
+			Do_Aimed = 0x57F830,
+			Do_Crouched = 0x57F8A0,
+			G_Inventory_Insert = 0x6092B0,
+			G_Inventory_Remove = 0x6095E0,
+			G_Inventory_GetWeaponInRightHand = 0x607B80,
+			G_Inventory_GetWeaponInLeftHand = 0x607BB0,
+			G_Inventory_GetAmmo = 0x609D20,
+			InventoryTruncate = 0x005878D0,
+			Go_Front = 0x0057D360,
+			Go_Back = 0x0057D430,
+			Go_Left = 0x0057D4D0,
+			Go_Right = 0x0057D5A0,
+			Go_FrontLeft = 0x0057D670,
+			Go_FrontRight = 0x0057D860,
+			Go_BackLeft = 0x0057DA50,
+			Go_BackRight = 0x0057DC10,
+			PoseSetPoseAimed = 0x00579EA0,
+			PoseSetPoseNormal = 0x00579630,
+			EraseDynColls = 0x00575ED0,
+			Death = 0x570570,
+			RecompileDeathPos = 0x58B8D0,
+			Do_DeadBodyDrop = 0x58B7E0,
         };
 
         //Thanks for DjBozkosz Documentation
@@ -719,6 +722,36 @@ namespace MafiaSDK
                 call funcAddress
             }
         }
+
+		void Death(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Death;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
+
+		void RecompileDeathPos(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::RecompileDeathPos;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
+
+		void Do_DeadBodyDrop(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Do_DeadBodyDrop;
+			__asm
+			{
+				mov ecx, this
+				call funcAddress
+			}
+		}
     };
 
     namespace C_Human_Hooks

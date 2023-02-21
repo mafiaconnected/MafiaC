@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef WIN32
 #pragma pack(push,1)
-#endif
 
 #define NETGAME_CURRENT_VERSION 1
 #define NETGAME_CURRENT_VERSION_STRING "1"
@@ -117,7 +115,7 @@ struct tMafia2VehicleSyncPacket
 struct tHumanCreatePacket
 {
 	float health;
-	uint32_t vehicleNetworkIndex;
+	int32_t vehicleNetworkIndex;
 	uint32_t seat;
 	bool isCrouching;
 	bool isAiming;
@@ -134,7 +132,7 @@ struct tHumanCreatePacket
 struct tHumanSyncPacket
 {
 	float health;
-	uint32_t vehicleNetworkIndex;
+	int32_t vehicleNetworkIndex;
 	uint32_t seat;
 	bool isCrouching;
 	bool isAiming;
@@ -200,6 +198,4 @@ struct tVehicleSyncPacket
 	CVector3D rotSpeed;
 };
 
-#ifdef WIN32
 #pragma pack(pop)
-#endif

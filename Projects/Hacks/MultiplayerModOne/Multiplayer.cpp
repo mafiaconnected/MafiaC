@@ -1086,32 +1086,38 @@ void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanHit(CClientHuman* target, CClientHuman* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
+void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
+{
+	if (target->IsLocal() || !target->IsSyncer())
+		return;
+
+	Packet Packet(MAFIAPACKET_HUMAN_DIE);
+	Packet.Write<int32_t>(target->GetId());
+	if (attacker != nullptr) {
+		Packet.Write<int32_t>(attacker->GetId());
+	}
+	else 
+	{
+		Packet.Write<int32_t>(INVALID_NETWORK_ID);
+	}
+	Packet.Write<int32_t>(INVALID_NETWORK_ID);
+	SendHostPacket(&Packet);
+}
+
+void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
 
 	Packet Packet(MAFIAPACKET_HUMAN_HIT);
-	//Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
 	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
+	//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
 	Packet.Write<CVector3D>(v1);
 	Packet.Write<CVector3D>(v2);
 	Packet.Write<CVector3D>(v3);
 	Packet.Write<int32_t>(hitType);
 	Packet.Write<float>(damage);
 	Packet.Write<int32_t>(bodyPart);
-	SendHostPacket(&Packet);
-}
-
-void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientHuman* attacker)
-{
-	if (target->IsLocal() || attacker->IsLocal())
-		return;
-
-	Packet Packet(MAFIAPACKET_HUMAN_DIE);
-	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
 	SendHostPacket(&Packet);
 }
 

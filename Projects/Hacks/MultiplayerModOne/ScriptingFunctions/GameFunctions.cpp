@@ -7,6 +7,22 @@
 #include "../Elements/ClientVehicle.h"
 #include <Utils/VectorTools.h>
 
+static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CVector3D pos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CClientEntity* pClientEntity = reinterpret_cast<CClientEntity*>(pClientManager->Create(ELEMENT_ENTITY));
+	pClientEntity->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientEntity);
+	pState->ReturnObject(pClientEntity);
+
+	return true;
+}
+
 static bool FunctionGameCreatePed(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -93,6 +109,12 @@ static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
 	const GChar* mapName = pState->CheckString(0);
 	if (!mapName) return false;
 	UTF8String mapName2(true, mapName);
+
+	bool bFullReload = true;
+	if (!pState->CheckBoolean(1, bFullReload))
+		return false;
+
+	g_pClientGame->m_bFullReload = false;
 
 	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
 	MafiaSDK::GetMission()->MapLoad(mapName2);
@@ -260,6 +282,26 @@ static bool FunctionSetPlayerControl(IScriptState* pState, int argc, void* pUser
 	return true;
 }
 
+static bool FunctionGameSetMoney(IScriptState* pState, int argc, void* pUser)
+{
+	int uiScore = 0;
+	if (!pState->CheckNumber(0, uiScore))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreSet(uiScore);
+	return true;
+}
+
+static bool FunctionGameEnableMoney(IScriptState* pState, int argc, void* pUser)
+{
+	bool bEnabled = false;
+	if (!pState->CheckBoolean(0, bEnabled))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->ScoreOn(bEnabled);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -324,6 +366,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
 
+	pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
+
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
 		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
@@ -351,12 +395,14 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s"), FunctionGameChangeMap, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s|b"), FunctionGameChangeMap, pClientManager);
 
 		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tvfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);

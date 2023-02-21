@@ -1,22 +1,15 @@
 #pragma once
 
-#if GTAC_RMLUI
+#if MAFIAC_RMLUI
 #include <RmlGUI/RmlUi.h>
 
-class CRmlRenderInterface : public CRmlBaseRenderInterface
+class CRmlRwRenderInterface : public CRmlBaseRenderInterface
 {
 public:
-	CRmlRenderInterface(Context* pContext);
-
-	bool m_bScissor;
-	Rml::Vector2i m_vecScissorPos;
-	Rml::Vector2i m_vecScissorSize;
+	CRmlRwRenderInterface(Context* pContext);
 
 	virtual void RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Rml::Vector2f& translation) override;
-
-	virtual void EnableScissorRegion(bool enable) override;
-	virtual void SetScissorRegion(int x, int y, int width, int height) override;
-	void UpdateScissor();
+	virtual void UpdateScissor() override;
 };
 
 class CRmlUi2 : public CRmlUi

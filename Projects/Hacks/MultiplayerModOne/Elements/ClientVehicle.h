@@ -125,4 +125,6 @@ public:
 	virtual void SetFromExistingEntity(MafiaSDK::C_Car* car);
 
 	virtual void CreateNetBlender() override;
+
+	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 };

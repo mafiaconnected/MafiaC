@@ -14,6 +14,8 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 {
 	m_Type = ELEMENT_PED;
 
+	bool m_isLocalPlayer = false;
+
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 	m_nVehicleSeatIndex = 0;
 	m_MafiaHuman = nullptr;
@@ -22,6 +24,8 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 	m_bExitedVehicleEvent = false;
 	m_bExitingVehicleEvent = false;
 	m_bEnteringVehicleEvent = false;
+
+	CClientVehicle* m_pVehicleEvent = nullptr;
 
 	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
@@ -130,7 +134,10 @@ bool CClientHuman::SetHealth(float fHealth)
 		return false;
 
 	GetGameHuman()->GetInterface()->health = fHealth;
-	MafiaSDK::GetIndicators()->PlayerSetWingmanLives((int)(fHealth / 2));
+
+	if (m_isLocalPlayer) {
+		MafiaSDK::GetIndicators()->PlayerSetWingmanLives((int)(fHealth / 2.0f));
+	}
 
 	return true;
 }
@@ -241,6 +248,17 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 void CClientHuman::Kill(void)
 {
 	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
+	// Note (Vortrex): Fixed with new death call, old way is moved to CClientHuman::InstantDeath
+	//GetGameHuman()->Death();
+	GetGameHuman()->Death();
+	GetGameHuman()->RecompileDeathPos();
+	GetGameHuman()->Do_DeadBodyDrop();
+}
+
+void CClientHuman::InstantDeath(void)
+{
+	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
+	// Note (Vortrex): Fixed with new death call
 	GetGameHuman()->Intern_ForceDeath();
 }
 
@@ -320,13 +338,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		{
 			if (iAnimTimeLeft > 0)
 			{
-				__asm
-				{
-					push 0
-					mov ecx, IHuman
-					mov eax, 0x57F830 // C_human::Do_Aimed
-					call eax
-				}
+				GetGameHuman()->Do_Aimed();
 			}
 		}
 
@@ -350,6 +362,9 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	if (GetGameHuman() == nullptr)
 		return false;
+
+	//if (m_isLocalPlayer)
+	//	return false;
 
 	auto IHuman = GetGameHuman()->GetInterface();
 
@@ -401,12 +416,12 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			{
 				if (IHuman->playersCar == nullptr)
 				{
-					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
 				}
 				else if (pVehicle->GetGameVehicle() != IHuman->playersCar)
 				{
 					RemoveFromVehicle();
-					WarpIntoVehicle(pVehicle, 0); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
 				}
 			}
 		}
@@ -574,7 +589,9 @@ void CClientHuman::OnCreated(void)
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 	{
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
-		WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+		if (pVehicle != nullptr) {
+			WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+		}
 	}
 
 	CArguments Args(1);
@@ -661,7 +678,7 @@ int8_t CClientHuman::GetVehicleSeat(void)
 
 void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	GetGameHuman()->Use_Actor((MafiaSDK::C_Actor*)pVehicle->GetGameVehicle(), iSeat, 0, 0);
 
@@ -670,7 +687,7 @@ void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
 
 void CClientHuman::RemoveFromVehicle(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
 		return;
@@ -692,7 +709,7 @@ void CClientHuman::RemoveFromVehicle(void)
 
 void CClientHuman::ExitVehicle(void)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);
 	GetGameHuman()->Use_Actor(GetOccupiedVehicle()->GetGameVehicle(), m_nVehicleSeatIndex, 2, 0);
 
@@ -702,7 +719,7 @@ void CClientHuman::ExitVehicle(void)
 
 bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
 {
-	_glogverboseprintf(__gstr(__FUNCTION__));
+	//_glogverboseprintf(__gstr(__FUNCTION__));
 
 	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
 		return false;
@@ -747,6 +764,13 @@ void CClientHuman::PlayAnim(const char* animName)
 	if (m_MafiaHuman == nullptr) return;
 
 	m_MafiaHuman->Do_PlayAnim(animName);
+}
+
+void CClientHuman::StopAnim()
+{
+	if (m_MafiaHuman == nullptr) return;
+
+	m_MafiaHuman->Do_StopAnim();
 }
 
 void CClientHuman::Shoot(bool state, const CVector3D& dstPos)
@@ -950,4 +974,9 @@ void CClientHuman::CreateNetBlender()
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 20;
 	m_pBlender = pBlender;
+}
+
+void CClientHuman::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
+{
+	GetGameHuman()->ForceAI(value1, value2, value3, value4);
 }

@@ -124,13 +124,12 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 		return;
 	}
 
-
 	// Set the position just a little higher ... some vehicles are spawning halfway into the ground :(
 	CVector3D pos2(pos);
 	pos2.z += 2.5f; // TODO
 	SetPosition(pos2);
 	SetRotation(rot);
-	SetRotationMat(CVecTools::ComputeDirVector(CVecTools::RadToDeg(rot.y)), m_RotationUp, m_RotationRight);
+	SetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
@@ -1116,4 +1115,9 @@ void CClientVehicle::CreateNetBlender()
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
 	m_pBlender = pBlender;
+}
+
+void CClientVehicle::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
+{
+	GetGameVehicle()->ForceAI(value1, value2, value3, value4);
 }

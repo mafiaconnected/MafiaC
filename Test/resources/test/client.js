@@ -87,6 +87,12 @@ addCommandHandler("god", (command, params) => {
 
 // ===========================================================================
 
+addCommandHandler("anim", (command, params) => {
+	localPlayer.addAnimation(params);
+});
+
+// ===========================================================================
+
 addCommandHandler("siren", (command, params) => {
 	if (localPlayer.vehicle == null) {
 		message("You need to be in a vehicle!");

@@ -35,25 +35,27 @@ static void OnGameInit()
 	// We don't want the game to be initialized in menu
 	if (!strcmp(mName, "00menu")) return;
 
-	g_pClientGame->OnPreStartInGame(false);
-	g_pClientGame->OnStartInGame(false);
+	if (g_pClientGame->m_bFullReload) {
+		g_pClientGame->OnPreStartInGame(false);
+		g_pClientGame->OnStartInGame(false);
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
-	if (pMultiplayer != nullptr)
-	{
-		pMultiplayer->Join(); // elements/resources are delayed until this call
-	}
+		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		if (pMultiplayer != nullptr)
+		{
+			pMultiplayer->Join(); // elements/resources are delayed until this call
+		}
 
-	CGameHacks::EnableGameMap(false);
+		CGameHacks::EnableGameMap(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BIGMAP));
 
-	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
+		MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
 
-	if(!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
-		auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
-		auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
+			auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
+			auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
 
-		if (bridge1) bridge1->Shutdown(true);
-		if (bridge2) bridge2->Shutdown(true);
+			if (bridge1) bridge1->Shutdown(true);
+			if (bridge2) bridge2->Shutdown(true);
+		}
 	}
 
 	CArguments Args;
@@ -254,7 +256,7 @@ RAWCODECALL CarUpdate(void)
 	}
 }
 
-RAWCODECALL SceneCreateActor(void)
+MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, DWORD frame)
 {
 	using ObjTypes = MafiaSDK::C_Mission_Enum::ObjectTypes;
 	std::vector<ObjTypes> forbidden_objects = {
@@ -266,105 +268,105 @@ RAWCODECALL SceneCreateActor(void)
 	};
 
 	for (auto forbidden_type : forbidden_objects) {
-		if (g_pSceneCreateActor_Type == forbidden_type && g_pSceneCreateActor_Frame != NULL) {
-			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+		if (type == forbidden_type && frame != NULL) {
+			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 			if (frame_ex)
 				frame_ex->SetOn(false);
-			return;
+			return nullptr;
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Trolley && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Trolley && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Door && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Door && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Pumpar && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Pumpar && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Dog && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Dog && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Plane && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::Plane && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::RailRoute && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::RailRoute && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::InitScript && g_pSceneCreateActor_Frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return;
-			}
-		}
+		//if (type == ObjTypes::InitScript && frame != NULL) {
+		//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+		//		if (frame_ex)
+		//			frame_ex->SetOn(false);
+		//		return nullptr;
+		//	}
+		//}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::Car && g_pSceneCreateActor_Frame != NULL) {
-			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return;
-			}
-		}
+		//if (type == ObjTypes::Car && frame != NULL) {
+		//	if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+		//		if (frame_ex)
+		//			frame_ex->SetOn(false);
+		//		return nullptr;
+		//	}
+		//}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::TrafficSetup && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::TrafficSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 
-		if (g_pSceneCreateActor_Type == ObjTypes::PedestrianSetup && g_pSceneCreateActor_Frame != NULL) {
+		if (type == ObjTypes::PedestrianSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
-				return;
+				return nullptr;
 			}
 		}
 	}
 
-	MafiaSDK::GetMission()->CreateActor(g_pSceneCreateActor_Type);
+	return MafiaSDK::GetMission()->CreateActor(type);
 }
 
 RAWCODECALL HumanSetAimPose(void)
@@ -510,25 +512,8 @@ RAWCODE HookCarUpdate(void)
 }
 
 // Unfinished
-RAWCODE HookSceneCreateActor(void)
+RAWCODE HookSceneCreateActor()
 {
-	_asm
-	{
-		mov g_pSceneCreateActor_Type, ecx
-		mov eax, [esp + 4]
-		mov g_pSceneCreateActor_Frame, eax
-		pushad
-	}
-	g_bCancelSceneCreateActor = false;
-	SceneCreateActor();
-	if (g_bCancelSceneCreateActor)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
 	__asm {
 		push edi
 		push eax
@@ -633,23 +618,22 @@ static void OnLocalPlayerFallDown()
 
 static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1, const S_vector& v2, const S_vector& v3, float damage, MafiaSDK::C_Actor* attacker, unsigned int bodyPart, MafiaSDK::I3D_Frame* targetFrame)
 {
-	//auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
-	//auto entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
+	auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
 
-	//g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	/*
+	auto entityAttacker = nullptr;
 
-	//if (humanTarget->GetHealth() <= 0) {
-	//	CArguments args;
-	//	args.AddObject(humanTarget);
-	//	args.AddObject(entityAttacker);
-	//	g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
-	//
-	//	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
-	//	if (pMultiplayer != nullptr)
-	//	{
-	//		pMultiplayer->SendHumanDeath(humanTarget, entityAttacker);
-	//	}
-	//}
+	if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy || attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Player) {
+		entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
+	}
+	else if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Car) 
+	{
+		entityAttacker = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)attacker);
+		g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+	}
+	*/
+		
+	g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
 
 	return 1;
 }
@@ -784,13 +768,13 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
 
 	// Remove dropped clip
-	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6); 
+	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6);
 
 	// Disable local player weapon drop
-	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6);
 
 	// Disable weapon drops
-	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6); 
+	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6);
 
 	// Game Exit
 	new CHackJumpHack(g_pHack, (void*)0x00612485, (void*)OnGameExit_Hook, 6);
@@ -823,8 +807,8 @@ void CGameHooks::InstallHooks()
 	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
 
 	// Hook SceneCreateActor
-	//new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 6);
-	//g_ReturnSceneCreateActor = (void*)(0x00544AFF + 6);
+	g_ReturnSceneCreateActor = (void*)(0x00544B07);
+	new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 8);
 
 	// Hook Car::Update
 	new CHackJumpHack(g_pHack, (void*)0x41FAC0, HookCarUpdate, 6);
@@ -833,4 +817,17 @@ void CGameHooks::InstallHooks()
 	// Hook I3D_Model::Open
 	new CHackJumpHack(g_pHack, (void*)0x100335A0, HookModelOpen, 5);
 	g_ReturnModelOpen = (void*)(0x100335A0 + 5);
+
+	// (From Mex) To fix the fullscreen game being suspended when using alt+tab
+	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
+	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
+	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
+
+	// Fix bug where window border disappears and bugs out the bottom of the window
+	//DWORD uiOldProt = 0;
+	//DWORD uiOldProt2 = 0;
+	//VirtualProtect((void*)0x1006EA60, 4, PAGE_EXECUTE_READWRITE, &uiOldProt);
+	//uint32_t ui = 0x90CA0000;
+	//new CHackValueHack(g_pHack, (void*)(0x1006EA60), 4, (unsigned char*)&ui);
+	//VirtualProtect((void*)0x1006EA60, 4, uiOldProt, &uiOldProt2);
 }
