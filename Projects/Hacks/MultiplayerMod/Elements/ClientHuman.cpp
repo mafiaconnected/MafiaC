@@ -338,7 +338,13 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 		{
 			if (iAnimTimeLeft > 0)
 			{
-				GetGameHuman()->Do_Aimed();
+				__asm
+				{
+					push 0
+					mov ecx, IHuman
+					mov eax, 0x57F830 // C_human::Do_Aimed
+					call eax
+				}
 			}
 		}
 
