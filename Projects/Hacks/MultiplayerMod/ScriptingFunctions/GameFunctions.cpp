@@ -195,6 +195,28 @@ static bool FunctionGameAnnounce(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionGameCreateSound(IScriptState* pState, int argc, void* pUser)
+{
+	const GChar* msg = pState->CheckString(0);
+	if (!msg) return false;
+	UTF8String message(true, msg);
+
+	int32_t iSoundID = MafiaSDK::GetMission()->GetGame()->CreateStream(message.CString());
+
+	pState->ReturnNumber(iSoundID);
+	return true;
+}
+
+static bool FunctionGamePlaySound(IScriptState* pState, int argc, void* pUser)
+{
+	int32_t iSoundID = 0;
+	if (!pState->CheckNumber(0, iSoundID))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->PlayStream(iSoundID);
+	return true;
+}
+
 static bool FunctionGameShowCountdown(IScriptState* pState, int argc, void* pUser)
 {
 	int8_t flag = 0;
@@ -387,6 +409,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
+		pGameNamespace->RegisterFunction(_gstr("createSound"), _gstr("s"), FunctionGameCreateSound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("playSound"), _gstr("i"), FunctionGamePlaySound, pClientManager);
 	}
 
 	{
