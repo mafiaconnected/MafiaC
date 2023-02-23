@@ -593,14 +593,6 @@ static bool FunctionHumanRemoveFromVehicle(IScriptState* pState, int argc, void*
 	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
 		return false;
 
-	CClientVehicle* pClientVehicle;
-	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
-		return false;
-
-	unsigned char ucSeat;
-	if (!pState->CheckNumber(1, ucSeat))
-		return false;
-
 	if (pClientHuman->GetGameHuman() == nullptr)
 		return pState->Error(_gstr("human not spawned"));
 
@@ -686,7 +678,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("holsterWeapon"), _gstr("t"), FunctionHumanHolsterWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("reloadWeapon"), _gstr("t"), FunctionHumanReloadWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
-	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("t"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionHumanForceAI, pClientManager);
