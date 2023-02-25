@@ -1810,6 +1810,9 @@ void CClientGame::LockControls(bool state)
 		return;
 	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer() == nullptr)
 		return;
+	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->GetInterface()->humanObject.carLeavingOrEntering != nullptr)
+		return;
+
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
