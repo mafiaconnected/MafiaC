@@ -363,7 +363,6 @@ static bool FunctionHumanSetHealth(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	pClientHuman->SetHealth(health);
-
 	return true;
 }
 
@@ -547,6 +546,22 @@ static bool FunctionHumanGetVehicle(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionHumanGetVehicleSeat(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnNumber(pClientHuman->GetVehicleSeat());
+	return true;
+}
+
 static bool FunctionHumanGetAddress(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -664,6 +679,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
 
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("vehicle"), ARGUMENT_OBJECT, FunctionHumanGetVehicle);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("seat"), ARGUMENT_OBJECT, FunctionHumanGetVehicleSeat);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("skin"), ARGUMENT_STRING, FunctionHumanGetSkin, FunctionHumanSetSkin);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationState"), ARGUMENT_INTEGER, FunctionHumanGetAnimationState);
