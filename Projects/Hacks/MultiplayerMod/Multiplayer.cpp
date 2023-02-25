@@ -1106,6 +1106,9 @@ void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 
 void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
+	if (target == nullptr)
+		return;
+
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
 
