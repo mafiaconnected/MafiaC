@@ -273,6 +273,7 @@ void CClientHuman::Despawn(void)
 	{
 		if (IsInVehicle())
 		{
+			GetGameHuman()->EraseDynColls();
 			RemoveFromVehicle();
 		}
 
