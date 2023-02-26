@@ -1023,7 +1023,12 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
 
 bool CClientVehicle::FreeSeat(unsigned char ucSeat)
 {
+	_gassert(ucSeat >= 0 && ucSeat < ARRAY_COUNT(m_pOccupants));
+
 	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	if (ucSeat == -1)
 		return false;
 
 	if (!IsSeatOccupied(ucSeat))

@@ -714,7 +714,7 @@ void CClientHuman::RemoveFromVehicle(void)
 
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 
-	if (pVehicle != nullptr)
+	if (pVehicle != nullptr && m_nVehicleSeatIndex != -1)
 	{
 		pVehicle->FreeSeat(m_nVehicleSeatIndex);
 	}
