@@ -2,8 +2,8 @@
 
 #pragma pack(push,1)
 
-#define NETGAME_CURRENT_VERSION 1
-#define NETGAME_CURRENT_VERSION_STRING "1"
+#define NETGAME_CURRENT_VERSION 2
+#define NETGAME_CURRENT_VERSION_STRING "2"
 
 #include <Multiplayer/Packets.h>
 
