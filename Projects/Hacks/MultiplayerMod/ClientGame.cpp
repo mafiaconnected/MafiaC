@@ -1816,7 +1816,7 @@ void CClientGame::LockControls(bool state)
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
-void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
+void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
 	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
 
@@ -1846,7 +1846,7 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 	pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
@@ -1874,7 +1874,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
+void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
@@ -1904,7 +1904,7 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
@@ -1932,7 +1932,7 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	//pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat)
+void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat)
 {
 	CArguments Args;
 	Args.AddObject(pClientHuman);

@@ -705,15 +705,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_ENTERINGVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -743,15 +743,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_ENTEREDVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -778,15 +778,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_EXITINGVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -813,15 +813,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_EXITEDVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -848,10 +848,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
-			uint32_t nHumanNetworkIndex;
+			int32_t nHumanNetworkIndex;
 			double fHealth;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadDouble(&fHealth, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
@@ -867,13 +867,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_JACKVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -898,10 +898,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_ELEMENT_UPDATE_ID:
 		{
-			uint64_t nLocalElementId;
+			int64_t nLocalElementId;
 			int32_t nServerElementId;
 
-			Reader.ReadUInt64(&nLocalElementId, 1);
+			Reader.ReadInt64(&nLocalElementId, 1);
 			Reader.ReadInt32(&nServerElementId, 1);
 
 			if (nServerElementId != INVALID_NETWORK_ID)

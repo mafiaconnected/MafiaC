@@ -310,7 +310,7 @@ bool CClientVehicle::SetHeading(float heading)
 	m_RotationFront = newRotationFront;
 	m_RotationUp = rotationUp;
 	m_RotationRight = rotationRight;
-	
+
 	UpdateGameMatrix();
 
 	// Disable interpolation
@@ -514,7 +514,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 		}
 	}
 
-	
+
 
 	GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(0);
@@ -990,23 +990,23 @@ bool CClientVehicle::Explode()
 	return true;
 }
 
-bool CClientVehicle::IsSeatOccupied(unsigned char ucSeat)
+bool CClientVehicle::IsSeatOccupied(int8_t iSeat)
 {
-	return GetHumanInSeat(ucSeat) != nullptr;
+	return GetHumanInSeat(iSeat) != nullptr;
 }
 
-CClientHuman* CClientVehicle::GetHumanInSeat(unsigned char ucSeat)
+CClientHuman* CClientVehicle::GetHumanInSeat(int8_t iSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return nullptr;
 
-	if (m_pOccupants[ucSeat] == nullptr)
+	if (m_pOccupants[iSeat] == nullptr)
 		return nullptr;
 
-	return m_pOccupants[ucSeat].GetPointer();
+	return m_pOccupants[iSeat].GetPointer();
 }
 
-bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
+bool CClientVehicle::AssignSeat(CClientHuman* pHuman, int8_t iSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -1014,27 +1014,27 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
 	if (pHuman == nullptr)
 		return false;
 
-	if (IsSeatOccupied(ucSeat))
+	if (IsSeatOccupied(iSeat))
 		return false;
 
-	m_pOccupants[ucSeat] = pHuman;
+	m_pOccupants[iSeat] = pHuman;
 	return true;
 }
 
-bool CClientVehicle::FreeSeat(unsigned char ucSeat)
+bool CClientVehicle::FreeSeat(int8_t iSeat)
 {
-	_gassert(ucSeat >= 0 && ucSeat < ARRAY_COUNT(m_pOccupants));
+	_gassert(iSeat >= 0 && iSeat < ARRAY_COUNT(m_pOccupants));
 
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	if (ucSeat == -1)
+	if (iSeat == -1)
 		return false;
 
-	if (!IsSeatOccupied(ucSeat))
+	if (!IsSeatOccupied(iSeat))
 		return false;
 
-	m_pOccupants[ucSeat] = nullptr;
+	m_pOccupants[iSeat] = nullptr;
 	return true;
 }
 

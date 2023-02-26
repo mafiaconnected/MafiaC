@@ -593,6 +593,8 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.camera = m_vecCamera;
 	Packet.seat = seatId;
 
+	_glogprintf(L"Seat ID: %d", seatId);
+
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
 
@@ -735,7 +737,7 @@ void CClientHuman::ExitVehicle(void)
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 }
 
-bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
+bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -744,16 +746,16 @@ bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSea
 
 	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
 
-	if (!pClientVehicle->IsSeatOccupied(ucSeat))
+	if (!pClientVehicle->IsSeatOccupied(iSeat))
 	{
 		if (IsInVehicle())
 		{
 			RemoveFromVehicle();
 		}
 
-		pClientVehicle->AssignSeat(this, ucSeat);
+		pClientVehicle->AssignSeat(this, iSeat);
 
-		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), ucSeat);
+		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), iSeat);
 	}
 	return true;
 }

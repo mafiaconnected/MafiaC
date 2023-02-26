@@ -590,14 +590,14 @@ static bool FunctionHumanWarpIntoVehicle(IScriptState* pState, int argc, void* p
 	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
 		return false;
 
-	unsigned char ucSeat;
-	if (!pState->CheckNumber(1, ucSeat))
+	int8_t iSeat;
+	if (!pState->CheckNumber(1, iSeat))
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
 		return pState->Error(_gstr("human not spawned"));
 
-	pClientHuman->WarpIntoVehicle(pClientVehicle, ucSeat);
+	pClientHuman->WarpIntoVehicle(pClientVehicle, iSeat);
 	return true;
 }
 
