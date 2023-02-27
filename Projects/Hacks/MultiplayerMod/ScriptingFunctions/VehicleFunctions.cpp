@@ -67,7 +67,7 @@ static bool FunctionVehicleGetOccupants(IScriptState* pState, int argc, void* pU
 		return false;
 
 	auto pArray = new CArgumentArray();
-	for (size_t i = 0; i < 4; i++)
+	for (int8_t i = 0; i < 4; i++)
 	{
 		pArray->AddObject(pClientVehicle->GetHumanInSeat(i));
 	}
@@ -1064,6 +1064,28 @@ static bool FunctionVehicleForceAI(IScriptState* pState, int argc, void* pUser)
 	}
 
 	pClientVehicle->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
+
+	return true;
+}
+
+static bool FunctionVehicleTest(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiValue1;
+	if (!pState->CheckNumber(0, uiValue1))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
 
 	return true;
 }

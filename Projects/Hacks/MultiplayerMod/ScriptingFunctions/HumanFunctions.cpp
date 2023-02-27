@@ -363,7 +363,6 @@ static bool FunctionHumanSetHealth(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	pClientHuman->SetHealth(health);
-
 	return true;
 }
 
@@ -547,6 +546,22 @@ static bool FunctionHumanGetVehicle(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionHumanGetVehicleSeat(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnNumber(pClientHuman->GetVehicleSeat());
+	return true;
+}
+
 static bool FunctionHumanGetAddress(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -575,14 +590,14 @@ static bool FunctionHumanWarpIntoVehicle(IScriptState* pState, int argc, void* p
 	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
 		return false;
 
-	unsigned char ucSeat;
-	if (!pState->CheckNumber(1, ucSeat))
+	int8_t iSeat;
+	if (!pState->CheckNumber(1, iSeat))
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
 		return pState->Error(_gstr("human not spawned"));
 
-	pClientHuman->WarpIntoVehicle(pClientVehicle, ucSeat);
+	pClientHuman->WarpIntoVehicle(pClientVehicle, iSeat);
 	return true;
 }
 
@@ -591,14 +606,6 @@ static bool FunctionHumanRemoveFromVehicle(IScriptState* pState, int argc, void*
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 	CClientHuman* pClientHuman;
 	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
-		return false;
-
-	CClientVehicle* pClientVehicle;
-	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
-		return false;
-
-	unsigned char ucSeat;
-	if (!pState->CheckNumber(1, ucSeat))
 		return false;
 
 	if (pClientHuman->GetGameHuman() == nullptr)
@@ -672,6 +679,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionHumanGetHeading, FunctionHumanSetHeading);
 
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("vehicle"), ARGUMENT_OBJECT, FunctionHumanGetVehicle);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("seat"), ARGUMENT_OBJECT, FunctionHumanGetVehicleSeat);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("skin"), ARGUMENT_STRING, FunctionHumanGetSkin, FunctionHumanSetSkin);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationState"), ARGUMENT_INTEGER, FunctionHumanGetAnimationState);
@@ -686,7 +694,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("holsterWeapon"), _gstr("t"), FunctionHumanHolsterWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("reloadWeapon"), _gstr("t"), FunctionHumanReloadWeapon, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("warpIntoVehicle"), _gstr("tvi"), FunctionHumanWarpIntoVehicle, pClientManager);
-	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("tvi"), FunctionHumanRemoveFromVehicle, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("removeFromVehicle"), _gstr("t"), FunctionHumanRemoveFromVehicle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("addAnimation"), _gstr("ts"), FunctionHumanPlayAnim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionHumanForceAI, pClientManager);

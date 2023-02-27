@@ -105,10 +105,10 @@ public:
 	virtual bool SetLocked(bool state);
 	virtual bool GetLocked();
 
-	virtual CClientHuman* GetHumanInSeat(unsigned char ucSeat);
-	virtual bool IsSeatOccupied(unsigned char ucSeat);
-	virtual bool AssignSeat(CClientHuman* pHuman, unsigned char ucSeat);
-	virtual bool FreeSeat(unsigned char ucSeat);
+	virtual CClientHuman* GetHumanInSeat(int8_t iSeat);
+	virtual bool IsSeatOccupied(int8_t iSeat);
+	virtual bool AssignSeat(CClientHuman* pHuman, int8_t iSeat);
+	virtual bool FreeSeat(int8_t iSeat);
 
 	virtual bool SetSiren(bool state);
 	virtual bool GetSiren();
