@@ -329,23 +329,23 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 			}
 		}
 
-		//if (type == ObjTypes::InitScript && frame != NULL) {
-		//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
-		//		if (frame_ex)
-		//			frame_ex->SetOn(false);
-		//		return nullptr;
-		//	}
-		//}
+		if (type == ObjTypes::InitScript && frame != NULL) {
+			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return nullptr;
+			}
+		}
 
-		//if (type == ObjTypes::Car && frame != NULL) {
-		//	if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-		//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
-		//		if (frame_ex)
-		//			frame_ex->SetOn(false);
-		//		return nullptr;
-		//	}
-		//}
+		if (type == ObjTypes::Car && frame != NULL) {
+			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				if (frame_ex)
+					frame_ex->SetOn(false);
+				return nullptr;
+			}
+		}
 
 		if (type == ObjTypes::TrafficSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
@@ -771,10 +771,10 @@ void CGameHooks::InstallHooks()
 	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6);
 
 	// Disable local player weapon drop
-	//new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6);
+	new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6);
 
 	// Disable weapon drops
-	//new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6);
+	new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6);
 
 	// Game Exit
 	new CHackJumpHack(g_pHack, (void*)0x00612485, (void*)OnGameExit_Hook, 6);
