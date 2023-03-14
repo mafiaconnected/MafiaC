@@ -21,8 +21,16 @@ namespace MafiaSDK
 {
 	struct C_Camera_Interface
 	{
-		I3D_Frame cameraFrame;
+		I3D_Frame cameraFrame;									// 0-4
+		PADDING(C_Camera_Interface, _pad0, 0x160);
+		S_matrix matrix1;										// 356-420
+		S_matrix matrix2;										// 420-484
+		S_matrix matrix3;										// 484-548
+		S_matrix matrix4;										// 548-612
 	};
+
+	//const size_t Offset = offsetof(C_Camera_Interface, matrix4);
+	//const size_t Size = sizeof(C_Camera_Interface::matrix4);
 
 	namespace C_Camera_Enum
 	{

@@ -21,32 +21,39 @@ namespace MafiaSDK
 {
     struct C_Human_Interface
     {
-        C_Entity_Interface entity;
+        C_Entity_Interface entity;								// 0-108
         PADDING(C_Human_Interface, _pad0, 0x4);
-        byte animStateLocal;
-        byte isInAnimWithCarLocal;
+        byte animStateLocal;									// 112-113
+        byte isInAnimWithCarLocal;								// 113-114
         PADDING(C_Human_Interface, _pad1, 0x2);
-        byte animState;
-        byte isInAnimWithCar;
+        byte animState;											// 116-117
+        byte isInAnimWithCar;									// 117-118
         PADDING(C_Human_Interface, _pad2, 0x22);
-        C_Car* playersCar;
-        C_Car* carLeavingOrEntering;
+        C_Car* playersCar;										// 152-156
+        C_Car* carLeavingOrEntering;							// 156-160
         PADDING(C_Human_Interface, _pad3, 0x144);
-        bool isDucking;
-        bool isAiming;
+        bool isDucking;											// 484-485
+        bool isAiming;											// 485-486
         PADDING(C_Human_Interface, _pad4, 0x6);
-        bool isShooting;
+        bool isShooting;										// 492-493
         PADDING(C_Human_Interface, _pad4b, 0x0F);
-        bool isReloading;
+        bool isReloading;										// 508-509
         PADDING(C_Human_Interface, _pad5, 0x11B);
-        I3D_Frame * neckFrame;
+        I3D_Frame * neckFrame;									// 792-796
         PADDING(C_Human_Interface, _pad6, 0x164);
-        G_Inventory inventory;
+        G_Inventory inventory;									// 1152-1280
         PADDING(C_Human_Interface, _pad7, 0xF4);
-        float inCarRotation;
+        float inCarRotation;									// 1524-1528
         PADDING(C_Human_Interface, _pad8, 0x4C);
-        float health;
+        float health;											// 1604-1608
+		PADDING(C_Human_Interface, _pad9, 0x434);
+		S_vector pose;											// 2684-2696
+		PADDING(C_Human_Interface, _pad10, 0x4C);
+		int32_t animTimeLeft;									// 2772-2776
     };
+
+	//const size_t Offset = offsetof(C_Human_Interface, animTimeLeft);
+	//const size_t Size = sizeof(C_Human_Interface::animTimeLeft);
 
     namespace C_Human_Enum
     {
@@ -92,9 +99,9 @@ namespace MafiaSDK
 			PoseSetPoseAimed = 0x00579EA0,
 			PoseSetPoseNormal = 0x00579630,
 			EraseDynColls = 0x00575ED0,
-			Death = 0x570570,
-			RecompileDeathPos = 0x58B8D0,
-			Do_DeadBodyDrop = 0x58B7E0,
+			Death = 0x00570570,
+			RecompileDeathPos = 0x0058B8D0,
+			Do_DeadBodyDrop = 0x0058B7E0,
         };
 
         //Thanks for DjBozkosz Documentation
@@ -339,7 +346,7 @@ namespace MafiaSDK
 
         void Do_StopAnim(void)
         {
-            unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Do_PlayAnim;
+            unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Do_StopAnim;
 
 
             __asm
@@ -752,6 +759,20 @@ namespace MafiaSDK
 				call funcAddress
 			}
 		}
+
+		void Do_Aimed(void)
+		{
+			unsigned long funcAddress = C_Human_Enum::FunctionsAddresses::Do_Aimed;
+			__asm
+			{
+				push 0
+				mov ecx, this
+				mov eax, funcAddress // C_human::Do_Aimed
+				call eax
+			}
+		}
+
+
     };
 
     namespace C_Human_Hooks

@@ -20,57 +20,59 @@
 namespace MafiaSDK
 {
     struct C_Vehicle_Interface {
-        PADDING(C_Vehicle_Interface, _pad0, 0x1B4);
-        float engine_health;
-        PADDING(C_Vehicle_Interface, _pad1, 0x34);
-        float health;
-        PADDING(C_Vehicle_Interface, _pad2, 0x28);
-        DWORD first_mesh;
-        DWORD last_mesh;
-        PADDING(C_Vehicle_Interface, _pad4, 0x100);
-        S_vector position;
-        PADDING(C_Vehicle_Interface, _pad5, 0xF4);
-        S_vector rot_speed;
-        PADDING(C_Vehicle_Interface, _pad6, 0x4);
-        bool horn;
-        bool siren;
-        bool sound_enabled;
-        float hand_break;
-        PADDING(C_Vehicle_Interface, _pad10, 0x6C);
-        float speed_limit;
-        PADDING(C_Vehicle_Interface, _pad11, 0x98);
-        float accelerating;
-        PADDING(C_Vehicle_Interface, _pad12, 0x4);
-        float engine_rpm;
-        PADDING(C_Vehicle_Interface, _pad13, 0x14);
-        DWORD gear;
-        PADDING(C_Vehicle_Interface, _pad14, 0x54);
-        float break_val;
-        PADDING(C_Vehicle_Interface, _pad15, 0x24);
-        float clutch;
-        PADDING(C_Vehicle_Interface, _pad16, 0x40);
-        float wheel_angle;
-        PADDING(C_Vehicle_Interface, _pad17, 0x604);
-        bool engine_on;
-        float fuel;
-        PADDING(C_Vehicle_Interface, _pad19, 0x8);
-        S_vector rot_forward;
-        S_vector rot_right;
-        S_vector rot_up;
-        PADDING(C_Vehicle_Interface, _pad20, 0x1330);
-        S_vector speed;
-        PADDING(C_Vehicle_Interface, _pad21, 0xC8);
-        bool lights;
+		PADDING(C_Vehicle_Interface, _pad0, 0x68);
+		bool roof;												// 104-105 - Needs more testing
+		PADDING(C_Vehicle_Interface, _pad1, 0x14B);
+		float engine_health;									// 436-440
+		PADDING(C_Vehicle_Interface, _pad2, 0x34);
+		float health;											// 492-496
+		PADDING(C_Vehicle_Interface, _pad3, 0x28);
+		DWORD first_mesh;										// 536-540
+		DWORD last_mesh;										// 540-544
+		PADDING(C_Vehicle_Interface, _pad4, 0x100);
+		S_vector position;										// 800-812
+		PADDING(C_Vehicle_Interface, _pad5, 0xF4);
+		S_vector rot_speed;										// 1056-1068
+		PADDING(C_Vehicle_Interface, _pad6, 0x4);
+		bool horn;												// 1072-1073
+		bool siren;												// 1073-1074
+		bool sound_enabled;										// 1074-1075
+		float hand_break;										// 1076-1080
+		PADDING(C_Vehicle_Interface, _pad10, 0x6C);
+		float speed_limit;										// 1188-1192
+		PADDING(C_Vehicle_Interface, _pad11, 0x98);
+		float accelerating;										// 1344-1348
+		PADDING(C_Vehicle_Interface, _pad12, 0x4);
+		float engine_rpm;										// 1352-1356
+		PADDING(C_Vehicle_Interface, _pad13, 0x14);
+		DWORD gear;												// 1376-1380
+		PADDING(C_Vehicle_Interface, _pad14, 0x54);
+		float break_val;										// 1464-1468
+		PADDING(C_Vehicle_Interface, _pad15, 0x24);
+		float clutch;											// 1504-1508
+		PADDING(C_Vehicle_Interface, _pad16, 0x40);
+		float wheel_angle;										// 1572-1576
+		PADDING(C_Vehicle_Interface, _pad17, 0x604);
+		bool engine_on;											// 3116-3117  
+		float fuel;												// 3120-3124
+		PADDING(C_Vehicle_Interface, _pad19, 0x8);
+		S_vector rot_forward;
+		S_vector rot_right;
+		S_vector rot_up;
+		PADDING(C_Vehicle_Interface, _pad20, 0x1330);
+		S_vector speed;
+		PADDING(C_Vehicle_Interface, _pad21, 0xC8);
+		bool lights;
     };
 
     //const size_t Offset = offsetof(C_Vehicle_Interface, lights);
-    //const size_t Offset = offsetof(C_Vehicle_Interface, siren);
+	//const size_t Size = sizeof(C_Vehicle_Interface::lights);
 
     namespace C_Vehicle_Enum
     {
         enum FunctionsAddresses
         {
-
+			
         };
     };
 
