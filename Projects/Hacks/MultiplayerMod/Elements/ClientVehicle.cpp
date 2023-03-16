@@ -453,6 +453,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	GChar szModel[64];
 	wmemset(szModel, _gstr('\0'), 64);
 	wmemcpy(szModel, m_szModel, 64);
+
 	CVector3D vecPos = m_Position;
 	CVector3D vecRot = m_Rotation;
 
@@ -468,13 +469,11 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	}
 
 	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
-
 	CQuaternion quatInitialRotation(0,0,0,1);
 	pBlender->SetTargetPosition(vecPos);
 	pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 	pBlender->SetTargetRotationQuat(quatInitialRotation);
 	pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
-
 	pBlender->ResetInterpolation();
 
 	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
@@ -484,35 +483,19 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	pGameVehicle->engine_health = Packet.engineHealth;
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
-	m_Horn = Packet.horn;
-	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
 	pGameVehicle->speed_limit = Packet.speedLimit;
 	pGameVehicle->clutch = Packet.clutch;
+	pGameVehicle->gear = Packet.gear;
+	pGameVehicle->siren = Packet.siren;
+	pGameVehicle->lights = Packet.lights;
 
-	SetLights(Packet.lights);
-	SetSiren(Packet.siren);
+	SetEngine(Packet.engineOn, true);
 
-	//if (gear != IVehicle.gear) {
-	//	GetGameVehicle()->SetGear(gear);
-	//}
-
-	if (Packet.engineOn)
-	{
-		if (!GetEngine())
-		{
-			SetEngine(true, true);
-		}
-	}
-	else
-	{
-		if (!pGameVehicle->engine_on)
-		{
-			SetEngine(false, true);
-		}
-	}
+	m_Horn = Packet.horn;
+	m_EngineRPM = Packet.rpm;
 
 	GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(0);
@@ -551,14 +534,8 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	pGameVehicle->engine_health = Packet.engineHealth;
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
-	//pGameVehicle->engine_on = Packet.engineOn;
-	//pGameVehicle->horn = Packet.horn;
-	m_Horn = Packet.horn;
 	pGameVehicle->siren = Packet.siren;
 	pGameVehicle->lights = Packet.lights;
-	//pGameVehicle->gear = Packet.gear;
-	//pGameVehicle->engine_rpm = Packet.rpm;
-	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
@@ -580,11 +557,14 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	}
 	else
 	{
-		if (!pGameVehicle->engine_on)
+		if (GetEngine())
 		{
 			SetEngine(false, true);
 		}
 	}
+
+	m_EngineRPM = Packet.rpm;
+	m_Horn = Packet.horn;
 
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
@@ -648,10 +628,6 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.wheelAngle = IVehicle.wheel_angle;
 	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
 	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
-
-	if (Packet.engineOn == true) {
-		GetGameVehicle()->SetEngineOn(true, true);
-	}
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
