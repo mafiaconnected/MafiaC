@@ -503,18 +503,16 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	{
 		if (!GetEngine())
 		{
-			SetEngine(true);
+			SetEngine(true, true);
 		}
 	}
 	else
 	{
 		if (!pGameVehicle->engine_on)
 		{
-			SetEngine(false);
+			SetEngine(false, true);
 		}
 	}
-
-
 
 	GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(0);
@@ -577,14 +575,14 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	{
 		if (!GetEngine())
 		{
-			SetEngine(true);
+			SetEngine(true, true);
 		}
 	}
 	else
 	{
 		if (!pGameVehicle->engine_on)
 		{
-			SetEngine(false);
+			SetEngine(false, true);
 		}
 	}
 
@@ -652,7 +650,7 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
 
 	if (Packet.engineOn == true) {
-		GetGameVehicle()->SetEngineOn(true, 2);
+		GetGameVehicle()->SetEngineOn(true, true);
 	}
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
@@ -787,7 +785,7 @@ bool CClientVehicle::SetGear(uint32_t gear)
 		return false;
 
 	m_MafiaVehicle->GetInterface()->vehicle_interface.gear = gear;
-
+	GetGameVehicle()->GearSnd();
 	return true;
 }
 
@@ -914,7 +912,8 @@ bool CClientVehicle::SetRoof(bool state)
 		return false;
 
 	//m_MafiaVehicle->GetInterface()->vehicle_interface.roof = state;
-	return false;
+	//m_MafiaVehicle->Do_Roof(state);
+	return true;
 }
 
 bool CClientVehicle::GetRoof()
@@ -922,8 +921,8 @@ bool CClientVehicle::GetRoof()
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	//return m_MafiaVehicle->GetInterface()->vehicle_interface.roof;
-	return false;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.roof;
+	//return false;
 }
 
 bool CClientVehicle::SetLocked(bool state)
@@ -963,12 +962,13 @@ bool CClientVehicle::GetLights()
 	return pVehicleInterface->lights;
 }
 
-bool CClientVehicle::SetEngine(bool state)
+bool CClientVehicle::SetEngine(bool state, bool unknown1 = true)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->SetEngineOn(state, 1);
+	m_MafiaVehicle->SetEngineOn(state, unknown1);
+	//m_MafiaVehicle->GetInterface()->vehicle_interface.sound_enabled = state;
 	return true;
 }
 
