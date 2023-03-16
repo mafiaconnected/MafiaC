@@ -340,7 +340,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Car && frame != NULL) {
 			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)g_pSceneCreateActor_Frame;
+				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
