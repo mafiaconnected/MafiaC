@@ -604,9 +604,13 @@ void CClientHuman::OnCreated(void)
 
 void CClientHuman::Process(void)
 {
+	//if (IsInVehicle()) {
+	//	GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
+	//}
+	
 	GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
 
-	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
+	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr && !IsInVehicle())
 	{
 		m_pBlender->Interpolate();
 	}
@@ -764,11 +768,12 @@ const GChar* CClientHuman::GetModel()
 	return CClientEntity::GetModel();
 }
 
-void CClientHuman::PlayAnim(const char* animName)
+void CClientHuman::PlayAnim(const GChar* animName)
 {
 	if (m_MafiaHuman == nullptr) return;
-
-	m_MafiaHuman->Do_PlayAnim(animName);
+	
+	UTF8String anim(true, animName);
+	m_MafiaHuman->Do_PlayAnim(anim);
 }
 
 void CClientHuman::StopAnim()
