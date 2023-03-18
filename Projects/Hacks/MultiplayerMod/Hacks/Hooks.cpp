@@ -44,18 +44,18 @@ static void OnGameInit()
 		{
 			pMultiplayer->Join(); // elements/resources are delayed until this call
 		}
+	}
 
-		CGameHacks::EnableGameMap(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BIGMAP));
+	CGameHacks::EnableGameMap(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BIGMAP));
 
-		MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
+	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC));
 
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
-			auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
-			auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
+	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_BRIDGES)) {
+		auto bridge1 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("LLsklap01");
+		auto bridge2 = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName("sklapx01");
 
-			if (bridge1) bridge1->Shutdown(true);
-			if (bridge2) bridge2->Shutdown(true);
-		}
+		if (bridge1) bridge1->Shutdown(true);
+		if (bridge2) bridge2->Shutdown(true);
 	}
 
 	CArguments Args;
@@ -64,6 +64,9 @@ static void OnGameInit()
 	g_pClientGame->m_pOnMapLoadedEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault)
 		return;
+
+	// Set full reload for next time (script can disable for map change)
+	g_pClientGame->m_bFullReload = true;
 }
 
 static void OnGameExit()
@@ -264,7 +267,15 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		//ObjTypes::Dog,
 		ObjTypes::Enemy,
 		//ObjTypes::Pumpar,
-		ObjTypes::Player
+		ObjTypes::Player,
+		ObjTypes::GhostObject,
+		ObjTypes::Detector,
+		ObjTypes::Bottle,
+		ObjTypes::Clocks,
+		ObjTypes::RaceCamera,
+		ObjTypes::SpecialIDK,
+		ObjTypes::Truck,
+		ObjTypes::Wagons,
 	};
 
 	for (auto forbidden_type : forbidden_objects) {
@@ -366,7 +377,9 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		}
 	}
 
-	return MafiaSDK::GetMission()->CreateActor(type);
+	// Grab model from frame with g_umapModelNames[frame]
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
+	return actor;
 }
 
 RAWCODECALL HumanSetAimPose(void)
