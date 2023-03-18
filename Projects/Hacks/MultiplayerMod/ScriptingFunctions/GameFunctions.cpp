@@ -344,6 +344,119 @@ static bool FunctionGameEnableMoney(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionGameSetDoorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iState1 = false;
+	if (!pState->CheckNumber(1, iState1))
+		return false;
+
+	bool bState2 = false;
+	if (!pState->CheckBoolean(2, bState2))
+		return false;
+
+	bool bState3 = false;
+	if (!pState->CheckBoolean(3, bState3))
+		return false;
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	actor->SetState((MafiaSDK::C_Door_Enum::States)iState1, MafiaSDK::GetMission()->GetGame()->GetLocalPlayer(), bState2, bState3);
+	return true;
+}
+
+static bool FunctionGameGetDoorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->current_state);
+	return true;
+}
+
+static bool FunctionGameGetDoorOpenAngle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->open_angle);
+	return true;
+}
+
+static bool FunctionGameGetDoorOpenDirection(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->open_direction);
+	return true;
+}
+
+static bool FunctionGameSetDoorOpenAngle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	float fAngle = false;
+	if (!pState->CheckNumber(1, fAngle))
+		return false;
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	actor->SetOpenAngle(fAngle);
+	return true;
+}
+
+static bool FunctionGameSetActorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	bool bActive = false;
+	if (!pState->CheckBoolean(1, bActive))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->SetActive(bActive);
+	return true;
+}
+
+static bool FunctionGameSetActorActState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iState = false;
+	if (!pState->CheckNumber(1, iState))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->SetActState(iState);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -443,6 +556,15 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
+	}
+
+	{
+		pGameNamespace->RegisterFunction(_gstr("getDoorState"), _gstr("s"), FunctionGameGetDoorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("getDoorOpenAngle"), _gstr("s"), FunctionGameGetDoorOpenAngle, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setDoorState"), _gstr("sibb"), FunctionGameSetDoorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("sb"), FunctionGameSetActorActState, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
