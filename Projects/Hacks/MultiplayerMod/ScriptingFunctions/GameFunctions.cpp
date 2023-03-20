@@ -564,7 +564,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("setDoorState"), _gstr("sibb"), FunctionGameSetDoorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("sb"), FunctionGameSetActorActState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("si"), FunctionGameSetActorActState, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
