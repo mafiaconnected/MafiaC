@@ -309,6 +309,23 @@ static bool FunctionHumanGetAnimationStateLocal(IScriptState* pState, int argc, 
 	return true;
 }
 
+static bool FunctionHumanGetAnimationTimeLeft(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnNumber(pClientHuman->GetGameHuman()->GetInterface()->animTimeLeft);
+
+	return true;
+}
+
 static bool FunctionHumanIsShooting(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -504,7 +521,7 @@ static bool FunctionHumanShootAt(IScriptState* pState, int argc, void* pUser)
 	return false;
 }
 
-static bool FunctionHumanStopShootingAt(IScriptState* pState, int argc, void* pUser)
+static bool FunctionHumanAimAt(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
@@ -707,6 +724,54 @@ static bool FunctionHumanGetCrouching(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
+static bool FunctionHumanGetReloading(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnBoolean(pClientHuman->GetGameHuman()->GetInterface()->isReloading);
+	return false;
+}
+
+static bool FunctionHumanGetAiming(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnBoolean(pClientHuman->GetGameHuman()->GetInterface()->isAiming);
+	return false;
+}
+
+static bool FunctionHumanGetPose(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(pClientHuman->GetGameHuman()->GetInterface()->pose));
+	return false;
+}
+
 static bool FunctionHumanSetCrouching(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -873,6 +938,42 @@ static bool FunctionHumanMoveBackwardRight(IScriptState* pState, int argc, void*
 		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->GetGameHuman()->Go_BackRight();
+	
+	return false;
+}
+
+static bool FunctionHumanIdle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pClientHuman->GetGameHuman()->GetInterface()->animState = 1;
+	pClientHuman->GetGameHuman()->GetInterface()->animStateLocal = 1;
+
+	return false;
+}
+
+static bool FunctionHumanPunch(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	//pClientHuman->GetGameHuman()->Hit();
+
 	return false;
 }
 
@@ -973,9 +1074,9 @@ static bool FunctionHumanForceAI(IScriptState* pState, int argc, void* pUser)
 		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->ForceAI(uiValue1, uiValue2, uiValue3, uiValue4);
-
 	return true;
 }
+
 #pragma endregion
 
 void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
@@ -992,9 +1093,13 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("skin"), ARGUMENT_STRING, FunctionHumanGetSkin, FunctionHumanSetSkin);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionHumanGetHealth, FunctionHumanSetHealth);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationState"), ARGUMENT_INTEGER, FunctionHumanGetAnimationState);
-	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationStateLocal"), ARGUMENT_INTEGER, FunctionHumanGetAnimationStateLocal);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationStateLocal"), ARGUMENT_INTEGER, FunctionHumanGetAnimationStateLocal); 
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("animationTimeLeft"), ARGUMENT_INTEGER, FunctionHumanGetAnimationTimeLeft);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("shooting"), ARGUMENT_BOOLEAN, FunctionHumanIsShooting);
 	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("crouching"), ARGUMENT_BOOLEAN, FunctionHumanGetCrouching, FunctionHumanSetCrouching);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("reloading"), ARGUMENT_BOOLEAN, FunctionHumanGetReloading);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("aiming"), ARGUMENT_BOOLEAN, FunctionHumanGetAiming);
+	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("pose"), ARGUMENT_VECTOR3D, FunctionHumanGetPose);
 
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("clearWeapons"), _gstr("t"), FunctionHumanClearWeapons, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("giveWeapon"), _gstr("tiii"), FunctionHumanGiveWeapon, pClientManager);
@@ -1011,7 +1116,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setBehavior"), _gstr("ti"), FunctionHumanSetBehavior, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionHumanForceAI, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("shootAt"), _gstr("tv"), FunctionHumanShootAt, pClientManager);
-	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("stopShootingAt"), _gstr("tv"), FunctionHumanStopShootingAt, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("aimAt"), _gstr("tv"), FunctionHumanAimAt, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveForward"), _gstr("tb"), FunctionHumanMoveForward, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveBackward"), _gstr("t"), FunctionHumanMoveBackward, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveLeft"), _gstr("tb"), FunctionHumanMoveLeft, pClientManager);
@@ -1020,6 +1125,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveForwardRight"), _gstr("tb"), FunctionHumanMoveForwardRight, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveBackLeft"), _gstr("t"), FunctionHumanMoveBackwardLeft, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveBackRight"), _gstr("t"), FunctionHumanMoveBackwardRight, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("idle"), _gstr("tw"), FunctionHumanIdle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("jump"), _gstr("t"), FunctionHumanJump, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("aim"), _gstr("t"), FunctionHumanAim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("breath"), _gstr("t"), FunctionHumanBreath, pClientManager);

@@ -16,7 +16,6 @@
 
 using namespace Galactic3D;
 
-bool g_bTrafficEnabled = false;
 std::unordered_map<uint32_t, std::string> g_umapModelNames;
 
 extern decltype(Direct3DCreate9)* g_pDirect3DCreate9;

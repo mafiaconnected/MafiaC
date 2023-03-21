@@ -28,6 +28,9 @@ namespace MafiaSDK
 		C_Vehicle_Interface	vehicle_interface;
 	};
 
+	//const size_t Offset = offsetof(C_Car_Interface, vehicle_interface);
+	//const size_t Size = sizeof(C_Car_Interface::vehicle_interface);
+
 	namespace C_Car_Enum
 	{
 		enum FunctionsAddresses

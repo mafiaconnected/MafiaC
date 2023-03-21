@@ -1208,7 +1208,7 @@ static bool FunctionVehicleGetAddress(IScriptState* pState, int argc, void* pUse
 		return false;
 	}
 
-	pState->ReturnNumber((uint32_t)pClientVehicle->GetGameVehicle());
+	pState->ReturnNumber((uint32_t)pClientVehicle->GetGameVehicle()+offsetof(MafiaSDK::C_Car_Interface, vehicle_interface));
 	return true;
 }
 
@@ -1292,6 +1292,6 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 
 	// Debug
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
-	//pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getTest"), _gstr("t"), FunctionVehicleGetTest, pClientManager);
 }

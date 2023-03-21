@@ -173,10 +173,13 @@ static bool FunctionGameEnableMap(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGameSetTrafficEnabled(IScriptState* pState, int argc, void* pUser)
 {
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
 	bool state = true;
 	if (!pState->CheckBoolean(0, state))
 		return false;
 
+	g_pClientGame->m_bLocalTrafficEnabled = state;
 	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(state);
 	return true;
 }
@@ -457,6 +460,34 @@ static bool FunctionGameSetActorActState(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iUnknown1 = false;
+	if (!pState->CheckNumber(1, iUnknown1))
+		return false;
+
+	uint32_t iUnknown2 = false;
+	if (!pState->CheckNumber(2, iUnknown2))
+		return false;
+
+	uint32_t iUnknown3 = false;
+	if (!pState->CheckNumber(3, iUnknown3))
+		return false;
+
+	uint32_t iUnknown4 = false;
+	if (!pState->CheckNumber(4, iUnknown4))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->ForceAI(iUnknown1, iUnknown2, iUnknown3, iUnknown4);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -563,8 +594,12 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("getDoorOpenAngle"), _gstr("s"), FunctionGameGetDoorOpenAngle, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setDoorState"), _gstr("sibb"), FunctionGameSetDoorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
+	}
+
+	{
 		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("si"), FunctionGameSetActorActState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorAI"), _gstr("siiii"), FunctionGameSetActorAI, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)

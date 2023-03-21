@@ -56,13 +56,13 @@ namespace MafiaSDK
 		bool engine_on;											// 3116-3117  
 		float fuel;												// 3120-3124
 		PADDING(C_Vehicle_Interface, _pad19, 0x8);
-		S_vector rot_forward;
-		S_vector rot_right;
-		S_vector rot_up;
+		S_vector rot_forward;									// 3132-3144
+		S_vector rot_right;										// 3144-3156
+		S_vector rot_up;										// 3156-3168
 		PADDING(C_Vehicle_Interface, _pad20, 0x1330);
-		S_vector speed;
+		S_vector speed;											// 8080-8092
 		PADDING(C_Vehicle_Interface, _pad21, 0xC8);
-		bool lights;
+		bool lights;											// 8292-8293
     };
 
     //const size_t Offset = offsetof(C_Vehicle_Interface, lights);
@@ -72,7 +72,8 @@ namespace MafiaSDK
     {
         enum FunctionsAddresses
         {
-			
+			OpenWindow = 0x004D7A80,
+			DoLights = 0x004D7CD0
         };
     };
 
@@ -83,6 +84,29 @@ namespace MafiaSDK
         {
             return reinterpret_cast<C_Vehicle_Interface*>(this);
         }
+
+		void OpenWindow(int windowID, BOOL arg2)
+		{
+			unsigned long functionAddress = C_Vehicle_Enum::FunctionsAddresses::OpenWindow;
+			__asm
+			{
+				mov ecx, this
+				push windowID
+				push arg2
+				call functionAddress
+			}
+		}
+
+		void DoLights(float arg1)
+		{
+			unsigned long functionAddress = C_Vehicle_Enum::FunctionsAddresses::DoLights;
+			__asm
+			{
+				mov ecx, this
+				push arg1
+				call functionAddress
+			}
+		}
     };
 };
 

@@ -52,8 +52,8 @@ namespace MafiaSDK
 		int32_t animTimeLeft;									// 2772-2776
     };
 
-	//const size_t Offset = offsetof(C_Human_Interface, animTimeLeft);
-	//const size_t Size = sizeof(C_Human_Interface::animTimeLeft);
+	const size_t Offset = offsetof(C_Human_Interface, entity);
+	const size_t Size = sizeof(C_Human_Interface::entity);
 
     namespace C_Human_Enum
     {
