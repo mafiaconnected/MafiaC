@@ -322,6 +322,13 @@ static bool FunctionSetCameraLookAt(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionSetCameraLookFromEyes(IScriptState* pState, int argc, void* pUser)
+{
+	MafiaSDK::GetMission()->GetGame()->GetCamera()->LookFromEyes();
+	MafiaSDK::GetCurrentCamera()->Update();
+	return true;
+}
+
 // Found on the internet
 inline auto WorldToScreen2(D3DXVECTOR3 pos, float matrix[16], int windowWidth, int windowHeight) -> D3DXVECTOR3
 {
@@ -419,6 +426,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 		auto pCameraNamespace = pGameNamespace->AddNamespace(_gstr("camera"));
 		pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
 		pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
+		pCameraNamespace->RegisterFunction(_gstr("lookFromEyes"), _gstr(""), FunctionSetCameraLookFromEyes);
 		pCameraNamespace->RegisterFunction(_gstr("restore"), _gstr(""), FunctionRestoreCamera);
 		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 

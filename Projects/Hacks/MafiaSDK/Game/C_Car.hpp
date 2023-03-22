@@ -28,6 +28,9 @@ namespace MafiaSDK
 		C_Vehicle_Interface	vehicle_interface;
 	};
 
+	//const size_t Offset = offsetof(C_Car_Interface, vehicle_interface);
+	//const size_t Size = sizeof(C_Car_Interface::vehicle_interface);
+
 	namespace C_Car_Enum
 	{
 		enum FunctionsAddresses
@@ -43,7 +46,8 @@ namespace MafiaSDK
 			Update = 0x0041FAC0,
 			PrepareDropOutWheel = 0x00426DD0,
 			PrepareDropOut = 0x00426EC0,
-			CarExplosion = 0x00421D60
+			CarExplosion = 0x00421D60,
+			//Do_Roof = 0x00472DE0,
 		};
 	};
 
@@ -348,6 +352,22 @@ namespace MafiaSDK
             }
             else return nullptr;
         }
+
+		/*
+		void Do_Roof(bool state)
+		{
+			unsigned long functionAddress = C_Car_Enum::FunctionsAddresses::Do_Roof;
+
+			__asm
+			{
+				mov eax, this
+				add eax, 0x68
+				mov ecx, [eax]
+				push state
+				call functionAddress
+			}
+		}
+		*/
 	};
 };
 

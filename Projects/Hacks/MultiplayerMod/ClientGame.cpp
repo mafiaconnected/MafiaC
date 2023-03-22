@@ -1120,7 +1120,9 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 			else if (Event.key.keysym.sym == SDLK_RETURN || Event.key.keysym.sym == SDLK_RETURN2 || Event.key.keysym.sym == SDLK_KP_ENTER)
 			{
 				SetCursorEnabled(false);
-				LockControls(false);
+				if (m_bControlsLocked) {
+					LockControls(false);
+				}
 
 				//_glogprintf(_gstr("CmdWindow ProcessInput"));
 				m_pResourceMgr->m_pCommandHandlers->PushLogger(m_pChatWindow);
@@ -1130,7 +1132,9 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 			else if (Event.key.keysym.sym == SDLK_ESCAPE)
 			{
 				SetCursorEnabled(false);
-				LockControls(false);
+				if (m_bControlsLocked) {
+					LockControls(false);
+				}
 			}
 
 			if (m_pCmdWindow->OnKeyDown(Event.key.keysym))
@@ -1144,7 +1148,10 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 		{
 			if (Event.key.keysym.sym == SDLK_t || Event.key.keysym.sym == SDLK_BACKQUOTE)
 			{
-				LockControls(true);
+				if (!m_bControlsLocked) {
+					LockControls(true);
+				}
+				
 				m_bEnableCmdWindowOnCharPress = true;
 				SetCursorEnabled(true);
 				return true;
@@ -1186,7 +1193,9 @@ void CClientGame::OnCharacter(wchar_t c)
 				UpdateCursorEnabled();
 				m_bEnableCmdWindowOnCharPress = false;
 
-				LockControls(true);
+				if (!m_bControlsLocked) {
+					LockControls(true);
+				}
 			}
 		}
 	}
@@ -1813,6 +1822,7 @@ void CClientGame::LockControls(bool state)
 	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->GetInterface()->humanObject.carLeavingOrEntering != nullptr)
 		return;
 
+	m_bControlsLocked = state;
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
@@ -2095,7 +2105,7 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 	switch (GameComponent)
 	{
 	case GAMECOMPONENT_TRAFFIC:
-		return m_CVars.GetBoolean(_gstr("Traffic"), true);
+		return m_CVars.GetBoolean(_gstr("Traffic"), true) || m_bLocalTrafficEnabled;
 	case GAMECOMPONENT_CIVILIANS:
 		return m_CVars.GetBoolean(_gstr("Civilians"), true);
 	case GAMECOMPONENT_SCRIPTS:

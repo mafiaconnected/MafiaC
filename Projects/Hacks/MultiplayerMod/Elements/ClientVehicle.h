@@ -113,7 +113,7 @@ public:
 	virtual bool SetSiren(bool state);
 	virtual bool GetSiren();
 
-	virtual bool SetEngine(bool state);
+	virtual bool SetEngine(bool state, bool unknown1);
 	virtual bool GetEngine();
 
 	virtual bool SetLights(bool state);

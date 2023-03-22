@@ -6,10 +6,13 @@ namespace MafiaSDK
     struct C_Game_Interface
     {
         PADDING(C_Game_Interface, _pad0, 0x4C);
-        C_Camera mCamera;
+        C_Camera mCamera;									// 76-77
         PADDING(C_Game_Interface, _pad1, 0x94);
-        C_Player* mLocalPlayer;
+        C_Player* mLocalPlayer;								// 228-232
     };
+
+	//const size_t Offset = offsetof(C_Game_Interface, mLocalPlayer);
+	//const size_t Size = sizeof(C_Game_Interface::mLocalPlayer);
 
     namespace C_Game_Enum
     {

@@ -37,6 +37,9 @@ public:
 	bool m_bExitingVehicleEvent;
 
 	CVector3D m_vecCamera;
+	CVector3D m_AimVector;
+
+	float m_InCarRotation;
 
 	CClientVehicle* m_pVehicleEvent;
 	
@@ -98,9 +101,8 @@ public:
 	virtual bool SetModel(const GChar* modelName) override;
 	virtual const GChar* GetModel() override;
 
-	void PlayAnim(const char* animName);
+	void PlayAnim(const GChar* animName);
 	void StopAnim();
-
 
 	void Shoot(bool state, const CVector3D& dstPos);
 	void Jump();
