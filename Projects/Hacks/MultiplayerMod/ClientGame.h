@@ -128,6 +128,7 @@ public:
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType;
+	Galactic3D::EventHandlers::CEventType* m_pOnAddActorEventType;
 
 	Galactic3D::CChatWindow* m_pChatWindow;
 	Galactic3D::CCmdWindow2* m_pCmdWindow;
