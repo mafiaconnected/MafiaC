@@ -403,7 +403,30 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_MINOR"), LAUNCHER_MINOR);
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_PATCH"), LAUNCHER_PATCH);
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_BUILD"), LAUNCHER_BUILD);
-	//pDefineHandlers->Define("CLIENT_VERSION", CLIENT_VERSION_MAJOR+"."+CLIENT_VERSION_MINOR+"."+CLIENT_VERSION_PATCH+"."+CLIENT_VERSION_BUILD);
+
+	// Actor types (for OnAddActor event) 
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_GHOSTOBJECT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::GhostObject);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLAYER"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Player);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CAR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Car);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DETECTOR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Detector);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOOR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Door);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TROLLEY"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Trolley);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_SPECIALIDK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::SpecialIDK);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BOTTLE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bottle);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRAFFIC"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::TrafficSetup);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PEDESTRIANSETUP"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::PedestrianSetup);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_UNKNOWN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Unknown);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOG"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Dog);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLANE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Plane);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RAILROUTE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RailRoute);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_FUELPUMPER"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Pumpar);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_ENEMY"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RACECAMERA"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RaceCamera);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_WAGON"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Wagons);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CLOCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Clocks);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PHYSICAL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Physical);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRUCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Truck);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_INITSCRIPT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::InitScript);
 }
 
 void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
