@@ -39,7 +39,6 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
-	CClientNetGame::ProcessPacket(Peer, PacketID, pStream); // this is asking for problems, MOVE IT TO DEFAULT CASE IDIOT
 
 	switch (PacketID)
 	{
@@ -941,7 +940,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		default:
 		{
-
+			CClientNetGame::ProcessPacket(Peer, PacketID, pStream); 
 		}
 		break;
 	}
@@ -1145,5 +1144,15 @@ void CMultiplayer::SendHumanChangeWeapon(CClientHuman* target, int8_t weapon)
 	Packet Packet(MAFIAPACKET_HUMAN_CHANGEWEAP);
 	Packet.Write<int32_t>(target->GetId());
 	Packet.Write<int32_t>((int32_t)weapon);
+	SendHostPacket(&Packet);
+}
+
+void CMultiplayer::SendHumanReloadWeapon(CClientHuman* target)
+{
+	if (target->IsLocal() || !target->IsSyncer())
+		return;
+
+	Packet Packet(MAFIAPACKET_HUMAN_RELOAD);
+	Packet.Write<int32_t>(target->GetId());
 	SendHostPacket(&Packet);
 }
