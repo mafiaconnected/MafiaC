@@ -114,7 +114,7 @@ static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckBoolean(1, bFullReload))
 		return false;
 
-	g_pClientGame->m_bFullReload = false;
+	g_pClientGame->m_bFullReload = bFullReload;
 
 	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
 	MafiaSDK::GetMission()->MapLoad(mapName2);
@@ -155,7 +155,6 @@ static bool FunctionGameFadeScreen(IScriptState* pState, int argc, void* pUser)
 
 	if (!pState->CheckNumber(2, color))
 		return false;
-
 
 	MafiaSDK::GetIndicators()->FadeInOutScreen(fadeIn, time, color);
 	return true;
@@ -460,6 +459,91 @@ static bool FunctionGameSetActorActState(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+static bool FunctionGameUnloadActor(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	MafiaSDK::GetMission()->UnloadActor(actor);
+	return true;
+}
+
+static bool FunctionGameSetVehicleTachometerValues(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	float fUnknown1;
+	if (!pState->CheckNumber(1, fUnknown1))
+		return false;
+
+	float fUnknown2;
+	if (!pState->CheckNumber(2, fUnknown2))
+		return false;
+
+	float fUnknown3;
+	if (!pState->CheckNumber(3, fUnknown3))
+		return false;
+
+	float fUnknown4;
+	if (!pState->CheckNumber(4, fUnknown4))
+		return false;
+
+	MafiaSDK::GetIndicators()->TachometrSetValues(fUnknown1, fUnknown2, fUnknown3, fUnknown4);
+	return true;
+}
+
+static bool FunctionGameAddVehicleToRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarAddCar(pClientVehicle->GetGameVehicle(), iColour);
+	return true;
+}
+
+static bool FunctionGameRemoveVehicleFromRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarRemoveCar(pClientVehicle->GetGameVehicle());
+	return true;
+}
+
+static bool FunctionGameSetPlayerVehicleOnRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarSetPlayerCar(MafiaSDK::GetMission()->GetGame()->GetLocalPlayer());
+	return true;
+}
+
 static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -587,6 +671,10 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setVehicleTachometerValues"), _gstr("ffff"), FunctionGameSetVehicleTachometerValues, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("addVehicleToRadar"), _gstr("xi"), FunctionGameAddVehicleToRadar, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("removeVehicleFromRadar"), _gstr("x"), FunctionGameRemoveVehicleFromRadar, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setPlayerVehicleOnRadar"), _gstr(""), FunctionGameSetPlayerVehicleOnRadar, pClientManager);
 	}
 
 	{
@@ -600,6 +688,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("si"), FunctionGameSetActorActState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorAI"), _gstr("siiii"), FunctionGameSetActorAI, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("unloadActor"), _gstr("s"), FunctionGameUnloadActor, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)
