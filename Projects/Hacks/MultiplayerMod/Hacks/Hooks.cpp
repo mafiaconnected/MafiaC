@@ -277,9 +277,23 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		ObjTypes::Wagons,
 	};
 
+	MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+
+	CArguments Args;
+	Args.AddNumber((uint32_t)type);
+	Args.AddString((const GChar*)frame_ex->GetInterface()->name); // Frame name
+	Args.AddString((const GChar*)g_umapModelNames[(uint32_t)frame_ex].c_str()); // Model name
+	
+	bool bPreventDefault = false;
+	g_pClientGame->m_pOnAddActorEventType->Trigger(Args, bPreventDefault);
+	if (bPreventDefault) {
+		if (frame_ex)
+			frame_ex->SetOn(false);
+		return;
+	}
+
 	for (auto forbidden_type : forbidden_objects) {
 		if (type == forbidden_type && frame != NULL) {
-			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 			if (frame_ex)
 				frame_ex->SetOn(false);
 			return nullptr;
@@ -287,7 +301,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Trolley && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -296,7 +309,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Door && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -305,7 +317,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Pumpar && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -323,7 +334,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Plane && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -332,7 +342,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::RailRoute && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -341,7 +350,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::InitScript && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -350,7 +358,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::Car && frame != NULL) {
 			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -359,7 +366,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::TrafficSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -368,7 +374,6 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 		if (type == ObjTypes::PedestrianSetup && frame != NULL) {
 			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
 				if (frame_ex)
 					frame_ex->SetOn(false);
 				return nullptr;
@@ -376,7 +381,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		}
 	}
 
-	// Grab model from frame with g_umapModelNames[frame]
+	// Grab model from frame with g_umapModelNames[(uint32_t)frame_ex]
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
 	return actor;
 }
