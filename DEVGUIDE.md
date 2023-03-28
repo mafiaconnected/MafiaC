@@ -3,11 +3,13 @@
 
 ## Project Structure
 The project is split into a heirarchy: Galactic > ModLauncher > Client/Server. 
-Galactic and ModLauncher belong to Jack's Mini Network and are private sources, but libs are provided as an SDK so you can use them to build. They are used in all Jack's Mini Network projects (GTAC, MafiaC, TRML, etc) so anything that should be applied universally to all those mods will be added to Galactic or ModLauncher by Jack or any other member of Jack's Mini Network that has access. The client is further split into "Hacks" which is a rather poorly chosen word to describe the "modules" of the project. The "MultiplayerMod" hacks are the main module for the project. Each game with a different engine will have a different MultiplayerMod module (like MultiplayerModTwo for Mafia 2, MultiplayerModDE for Definitive Edition, etc)
+
+Galactic and ModLauncher belong to Jack's Mini Network and are private sources, but libs are provided as an SDK so you can use them to build. They are used in all Jack's Mini Network projects (GTAC, MafiaC, TRML, etc) so anything that should be applied universally to all those mods will be added to Galactic or ModLauncher by Jack or any other member of Jack's Mini Network that has access.   
+The client is further split into "Hacks" which is a rather poorly chosen word to describe the "modules" of the project. The "MultiplayerMod" hacks are the main module for the project. Each game with a different engine will have a different MultiplayerMod module (like MultiplayerModTwo for Mafia 2, MultiplayerModDE for Definitive Edition, etc)
 
 ### What you'll need
 * Git (like [Github Desktop](https://desktop.github.com/) or just the [basic git](https://git-scm.com/downloads))
-* [Visual Studio 2017](https://www.visualstudio.com/downloads/) (With XP Support and C++)
+* [Visual Studio](https://www.visualstudio.com/downloads/)
 * [DirectX SDK](https://www.microsoft.com/en-gb/download/details.aspx?id=6812)
 * [CMake](https://cmake.org/download/)
 * [SpiderMonkey](https://github.com/jack9267/SpiderMonkey)
@@ -35,4 +37,7 @@ Galactic and ModLauncher belong to Jack's Mini Network and are private sources, 
 * The "Compile" bat files make building easier.
 * The "Data" folder contains extra non-essential stuff like Languages, GUI stuff, etc. It's provided in the release as a tar archive.
 * The "Update Archive.bat" tool packs the stuff in "Data" to the above tar archive.
+* Use Debug or RelWithDebInfo builds to test. Release build will not launch (see next item).
+* The public release build is signed with Authenticode, and won't work without being built/signed by jack9267 himself.
+* You can use any VS tools to build a test version, but public releases use 2017 tools with XP Support and C++
 * More will be added to this list as I think of them.
