@@ -65,7 +65,7 @@ static void OnGameInit()
 		return;
 
 	// Set full reload for next time (script can disable for map change)
-	g_pClientGame->m_bFullReload = true;
+	//g_pClientGame->m_bFullReload = true;
 }
 
 static void OnGameExit()
@@ -266,13 +266,13 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		//ObjTypes::Dog,
 		ObjTypes::Enemy,
 		//ObjTypes::Pumpar,
-		ObjTypes::Player,
+		//ObjTypes::Player,
 		ObjTypes::GhostObject,
 		ObjTypes::Detector,
-		ObjTypes::Bottle,
-		ObjTypes::Clocks,
+		//ObjTypes::Bottle,
+		//ObjTypes::Clocks,
 		ObjTypes::RaceCamera,
-		ObjTypes::SpecialIDK,
+		//ObjTypes::Model,
 		ObjTypes::Truck,
 		ObjTypes::Wagons,
 	};
@@ -281,15 +281,19 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 	CArguments Args;
 	Args.AddNumber((uint32_t)type);
-	Args.AddString((const GChar*)frame_ex->GetInterface()->name); // Frame name
-	Args.AddString((const GChar*)g_umapModelNames[(uint32_t)frame_ex].c_str()); // Model name
+
+	CString Name(false, frame_ex->GetInterface()->name);
+	Args.AddString(Name); // Frame name
+
+	CString Model(false, g_umapModelNames[(uint32_t)frame_ex].c_str());
+	Args.AddString(Model); // Model name
 	
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnAddActorEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault) {
 		if (frame_ex)
 			frame_ex->SetOn(false);
-		return;
+		return nullptr;
 	}
 
 	for (auto forbidden_type : forbidden_objects) {
@@ -298,86 +302,86 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 				frame_ex->SetOn(false);
 			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Trolley && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Trolley && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Door && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Door && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Pumpar && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Pumpar && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Dog && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
-				MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Dog && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
+			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Plane && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Plane && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::RailRoute && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::RailRoute && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::InitScript && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::InitScript && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::Car && frame != NULL) {
-			if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::Car && frame != NULL) {
+		if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DEFAULTPARKEDCARS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::TrafficSetup && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::TrafficSetup && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
+	}
 
-		if (type == ObjTypes::PedestrianSetup && frame != NULL) {
-			if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
-				if (frame_ex)
-					frame_ex->SetOn(false);
-				return nullptr;
-			}
+	if (type == ObjTypes::PedestrianSetup && frame != NULL) {
+		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
+			if (frame_ex)
+				frame_ex->SetOn(false);
+			return nullptr;
 		}
 	}
 
