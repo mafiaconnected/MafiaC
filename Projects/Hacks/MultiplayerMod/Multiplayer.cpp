@@ -40,6 +40,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
 
+	CClientNetGame::ProcessPacket(Peer, PacketID, pStream);
+
 	switch (PacketID)
 	{
 		case PACKET_RESPONSE:
@@ -940,7 +942,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		default:
 		{
-			CClientNetGame::ProcessPacket(Peer, PacketID, pStream); 
+			
 		}
 		break;
 	}
