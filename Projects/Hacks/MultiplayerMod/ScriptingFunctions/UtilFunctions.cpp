@@ -411,11 +411,11 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DETECTOR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Detector);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOOR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Door);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TROLLEY"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Trolley);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_SPECIALIDK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::SpecialIDK);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_MODEL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Model);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BOTTLE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bottle);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRAFFIC"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::TrafficSetup);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PEDESTRIANSETUP"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::PedestrianSetup);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_UNKNOWN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Unknown);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BRIDGE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bridge);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOG"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Dog);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLANE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Plane);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RAILROUTE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RailRoute);
