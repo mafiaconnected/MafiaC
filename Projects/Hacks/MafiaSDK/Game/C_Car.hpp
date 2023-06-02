@@ -47,7 +47,7 @@ namespace MafiaSDK
 			PrepareDropOutWheel = 0x00426DD0,
 			PrepareDropOut = 0x00426EC0,
 			CarExplosion = 0x00421D60,
-			//Do_Roof = 0x00472DE0,
+			Do_Roof = 0x00472DE0,
 		};
 	};
 
