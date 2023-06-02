@@ -840,6 +840,8 @@ void CClientHuman::ClearInventory()
 
 		item.weapId = item.ammo1 = item.ammo2 = 0;
 	}
+
+	GetGameHuman()->InventoryTruncate();
 }
 
 void CClientHuman::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2)
