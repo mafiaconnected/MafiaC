@@ -954,9 +954,10 @@ static bool FunctionHumanIdle(IScriptState* pState, int argc, void* pUser)
 	if (pClientHuman->GetGameHuman() == nullptr)
 		return pState->Error(_gstr("human not spawned"));
 
+	pClientHuman->StopAnim();
 	pClientHuman->GetGameHuman()->GetInterface()->animState = 1;
 	pClientHuman->GetGameHuman()->GetInterface()->animStateLocal = 1;
-
+	
 	return false;
 }
 
@@ -1125,7 +1126,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveForwardRight"), _gstr("tb"), FunctionHumanMoveForwardRight, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveBackLeft"), _gstr("t"), FunctionHumanMoveBackwardLeft, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("moveBackRight"), _gstr("t"), FunctionHumanMoveBackwardRight, pClientManager);
-	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("idle"), _gstr("tw"), FunctionHumanIdle, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("idle"), _gstr("t"), FunctionHumanIdle, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("jump"), _gstr("t"), FunctionHumanJump, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("aim"), _gstr("t"), FunctionHumanAim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("breath"), _gstr("t"), FunctionHumanBreath, pClientManager);
