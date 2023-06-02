@@ -52,6 +52,7 @@ void CConnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* p
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 	{
+		g_pClientGame->m_bFullReload = true;
 		g_pClientGame->StopMultiplayerGame(DISCONNECT_GRACEFUL, true);
 	}
 
