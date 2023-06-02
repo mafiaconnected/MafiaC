@@ -487,6 +487,31 @@ static bool FunctionVehicleSetEngine(IScriptState* pState, int argc, void* pUser
 	if (!pState->CheckBoolean(0, state))
 		return false;
 
+	if (pClientVehicle->SetEngine(state, 1))
+		return true;
+
+	return false;
+}
+
+static bool FunctionVehicleSetEngineDetailed(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	bool state;
+	if (!pState->CheckBoolean(0, state))
+		return false;
+
 	bool unknown = 1;
 	if (!pState->CheckBoolean(1, unknown))
 		return false;
@@ -1267,7 +1292,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupant"), _gstr("ti"), FunctionVehicleGetOccupant, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupants"), _gstr("t"), FunctionVehicleGetOccupants, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setSoundEnabled"), _gstr("tb"), FunctionVehicleSetSoundEnabled, pClientManager);
-	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setEngineState"), _gstr("tbb"), FunctionVehicleSetEngine, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setEngineState"), _gstr("tbb"), FunctionVehicleSetEngineDetailed, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("playGearShiftSound"), _gstr("t"), FunctionVehiclePlayGearShiftSound, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setCustomEngineValues"), _gstr("tfff"), FunctionVehicleSetCustomEngineValues, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("removeTire"), _gstr("ti"), FunctionVehicleRemoveTire, pClientManager);
