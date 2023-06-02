@@ -44,4 +44,5 @@ public:
 	void SendHumanDeath(CClientHuman* target, CClientEntity* attacker);
 	void SendHumanDropWeapon(CClientHuman* target);
 	void SendHumanChangeWeapon(CClientHuman* target, int8_t weapon);
+	void SendHumanReloadWeapon(CClientHuman* target);
 };
