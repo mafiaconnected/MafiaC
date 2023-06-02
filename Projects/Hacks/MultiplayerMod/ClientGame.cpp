@@ -316,7 +316,7 @@ void CClientGame::InitialiseScripting(void)
 	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, true);
 	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, true);
 	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, true);
-	m_pOnAddActorEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnAddActor"), _gstr("Called whenever game actor is added"), 2, true);
+	m_pOnAddActorEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnAddActor"), _gstr("Called whenever game actor is added"), 3, true);
 
 	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr, false, false, false, false, false);
 	m_pGalacticFunctions->m_p2D = &m_p2D;
@@ -2107,7 +2107,7 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 	case GAMECOMPONENT_TRAFFIC:
 		return m_CVars.GetBoolean(_gstr("Traffic"), true) || m_bLocalTrafficEnabled;
 	case GAMECOMPONENT_CIVILIANS:
-		return m_CVars.GetBoolean(_gstr("Civilians"), true);
+		return m_CVars.GetBoolean(_gstr("Civilians"), true) || m_bLocalCiviliansEnabled;
 	case GAMECOMPONENT_SCRIPTS:
 		return m_CVars.GetBoolean(_gstr("Scripts"), true);
 	case GAMECOMPONENT_BRIDGES:
@@ -2126,6 +2126,9 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		return m_CVars.GetBoolean(_gstr("Planes"), true);
 	case GAMECOMPONENT_BIGMAP:
 		return m_CVars.GetBoolean(_gstr("BigMap"), true);
+	case GAMECOMPONENT_DEFAULTPARKEDCARS:
+		return m_CVars.GetBoolean(_gstr("DefaultParkedCars"), true);
+		
 	default:
 		break;
 	}
