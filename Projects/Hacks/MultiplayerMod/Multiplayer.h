@@ -7,6 +7,7 @@ class CClientEntity;
 class CClientHuman;
 class CClientPlayer;
 class CClientVehicle;
+class CClientDummy;
 
 #define MAFIA_P2P_SERVER_IDS 1
 
