@@ -15,10 +15,10 @@ static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void*
 	if (!pState->CheckVector3D(0, pos))
 		return false;
 
-	CClientEntity* pClientEntity = reinterpret_cast<CClientEntity*>(pClientManager->Create(ELEMENT_ENTITY));
-	pClientEntity->m_pResource = pState->GetResource();
-	pClientManager->RegisterNetObject(pClientEntity);
-	pState->ReturnObject(pClientEntity);
+	CClientDummy* pClientDummy = reinterpret_cast<CClientDummy*>(pClientManager->Create(ELEMENT_DUMMY));
+	pClientDummy->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientDummy);
+	pState->ReturnObject(pClientDummy);
 
 	return true;
 }
@@ -636,8 +636,6 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
 
-	pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
-
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
 		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
@@ -651,6 +649,9 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 		pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreateVehicle, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
+
+		pClientManager->m_pClientDummyClass->RegisterConstructor(_gstr("tv"), FunctionGameCreateDummyElement, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
 	}
 
 	{
