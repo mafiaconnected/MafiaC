@@ -2038,7 +2038,7 @@ bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 
 	auto pClientVehicle = Strong<CClientVehicle>::New(m_pClientManager->Create(ELEMENT_VEHICLE));
 	pClientVehicle->SetFromExistingEntity(pCar);
-	//m_pClientManager->RegisterObject(pClientVehicle);
+	m_pClientManager->RegisterNetObject(pClientVehicle);
 
 	{
 		pClientVehicle->GenerateGUID();
