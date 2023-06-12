@@ -815,13 +815,6 @@ void CClientGame::OnEndInGame(void)
 	if (m_pNewMultiplayer != nullptr)
 	{
 		m_pNewMultiplayer->Reset();
-
-		// If the game is restarting and we haven't connected, delete this new multiplayer
-		if (!m_pNewMultiplayer->IsConnected())
-		{
-			delete m_pNewMultiplayer;
-			m_pNewMultiplayer = nullptr;
-		}
 	}
 
 	m_pResourceMgr->ClearAllResources();
@@ -829,7 +822,8 @@ void CClientGame::OnEndInGame(void)
 	//if (m_pFonts != nullptr)
 	//	m_pFonts->UninitialiseRendering();
 
-	m_pCmdWindow->ReInitialise();
+	if (m_pCmdWindow != nullptr)
+		m_pCmdWindow->ReInitialise();
 
 	// ANYTHING USING FONTS NEEDS TO BE GONE HERE FOR NOW!!!!!
 	if (m_pCmdWindow != nullptr)
@@ -2137,6 +2131,8 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 
 void CClientGame::ShowDisconnectReason()
 {
+	if (m_pChatWindow == nullptr)
+		return;
 	const GChar* rgpszReasons[] = {
 		_gstr("TIMEOUT"),
 		_gstr("FULL"),

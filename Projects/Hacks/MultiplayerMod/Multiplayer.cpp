@@ -36,7 +36,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 	{
 		_glogprintf(_gstr("Multiplayer Process Packet - Response packet received 1"));
 		//g_pClientGame->ResetWorld();
-		g_pClientGame->m_pChatWindow->FlushBuffers();
+		if (g_pClientGame->m_pChatWindow != nullptr)
+			g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
 
