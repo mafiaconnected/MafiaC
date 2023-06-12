@@ -5,6 +5,4 @@ Mafia Connected is a scriptable multiplayer modification for Mafia: The City of 
 [Website](https://mafiaconnected.com)
 [Discord](https://discord.gg/rtA9kpuQzf)
 
-The website is under construction and will be available eventually.
-
 If you're interested in contributing or have any questions about the structure/code of the project, check out the [development guide](https://github.com/MafiaC/DEVGUIDE.md)

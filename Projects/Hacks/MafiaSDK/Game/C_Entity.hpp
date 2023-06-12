@@ -21,18 +21,21 @@ namespace MafiaSDK
 {
     struct C_Entity_Interface
     {
-        unsigned long vtable;
+        unsigned long vtable;									// 0-4
         PADDING(C_Entity_Interface, _pad0, 0xC);
-        unsigned long objectType;
+        unsigned long objectType;								// 16-20
         PADDING(C_Entity_Interface, _pad1, 0x10);
-        S_vector position;
-        S_vector rotation;
+        S_vector position;										// 36-48
+        S_vector rotation;										// 48-56
         PADDING(C_Entity_Interface, _pad2, 0x21);
-        bool isActive;
-        bool doRemove;
+        bool isActive;											// 93-94
+        bool doRemove;											// 94-95
         PADDING(C_Entity_Interface, _pad3, 0x9);
-        I3D_Frame *frame;
+        I3D_Frame *frame;										// 104-108
     };
+
+	//const size_t Offset = offsetof(C_Entity_Interface, frame);
+	//const size_t Size = sizeof(C_Entity_Interface::frame);
 
     namespace C_Entity_Enum
     {

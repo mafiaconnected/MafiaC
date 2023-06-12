@@ -136,7 +136,7 @@ bool CClientHuman::SetHealth(float fHealth)
 	GetGameHuman()->GetInterface()->health = fHealth;
 
 	if (m_isLocalPlayer) {
-		MafiaSDK::GetIndicators()->PlayerSetWingmanLives((int)(fHealth / 2.0f));
+		MafiaSDK::GetIndicators()->PlayerSetWingmanLives(round(fHealth));
 	}
 
 	return true;
@@ -273,6 +273,7 @@ void CClientHuman::Despawn(void)
 	{
 		if (IsInVehicle())
 		{
+			GetGameHuman()->EraseDynColls();
 			RemoveFromVehicle();
 		}
 
@@ -332,8 +333,8 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 			IHuman->isInAnimWithCar = true;
 		}
 
-		int32_t iAnimTimeLeft = *(int32_t*)(((uint32_t)IHuman) + 2772);
-		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
+		int32_t iAnimTimeLeft = IHuman->animTimeLeft;
+		IHuman->animTimeLeft = Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
 			if (iAnimTimeLeft > 0)
@@ -385,23 +386,17 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 		else
 		{
 			IHuman->animStateLocal = Packet.animStateLocal;
-			IHuman->animState = Packet.animStateLocal;
+			IHuman->animState = Packet.animationState;
 			IHuman->isInAnimWithCar = true;
 		}
 
-		int32_t iAnimTimeLeft = *(int32_t*)(((uint32_t)IHuman) + 2772);
-		*(int32_t*)(((uint32_t)IHuman) + 2772) = (int32_t)Packet.animStopTime;
+		int32_t iAnimTimeLeft = IHuman->animTimeLeft;
+		IHuman->animTimeLeft = Packet.animStopTime;
 		if (Packet.animStopTime <= 0)
 		{
 			if (iAnimTimeLeft > 0)
 			{
-				__asm
-				{
-					push 0
-					mov ecx, IHuman
-					mov eax, 0x57F830 // C_human::Do_Aimed
-					call eax
-				}
+				GetGameHuman()->Do_Aimed();
 			}
 		}
 
@@ -416,12 +411,12 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			{
 				if (IHuman->playersCar == nullptr)
 				{
-					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 				}
 				else if (pVehicle->GetGameVehicle() != IHuman->playersCar)
 				{
 					RemoveFromVehicle();
-					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex); // TODO: Use correct seat?
+					WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 				}
 			}
 		}
@@ -433,34 +428,39 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			}
 		}
 	}
-	IHuman->inCarRotation = Packet.inCarRotation;
+	
 	SetActiveWeapon(Packet.weaponId);
 
-	m_vecCamera = Packet.camera;
-	if (m_vecCamera.GetLength() != 0.0f)
-	{
-		uint32_t uiCamera = (uint32_t)&m_vecCamera;
-		g_pClientGame->m_bHumanSetAimPoseInvokedByGame = false;
-		float x, y, z;
-		x = m_vecCamera.x;
-		y = m_vecCamera.y;
-		z = m_vecCamera.z;
-		uint32_t uiFunc = Packet.isAiming ? 0x579EA0 : 0x579630; // set aim pose / set normal pose
-		__asm
+	if (!IsInVehicle()) {
+		m_vecCamera = Packet.camera;
+		if (m_vecCamera.GetLength() != 0.0f)
 		{
-			push z
-			push y
-			push x
-			mov ecx, IHuman
-			mov eax, uiFunc
-			call eax
+			uint32_t uiCamera = (uint32_t)&m_vecCamera;
+			g_pClientGame->m_bHumanSetAimPoseInvokedByGame = false;
+			float x, y, z;
+			x = m_vecCamera.x;
+			y = m_vecCamera.y;
+			z = m_vecCamera.z;
+			uint32_t uiFunc = Packet.isAiming ? 0x579EA0 : 0x579630; // set aim pose / set normal pose
+			__asm
+			{
+				push z
+				push y
+				push x
+				mov ecx, IHuman
+				mov eax, uiFunc
+				call eax
+			}
+			g_pClientGame->m_bHumanSetAimPoseInvokedByGame = true;
 		}
-		g_pClientGame->m_bHumanSetAimPoseInvokedByGame = true;
 	}
+
+	m_InCarRotation = Packet.inCarRotation;
+	IHuman->inCarRotation = m_InCarRotation;
 
 	//_glogprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), vPos.x, vPos.y, vPos.z, vRelPos.x, vRelPos.y, vRelPos.z, vRot.x, vRot.y, vRot.z, IHuman->entity.rotation.x, IHuman->entity.rotation.y, IHuman->entity.rotation.z, vRelRot.x, vRelRot.y, vRelRot.z, IHuman->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, IHuman->isDucking ? L"Yes" : L"No", IHuman->isAiming ? L"Yes" : L"No", IHuman->animState);
 
-	if (!IsSyncer())
+	if (!IsSyncer() && !IsInVehicle())
 	{
 		auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
 
@@ -486,8 +486,6 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	if (IsInVehicle())
 		vehicleId = GetOccupiedVehicle()->GetId();
 
-	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
-
 	tHumanCreatePacket Packet;
 
 	Packet.health = IHuman->health;
@@ -501,8 +499,10 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.animationState = IHuman->animState;
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
-	Packet.animStopTime = iStopAnimTime;
+	Packet.animStopTime = IHuman->animTimeLeft;
 	Packet.weaponId = *(int16_t*)(((uint32_t)IHuman) + 1184);
+
+	Packet.seat = GetVehicleSeat();
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -529,6 +529,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	CVector3D diffRot = m_Rotation - prevRot;
 
 	int vehicleId = INVALID_NETWORK_ID;
+	int seatId = 0;
 
 	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
 	if (pClientVehicle == nullptr)
@@ -538,6 +539,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	if (pClientVehicle != nullptr)
 	{
 		vehicleId = pClientVehicle->GetId();
+		seatId = GetVehicleSeat();
 	}
 
 	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)IHuman) + 2772);
@@ -571,9 +573,10 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.animationState = IHuman->animState;
 	Packet.isInAnimWithCar = IHuman->isInAnimWithCar;
 	Packet.inCarRotation = IHuman->inCarRotation;
-	Packet.animStopTime = iStopAnimTime;
+	Packet.animStopTime = IHuman->animTimeLeft;
 	Packet.weaponId = *(int16_t*)(((uint32_t)IHuman) + 1184);
 	Packet.camera = m_vecCamera;
+	Packet.seat = seatId;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -601,7 +604,13 @@ void CClientHuman::OnCreated(void)
 
 void CClientHuman::Process(void)
 {
-	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
+	//if (IsInVehicle()) {
+	//	GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
+	//}
+	
+	GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
+
+	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr && !IsInVehicle())
 	{
 		m_pBlender->Interpolate();
 	}
@@ -696,7 +705,7 @@ void CClientHuman::RemoveFromVehicle(void)
 
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 
-	if (pVehicle != nullptr)
+	if (pVehicle != nullptr && m_nVehicleSeatIndex != -1)
 	{
 		pVehicle->FreeSeat(m_nVehicleSeatIndex);
 	}
@@ -717,7 +726,7 @@ void CClientHuman::ExitVehicle(void)
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 }
 
-bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSeat)
+bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -726,16 +735,16 @@ bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t ucSea
 
 	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
 
-	if (!pClientVehicle->IsSeatOccupied(ucSeat))
+	if (!pClientVehicle->IsSeatOccupied(iSeat))
 	{
 		if (IsInVehicle())
 		{
 			RemoveFromVehicle();
 		}
 
-		pClientVehicle->AssignSeat(this, ucSeat);
+		pClientVehicle->AssignSeat(this, iSeat);
 
-		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), ucSeat);
+		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), iSeat);
 	}
 	return true;
 }
@@ -759,11 +768,12 @@ const GChar* CClientHuman::GetModel()
 	return CClientEntity::GetModel();
 }
 
-void CClientHuman::PlayAnim(const char* animName)
+void CClientHuman::PlayAnim(const GChar* animName)
 {
 	if (m_MafiaHuman == nullptr) return;
-
-	m_MafiaHuman->Do_PlayAnim(animName);
+	
+	UTF8String anim(true, animName);
+	m_MafiaHuman->Do_PlayAnim(anim);
 }
 
 void CClientHuman::StopAnim()
@@ -790,7 +800,7 @@ void CClientHuman::Jump()
 void CClientHuman::ThrowGrenade(const CVector3D& dstPos)
 {
 	if (m_MafiaHuman == nullptr) return;
-	_glogprintf(_gstr("Setting element #%d (human) to throw grenade at [%f, %f, %f]"), GetId(), dstPos.x, dstPos.y, dstPos.z);
+	//_glogprintf(_gstr("Setting element #%d (human) to throw grenade at [%f, %f, %f]"), GetId(), dstPos.x, dstPos.y, dstPos.z);
 	m_MafiaHuman->Do_ThrowGranade(CVecTools::ConvertToMafiaVec(dstPos));
 }
 
@@ -830,6 +840,8 @@ void CClientHuman::ClearInventory()
 
 		item.weapId = item.ammo1 = item.ammo2 = 0;
 	}
+
+	//GetGameHuman()->InventoryTruncate();
 }
 
 void CClientHuman::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2)

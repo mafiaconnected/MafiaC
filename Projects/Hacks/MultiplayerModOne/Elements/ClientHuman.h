@@ -28,7 +28,7 @@ public:
 	bool m_isLocalPlayer;
 
 	int32_t m_nVehicleNetworkIndex;
-	uint32_t m_nVehicleSeatIndex;
+	int8_t m_nVehicleSeatIndex;
 
 	bool m_bEnteredVehicleEvent;
 	bool m_bEnteringVehicleEvent;
@@ -37,6 +37,9 @@ public:
 	bool m_bExitingVehicleEvent;
 
 	CVector3D m_vecCamera;
+	CVector3D m_AimVector;
+
+	float m_InCarRotation;
 
 	CClientVehicle* m_pVehicleEvent;
 	
@@ -89,18 +92,17 @@ public:
 
 	bool IsInVehicle(void);
 	bool IsInVehicle(CClientVehicle* pClientVehicle);
-	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t ucSeat);
-	void EnterVehicle(CClientVehicle* pVehicle, uint8_t ucSeat);
+	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t iSeat);
+	void EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat);
 	void RemoveFromVehicle(void);
 	void ExitVehicle(void);
-	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t byteSeat);
+	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat);
 
 	virtual bool SetModel(const GChar* modelName) override;
 	virtual const GChar* GetModel() override;
 
-	void PlayAnim(const char* animName);
+	void PlayAnim(const GChar* animName);
 	void StopAnim();
-
 
 	void Shoot(bool state, const CVector3D& dstPos);
 	void Jump();

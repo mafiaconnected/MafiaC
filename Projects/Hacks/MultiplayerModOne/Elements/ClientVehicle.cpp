@@ -310,7 +310,7 @@ bool CClientVehicle::SetHeading(float heading)
 	m_RotationFront = newRotationFront;
 	m_RotationUp = rotationUp;
 	m_RotationRight = rotationRight;
-	
+
 	UpdateGameMatrix();
 
 	// Disable interpolation
@@ -453,6 +453,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	GChar szModel[64];
 	wmemset(szModel, _gstr('\0'), 64);
 	wmemcpy(szModel, m_szModel, 64);
+
 	CVector3D vecPos = m_Position;
 	CVector3D vecRot = m_Rotation;
 
@@ -468,13 +469,11 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	}
 
 	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
-
 	CQuaternion quatInitialRotation(0,0,0,1);
 	pBlender->SetTargetPosition(vecPos);
 	pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 	pBlender->SetTargetRotationQuat(quatInitialRotation);
 	pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
-
 	pBlender->ResetInterpolation();
 
 	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
@@ -484,37 +483,19 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	pGameVehicle->engine_health = Packet.engineHealth;
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
-	m_Horn = Packet.horn;
-	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
 	pGameVehicle->speed_limit = Packet.speedLimit;
 	pGameVehicle->clutch = Packet.clutch;
+	pGameVehicle->gear = Packet.gear;
+	pGameVehicle->siren = Packet.siren;
+	pGameVehicle->lights = Packet.lights;
 
-	SetLights(Packet.lights);
-	SetSiren(Packet.siren);
+	SetEngine(Packet.engineOn, true);
 
-	//if (gear != IVehicle.gear) {
-	//	GetGameVehicle()->SetGear(gear);
-	//}
-
-	if (Packet.engineOn)
-	{
-		if (!GetEngine())
-		{
-			SetEngine(true);
-		}
-	}
-	else
-	{
-		if (!pGameVehicle->engine_on)
-		{
-			SetEngine(false);
-		}
-	}
-
-	
+	m_Horn = Packet.horn;
+	m_EngineRPM = Packet.rpm;
 
 	GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(0);
@@ -553,14 +534,8 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	pGameVehicle->engine_health = Packet.engineHealth;
 	pGameVehicle->fuel = Packet.fuel;
 	pGameVehicle->sound_enabled = Packet.sound;
-	//pGameVehicle->engine_on = Packet.engineOn;
-	//pGameVehicle->horn = Packet.horn;
-	m_Horn = Packet.horn;
 	pGameVehicle->siren = Packet.siren;
 	pGameVehicle->lights = Packet.lights;
-	//pGameVehicle->gear = Packet.gear;
-	//pGameVehicle->engine_rpm = Packet.rpm;
-	m_EngineRPM = Packet.rpm;
 	pGameVehicle->accelerating = Packet.accel;
 	pGameVehicle->break_val = Packet.brake;
 	pGameVehicle->hand_break = Packet.handBrake;
@@ -577,16 +552,19 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	{
 		if (!GetEngine())
 		{
-			SetEngine(true);
+			SetEngine(true, true);
 		}
 	}
 	else
 	{
-		if (!pGameVehicle->engine_on)
+		if (GetEngine())
 		{
-			SetEngine(false);
+			SetEngine(false, true);
 		}
 	}
+
+	m_EngineRPM = Packet.rpm;
+	m_Horn = Packet.horn;
 
 	m_RelativePosition = Packet.speed;
 	m_RelativeRotation = Packet.rotSpeed;
@@ -650,10 +628,6 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.wheelAngle = IVehicle.wheel_angle;
 	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
 	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
-
-	if (Packet.engineOn == true) {
-		GetGameVehicle()->SetEngineOn(true, 2);
-	}
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -787,7 +761,7 @@ bool CClientVehicle::SetGear(uint32_t gear)
 		return false;
 
 	m_MafiaVehicle->GetInterface()->vehicle_interface.gear = gear;
-
+	GetGameVehicle()->GearSnd();
 	return true;
 }
 
@@ -914,7 +888,8 @@ bool CClientVehicle::SetRoof(bool state)
 		return false;
 
 	//m_MafiaVehicle->GetInterface()->vehicle_interface.roof = state;
-	return false;
+	//m_MafiaVehicle->Do_Roof(state);
+	return true;
 }
 
 bool CClientVehicle::GetRoof()
@@ -922,8 +897,8 @@ bool CClientVehicle::GetRoof()
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	//return m_MafiaVehicle->GetInterface()->vehicle_interface.roof;
-	return false;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.roof;
+	//return false;
 }
 
 bool CClientVehicle::SetLocked(bool state)
@@ -963,12 +938,13 @@ bool CClientVehicle::GetLights()
 	return pVehicleInterface->lights;
 }
 
-bool CClientVehicle::SetEngine(bool state)
+bool CClientVehicle::SetEngine(bool state, bool unknown1 = true)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->SetEngineOn(state, 1);
+	m_MafiaVehicle->SetEngineOn(state, unknown1);
+	//m_MafiaVehicle->GetInterface()->vehicle_interface.sound_enabled = state;
 	return true;
 }
 
@@ -990,23 +966,23 @@ bool CClientVehicle::Explode()
 	return true;
 }
 
-bool CClientVehicle::IsSeatOccupied(unsigned char ucSeat)
+bool CClientVehicle::IsSeatOccupied(int8_t iSeat)
 {
-	return GetHumanInSeat(ucSeat) != nullptr;
+	return GetHumanInSeat(iSeat) != nullptr;
 }
 
-CClientHuman* CClientVehicle::GetHumanInSeat(unsigned char ucSeat)
+CClientHuman* CClientVehicle::GetHumanInSeat(int8_t iSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return nullptr;
 
-	if (m_pOccupants[ucSeat] == nullptr)
+	if (m_pOccupants[iSeat] == nullptr)
 		return nullptr;
 
-	return m_pOccupants[ucSeat].GetPointer();
+	return m_pOccupants[iSeat].GetPointer();
 }
 
-bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
+bool CClientVehicle::AssignSeat(CClientHuman* pHuman, int8_t iSeat)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -1014,22 +990,27 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, unsigned char ucSeat)
 	if (pHuman == nullptr)
 		return false;
 
-	if (IsSeatOccupied(ucSeat))
+	if (IsSeatOccupied(iSeat))
 		return false;
 
-	m_pOccupants[ucSeat] = pHuman;
+	m_pOccupants[iSeat] = pHuman;
 	return true;
 }
 
-bool CClientVehicle::FreeSeat(unsigned char ucSeat)
+bool CClientVehicle::FreeSeat(int8_t iSeat)
 {
+	_gassert(iSeat >= 0 && iSeat < ARRAY_COUNT(m_pOccupants));
+
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	if (!IsSeatOccupied(ucSeat))
+	if (iSeat == -1)
 		return false;
 
-	m_pOccupants[ucSeat] = nullptr;
+	if (!IsSeatOccupied(iSeat))
+		return false;
+
+	m_pOccupants[iSeat] = nullptr;
 	return true;
 }
 

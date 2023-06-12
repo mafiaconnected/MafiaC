@@ -38,6 +38,7 @@ enum eGameComponent
 	GAMECOMPONENT_FUELSTATIONS, 
 	GAMECOMPONENT_PLANES,
 	GAMECOMPONENT_BIGMAP,
+	GAMECOMPONENT_DEFAULTPARKEDCARS,
 };
 
 class CClientPlayer;
@@ -128,6 +129,7 @@ public:
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType;
+	Galactic3D::EventHandlers::CEventType* m_pOnAddActorEventType;
 
 	Galactic3D::CChatWindow* m_pChatWindow;
 	Galactic3D::CCmdWindow2* m_pCmdWindow;
@@ -215,6 +217,9 @@ public:
 
 	bool m_bFullReload = true;
 	bool m_bDontReloadScripts = false;
+	bool m_bControlsLocked = false;
+	bool m_bLocalTrafficEnabled = false;
+	bool m_bLocalCiviliansEnabled = false;
 
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
@@ -286,11 +291,11 @@ public:
 
 	void LockControls(bool state);
 
-	void HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
-	void HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown);
-	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
-	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
-	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat);
+	void HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
+	void HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown);
+	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iUnknown);
+	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
+	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat);
 	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();

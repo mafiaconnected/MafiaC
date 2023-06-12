@@ -4,3 +4,4 @@
 #include "ClientHuman.h"
 #include "ClientPlayer.h"
 #include "ClientVehicle.h"
+#include "ClientDummy.h"

@@ -15,10 +15,10 @@ static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void*
 	if (!pState->CheckVector3D(0, pos))
 		return false;
 
-	CClientEntity* pClientEntity = reinterpret_cast<CClientEntity*>(pClientManager->Create(ELEMENT_ENTITY));
-	pClientEntity->m_pResource = pState->GetResource();
-	pClientManager->RegisterNetObject(pClientEntity);
-	pState->ReturnObject(pClientEntity);
+	CClientDummy* pClientDummy = reinterpret_cast<CClientDummy*>(pClientManager->Create(ELEMENT_DUMMY));
+	pClientDummy->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientDummy);
+	pState->ReturnObject(pClientDummy);
 
 	return true;
 }
@@ -114,7 +114,7 @@ static bool FunctionGameChangeMap(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckBoolean(1, bFullReload))
 		return false;
 
-	g_pClientGame->m_bFullReload = false;
+	g_pClientGame->m_bFullReload = bFullReload;
 
 	// Note (Sevenisko): had to use another func, because PatchJumpToGame works only on game load
 	MafiaSDK::GetMission()->MapLoad(mapName2);
@@ -156,7 +156,6 @@ static bool FunctionGameFadeScreen(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckNumber(2, color))
 		return false;
 
-
 	MafiaSDK::GetIndicators()->FadeInOutScreen(fadeIn, time, color);
 	return true;
 }
@@ -173,10 +172,13 @@ static bool FunctionGameEnableMap(IScriptState* pState, int argc, void* pUser)
 
 static bool FunctionGameSetTrafficEnabled(IScriptState* pState, int argc, void* pUser)
 {
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
 	bool state = true;
 	if (!pState->CheckBoolean(0, state))
 		return false;
 
+	g_pClientGame->m_bLocalTrafficEnabled = state;
 	MafiaSDK::GetMission()->GetGame()->SetTrafficVisible(state);
 	return true;
 }
@@ -192,6 +194,48 @@ static bool FunctionGameAnnounce(IScriptState* pState, int argc, void* pUser)
 		return false;
 
 	MafiaSDK::GetIndicators()->RaceFlashText(message.CString(), time);
+	return true;
+}
+
+static bool FunctionGameCreateSound(IScriptState* pState, int argc, void* pUser)
+{
+	const GChar* msg = pState->CheckString(0);
+	if (!msg) return false;
+	UTF8String message(true, msg);
+
+	int32_t iSoundID = MafiaSDK::GetMission()->GetGame()->CreateStream(message.CString());
+
+	pState->ReturnNumber(iSoundID);
+	return true;
+}
+
+static bool FunctionGamePlaySound(IScriptState* pState, int argc, void* pUser)
+{
+	int32_t iSoundID = 0;
+	if (!pState->CheckNumber(0, iSoundID))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->PlayStream(iSoundID);
+	return true;
+}
+
+static bool FunctionGamePauseSound(IScriptState* pState, int argc, void* pUser)
+{
+	int32_t iSoundID = 0;
+	if (!pState->CheckNumber(0, iSoundID))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->PauseStream(iSoundID);
+	return true;
+}
+
+static bool FunctionGameDestroySound(IScriptState* pState, int argc, void* pUser)
+{
+	int32_t iSoundID = 0;
+	if (!pState->CheckNumber(0, iSoundID))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->DestroyStream(iSoundID);
 	return true;
 }
 
@@ -302,6 +346,232 @@ static bool FunctionGameEnableMoney(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionGameSetDoorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iState1 = false;
+	if (!pState->CheckNumber(1, iState1))
+		return false;
+
+	bool bState2 = false;
+	if (!pState->CheckBoolean(2, bState2))
+		return false;
+
+	bool bState3 = false;
+	if (!pState->CheckBoolean(3, bState3))
+		return false;
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	actor->SetState((MafiaSDK::C_Door_Enum::States)iState1, MafiaSDK::GetMission()->GetGame()->GetLocalPlayer(), bState2, bState3);
+	return true;
+}
+
+static bool FunctionGameGetDoorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->current_state);
+	return true;
+}
+
+static bool FunctionGameGetDoorOpenAngle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->open_angle);
+	return true;
+}
+
+static bool FunctionGameGetDoorOpenDirection(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	pState->ReturnNumber(actor->GetInterface()->open_direction);
+	return true;
+}
+
+static bool FunctionGameSetDoorOpenAngle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	float fAngle = false;
+	if (!pState->CheckNumber(1, fAngle))
+		return false;
+
+	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	actor->SetOpenAngle(fAngle);
+	return true;
+}
+
+static bool FunctionGameSetActorState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	bool bActive = false;
+	if (!pState->CheckBoolean(1, bActive))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->SetActive(bActive);
+	return true;
+}
+
+static bool FunctionGameSetActorActState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iState = false;
+	if (!pState->CheckNumber(1, iState))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->SetActState(iState);
+	return true;
+}
+
+static bool FunctionGameUnloadActor(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	MafiaSDK::GetMission()->UnloadActor(actor);
+	return true;
+}
+
+static bool FunctionGameSetVehicleTachometerValues(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	float fUnknown1;
+	if (!pState->CheckNumber(1, fUnknown1))
+		return false;
+
+	float fUnknown2;
+	if (!pState->CheckNumber(2, fUnknown2))
+		return false;
+
+	float fUnknown3;
+	if (!pState->CheckNumber(3, fUnknown3))
+		return false;
+
+	float fUnknown4;
+	if (!pState->CheckNumber(4, fUnknown4))
+		return false;
+
+	MafiaSDK::GetIndicators()->TachometrSetValues(fUnknown1, fUnknown2, fUnknown3, fUnknown4);
+	return true;
+}
+
+static bool FunctionGameAddVehicleToRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarAddCar(pClientVehicle->GetGameVehicle(), iColour);
+	return true;
+}
+
+static bool FunctionGameRemoveVehicleFromRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarRemoveCar(pClientVehicle->GetGameVehicle());
+	return true;
+}
+
+static bool FunctionGameSetPlayerVehicleOnRadar(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pClientVehicle))
+		return false;
+
+	uint32_t iColour = 0;
+	if (!pState->CheckNumber(1, iColour))
+		return false;
+
+	MafiaSDK::GetIndicators()->RadarSetPlayerCar(MafiaSDK::GetMission()->GetGame()->GetLocalPlayer());
+	return true;
+}
+
+static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	uint32_t iUnknown1 = false;
+	if (!pState->CheckNumber(1, iUnknown1))
+		return false;
+
+	uint32_t iUnknown2 = false;
+	if (!pState->CheckNumber(2, iUnknown2))
+		return false;
+
+	uint32_t iUnknown3 = false;
+	if (!pState->CheckNumber(3, iUnknown3))
+		return false;
+
+	uint32_t iUnknown4 = false;
+	if (!pState->CheckNumber(4, iUnknown4))
+		return false;
+
+	MafiaSDK::GetMission()->FindActorByName(name2)->ForceAI(iUnknown1, iUnknown2, iUnknown3, iUnknown4);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -366,8 +636,6 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 	pGameNamespace->AddProperty(pClientManager, _gstr("mapName"), ARGUMENT_STRING, FunctionGameGetMapName);
 
-	pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
-
 	{
 		pGameNamespace->AddProperty(pClientGame, _gstr("game"), ARGUMENT_INTEGER, FunctionGetGame);
 		pGameNamespace->AddProperty(pClientGame, _gstr("width"), ARGUMENT_INTEGER, FunctionGetWidth);
@@ -381,12 +649,19 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 
 		pClientManager->m_pClientVehicleClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreateVehicle, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
+
+		pClientManager->m_pClientDummyClass->RegisterConstructor(_gstr("tv"), FunctionGameCreateDummyElement, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
 	}
 
 	{
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
+		pGameNamespace->RegisterFunction(_gstr("createSound"), _gstr("s"), FunctionGameCreateSound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("playSound"), _gstr("i"), FunctionGamePlaySound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("pauseSound"), _gstr("i"), FunctionGamePauseSound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("destroySound"), _gstr("i"), FunctionGameDestroySound, pClientManager);
 	}
 
 	{
@@ -397,6 +672,24 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setVehicleTachometerValues"), _gstr("ffff"), FunctionGameSetVehicleTachometerValues, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("addVehicleToRadar"), _gstr("xi"), FunctionGameAddVehicleToRadar, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("removeVehicleFromRadar"), _gstr("x"), FunctionGameRemoveVehicleFromRadar, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("setPlayerVehicleOnRadar"), _gstr(""), FunctionGameSetPlayerVehicleOnRadar, pClientManager);
+	}
+
+	{
+		pGameNamespace->RegisterFunction(_gstr("getDoorState"), _gstr("s"), FunctionGameGetDoorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("getDoorOpenAngle"), _gstr("s"), FunctionGameGetDoorOpenAngle, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setDoorState"), _gstr("sibb"), FunctionGameSetDoorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
+	}
+
+	{
+		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("si"), FunctionGameSetActorActState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorAI"), _gstr("siiii"), FunctionGameSetActorAI, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("unloadActor"), _gstr("s"), FunctionGameUnloadActor, pClientManager);
 	}
 
 	if (pClientGame->GetMultiplayer() == nullptr)

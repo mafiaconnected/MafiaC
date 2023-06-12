@@ -11,6 +11,7 @@ class CClientEntity;
 class CClientHuman;
 class CClientPlayer;
 class CClientVehicle;
+class CClientDummy;
 
 // Changable limits
 #include <IncreasedLimits.h>
@@ -21,6 +22,7 @@ enum eMafiaElementType
 	ELEMENT_PED = ELEMENT_ENTITY | 8,
 	ELEMENT_PLAYER = ELEMENT_PED | 16,
 	ELEMENT_VEHICLE = ELEMENT_ENTITY | 32,
+	ELEMENT_DUMMY = ELEMENT_ENTITY | 64,
 };
 
 class CMafiaClientManager : public Galactic3D::CClientManager
@@ -35,6 +37,7 @@ public:
 	Galactic3D::ReflectedClass* m_pClientHumanClass;
 	Galactic3D::ReflectedClass* m_pClientPlayerClass;
 	Galactic3D::ReflectedClass* m_pClientVehicleClass;
+	Galactic3D::ReflectedClass* m_pClientDummyClass;
 
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);

@@ -7,6 +7,7 @@ class CClientEntity;
 class CClientHuman;
 class CClientPlayer;
 class CClientVehicle;
+class CClientDummy;
 
 #define MAFIA_P2P_SERVER_IDS 1
 
@@ -44,4 +45,5 @@ public:
 	void SendHumanDeath(CClientHuman* target, CClientEntity* attacker);
 	void SendHumanDropWeapon(CClientHuman* target);
 	void SendHumanChangeWeapon(CClientHuman* target, int8_t weapon);
+	void SendHumanReloadWeapon(CClientHuman* target);
 };

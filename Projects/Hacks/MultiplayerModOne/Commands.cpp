@@ -52,6 +52,7 @@ void CConnectCommandHandler::Execute(const GChar* pszCommandName, const GChar* p
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 	{
+		g_pClientGame->m_bFullReload = true;
 		g_pClientGame->StopMultiplayerGame(DISCONNECT_GRACEFUL, true);
 	}
 
@@ -91,16 +92,20 @@ void CDisconnectCommandHandler::Execute(const GChar* pszCommandName, const GChar
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 		g_pClientGame->StopMultiplayerGameWhenSafe(DISCONNECT_GRACEFUL);
+		//g_pClientGame->StopMultiplayerGame(DISCONNECT_GRACEFUL, false);
 	else
 		m_pCommandHandlers->m_pLogger->LogFormatted(LOGTYPE_WARN, _gstr("Not connected to a server!"));
 }
 
 void CMafiaCExitCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)
 {
-//	g_pClientGame->ShutDown();
+	//g_pClientGame->ShutDown();
 
-	if (GHWND != nullptr)
+	g_pClientGame->StopMultiplayerGame(DISCONNECT_GRACEFUL, false);
+
+	if (GHWND != nullptr) {
 		SendMessageW(GHWND, WM_CLOSE, 0, 0);
+	}
 }
 
 void CConsoleCommandHandler::Execute(const GChar* pszCommandName, const GChar* pszArguments, CBaseObject* pClient)

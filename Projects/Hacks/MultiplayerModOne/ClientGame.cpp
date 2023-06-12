@@ -306,17 +306,17 @@ void CClientGame::InitialiseScripting(void)
 	//m_pOnExampleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnExampleEvent"), _gstr("Called whenever something happens"), 1);
 	//m_pOnExampleEventType->m_bCanPreventDefault = true;
 	//m_pOnExampleEventType->m_iSource = 0;
-	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, false);
+	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, true);
 	//m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
 	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"), 7, true);
-	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, false);
-	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, false);
-
-	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, false);
-	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, false);
-	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, false);
-	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, false);
-	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, false);
+	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, true);
+	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, true);
+	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, true);
+	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, true);
+	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, true);
+	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, true);
+	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, true);
+	m_pOnAddActorEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnAddActor"), _gstr("Called whenever game actor is added"), 3, true);
 
 	m_pGalacticFunctions = new CGalacticFunctions(m_pResourceMgr, false, false, false, false, false);
 	m_pGalacticFunctions->m_p2D = &m_p2D;
@@ -1120,7 +1120,9 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 			else if (Event.key.keysym.sym == SDLK_RETURN || Event.key.keysym.sym == SDLK_RETURN2 || Event.key.keysym.sym == SDLK_KP_ENTER)
 			{
 				SetCursorEnabled(false);
-				LockControls(false);
+				if (m_bControlsLocked) {
+					LockControls(false);
+				}
 
 				//_glogprintf(_gstr("CmdWindow ProcessInput"));
 				m_pResourceMgr->m_pCommandHandlers->PushLogger(m_pChatWindow);
@@ -1130,7 +1132,9 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 			else if (Event.key.keysym.sym == SDLK_ESCAPE)
 			{
 				SetCursorEnabled(false);
-				LockControls(false);
+				if (m_bControlsLocked) {
+					LockControls(false);
+				}
 			}
 
 			if (m_pCmdWindow->OnKeyDown(Event.key.keysym))
@@ -1144,7 +1148,10 @@ bool CClientGame::OnKeyDown(const SDL_Event& Event)
 		{
 			if (Event.key.keysym.sym == SDLK_t || Event.key.keysym.sym == SDLK_BACKQUOTE)
 			{
-				LockControls(true);
+				if (!m_bControlsLocked) {
+					LockControls(true);
+				}
+				
 				m_bEnableCmdWindowOnCharPress = true;
 				SetCursorEnabled(true);
 				return true;
@@ -1186,7 +1193,9 @@ void CClientGame::OnCharacter(wchar_t c)
 				UpdateCursorEnabled();
 				m_bEnableCmdWindowOnCharPress = false;
 
-				LockControls(true);
+				if (!m_bControlsLocked) {
+					LockControls(true);
+				}
 			}
 		}
 	}
@@ -1810,10 +1819,14 @@ void CClientGame::LockControls(bool state)
 		return;
 	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer() == nullptr)
 		return;
+	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->GetInterface()->humanObject.carLeavingOrEntering != nullptr)
+		return;
+
+	m_bControlsLocked = state;
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
-void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
+void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
 	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
 
@@ -1843,7 +1856,7 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 	pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
@@ -1871,7 +1884,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
+void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
@@ -1901,7 +1914,7 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
 	_glogprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
@@ -1929,7 +1942,7 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	//pClientVehicle->FreeSeat(iSeat);
 }
 
-void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, uint8_t iSeat)
+void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat)
 {
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -2025,7 +2038,7 @@ bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 
 	auto pClientVehicle = Strong<CClientVehicle>::New(m_pClientManager->Create(ELEMENT_VEHICLE));
 	pClientVehicle->SetFromExistingEntity(pCar);
-	//m_pClientManager->RegisterObject(pClientVehicle);
+	m_pClientManager->RegisterNetObject(pClientVehicle);
 
 	{
 		pClientVehicle->GenerateGUID();
@@ -2092,9 +2105,9 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 	switch (GameComponent)
 	{
 	case GAMECOMPONENT_TRAFFIC:
-		return m_CVars.GetBoolean(_gstr("Traffic"), true);
+		return m_CVars.GetBoolean(_gstr("Traffic"), true) || m_bLocalTrafficEnabled;
 	case GAMECOMPONENT_CIVILIANS:
-		return m_CVars.GetBoolean(_gstr("Civilians"), true);
+		return m_CVars.GetBoolean(_gstr("Civilians"), true) || m_bLocalCiviliansEnabled;
 	case GAMECOMPONENT_SCRIPTS:
 		return m_CVars.GetBoolean(_gstr("Scripts"), true);
 	case GAMECOMPONENT_BRIDGES:
@@ -2113,6 +2126,9 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 		return m_CVars.GetBoolean(_gstr("Planes"), true);
 	case GAMECOMPONENT_BIGMAP:
 		return m_CVars.GetBoolean(_gstr("BigMap"), true);
+	case GAMECOMPONENT_DEFAULTPARKEDCARS:
+		return m_CVars.GetBoolean(_gstr("DefaultParkedCars"), true);
+		
 	default:
 		break;
 	}

@@ -39,7 +39,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
-	CClientNetGame::ProcessPacket(Peer, PacketID, pStream); // this is asking for problems, MOVE IT TO DEFAULT CASE IDIOT
+
+	CClientNetGame::ProcessPacket(Peer, PacketID, pStream);
 
 	switch (PacketID)
 	{
@@ -384,6 +385,9 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			bool state = false;
 			Reader.ReadBoolean(state);
 
+			//bool unknown = false;
+			//Reader.ReadBoolean(unknown);
+
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
 				return;
@@ -393,7 +397,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
-					pClientVehicle->SetEngine(state);
+					pClientVehicle->SetEngine(state, true);
 				}
 			}
 		}
@@ -705,15 +709,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_ENTERINGVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -743,15 +747,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_ENTEREDVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -778,15 +782,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_EXITINGVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -813,15 +817,15 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_EXITEDVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nUnknown;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nUnknown, 1);
 
@@ -848,10 +852,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
-			uint32_t nHumanNetworkIndex;
+			int32_t nHumanNetworkIndex;
 			double fHealth;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadDouble(&fHealth, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
@@ -867,13 +871,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_HUMAN_JACKVEHICLE:
 		{
-			uint32_t nHumanNetworkIndex;
-			uint32_t nVehicleNetworkIndex;
-			uint8_t nSeatId;
+			int32_t nHumanNetworkIndex;
+			int32_t nVehicleNetworkIndex;
+			int8_t nSeatId;
 
-			Reader.ReadUInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadUInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadUInt8(&nSeatId, 1);
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nSeatId, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -898,10 +902,10 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		case MAFIAPACKET_ELEMENT_UPDATE_ID:
 		{
-			uint64_t nLocalElementId;
+			int64_t nLocalElementId;
 			int32_t nServerElementId;
 
-			Reader.ReadUInt64(&nLocalElementId, 1);
+			Reader.ReadInt64(&nLocalElementId, 1);
 			Reader.ReadInt32(&nServerElementId, 1);
 
 			if (nServerElementId != INVALID_NETWORK_ID)
@@ -938,7 +942,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		default:
 		{
-
+			
 		}
 		break;
 	}
@@ -1106,6 +1110,9 @@ void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 
 void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
+	if (target == nullptr)
+		return;
+
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
 
@@ -1139,5 +1146,15 @@ void CMultiplayer::SendHumanChangeWeapon(CClientHuman* target, int8_t weapon)
 	Packet Packet(MAFIAPACKET_HUMAN_CHANGEWEAP);
 	Packet.Write<int32_t>(target->GetId());
 	Packet.Write<int32_t>((int32_t)weapon);
+	SendHostPacket(&Packet);
+}
+
+void CMultiplayer::SendHumanReloadWeapon(CClientHuman* target)
+{
+	if (target->IsLocal() || !target->IsSyncer())
+		return;
+
+	Packet Packet(MAFIAPACKET_HUMAN_RELOAD);
+	Packet.Write<int32_t>(target->GetId());
 	SendHostPacket(&Packet);
 }
