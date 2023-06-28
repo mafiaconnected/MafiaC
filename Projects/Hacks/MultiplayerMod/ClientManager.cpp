@@ -32,16 +32,46 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
 
 CNetObject* CMafiaClientManager::Create(int32_t nType)
 {
+	CClientVehicle* veh;
+	CClientHuman* ped;
+	CClientPlayer* player;
+
 	switch (nType)
 	{
 	case ELEMENT_ELEMENT:
 		return new CClientEntity(this);
 	case ELEMENT_VEHICLE:
-		return new CClientVehicle(this);
+		veh = new CClientVehicle(this);
+		for (int i = 0; i < MAX_VEHICLES; i++)
+		{
+			if (m_rgpVehicles[i].IsNull())
+			{
+				m_rgpVehicles[i] = veh;
+				return veh;
+			}
+		}
+		break;
 	case ELEMENT_PLAYER:
-		return new CClientPlayer(this);
+		player = new CClientPlayer(this);
+		for (int i = 0; i < MAX_PEDS; i++)
+		{
+			if (m_rgpPlayers[i].IsNull())
+			{
+				m_rgpPlayers[i] = player;
+				return player;
+			}
+		}
+		break;
 	case ELEMENT_PED:
-		return new CClientHuman(this);
+		ped = new CClientHuman(this);
+		for (int i = 0; i < MAX_PEDS; i++)
+		{
+			if (m_rgpPeds[i].IsNull())
+			{
+				m_rgpPeds[i] = ped;
+				return ped;
+			}
+		}
 	case ELEMENT_DUMMY:
 		return new CClientDummy(this);
 	default:
@@ -52,14 +82,14 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 
 void CMafiaClientManager::Remove(CNetObject* pNetObject)
 {
-	//for (int i = 0; i < MAX_VEHICLES; i++)
-	//{
-	//	if (m_rgpVehicles[i] != nullptr && !m_rgpVehicles[i].IsNull() && m_rgpVehicles[i].GetPointer() == pNetObject)
-	//	{
-	//		m_rgpVehicles[i].SetNull();
-	//		return;
-	//	}
-	//}
+	for (int i = 0; i < MAX_VEHICLES; i++)
+	{
+		if (m_rgpVehicles[i] != nullptr && !m_rgpVehicles[i].IsNull() && m_rgpVehicles[i].GetPointer() == pNetObject)
+		{
+			m_rgpVehicles[i].SetNull();
+			return;
+		}
+	}
 }
 
 bool CMafiaClientManager::IsConnecting(void)
@@ -157,6 +187,21 @@ CClientPlayer* CMafiaClientManager::FindPlayer(MafiaSDK::C_Player* pPlayer)
 	for (auto pElement : m_rgpPlayers)
 	{
 		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameHuman() == pPlayer)
+		{
+			return pElement.GetPointer();
+		}
+	}
+	return nullptr;
+}
+
+CClientObject* CMafiaClientManager::FindObject(MafiaSDK::C_Actor* pObject)
+{
+	if (pObject == nullptr)
+		return nullptr;
+
+	for (auto pElement : m_rgpObjects)
+	{
+		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameObject() == pObject)
 		{
 			return pElement.GetPointer();
 		}
