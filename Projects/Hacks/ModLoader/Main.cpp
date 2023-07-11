@@ -20,6 +20,10 @@ static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 
 	//_glogprintf(_gstr("Read file: %hs"), file);
 
+	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
+	//strFile += (const GChar*)file;
+	//return dtaOpen(strFile, params);
+
 	return dtaOpen(file, params);
 }
 
@@ -31,9 +35,11 @@ static void Load(tHackEventDataLoad* pData)
     hRwData = GetModuleHandle(_T("rw_data.dll"));
 	HMODULE hGame = GetModuleHandle(_T("Game.exe"));
 	HMODULE hLS3DF = GetModuleHandle(_T("LS3DF.dll"));
+
 	assert(hGame);
 	assert(hLS3DF);
 	assert(hRwData);
+
     if (hGame != nullptr)
     {
         CHacks::GetImportLookups(hGame, "rw_data.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
