@@ -608,6 +608,29 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		}
 		break;
 
+		case MAFIAPACKET_VEHICLE_SETGEAR:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			uint32_t gear = 0;
+			Reader.ReadUInt32(&gear, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetGear(gear);
+				}
+			}
+		}
+		break;
+
 		case MAFIAPACKET_EXPLOSION:
 		{
 			CVector3D pos;
