@@ -386,8 +386,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			bool state = false;
 			Reader.ReadBoolean(state);
 
-			//bool unknown = false;
-			//Reader.ReadBoolean(unknown);
+			bool instant = true;
+			Reader.ReadBoolean(instant);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
@@ -398,7 +398,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
-					pClientVehicle->SetEngine(state, true);
+					pClientVehicle->SetEngine(state, instant);
 				}
 			}
 		}
