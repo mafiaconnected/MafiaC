@@ -264,7 +264,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 	std::vector<ObjTypes> forbidden_objects = {
 		//ObjTypes::Car,
 		//ObjTypes::Dog,
-		ObjTypes::Enemy,
+		//ObjTypes::Enemy,
 		//ObjTypes::Pumpar,
 		//ObjTypes::Player,
 		ObjTypes::GhostObject,
@@ -304,89 +304,94 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		}
 	}
 
-	if (type == ObjTypes::Trolley && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Trolley && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::Door && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Door && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOORS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::Pumpar && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Pumpar && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_FUELSTATIONS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::Dog && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
-			MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Dog && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DOGS)) {
+	//		MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::Plane && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Plane && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_PLANES)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::RailRoute && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::RailRoute && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAINS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::InitScript && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::InitScript && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_SCRIPTS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::Car && frame != NULL) {
-		if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DEFAULTPARKEDCARS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::Car && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_DEFAULTPARKEDCARS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::TrafficSetup && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::TrafficSetup && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
-	if (type == ObjTypes::PedestrianSetup && frame != NULL) {
-		if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
-			if (frame_ex)
-				frame_ex->SetOn(false);
-			return nullptr;
-		}
-	}
+	//if (type == ObjTypes::PedestrianSetup && frame != NULL) {
+	//	if (!g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_CIVILIANS)) {
+	//		if (frame_ex)
+	//			frame_ex->SetOn(false);
+	//		return nullptr;
+	//	}
+	//}
 
 	// Grab model from frame with g_umapModelNames[(uint32_t)frame_ex]
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
+
+	if (type == ObjTypes::Car && frame != NULL) {
+		g_pClientGame->OnTrafficCarCreate((MafiaSDK::C_Car*)actor);
+	}
+
 	return actor;
 }
 
