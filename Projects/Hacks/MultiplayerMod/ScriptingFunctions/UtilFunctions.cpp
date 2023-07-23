@@ -401,8 +401,8 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TROLLEY"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Trolley);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_MODEL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Model);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BOTTLE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bottle);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRAFFIC"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::TrafficSetup);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PEDESTRIANSETUP"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::PedestrianSetup);	
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRAFFIC"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Traffic);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PEDESTRIAN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Pedestrian);	
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BRIDGE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bridge);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOG"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Dog);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLANE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Plane);
@@ -410,8 +410,8 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_FUELPUMPER"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Pumpar);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_HUMAN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Human);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RACECAMERA"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RaceCamera);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_WAGON"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Wagons);
-	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CLOCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Clocks);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_WAGON"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Wagon);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CLOCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Clock);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PHYSICAL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Physical);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRUCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Truck);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_INITSCRIPT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::InitScript);

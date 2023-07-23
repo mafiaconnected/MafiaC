@@ -267,14 +267,14 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		//ObjTypes::Enemy,
 		//ObjTypes::Pumpar,
 		//ObjTypes::Player,
-		ObjTypes::GhostObject,
-		ObjTypes::Detector,
+		//ObjTypes::GhostObject,
+		//ObjTypes::Script,
 		//ObjTypes::Bottle,
 		//ObjTypes::Clocks,
-		ObjTypes::RaceCamera,
+		//ObjTypes::RaceCamera,
 		//ObjTypes::Model,
-		ObjTypes::Truck,
-		ObjTypes::Wagons,
+		//ObjTypes::Truck,
+		//ObjTypes::Wagon,
 	};
 
 	MafiaSDK::I3D_Frame* frame_ex = (MafiaSDK::I3D_Frame*)frame;
@@ -388,7 +388,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 	// Grab model from frame with g_umapModelNames[(uint32_t)frame_ex]
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
 
-	if (type == ObjTypes::Car && frame != NULL) {
+	if (type == ObjTypes::Traffic && frame != NULL) {
 		g_pClientGame->OnTrafficCarCreate((MafiaSDK::C_Car*)actor);
 	}
 
