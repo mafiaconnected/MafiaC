@@ -19,7 +19,7 @@ Galactic3D::ReflectedClass* CClientObject::GetReflectedClass(void)
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientObjectClass;
 }
 
-void CClientObject::Create(const GChar* model, const CVector3D& pos, const CVector3D& rot)
+void CClientObject::Create(const CVector3D& pos, const CVector3D& rot)
 {
 	if (m_MafiaObject != nullptr)
 	{
@@ -29,19 +29,9 @@ void CClientObject::Create(const GChar* model, const CVector3D& pos, const CVect
 
 	auto pModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
 
-	if (pModel == nullptr)
-	{
-		printf("Failed to create object. Frame creation failed.\n");
-		return;
-	}
+	UTF8String model(true, m_szModel);
 
-	UTF8String mdl(true, model);
-
-	if (!MafiaSDK::GetModelCache()->Open(pModel, mdl.CString(), NULL, NULL, NULL, NULL))
-	{
-		//printf("Failed to create object. Open model cache failed. Model: %s\n", mdl.CString());
-		//return;
-	}
+	MafiaSDK::GetModelCache()->Open(pModel, model.CString(), NULL, NULL, NULL, NULL);
 
 	pModel->SetName("SomeObject");
 	pModel->SetScale({ 1, 1, 1 });
@@ -54,12 +44,12 @@ void CClientObject::Create(const GChar* model, const CVector3D& pos, const CVect
 	pModel->Update();
 
 	g_pClientGame->m_bCreateActorInvokedByGame = false;
-	m_MafiaObject = reinterpret_cast<MafiaSDK::C_Actor*>(MafiaSDK::GetMission()->CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes::Model));
+	m_MafiaObject = reinterpret_cast<MafiaSDK::C_Actor*>(MafiaSDK::GetMission()->CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes::Physical));
 	g_pClientGame->m_bCreateActorInvokedByGame = true;
 
 	if (m_MafiaObject == nullptr)
 	{
-		printf("Failed to create object. Game actor creation failed. Model: %s\n", mdl.CString());
+		printf("Failed to create object. Game actor creation failed. Model: %s\n", model.CString());
 		return;
 	}
 
@@ -124,4 +114,24 @@ void CClientObject::UpdateGameMatrix(void)
 	}
 
 	m_MafiaObject->GetFrame()->Update();
+}
+
+MafiaSDK::C_Actor* CClientObject::GetGameObject()
+{
+	return m_MafiaObject;
+}
+
+bool CClientObject::ReadCreatePacket(Galactic3D::Stream* pStream)
+{
+	if (!CClientEntity::ReadCreatePacket(pStream))
+		return false;
+
+	//_glogprintf(_gstr("Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%f, %f, %f - %f, %f, %f]\n\tRotation: [%f, %f, %f - %f, %f, %f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z));
+
+	if (GetGameObject() == nullptr)
+	{
+		Create(m_Position, m_Rotation);
+	}
+
+	return true;
 }

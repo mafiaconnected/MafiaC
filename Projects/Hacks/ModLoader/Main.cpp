@@ -9,7 +9,7 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
-std::unordered_map<const char*, Stream> g_umapFileNames;
+//std::unordered_map<const char*, Stream> g_umapFileNames;
 
 static void ForceDTARead(bool state)
 {

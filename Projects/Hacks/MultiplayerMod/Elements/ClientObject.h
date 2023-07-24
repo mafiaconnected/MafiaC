@@ -17,8 +17,8 @@ public:
 
 	virtual MafiaSDK::C_Actor* GetGameObject();
 
-	virtual void Process(void) override;
-	virtual void Create(const GChar* model, const CVector3D& pos, const CVector3D& rot);
+	//virtual void Process(void) override;
+	virtual void Create(const CVector3D& pos, const CVector3D& rot);
 	virtual void Delete(void);
 	virtual void Despawn(void);
 	virtual void Remove(void);
@@ -28,15 +28,15 @@ public:
 
 	void UpdateGameMatrix(void);
 
-	virtual bool SetPosition(const CVector3D& vecPos) override;
-	virtual bool GetPosition(CVector3D& vecPos) override;
+	//virtual bool SetPosition(const CVector3D& vecPos) override;
+	//virtual bool GetPosition(CVector3D& vecPos) override;
 
-	virtual bool SetRotation(const CVector3D& vecPos) override;
-	virtual bool GetRotation(CVector3D& vecPos) override;
+	//virtual bool SetRotation(const CVector3D& vecPos) override;
+	//virtual bool GetRotation(CVector3D& vecPos) override;
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
-	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
+	//virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
 
-	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
-	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
+	//virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
+	//virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
 };

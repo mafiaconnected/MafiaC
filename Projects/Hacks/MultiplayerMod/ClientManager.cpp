@@ -23,6 +23,7 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
     m_pClientPlayerClass = pElements->NewClass(_gstr("Player"), m_pClientHumanClass);
     m_pClientVehicleClass = pElements->NewClass(_gstr("Vehicle"), m_pClientEntityClass);
 	m_pClientDummyClass = pElements->NewClass(_gstr("Dummy"), m_pClientEntityClass);
+	m_pClientObjectClass = pElements->NewClass(_gstr("Object"), m_pClientEntityClass);
 
 	m_pSurfaceClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Surface"));
 	m_pTextureClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Texture"), m_pSurfaceClass);
@@ -35,11 +36,14 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 	CClientVehicle* veh;
 	CClientHuman* ped;
 	CClientPlayer* player;
+	CClientObject* object;
 
 	switch (nType)
 	{
 	case ELEMENT_ELEMENT:
 		return new CClientEntity(this);
+	case ELEMENT_DUMMY:
+		return new CClientDummy(this);
 	case ELEMENT_VEHICLE:
 		veh = new CClientVehicle(this);
 		for (int i = 0; i < MAX_VEHICLES; i++)
@@ -72,8 +76,18 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 				return ped;
 			}
 		}
-	case ELEMENT_DUMMY:
-		return new CClientDummy(this);
+		break;
+	case ELEMENT_OBJECT:
+		object = new CClientObject(this);
+		for (int i = 0; i < MAX_OBJECTS; i++)
+		{
+			if (m_rgpObjects[i].IsNull())
+			{
+				m_rgpObjects[i] = object;
+				return object;
+			}
+		}
+		break;
 	default:
 		break;
 	}

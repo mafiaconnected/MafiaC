@@ -287,7 +287,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 	CString Model(false, g_umapModelNames[(uint32_t)frame_ex].c_str());
 	Args.AddString(Model); // Model name
-	
+
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnAddActorEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault) {
@@ -388,9 +388,11 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 	// Grab model from frame with g_umapModelNames[(uint32_t)frame_ex]
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
 
-	if (type == ObjTypes::Traffic && frame != NULL) {
-		g_pClientGame->OnTrafficCarCreate((MafiaSDK::C_Car*)actor);
-	}
+	//if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
+	//	if ((type == ObjTypes::Car || type == ObjTypes::Traffic) && frame != NULL) {
+	//		g_pClientGame->OnTrafficCarCreate((MafiaSDK::C_Car*)actor);
+	//	}
+	//}
 
 	return actor;
 }
