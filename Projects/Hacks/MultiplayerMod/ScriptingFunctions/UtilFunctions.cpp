@@ -141,32 +141,11 @@ static bool FunctionSetCameraLookAtOld(IScriptState* pState, int argc, void* pUs
 
 static bool FunctionGetCameraMatrix(IScriptState* pState, int argc, void* pUser)
 {
-	// UNFINISHED
-	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
-	D3DXMATRIX camMat1 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 356);
-	D3DXMATRIX camMat2 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 484);
-	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
-	
-	CMatrix4x4 mat;
+	CMatrix4x4 mat(CVecTools::ConvertFromMafiaMatrix(MafiaSDK::GetCurrentCamera()->GetMatrix()));
+	pState->ReturnMatrix4x4(mat);
 
-	CVector3D vecPosition;
-	vecPosition.x = camMat3.m[3][0];
-	vecPosition.y = camMat3.m[3][1];
-	vecPosition.z = camMat3.m[3][2];
-	mat.SetTranslate(vecPosition);
-
-	CVector3D vecRotation;
-	vecPosition.x = camMat3.m[3][0];
-	vecPosition.y = camMat3.m[3][1];
-	vecPosition.z = camMat3.m[3][2];
-	mat.SetTranslate(vecPosition);
-
-	CVector3D vecCameraPosition;
-	vecCameraPosition.x = camMat3.m[3][0];
-	vecCameraPosition.y = camMat3.m[3][1];
-	vecCameraPosition.z = camMat3.m[3][2];
-
-	pState->ReturnVector3D(vecCameraPosition);
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
 	return true;
 }
 
@@ -176,15 +155,11 @@ static bool FunctionSetCameraMatrix(IScriptState* pState, int argc, void* pUser)
 	if (!pState->CheckMatrix4x4(0, mat))
 		return false;
 
-	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
-	D3DXMATRIX camMat3 = *(D3DXMATRIX*)(*(uint32_t*)((((uint32_t)&pGame->GetInterface()->mCamera) + 4)) + 548);
+	MafiaSDK::GetCurrentCamera()->SetMatrix(CVecTools::ConvertToMafiaMatrix(mat));
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
 
-	CVector3D vecCameraPosition;
-	vecCameraPosition.x = camMat3.m[3][0];
-	vecCameraPosition.y = camMat3.m[3][1];
-	vecCameraPosition.z = camMat3.m[3][2];
-
-	pState->ReturnVector3D(vecCameraPosition);
+	pState->ReturnMatrix4x4(mat);
 	return true;
 }
 
@@ -326,6 +301,19 @@ static bool FunctionSetCameraLookFromEyes(IScriptState* pState, int argc, void* 
 {
 	MafiaSDK::GetMission()->GetGame()->GetCamera()->LookFromEyes();
 	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
+	return true;
+}
+
+static bool FunctionSetCameraLookAround(IScriptState* pState, int argc, void* pUser)
+{
+	int32_t val;
+	if (!pState->CheckNumber(0, val))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->GetCamera()->LookAround(val);
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
 	return true;
 }
 
@@ -403,7 +391,30 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_MINOR"), LAUNCHER_MINOR);
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_PATCH"), LAUNCHER_PATCH);
 	pDefineHandlers->Define(_gstr("CLIENT_VERSION_BUILD"), LAUNCHER_BUILD);
-	//pDefineHandlers->Define("CLIENT_VERSION", CLIENT_VERSION_MAJOR+"."+CLIENT_VERSION_MINOR+"."+CLIENT_VERSION_PATCH+"."+CLIENT_VERSION_BUILD);
+
+	// Actor types (for OnAddActor event) 
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_GHOSTOBJECT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::GhostObject);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLAYER"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Player);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CAR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Car);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_SCRIPT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Script);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOOR"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Door);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TROLLEY"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Trolley);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_MODEL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Model);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BOTTLE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bottle);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRAFFIC"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Traffic);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PEDESTRIAN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Pedestrian);	
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_BRIDGE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Bridge);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_DOG"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Dog);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PLANE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Plane);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RAILROUTE"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RailRoute);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_FUELPUMPER"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Pumpar);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_HUMAN"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Human);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_RACECAMERA"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::RaceCamera);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_WAGON"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Wagon);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_CLOCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Clock);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PHYSICAL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Physical);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRUCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Truck);
+	pDefineHandlers->Define(_gstr("ACTOR_TYPE_INITSCRIPT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::InitScript);
 }
 
 void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
@@ -417,9 +428,9 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
-	pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
-	pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
-	pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPeds"), _gstr(""), FunctionGetHumans);
+	//pScripting->m_Global.RegisterFunction(_gstr("getPlayers"), _gstr(""), FunctionGetPlayers);
+	//pScripting->m_Global.RegisterFunction(_gstr("getVehicles"), _gstr(""), FunctionGetVehicles);
 	pScripting->m_Global.RegisterFunction(_gstr("getScreenFromWorldPosition"), _gstr("v"), FunctionGetScreenFromWorldPosition, pClientGame);
 
 	{
@@ -427,12 +438,12 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 		pCameraNamespace->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionGetCameraPosition, FunctionSetCameraLookAtPosition);
 		pCameraNamespace->AddProperty(pClientManager, _gstr("lookAtPosition"), ARGUMENT_VECTOR3D, FunctionGetCameraLookAtPosition, FunctionSetCameraLookAtPosition);
 		pCameraNamespace->RegisterFunction(_gstr("lookFromEyes"), _gstr(""), FunctionSetCameraLookFromEyes);
+		pCameraNamespace->RegisterFunction(_gstr("lookAround"), _gstr("i"), FunctionSetCameraLookAround);
 		pCameraNamespace->RegisterFunction(_gstr("restore"), _gstr(""), FunctionRestoreCamera);
 		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 
 		// Compatibility with GTAC
 		pGameNamespace->AddProperty(pClientGame, _gstr("cameraMatrix"), ARGUMENT_MATRIX4X4, FunctionGetCameraMatrix, FunctionSetCameraMatrix); // TODO
-		//pGameNamespace->RegisterFunction(_gstr("setCameraMatrix"), _gstr("x"), FunctionSetCameraMatrix, pClientGame); // TODO
 		pGameNamespace->RegisterFunction(_gstr("restoreCamera"), _gstr("|b"), FunctionRestoreCamera);
 		pGameNamespace->RegisterFunction(_gstr("setCameraLookAt"), _gstr("vv|b"), FunctionSetCameraLookAt);
 	}

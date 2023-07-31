@@ -13,6 +13,7 @@ public:
 	static void RegisterEntityFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterGameFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
+	static void RegisterObjectFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	//static void RegisterPlayerFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);

@@ -207,7 +207,7 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	pModel->Update();
 
 	g_pClientGame->m_bCreateActorInvokedByGame = false;
-	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy));
+	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Human));
 	g_pClientGame->m_bCreateActorInvokedByGame = true;
 
 	m_MafiaHuman->Init(pModel);
@@ -840,6 +840,8 @@ void CClientHuman::ClearInventory()
 
 		item.weapId = item.ammo1 = item.ammo2 = 0;
 	}
+
+	//GetGameHuman()->InventoryTruncate();
 }
 
 void CClientHuman::GiveWeapon(unsigned short ucWeapon, unsigned short ucAmmo1, unsigned short ucAmmo2)

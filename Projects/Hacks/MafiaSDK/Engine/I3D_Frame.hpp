@@ -104,6 +104,12 @@ namespace MafiaSDK
             return *(S_matrix*)((DWORD)this + 0x10);
         }
 
+		void SetMatrix(S_matrix mat)
+		{
+			*(S_matrix*)((DWORD)this + 0x10) = mat;
+			return;
+		}
+
         void UpdateWMatrixProc()
         {
             DWORD update_mat = 0x0060fc30;

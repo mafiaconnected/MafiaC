@@ -9,6 +9,8 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
+//std::unordered_map<const char*, Stream> g_umapFileNames;
+
 static void ForceDTARead(bool state)
 {
 	*(BYTE*)(((DWORD)hRwData + 0x12C98)) = state;
@@ -16,9 +18,15 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	// To-do (Sevenisko): Actually load mods
+	//if (g_umapFileNames.count(file) > 0) {
+		// Custom file is available, use it
+	//}
 
 	//_glogprintf(_gstr("Read file: %hs"), file);
+
+	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
+	//strFile += (const GChar*)file;
+	//return dtaOpen(strFile, params);
 
 	return dtaOpen(file, params);
 }
@@ -31,9 +39,11 @@ static void Load(tHackEventDataLoad* pData)
     hRwData = GetModuleHandle(_T("rw_data.dll"));
 	HMODULE hGame = GetModuleHandle(_T("Game.exe"));
 	HMODULE hLS3DF = GetModuleHandle(_T("LS3DF.dll"));
+
 	assert(hGame);
 	assert(hLS3DF);
 	assert(hRwData);
+
     if (hGame != nullptr)
     {
         CHacks::GetImportLookups(hGame, "rw_data.dll", [&](uint16_t Ordinal, const char* pszName, void** ppFunction) {
@@ -76,9 +86,29 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 	switch (Event)
 	{
 		case HACKEVENT_LOAD:
+		{
 			Load((tHackEventDataLoad*)pData);
 			return HACKEVENTRESULT_NORMAL;
 			break;
+		}
+		case HACKEVENT_REGISTERFUNCTIONS:
+		{
+			/*
+			Interfaces::IScripting* pScripting = ((tHackEventDataRegisterFunctions*)pData)->m_pScripting;
+
+			Strong<Interfaces::IReflectedNamespace> pGlobal;
+			if (!Failed(pScripting->GetGlobal(&pGlobal)))
+			{
+				Strong<Interfaces::IReflectedNamespace> pModLoader;
+				if (!Failed(pGlobal->AddNamespace("modloader", &pModLoader)))
+				{
+					pModLoader->RegisterFunction("addFile", "xs", FunctionAddGameFile, nullptr);
+				}
+			}
+			*/
+		}
+		return HACKEVENTRESULT_NORMAL;
+		break;
 		default:
 			break;
 	}

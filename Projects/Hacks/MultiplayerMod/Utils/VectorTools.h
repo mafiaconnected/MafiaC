@@ -123,8 +123,14 @@ public:
 	static CVector3D ConvertFromMafiaVec(const S_vector& vec);
 
 	static void Rotate(double heading, double attitude, double bank, S_quat& quat);
-	S_quat CalculateRotation(CMatrix3x3& a);
+	static S_quat CalculateRotation(CMatrix3x3& a);
 
 	static float RadToDeg(float rad);
 	static float DegToRad(float deg);
+
+	static CMatrix4x4 ConvertFromMafiaMatrix(S_matrix mat);
+	static S_matrix ConvertToMafiaMatrix(CMatrix4x4 mat);
+
+	static CQuaternion ConvertFromMafiaQuat(S_quat quat);
+	static S_quat ConvertToMafiaQuat(CQuaternion quat);
 };

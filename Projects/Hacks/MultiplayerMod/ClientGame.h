@@ -38,6 +38,7 @@ enum eGameComponent
 	GAMECOMPONENT_FUELSTATIONS, 
 	GAMECOMPONENT_PLANES,
 	GAMECOMPONENT_BIGMAP,
+	GAMECOMPONENT_DEFAULTPARKEDCARS,
 };
 
 class CClientPlayer;
@@ -128,6 +129,7 @@ public:
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType;
+	Galactic3D::EventHandlers::CEventType* m_pOnAddActorEventType;
 
 	Galactic3D::CChatWindow* m_pChatWindow;
 	Galactic3D::CCmdWindow2* m_pCmdWindow;
@@ -217,6 +219,7 @@ public:
 	bool m_bDontReloadScripts = false;
 	bool m_bControlsLocked = false;
 	bool m_bLocalTrafficEnabled = false;
+	bool m_bLocalCiviliansEnabled = false;
 
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }

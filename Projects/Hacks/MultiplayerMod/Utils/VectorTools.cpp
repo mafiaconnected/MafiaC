@@ -207,3 +207,52 @@ float CVecTools::RadToDeg(float rad)
 {
 	return rad * 180 / PI;
 }
+
+S_matrix CVecTools::ConvertToMafiaMatrix(CMatrix4x4 mat) {
+	S_matrix newMat;
+
+	newMat.values[0] = mat.m_vec[0].x;
+	newMat.values[1] = mat.m_vec[0].y;
+	newMat.values[2] = mat.m_vec[0].z;
+	newMat.values[3] = mat.m_vec[0].w;
+
+	newMat.values[4] = mat.m_vec[1].x;
+	newMat.values[5] = mat.m_vec[1].y;
+	newMat.values[6] = mat.m_vec[1].z;
+	newMat.values[7] = mat.m_vec[1].w;
+
+	newMat.values[8] = mat.m_vec[2].x;
+	newMat.values[9] = mat.m_vec[2].y;
+	newMat.values[10] = mat.m_vec[2].z;
+	newMat.values[11] = mat.m_vec[2].w;
+
+	newMat.values[12] = mat.m_vec[3].x;
+	newMat.values[13] = mat.m_vec[3].y;
+	newMat.values[14] = mat.m_vec[3].z;
+	newMat.values[15] = mat.m_vec[3].w;
+
+	return newMat;
+}
+
+CMatrix4x4 CVecTools::ConvertFromMafiaMatrix(S_matrix mat) {
+	CMatrix4x4 newMat(mat.values);
+	return newMat;
+}
+
+CQuaternion CVecTools::ConvertFromMafiaQuat(S_quat quat) {
+	CQuaternion newQuat;
+	newQuat.m_X = quat.x;
+	newQuat.m_Y = quat.y;
+	newQuat.m_Z = quat.z;
+	newQuat.m_W = quat.w;
+	return newQuat;
+}
+
+S_quat CVecTools::ConvertToMafiaQuat(CQuaternion quat) {
+	S_quat newQuat;
+	newQuat.x = quat.m_X;
+	newQuat.y = quat.m_Y;
+	newQuat.z = quat.m_Z;
+	newQuat.w = quat.m_W;
+	return newQuat;
+}

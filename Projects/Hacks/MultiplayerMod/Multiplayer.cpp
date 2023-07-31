@@ -36,10 +36,12 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 	{
 		_glogprintf(_gstr("Multiplayer Process Packet - Response packet received 1"));
 		//g_pClientGame->ResetWorld();
-		g_pClientGame->m_pChatWindow->FlushBuffers();
+		if (g_pClientGame->m_pChatWindow != nullptr)
+			g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
-	CClientNetGame::ProcessPacket(Peer, PacketID, pStream); // this is asking for problems, MOVE IT TO DEFAULT CASE IDIOT
+
+	CClientNetGame::ProcessPacket(Peer, PacketID, pStream);
 
 	switch (PacketID)
 	{
@@ -384,8 +386,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			bool state = false;
 			Reader.ReadBoolean(state);
 
-			//bool unknown = false;
-			//Reader.ReadBoolean(unknown);
+			bool instant = true;
+			Reader.ReadBoolean(instant);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
@@ -396,7 +398,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
-					pClientVehicle->SetEngine(state, true);
+					pClientVehicle->SetEngine(state, instant);
 				}
 			}
 		}
@@ -601,6 +603,29 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->Explode();
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETGEAR:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			uint32_t gear = 0;
+			Reader.ReadUInt32(&gear, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetGear(gear);
 				}
 			}
 		}
@@ -941,7 +966,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 
 		default:
 		{
-
+			
 		}
 		break;
 	}
@@ -1145,5 +1170,15 @@ void CMultiplayer::SendHumanChangeWeapon(CClientHuman* target, int8_t weapon)
 	Packet Packet(MAFIAPACKET_HUMAN_CHANGEWEAP);
 	Packet.Write<int32_t>(target->GetId());
 	Packet.Write<int32_t>((int32_t)weapon);
+	SendHostPacket(&Packet);
+}
+
+void CMultiplayer::SendHumanReloadWeapon(CClientHuman* target)
+{
+	if (target->IsLocal() || !target->IsSyncer())
+		return;
+
+	Packet Packet(MAFIAPACKET_HUMAN_RELOAD);
+	Packet.Write<int32_t>(target->GetId());
 	SendHostPacket(&Packet);
 }
