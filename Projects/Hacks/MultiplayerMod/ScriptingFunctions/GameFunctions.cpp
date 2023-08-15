@@ -16,9 +16,32 @@ static bool FunctionGameCreateDummyElement(IScriptState* pState, int argc, void*
 		return false;
 
 	CClientDummy* pClientDummy = reinterpret_cast<CClientDummy*>(pClientManager->Create(ELEMENT_DUMMY));
+	pClientDummy->SetPosition(pos);
 	pClientDummy->m_pResource = pState->GetResource();
 	pClientManager->RegisterNetObject(pClientDummy);
 	pState->ReturnObject(pClientDummy);
+
+	return true;
+}
+
+static bool FunctionGameCreateObject(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CVector3D pos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CVector3D rot = { 0, 0, 0 };
+	if (!pState->CheckVector3D(1, rot))
+		return false;
+
+	CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pClientManager->Create(ELEMENT_OBJECT));
+	pClientObject->SetPosition(pos);
+	pClientObject->SetRotation(rot);
+	pClientObject->m_pResource = pState->GetResource();
+	pClientManager->RegisterNetObject(pClientObject);
+	pState->ReturnObject(pClientObject);
 
 	return true;
 }
@@ -126,8 +149,6 @@ static bool FunctionGameMessage(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
-
 	const GChar* msg = pState->CheckString(0);
 	if (!msg) return false;
 	UTF8String message(true, msg);
@@ -192,8 +213,38 @@ static bool FunctionGameAnnounce(IScriptState* pState, int argc, void* pUser)
 	float time = 1.5f;
 	if (!pState->CheckNumber(1, time))
 		return false;
-
+	
 	MafiaSDK::GetIndicators()->RaceFlashText(message.CString(), time);
+	return true;
+}
+
+static bool FunctionGameRenderText(IScriptState* pState, int argc, void* pUser)
+{
+	const GChar* msg = pState->CheckString(0);
+	if (!msg) return false;
+	UTF8String message(true, msg);
+
+	CVector2D vecPos;
+	if (!pState->CheckVector2D(1, vecPos))
+		return false;
+
+	CVector2D vecSize;
+	if (!pState->CheckVector2D(2, vecSize))
+		return false;
+
+	int32_t iColour;
+	if (!pState->CheckNumber(3, iColour))
+		return false;
+
+	bool bUnderlined;
+	if (!pState->CheckBoolean(4, bUnderlined))
+		return false;
+
+	int32_t iFontStyle;
+	if (!pState->CheckNumber(3, iFontStyle))
+		return false;
+
+	MafiaSDK::GetIndicators()->OutText(message, vecPos.x, vecPos.y, vecSize.x, vecSize.y, iColour, (int)bUnderlined, iFontStyle);
 	return true;
 }
 
@@ -572,6 +623,33 @@ static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+/*
+static bool FunctionAudioSetWorldPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	Galactic3D::Audio::CSound* pAudioObject;
+
+	if (!pState->GetThis(Galactic3D::Audio::CSound, &pAudioObject))
+		return false;
+
+	CVector3D pos = { 0, 0, 0 };
+	if (!pState->CheckVector3D(0, pos))
+		return false;
+
+	CVector3D orient = { 0, 0, 0 };
+	if (!pState->CheckVector3D(1, orient))
+		return false;
+
+	CVector3D vel = { 0, 0, 0 };
+	if (!pState->CheckVector3D(2, vel))
+		return false;
+
+	BASS_ChannelSet3DPosition(pAudioObject->m_pAudioInstance, pos, orient, vel);
+	return true;
+}
+*/
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -653,13 +731,16 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createVehicle"), _gstr("svf"), FunctionGameCreateVehicle, pClientManager);
 
 		pClientManager->m_pClientDummyClass->RegisterConstructor(_gstr("tv"), FunctionGameCreateDummyElement, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createDummy"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createDummyElement"), _gstr("v"), FunctionGameCreateDummyElement, pClientManager);
+
+		pClientManager->m_pClientDummyClass->RegisterConstructor(_gstr("tv"), FunctionGameCreateObject, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createObject"), _gstr("v"), FunctionGameCreateObject, pClientManager);
 	}
 
 	{
 		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientGame);
+		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createSound"), _gstr("s"), FunctionGameCreateSound, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("playSound"), _gstr("i"), FunctionGamePlaySound, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("pauseSound"), _gstr("i"), FunctionGamePauseSound, pClientManager);
@@ -671,6 +752,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("message"), _gstr("si"), FunctionGameMessage, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMap"), _gstr("b"), FunctionGameEnableMap, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("announce"), _gstr("sf"), FunctionGameAnnounce, pClientManager);
+		pHUDNamespace->RegisterFunction(_gstr("renderText"), _gstr("szzibi"), FunctionGameRenderText, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("showCountdown"), _gstr("i"), FunctionGameShowCountdown, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("setMoney"), _gstr("i"), FunctionGameSetMoney, pClientManager);
 		pHUDNamespace->RegisterFunction(_gstr("enableMoney"), _gstr("b"), FunctionGameEnableMoney, pClientManager);
@@ -703,4 +785,6 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
+
+	//g_pClientGame->m_pAudioScriptingFunctions->m_pSoundClass->RegisterFunction(_gstr("setWorldPosition"), _gstr("v"), FunctionAudioSetWorldPosition, pClientManager);
 }
