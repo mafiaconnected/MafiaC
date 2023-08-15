@@ -1132,5 +1132,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("breath"), _gstr("t"), FunctionHumanBreath, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("throwGrenade"), _gstr("tv"), FunctionHumanThrowGrenade, pClientManager);
 
-	pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
+	
+	// Debug
+	//pClientManager->m_pClientHumanClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionHumanGetAddress);
 }
