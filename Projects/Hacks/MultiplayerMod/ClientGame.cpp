@@ -1822,7 +1822,7 @@ void CClientGame::LockControls(bool state)
 
 void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
-	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
+	int8_t iSeat = (iHopSeatsBool == 1 && iDoor > 0) ? iDoor - 1 : iDoor;
 
 	_glogprintf(_gstr("Human entering vehicle"));
 	CArguments Args;
