@@ -1078,7 +1078,51 @@ static bool FunctionHumanForceAI(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionHumanSetProperty(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	uint32_t uiProperty;
+	if (!pState->CheckNumber(0, uiProperty))
+		return false;
+
+	float fValue;
+	if (!pState->CheckNumber(1, fValue))
+		return false;
+
+	if (pClientHuman->GetGameHuman() == nullptr)
+		return pState->Error(_gstr("human not spawned"));
+
+	pClientHuman->GetGameHuman()->SetProperty((MafiaSDK::C_Human_Enum::Property)uiProperty, fValue);
+	return true;
+}
+
 #pragma endregion
+
+void CScriptingFunctions::RegisterHumanDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
+{
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_STRENGTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Strength);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_HEALTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Health);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_LEFTHANDHEALTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::HealthHandL);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_RIGHTHANDHEALTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::HealthHandR);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_LEFTLEGHEALTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::HealthLegL);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_RIGHTLEGHEALTH"), (uint32_t)MafiaSDK::C_Human_Enum::Property::HealthLegR);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_REACTIONS"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Reactions);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_SPEED"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Speed);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_AGGRESSIVENESS"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Aggressivity);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_INTELLIGENCE"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Inteligence);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_SHOOTING"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Shooting);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_SIGHT"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Sight);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_HEARING"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Hearing);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_DRIVING"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Driving);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_MASS"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Mass);
+	pDefineHandlers->Define(_gstr("PED_PROPERTY_MORALE"), (uint32_t)MafiaSDK::C_Human_Enum::Property::Morale);
+}
 
 void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
 {
@@ -1131,6 +1175,7 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("aim"), _gstr("t"), FunctionHumanAim, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("breath"), _gstr("t"), FunctionHumanBreath, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("throwGrenade"), _gstr("tv"), FunctionHumanThrowGrenade, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setProperty"), _gstr("tif"), FunctionHumanSetProperty, pClientManager);
 
 	
 	// Debug
