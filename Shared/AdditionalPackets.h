@@ -3,7 +3,6 @@
 #pragma pack(push,1)
 
 #define NETGAME_CURRENT_VERSION 3
-#define NETGAME_CURRENT_VERSION_STRING "3"
 
 #include <Multiplayer/Packets.h>
 
@@ -131,7 +130,7 @@ struct tVehicleCreatePacket
 	bool horn;
 	bool siren;
 	bool lights;
-	uint32_t gear;
+	int32_t gear;
 	float rpm;
 	float accel;
 	float brake;
@@ -157,7 +156,7 @@ struct tVehicleSyncPacket
 	bool horn;
 	bool siren;
 	bool lights;
-	uint32_t gear;
+	int32_t gear;
 	float rpm;
 	float accel;
 	float brake;
