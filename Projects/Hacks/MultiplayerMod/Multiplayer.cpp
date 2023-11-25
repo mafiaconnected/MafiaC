@@ -25,7 +25,6 @@ CMultiplayer::CMultiplayer(CClientManager* pClientManager, CVarSystem* pCVars) :
 	m_Version.m_PatchVersion = LAUNCHER_PATCH;
 
 	m_Version.m_Game = pClientManager->m_Games.GetGameId(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Game.m_szName);
-	m_Version.m_GameVersion = 1;
 }
 
 void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
