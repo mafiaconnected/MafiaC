@@ -9,7 +9,7 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
-//std::unordered_map<const char*, Stream> g_umapFileNames;
+//std::unordered_map <const char*, Galactic3D::Stream> g_umapFileNames;
 
 static void ForceDTARead(bool state)
 {
@@ -18,16 +18,22 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	//if (g_umapFileNames.count(file) > 0) {
+	//if (g_umapFileNames.count(file) > 0) {	
 		// Custom file is available, use it
+		//return dtaOpen(file, params);
 	//}
 
 	//_glogprintf(_gstr("Read file: %hs"), file);
 
-	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
-	//strFile += (const GChar*)file;
-	//return dtaOpen(strFile, params);
+	//CString File(false, file);
 
+	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
+	//strFile += File;
+
+	//UTF8String String(false, strFile.c_str());
+
+	//return dtaOpen(String, params);
+	
 	return dtaOpen(file, params);
 }
 
@@ -77,7 +83,7 @@ static void Load(tHackEventDataLoad* pData)
                 }
             }
             return true;
-            });
+        });
     }
 }
 
