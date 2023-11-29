@@ -24,7 +24,7 @@
 #include "Hacks/Hooks.h"
 #include <LoadScreen.h>
 
-uint32_t g_uiSyncedTickCount = 0;
+uint32_t g_uiSyncedTickCountII = 0;
 
 using namespace Galactic3D;
 
@@ -288,7 +288,7 @@ void CClientGameII::InitialiseScripting(void)
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
 
-	m_pResourceMgr = new CMafiaClientResourceMgr(m_pContext);
+	m_pResourceMgr = new CMafiaClientResourceMgrII(m_pContext);
 
 	m_pOnEntityProcessEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnEntityProcess"), _gstr("Called whenever an entity is processed"), 1);
 	m_pOnEntityProcessEventType->m_bCanPreventDefault = true;
@@ -339,10 +339,10 @@ void CClientGameII::InitialiseScripting(void)
 		m_pDownloadManager->m_pResourceMgr = m_pResourceMgr;
 	m_pResourceMgr->m_pDownloadManager = m_pDownloadManager;
 
-	m_pClientManager = new CMafiaClientManager(m_pContext, m_pResourceMgr);
+	m_pClientManager = new CMafiaClientManagerII(m_pContext, m_pResourceMgr);
 	m_pClientManager->m_pChatWindow = m_pChatWindow;
-	CScriptingFunctions::RegisterDefines(m_pResourceMgr->m_pDefineHandlers);
-	CScriptingFunctions::RegisterFunctions(m_pResourceMgr->m_pScripting, this);
+	CScriptingFunctionsII::RegisterDefines(m_pResourceMgr->m_pDefineHandlers);
+	CScriptingFunctionsII::RegisterFunctions(m_pResourceMgr->m_pScripting, this);
 
 	m_pResourceMgr->DefineAllClasses();
 
@@ -1253,12 +1253,12 @@ void CClientGameII::OnRender2DStuff(void)
 		}
 	}
 
-	CMultiplayer* pMultiplayer = GetMultiplayer();
+	CMultiplayerII* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (!pMultiplayer->IsConnected())
 		{
-			m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, _gstr("Connecting ..."), CVector2D(0.0f, fHeight - (m_TextDrawing.m_fLargeSize * 2.0f)), fWidth, 0.975f, 0.0f, Galactic3D::COLOUR::Lime, false);
+			m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, _gstr("Connecting ..."), CVector2D(0.0f, height - (m_TextDrawing.m_fLargeSize * 2.0f)), width, 0.975f, 0.0f, Galactic3D::COLOUR::Lime, false);
 		}
 	}
 
@@ -1285,21 +1285,21 @@ void CClientGameII::OnRender2DStuff(void)
 			}
 		}
 
-		float fPadding = 10.0f / 800.0f * fWidth;
+		float fPadding = 10.0f / 800.0f * width;
 
-		m_TextDrawing.MeasureText(1, vecSize, Machines.c_str(), fWidth - (fPadding * 2.0f), 0.0f, 0.0f, false);
-		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 1, Machines.c_str(), CVector2D(fWidth - vecSize.x - fPadding, 200.0f), fWidth - vecSize.x - (fPadding * 2.0f), 0.0f, 0.0f, Galactic3D::COLOUR::Lime, false, false, false, true);
+		m_TextDrawing.MeasureText(1, vecSize, Machines.c_str(), width - (fPadding * 2.0f), 0.0f, 0.0f, false);
+		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 1, Machines.c_str(), CVector2D(width - vecSize.x - fPadding, 200.0f), width - vecSize.x - (fPadding * 2.0f), 0.0f, 0.0f, Galactic3D::COLOUR::Lime, false, false, false, true);
 	}
 
 	if (m_bFPSCounter)
 	{
-		float fPadding = 10.0f / 800.0f * fWidth;
+		float fPadding = 10.0f / 800.0f * width;
 
 		CVector2D vecSize;
 		GString FPS = _gtostring(m_FPSCounter.GetFPS());
 
-		m_TextDrawing.MeasureText(0, vecSize, FPS.c_str(), fWidth - fPadding, 0.0f, 0.0f, false);
-		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, FPS.c_str(), CVector2D(fPadding, 0.0f), fWidth - (fPadding * 2.0f), 1.0f, 0.0f, Galactic3D::COLOUR::Aqua, false, false, false, true);
+		m_TextDrawing.MeasureText(0, vecSize, FPS.c_str(), width - fPadding, 0.0f, 0.0f, false);
+		m_TextDrawing.RenderText(m_pGalacticFunctions->m_p2D, 0, FPS.c_str(), CVector2D(fPadding, 0.0f), width - (fPadding * 2.0f), 1.0f, 0.0f, Galactic3D::COLOUR::Aqua, false, false, false, true);
 	}
 
 	if (m_pResourceMgr->m_pDownloadManager != NULL) // all codebase should support the download manager being NULL!
@@ -1307,11 +1307,11 @@ void CClientGameII::OnRender2DStuff(void)
 		if (m_pResourceMgr->m_pDownloadManager->ShouldShowProgress())
 		{
 			float fProgress = m_pResourceMgr->m_pDownloadManager->GetProgress();
-			CBufferedRectangle Rect(CVector2D(15.0f - 2.5f, fHeight - 50.0f - 2.5f), CVector2D(fWidth - 30.0f + 5.0f, 15.0f), Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, 0.0f, CVector2D(0.0f, 0.0f));
+			CBufferedRectangle Rect(CVector2D(15.0f - 2.5f, width - 50.0f - 2.5f), CVector2D(width - 30.0f + 5.0f, 15.0f), Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, Galactic3D::COLOUR::Black, 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
-			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D(fWidth - 30.0f, 10.0f), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), 0.0f, CVector2D(0.0f, 0.0f));
+			Rect = CBufferedRectangle(CVector2D(15.0f, height - 50.0f), CVector2D(width - 30.0f, 10.0f), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), Galactic3D::COLOUR(0, 127, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
-			Rect = CBufferedRectangle(CVector2D(15.0f, fHeight - 50.0f), CVector2D((fWidth - 30.0f) * fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
+			Rect = CBufferedRectangle(CVector2D(15.0f, height - 50.0f), CVector2D((width - 30.0f) * fProgress, 10.0f), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), Galactic3D::COLOUR(0, 255, 0), 0.0f, CVector2D(0.0f, 0.0f));
 			m_pGalacticFunctions->m_p2D->DrawRectangle(nullptr, Rect);
 		}
 	}
@@ -1393,7 +1393,7 @@ bool CClientGameII::Connect(const GChar* pszHost, unsigned short usPort, const G
 		}
 	}
 	//m_pResourceMgr->ClearAllResources();
-	m_pNewMultiplayer = new CMultiplayer(m_pClientManager, &m_CVars);
+	m_pNewMultiplayer = new CMultiplayerII(m_pClientManager, &m_CVars);
 
 	m_pCmdWindow->FlushBuffers();
 	m_pCmdWindow->Disable();
@@ -1429,7 +1429,7 @@ bool CClientGameII::Connect(const GChar* pszHost, unsigned short usPort, const G
 
 void CClientGameII::StopMultiplayerGame(int iReason, bool bPreventRestart)
 {
-	CMultiplayer* pMultiplayer = GetMultiplayer();
+	CMultiplayerII* pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		tHackEventDataDiscordUpdate Data = {};
@@ -1827,9 +1827,9 @@ void CClientGameII::LockControls(bool state)
 		return;
 	if (m_pClientManager->m_pLocalPlayer == nullptr)
 		return;
-	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer() == nullptr)
+	if (m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayerII>()->GetGamePlayer() == nullptr)
 		return;
-	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
+	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayerII>()->GetGamePlayer()->LockControls(state);
 }
 
 void CClientGameII::HumanEnteringVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
@@ -1855,7 +1855,7 @@ void CClientGameII::HumanEnteringVehicle(CClientHumanII* pClientHuman, CClientVe
 	else
 	{
 		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
+		//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
 		g_pClientGame->m_bUseActorInvokedByGame = true;
 	}
 
@@ -2031,12 +2031,14 @@ void CClientGameII::DestroyUninitializedGameElements()
 
 }
 
-bool CClientGameII::OnTrafficCarRespawn(CClientVehicle* pClientVehicle, MafiaSDK::C_Car* pCar)
+/*
+bool CClientGameII::OnTrafficCarRespawn(CClientVehicleII* pClientVehicle, MafiaSDK::C_Car* pCar)
 {
 	pClientVehicle->SetFromExistingEntity(pCar);
 
 	return true;
 }
+*/
 
 bool CClientGameII::IsGameComponentEnabled(eGameComponent GameComponent)
 {

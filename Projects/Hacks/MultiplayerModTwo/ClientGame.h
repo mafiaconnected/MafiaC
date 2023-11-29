@@ -24,6 +24,12 @@ namespace Galactic3D
 	class CClientDownloadManager;
 };
 
+enum eGameComponent
+{
+	GAMECOMPONENT_TRAFFIC,
+	GAMECOMPONENT_CIVILIANS,
+};
+
 class CClientPlayerII;
 
 class CMafiaCHtmlContainerII : public CHtmlContainer
@@ -191,6 +197,9 @@ public:
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
+	bool m_bReconnectOnDisconnect;
+	bool m_bFullReload;
+
 	inline CMultiplayerII* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayerII* GetActiveMultiplayer(void) { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
@@ -215,6 +224,8 @@ public:
 	void RegisterCommands();
 	void ResetWorld(void);
 	void LoadLobbyResource(void);
+
+	void ShowDisconnectReason();
 
 	void OnProcess(void);
 	void OnFrame(void);
@@ -265,11 +276,13 @@ public:
 	void HumanExitingVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iDoor, uint32_t iAction, uint32_t iUnknown);
 	void HumanExitedVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHumanII* pClientHuman, CClientVehicleII* pClientVehicle, uint8_t iSeat);
-	void HumanHit(CClientHumanII* humanTarget, CClientEntityII* humanAttacker, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
+	void HumanHit(CClientHumanII* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
 
 	void DestroyUninitializedGameElements();
 
 	M2::eEntityType ToMafiaEntityType(int entityType);
+
+	bool IsGameComponentEnabled(eGameComponent GameComponent);
 };
 
 extern CClientGameII* g_pClientGame;

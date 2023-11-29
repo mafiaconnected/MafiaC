@@ -38,7 +38,7 @@ public:
 	void ProcessNewPeerElements();
 
 	void SendLocalPlayerShoot(bool bState, CVector3D position);
-	void SendHumanHit(CClientHumanII* target, CClientHumanII* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart);
+	void SendHumanHit(CClientHumanII* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart);
 	void SendHumanDeath(CClientHumanII* target, CClientHumanII* attacker);
 	void SendHumanDropWeapon(CClientHumanII* target);
 	void SendHumanChangeWeapon(CClientHumanII* target, int8_t weapon);

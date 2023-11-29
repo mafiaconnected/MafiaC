@@ -159,10 +159,11 @@ void CGameHooksII::InstallHooks()
 	//	printf("[game-event] ped entering the car on seat: %d\n", seat);
 	//});
 
-	M2::Initialize([]);
+	//M2::Initialize([]);
 
 	Mem::Initialize();
 
+	/*
 	// Hooking game module registering
 	Mem::Hooks::InstallJmpPatch(0x4F2F05, (DWORD)GameModuleInstall, 5);
 
@@ -223,6 +224,7 @@ void CGameHooksII::InstallHooks()
 	// Disable DLC loadings (NONO, WE NEED DLCs !)
 	//Mem::Utilites::PatchAddress(0x11A62C0, 0xC300B0); // mov al, 0; retn
 	//InitializeSDKHandlers();
+	*/
 
 	/*
 	M2::Initialize([]() {

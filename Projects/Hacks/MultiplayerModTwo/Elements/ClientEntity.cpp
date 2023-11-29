@@ -70,7 +70,7 @@ void CClientEntityII::Delete(void)
 {
 	if (m_pEntity != nullptr)
 	{
-		M2::Wrappers::DestroyEntity(m_pEntity, g_pClientGame->ToMafiaEntityType(m_Type));
+		//M2::Wrappers::DestroyEntity(m_pEntity, g_pClientGame->ToMafiaEntityType(m_Type));
 		m_pEntity = nullptr;
 	}
 }

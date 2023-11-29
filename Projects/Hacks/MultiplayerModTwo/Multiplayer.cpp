@@ -25,7 +25,6 @@ CMultiplayerII::CMultiplayerII(CClientManager* pClientManager, CVarSystem* pCVar
 	m_Version.m_PatchVersion = LAUNCHER_PATCH;
 
 	m_Version.m_Game = pClientManager->m_Games.GetGameId(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Game.m_szName);
-	m_Version.m_GameVersion = 1;
 }
 
 void CMultiplayerII::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
@@ -950,7 +949,7 @@ void CMultiplayerII::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayerII::SendHumanHit(CClientHumanII* target, CClientHumanII* attacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
+void CMultiplayerII::SendHumanHit(CClientHumanII* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, unsigned int bodyPart)
 {
 	if (target->IsLocal() || !target->IsSyncer())
 		return;
@@ -958,7 +957,6 @@ void CMultiplayerII::SendHumanHit(CClientHumanII* target, CClientHumanII* attack
 	Packet Packet(MAFIAPACKET_HUMAN_HIT);
 	//Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
 	Packet.Write<int32_t>(target->GetId());
-	Packet.Write<int32_t>(attacker->GetId());
 	Packet.Write<CVector3D>(v1);
 	Packet.Write<CVector3D>(v2);
 	Packet.Write<CVector3D>(v3);

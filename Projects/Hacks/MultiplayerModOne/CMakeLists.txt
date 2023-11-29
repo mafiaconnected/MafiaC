@@ -11,7 +11,7 @@ endif()
 
 new_hack_static(MultiplayerModOne "${SOURCES}" "")
 
-target_link_spidermonkey(MultiplayerMod)
+target_link_spidermonkey(MultiplayerModOne)
 
 target_link_libraries(
 	MultiplayerModOne
