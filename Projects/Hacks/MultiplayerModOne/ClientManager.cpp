@@ -23,6 +23,7 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
     m_pClientPlayerClass = pElements->NewClass(_gstr("Player"), m_pClientHumanClass);
     m_pClientVehicleClass = pElements->NewClass(_gstr("Vehicle"), m_pClientEntityClass);
 	m_pClientDummyClass = pElements->NewClass(_gstr("Dummy"), m_pClientEntityClass);
+	m_pClientObjectClass = pElements->NewClass(_gstr("Object"), m_pClientEntityClass);
 
 	m_pSurfaceClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Surface"));
 	m_pTextureClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Texture"), m_pSurfaceClass);
@@ -32,18 +33,61 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
 
 CNetObject* CMafiaClientManager::Create(int32_t nType)
 {
+	CClientVehicle* veh;
+	CClientHuman* ped;
+	CClientPlayer* player;
+	CClientObject* object;
+
 	switch (nType)
 	{
 	case ELEMENT_ELEMENT:
 		return new CClientEntity(this);
-	case ELEMENT_VEHICLE:
-		return new CClientVehicle(this);
-	case ELEMENT_PLAYER:
-		return new CClientPlayer(this);
-	case ELEMENT_PED:
-		return new CClientHuman(this);
 	case ELEMENT_DUMMY:
 		return new CClientDummy(this);
+	case ELEMENT_VEHICLE:
+		veh = new CClientVehicle(this);
+		for (int i = 0; i < MAX_VEHICLES; i++)
+		{
+			if (m_rgpVehicles[i].IsNull())
+			{
+				m_rgpVehicles[i] = veh;
+				return veh;
+			}
+		}
+		break;
+	case ELEMENT_PLAYER:
+		player = new CClientPlayer(this);
+		for (int i = 0; i < MAX_PEDS; i++)
+		{
+			if (m_rgpPlayers[i].IsNull())
+			{
+				m_rgpPlayers[i] = player;
+				return player;
+			}
+		}
+		break;
+	case ELEMENT_PED:
+		ped = new CClientHuman(this);
+		for (int i = 0; i < MAX_PEDS; i++)
+		{
+			if (m_rgpPeds[i].IsNull())
+			{
+				m_rgpPeds[i] = ped;
+				return ped;
+			}
+		}
+		break;
+	case ELEMENT_OBJECT:
+		object = new CClientObject(this);
+		for (int i = 0; i < MAX_OBJECTS; i++)
+		{
+			if (m_rgpObjects[i].IsNull())
+			{
+				m_rgpObjects[i] = object;
+				return object;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -52,14 +96,14 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 
 void CMafiaClientManager::Remove(CNetObject* pNetObject)
 {
-	//for (int i = 0; i < MAX_VEHICLES; i++)
-	//{
-	//	if (m_rgpVehicles[i] != nullptr && !m_rgpVehicles[i].IsNull() && m_rgpVehicles[i].GetPointer() == pNetObject)
-	//	{
-	//		m_rgpVehicles[i].SetNull();
-	//		return;
-	//	}
-	//}
+	for (int i = 0; i < MAX_VEHICLES; i++)
+	{
+		if (m_rgpVehicles[i] != nullptr && !m_rgpVehicles[i].IsNull() && m_rgpVehicles[i].GetPointer() == pNetObject)
+		{
+			m_rgpVehicles[i].SetNull();
+			return;
+		}
+	}
 }
 
 bool CMafiaClientManager::IsConnecting(void)
@@ -157,6 +201,21 @@ CClientPlayer* CMafiaClientManager::FindPlayer(MafiaSDK::C_Player* pPlayer)
 	for (auto pElement : m_rgpPlayers)
 	{
 		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameHuman() == pPlayer)
+		{
+			return pElement.GetPointer();
+		}
+	}
+	return nullptr;
+}
+
+CClientObject* CMafiaClientManager::FindObject(MafiaSDK::C_Actor* pObject)
+{
+	if (pObject == nullptr)
+		return nullptr;
+
+	for (auto pElement : m_rgpObjects)
+	{
+		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameObject() == pObject)
 		{
 			return pElement.GetPointer();
 		}

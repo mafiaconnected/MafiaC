@@ -5,3 +5,4 @@
 #include "ClientPlayer.h"
 #include "ClientVehicle.h"
 #include "ClientDummy.h"
+#include "ClientObject.h"

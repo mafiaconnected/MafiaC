@@ -25,7 +25,6 @@ CMultiplayer::CMultiplayer(CClientManager* pClientManager, CVarSystem* pCVars) :
 	m_Version.m_PatchVersion = LAUNCHER_PATCH;
 
 	m_Version.m_Game = pClientManager->m_Games.GetGameId(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Game.m_szName);
-	m_Version.m_GameVersion = 1;
 }
 
 void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
@@ -36,7 +35,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 	{
 		_glogprintf(_gstr("Multiplayer Process Packet - Response packet received 1"));
 		//g_pClientGame->ResetWorld();
-		g_pClientGame->m_pChatWindow->FlushBuffers();
+		if (g_pClientGame->m_pChatWindow != nullptr)
+			g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
 
@@ -385,8 +385,8 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			bool state = false;
 			Reader.ReadBoolean(state);
 
-			//bool unknown = false;
-			//Reader.ReadBoolean(unknown);
+			bool instant = true;
+			Reader.ReadBoolean(instant);
 
 			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
 			if (pClient == nullptr) // We didn't receive that client yet
@@ -397,7 +397,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
 				if (pClientVehicle != nullptr)
 				{
-					pClientVehicle->SetEngine(state, true);
+					pClientVehicle->SetEngine(state, instant);
 				}
 			}
 		}
@@ -602,6 +602,29 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 				if (pClientVehicle != nullptr)
 				{
 					pClientVehicle->Explode();
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_VEHICLE_SETGEAR:
+		{
+			int32_t nVehicleNetworkIndex;
+			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+
+			uint32_t gear = 0;
+			Reader.ReadUInt32(&gear, 1);
+
+			auto pClient = m_NetMachines.GetMachine(m_iLocalIndex);
+			if (pClient == nullptr) // We didn't receive that client yet
+				return;
+
+			if (nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientVehicle != nullptr)
+				{
+					pClientVehicle->SetGear(gear);
 				}
 			}
 		}

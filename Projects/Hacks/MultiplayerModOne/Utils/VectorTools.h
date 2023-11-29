@@ -128,6 +128,9 @@ public:
 	static float RadToDeg(float rad);
 	static float DegToRad(float deg);
 
-	static CMatrix4x4 CVecTools::ConvertFromMafiaMatrix(S_matrix mat);
-	static S_matrix CVecTools::ConvertToMafiaMatrix(CMatrix4x4 mat);
+	static CMatrix4x4 ConvertFromMafiaMatrix(S_matrix mat);
+	static S_matrix ConvertToMafiaMatrix(CMatrix4x4 mat);
+
+	static CQuaternion ConvertFromMafiaQuat(S_quat quat);
+	static S_quat ConvertToMafiaQuat(CQuaternion quat);
 };

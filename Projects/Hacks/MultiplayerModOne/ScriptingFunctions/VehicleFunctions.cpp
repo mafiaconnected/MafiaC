@@ -1061,6 +1061,156 @@ static bool FunctionVehicleSetHeading(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
+static bool FunctionVehicleGetRotationFront(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+
+	pState->ReturnVector3D(vecRotFront);
+
+	return true;
+}
+
+static bool FunctionVehicleSetRotationFront(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	CVector3D newRotVec;
+	if (!pState->CheckVector3D(0, newRotVec))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+	pClientVehicle->SetRotationMat(newRotVec, vecRotRight, vecRotUp);
+	pState->ReturnVector3D(newRotVec);
+
+	return true;
+}
+
+static bool FunctionVehicleGetRotationRight(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+
+	pState->ReturnVector3D(vecRotRight);
+
+	return true;
+}
+
+static bool FunctionVehicleSetRotationRight(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	CVector3D newRotVec;
+	if (!pState->CheckVector3D(0, newRotVec))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+	pClientVehicle->SetRotationMat(vecRotFront, newRotVec, vecRotUp);
+	pState->ReturnVector3D(newRotVec);
+
+	return true;
+}
+
+static bool FunctionVehicleGetRotationUp(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+
+	pState->ReturnVector3D(vecRotUp);
+
+	return true;
+}
+
+static bool FunctionVehicleSetRotationUp(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	CVector3D newRotVec;
+	if (!pState->CheckVector3D(0, newRotVec))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	CVector3D vecRotFront, vecRotRight, vecRotUp;
+	pClientVehicle->GetRotationMat(vecRotFront, vecRotRight, vecRotUp);
+	pClientVehicle->SetRotationMat(vecRotFront, vecRotRight, newRotVec);
+	pState->ReturnVector3D(newRotVec);
+
+	return true;
+}
+
 static bool FunctionVehicleSetActState(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -1275,7 +1425,78 @@ static bool FunctionVehicleSetTest(IScriptState* pState, int argc, void* pUser)
 		return false;
 	}
 
+	
+
 	//_glogprintf(_gstr("%p\n"), offsetof(MafiaSDK::C_Vehicle_Interface, engine_on));
+	return true;
+}
+
+static bool FunctionVehicleRemoveComponent(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiComponent;
+	if (!pState->CheckNumber(0, uiComponent))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientVehicle->GetGameVehicle()->RemoveComponent(uiComponent);
+	return true;
+}
+
+static bool FunctionVehicleGetComponent(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiComponent;
+	if (!pState->CheckNumber(0, uiComponent))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientVehicle->GetGameVehicle()->GetCarComponent(uiComponent);
+	return true;
+}
+
+static bool FunctionVehicleGetTire(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientVehicle* pClientVehicle;
+
+	if (!pState->GetThis(pClientManager->m_pClientVehicleClass, &pClientVehicle))
+		return false;
+
+	uint32_t uiIndex;
+	if (!pState->CheckNumber(0, uiIndex))
+		return false;
+
+	if (pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		pState->Error(_gstr("vehicle not spawned"));
+		return false;
+	}
+
+	pClientVehicle->GetGameVehicle()->GetCarTyre(uiIndex);
 	return true;
 }
 
@@ -1287,6 +1508,10 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionVehicleGetHeading, FunctionVehicleSetHeading);
 
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("rotationFront"), ARGUMENT_VECTOR3D, FunctionVehicleGetRotationFront, FunctionVehicleSetRotationFront);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("rotationRight"), ARGUMENT_VECTOR3D, FunctionVehicleGetRotationRight, FunctionVehicleSetRotationRight);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("rotationUp"), ARGUMENT_VECTOR3D, FunctionVehicleGetRotationUp, FunctionVehicleSetRotationUp);
+
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("explode"), _gstr("t"), FunctionVehicleExplode, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("repair"), _gstr("t"), FunctionVehicleRepair, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getOccupant"), _gstr("ti"), FunctionVehicleGetOccupant, pClientManager);
@@ -1295,7 +1520,10 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setEngineState"), _gstr("tbb"), FunctionVehicleSetEngineDetailed, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("playGearShiftSound"), _gstr("t"), FunctionVehiclePlayGearShiftSound, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setCustomEngineValues"), _gstr("tfff"), FunctionVehicleSetCustomEngineValues, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getTireState"), _gstr("ti"), FunctionVehicleGetTire, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("removeTire"), _gstr("ti"), FunctionVehicleRemoveTire, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getComponentState"), _gstr("ti"), FunctionVehicleGetComponent, pClientManager);
+	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("removeComponent"), _gstr("ti"), FunctionVehicleRemoveComponent, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setCollisionsEnabled"), _gstr("ti"), FunctionVehicleSetCollisionsEnabled, pClientManager);
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("siren"), ARGUMENT_BOOLEAN, FunctionVehicleGetSiren, FunctionVehicleSetSiren);
@@ -1317,6 +1545,6 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 
 	// Debug
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setActState"), _gstr("ti"), FunctionVehicleSetActState, pClientManager);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
+	//pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("address"), ARGUMENT_INTEGER, FunctionVehicleGetAddress);
 	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getTest"), _gstr("t"), FunctionVehicleGetTest, pClientManager);
 }

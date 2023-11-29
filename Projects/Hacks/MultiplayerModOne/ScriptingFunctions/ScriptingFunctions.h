@@ -9,10 +9,12 @@ class CScriptingFunctions
 public:
     static void RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers);
 	static void RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefineHandlers);
+	static void RegisterHumanDefines(Galactic3D::CDefineHandlers* pDefineHandlers);
 	
 	static void RegisterEntityFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterGameFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterHumanFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
+	static void RegisterObjectFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	//static void RegisterPlayerFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterVehicleFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);
 	static void RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame);

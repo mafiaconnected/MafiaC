@@ -12,6 +12,7 @@ class CClientHuman;
 class CClientPlayer;
 class CClientVehicle;
 class CClientDummy;
+class CClientObject;
 
 // Changable limits
 #include <IncreasedLimits.h>
@@ -23,6 +24,7 @@ enum eMafiaElementType
 	ELEMENT_PLAYER = ELEMENT_PED | 16,
 	ELEMENT_VEHICLE = ELEMENT_ENTITY | 32,
 	ELEMENT_DUMMY = ELEMENT_ENTITY | 64,
+	ELEMENT_OBJECT = ELEMENT_ENTITY | 128,
 };
 
 class CMafiaClientManager : public Galactic3D::CClientManager
@@ -38,6 +40,7 @@ public:
 	Galactic3D::ReflectedClass* m_pClientPlayerClass;
 	Galactic3D::ReflectedClass* m_pClientVehicleClass;
 	Galactic3D::ReflectedClass* m_pClientDummyClass;
+	Galactic3D::ReflectedClass* m_pClientObjectClass;
 
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
@@ -51,10 +54,12 @@ public:
 	virtual CClientHuman* FindHuman(MafiaSDK::C_Human* pHuman);
 	virtual CClientPlayer* FindPlayer(MafiaSDK::C_Player* pPlayer);
 	virtual CClientVehicle* FindVehicle(MafiaSDK::C_Car* pVehicle);
+	virtual CClientObject* FindObject(MafiaSDK::C_Actor* pObject);
 	
 	Galactic3D::Weak<CClientVehicle> m_rgpVehicles[MAX_VEHICLES];
 	Galactic3D::Weak<CClientHuman> m_rgpPeds[MAX_PEDS];
 	Galactic3D::Weak<CClientPlayer> m_rgpPlayers[MAX_PEDS];
+	Galactic3D::Weak<CClientObject> m_rgpObjects[MAX_OBJECTS];
 };
 
 class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr

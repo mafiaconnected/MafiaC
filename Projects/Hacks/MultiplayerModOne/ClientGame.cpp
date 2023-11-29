@@ -815,13 +815,6 @@ void CClientGame::OnEndInGame(void)
 	if (m_pNewMultiplayer != nullptr)
 	{
 		m_pNewMultiplayer->Reset();
-
-		// If the game is restarting and we haven't connected, delete this new multiplayer
-		if (!m_pNewMultiplayer->IsConnected())
-		{
-			delete m_pNewMultiplayer;
-			m_pNewMultiplayer = nullptr;
-		}
 	}
 
 	m_pResourceMgr->ClearAllResources();
@@ -829,7 +822,8 @@ void CClientGame::OnEndInGame(void)
 	//if (m_pFonts != nullptr)
 	//	m_pFonts->UninitialiseRendering();
 
-	m_pCmdWindow->ReInitialise();
+	if (m_pCmdWindow != nullptr)
+		m_pCmdWindow->ReInitialise();
 
 	// ANYTHING USING FONTS NEEDS TO BE GONE HERE FOR NOW!!!!!
 	if (m_pCmdWindow != nullptr)
@@ -1828,7 +1822,7 @@ void CClientGame::LockControls(bool state)
 
 void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
-	int8_t iSeat = iHopSeatsBool == 0 ? iDoor : (iDoor - 1);
+	int8_t iSeat = (iHopSeatsBool == 1 && iDoor > 0) ? iDoor - 1 : iDoor;
 
 	_glogprintf(_gstr("Human entering vehicle"));
 	CArguments Args;
@@ -1836,21 +1830,25 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 	Args.AddObject(pClientVehicle);
 	Args.AddNumber(iSeat);
 	m_pOnHumanEnteringVehicleEventType->Trigger(Args);
-
-	if (pClientHuman->IsSyncer()) {
-		Packet Packet(MAFIAPACKET_HUMAN_ENTERINGVEHICLE);
-		Packet.Write<int32_t>(pClientHuman->GetId());
-		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iDoor);
-		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iHopSeatsBool);
-		m_pMultiplayer->SendHostPacket(&Packet);
-	}
-	else
+	
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
 	{
-		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
-		g_pClientGame->m_bUseActorInvokedByGame = true;
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_ENTERINGVEHICLE);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<int32_t>(pClientVehicle->GetId());
+			Packet.Write<int8_t>(iDoor);
+			Packet.Write<int32_t>(iAction);
+			Packet.Write<int32_t>(iHopSeatsBool);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			g_pClientGame->m_bUseActorInvokedByGame = false;
+			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
+			g_pClientGame->m_bUseActorInvokedByGame = true;
+		}
 	}
 
 	pClientVehicle->AssignSeat(pClientHuman, iSeat);
@@ -1865,20 +1863,24 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	Args.AddNumber(iSeat);
 	m_pOnHumanEnteredVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsSyncer()) {
-		Packet Packet(MAFIAPACKET_HUMAN_ENTEREDVEHICLE);
-		Packet.Write<int32_t>(pClientHuman->GetId());
-		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iSeat);
-		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iUnknown);
-		m_pMultiplayer->SendHostPacket(&Packet);
-	}
-	else
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
 	{
-		//g_pClientGame->m_bUseActorInvokedByGame = false;
-		//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
-		//g_pClientGame->m_bUseActorInvokedByGame = true;
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_ENTEREDVEHICLE);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<int32_t>(pClientVehicle->GetId());
+			Packet.Write<int8_t>(iSeat);
+			Packet.Write<int32_t>(iAction);
+			Packet.Write<int32_t>(iUnknown);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			//g_pClientGame->m_bUseActorInvokedByGame = false;
+			//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
+			//g_pClientGame->m_bUseActorInvokedByGame = true;
+		}
 	}
 
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
@@ -1895,20 +1897,24 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	Args.AddNumber(iSeat);
 	m_pOnHumanExitingVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsSyncer()) {
-		Packet Packet(MAFIAPACKET_HUMAN_EXITINGVEHICLE);
-		Packet.Write<int32_t>(pClientHuman->GetId());
-		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iUnknown1);
-		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iUnknown2);
-		m_pMultiplayer->SendHostPacket(&Packet);
-	}
-	else
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
 	{
-		g_pClientGame->m_bUseActorInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
-		g_pClientGame->m_bUseActorInvokedByGame = true;
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_EXITINGVEHICLE);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<int32_t>(pClientVehicle->GetId());
+			Packet.Write<int8_t>(iUnknown1);
+			Packet.Write<int32_t>(iAction);
+			Packet.Write<int32_t>(iUnknown2);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			g_pClientGame->m_bUseActorInvokedByGame = false;
+			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
+			g_pClientGame->m_bUseActorInvokedByGame = true;
+		}
 	}
 
 	pClientVehicle->FreeSeat(iSeat);
@@ -1923,20 +1929,24 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	Args.AddNumber(iSeat);
 	m_pOnHumanExitedVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsSyncer()) {
-		Packet Packet(MAFIAPACKET_HUMAN_EXITEDVEHICLE);
-		Packet.Write<int32_t>(pClientHuman->GetId());
-		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iSeat);
-		Packet.Write<int32_t>(iAction);
-		Packet.Write<int32_t>(iUnknown);
-		m_pMultiplayer->SendHostPacket(&Packet);
-	}
-	else
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
 	{
-		//g_pClientGame->m_bUseActorInvokedByGame = false;
-		//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
-		//g_pClientGame->m_bUseActorInvokedByGame = true;
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_EXITEDVEHICLE);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<int32_t>(pClientVehicle->GetId());
+			Packet.Write<int8_t>(iSeat);
+			Packet.Write<int32_t>(iAction);
+			Packet.Write<int32_t>(iUnknown);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			//g_pClientGame->m_bUseActorInvokedByGame = false;
+			//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
+			//g_pClientGame->m_bUseActorInvokedByGame = true;
+		}
 	}
 
 	//pClientVehicle->FreeSeat(iSeat);
@@ -1950,19 +1960,23 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	Args.AddNumber(iSeat);
 	m_pOnHumanJackVehicleEventType->Trigger(Args);
 
-	if (pClientHuman->IsSyncer())
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
 	{
-		Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
-		Packet.Write<int32_t>(pClientHuman->GetId());
-		Packet.Write<int32_t>(pClientVehicle->GetId());
-		Packet.Write<int8_t>(iSeat);
-		m_pMultiplayer->SendHostPacket(&Packet);
-	}
-	else
-	{
-		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = false;
-		pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
-		g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
+		if (pClientHuman->IsSyncer())
+		{
+			Packet Packet(MAFIAPACKET_HUMAN_JACKVEHICLE);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<int32_t>(pClientVehicle->GetId());
+			Packet.Write<int8_t>(iSeat);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = false;
+			pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
+			g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
+		}
 	}
 }
 
@@ -2137,6 +2151,8 @@ bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 
 void CClientGame::ShowDisconnectReason()
 {
+	if (m_pChatWindow == nullptr)
+		return;
 	const GChar* rgpszReasons[] = {
 		_gstr("TIMEOUT"),
 		_gstr("FULL"),
