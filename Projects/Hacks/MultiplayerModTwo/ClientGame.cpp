@@ -10,7 +10,9 @@
 #include <Multiplayer/ChatWindow.h>
 #include <Multiplayer/CmdWindow.h>
 #include <Audio/BassRenderer.h>
+#ifdef GAMEMAFIA2_DLL
 #include <Audio/BassRenderer.hpp>
+#endif
 //#include <Audio/FMODRenderer.h>
 #include <LucasFont/LucasFont.h>
 #include <sstream>
