@@ -623,6 +623,19 @@ static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
+static bool FunctionGameAddModelToCache(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+
+	if (!name) 
+		return false;
+
+	g_pClientGame->AddModelToCache(name);
+	return true;
+}
+
 /*
 static bool FunctionAudioSetWorldPosition(IScriptState* pState, int argc, void* pUser)
 {
@@ -785,6 +798,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
+
+	pGameNamespace->RegisterFunction(_gstr("addModelToCache"), _gstr("s"), FunctionGameAddModelToCache, pClientManager);
 
 	//g_pClientGame->m_pAudioScriptingFunctions->m_pSoundClass->RegisterFunction(_gstr("setWorldPosition"), _gstr("v"), FunctionAudioSetWorldPosition, pClientManager);
 }

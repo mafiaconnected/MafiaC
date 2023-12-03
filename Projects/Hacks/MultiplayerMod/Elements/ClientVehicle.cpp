@@ -82,26 +82,17 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 {
 	if (m_MafiaVehicle != nullptr)
 	{
-		printf("Failed to create vehicle. Game vehicle already exists.");
+		_glogerrorprintf(_gstr("Failed to create vehicle. Game vehicle already exists."));
 		return;
 	}
 
 	g_pClientGame->m_bCreateVehicleInvokedByGame = false;
 
-	auto pVehModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
+	MafiaSDK::I3D_Model* pVehModel = g_pClientGame->GetModelFromCache(model);
 
-	if (pVehModel == nullptr)
-	{
-		printf("Failed to create vehicle. Frame creation failed.\n");
+	if (pVehModel == nullptr) {
+		_glogerrorprintf(_gstr("Failed to create vehicle. Model could not be loaded."));
 		return;
-	}
-
-	UTF8String mdl(true, model);
-
-	if (!MafiaSDK::GetModelCache()->Open(pVehModel, mdl.CString(), NULL, NULL, NULL, NULL))
-	{
-		//printf("Failed to create vehicle. Open model cache failed. Model: %s\n", mdl.CString());
-		//return;
 	}
 
 	pVehModel->SetName("SomeOrdinaryVehicles");
@@ -120,7 +111,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 
 	if (m_MafiaVehicle == nullptr)
 	{
-		printf("Failed to create vehicle. Game actor creation failed. Model: %s\n", mdl.CString());
+		_glogerrorprintf(_gstr("Failed to create vehicle. Game actor creation failed. Model: %s"), model);
 		return;
 	}
 

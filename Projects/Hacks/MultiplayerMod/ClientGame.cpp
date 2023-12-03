@@ -2151,3 +2151,62 @@ void CClientGame::ShowDisconnectReason()
 	};
 	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
 }
+
+void CClientGame::AddModelToCache(const GChar* model) {
+	if (g_umapModelCache.count(model) > 0) {
+		return;
+	}
+	else
+	{
+		auto pModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
+
+		if (model == nullptr)
+		{
+			_glogerrorprintf(_gstr("Failed to add model to cache. Frame creation failed. Model: %s"), model);
+			return;
+		}
+
+		UTF8String mdl(true, model);
+
+		if (!MafiaSDK::GetModelCache()->Open(pModel, mdl.CString(), NULL, NULL, NULL, NULL))
+		{
+			_glogerrorprintf(_gstr("Failed to add model to cache. Model open failed. Model: %s"), model);
+			return;
+		}
+
+		g_umapModelCache[model] = pModel;
+		return;
+	}
+	
+	return;
+}
+
+MafiaSDK::I3D_Model* CClientGame::GetModelFromCache(const GChar* model) {
+	if (g_umapModelCache.count(model) > 0) {
+		return g_umapModelCache[model];
+	}
+	else 
+	{
+		auto pModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
+
+		if (model == nullptr)
+		{
+			_glogerrorprintf(_gstr("Failed to get model from cache. Frame creation failed. Model: %s"), model);
+			return nullptr;
+		}
+
+		UTF8String mdl(true, model);
+
+		if (!MafiaSDK::GetModelCache()->Open(pModel, mdl.CString(), NULL, NULL, NULL, NULL))
+		{
+			_glogerrorprintf(_gstr("Failed to get model from cache. Model open failed. Model: %s"), model);
+			return nullptr;
+		}
+
+		g_umapModelCache[model] = pModel;
+
+		return pModel;
+	}
+
+	return nullptr;
+}

@@ -195,11 +195,12 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	if (GetGameHuman() != nullptr)
 		Despawn();
 
-	auto pModel = (MafiaSDK::I3D_Model*)MafiaSDK::I3DGetDriver()->CreateFrame(MafiaSDK::I3D_Driver_Enum::FrameType::MODEL);
+	MafiaSDK::I3D_Model* pModel = g_pClientGame->GetModelFromCache(m_szModel);
 
-	UTF8String model(true, m_szModel);
-
-	MafiaSDK::GetModelCache()->Open(pModel, model.CString(), NULL, NULL, NULL, NULL);
+	if (pModel == nullptr) {
+		_glogerrorprintf(_gstr("Failed to create ped. Model could not be loaded."));
+		return;
+	}
 
 	//pModel->SetName(name.CString());
 	pModel->SetScale({ 1, 1, 1 });
@@ -210,9 +211,17 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	m_MafiaHuman = reinterpret_cast<MafiaSDK::C_Human*>(MafiaSDK::GetMission()->CreateActor(isLocal ? MafiaSDK::C_Mission_Enum::ObjectTypes::Player : MafiaSDK::C_Mission_Enum::ObjectTypes::Human));
 	g_pClientGame->m_bCreateActorInvokedByGame = true;
 
+	if (m_MafiaHuman == nullptr)
+	{
+		_glogerrorprintf(_gstr("Failed to create ped. Game actor creation failed. Model: %s"), m_szModel);
+		return;
+	}
+
 	m_MafiaHuman->Init(pModel);
 
-	if (!isLocal) m_MafiaHuman->SetBehavior(MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactOnWeapon);
+	if (!isLocal) {
+		m_MafiaHuman->SetBehavior(MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactOnWeapon);
+	}
 
 	m_MafiaHuman->SetShooting(1);
 	m_MafiaHuman->SetActive(true);

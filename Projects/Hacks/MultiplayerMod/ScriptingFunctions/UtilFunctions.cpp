@@ -317,6 +317,22 @@ static bool FunctionSetCameraLookAround(IScriptState* pState, int argc, void* pU
 	return true;
 }
 
+static bool FunctionSetCameraSwing(IScriptState* pState, int argc, void* pUser)
+{
+	bool bSwingEnabled;
+	if (!pState->CheckBoolean(0, bSwingEnabled))
+		return false;
+
+	float fSwingAngle;
+	if (!pState->CheckNumber(1, fSwingAngle))
+		return false;
+
+	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetSwing(bSwingEnabled, fSwingAngle, MafiaSDK::GetCurrentCamera()->~I3D_Frame);
+	MafiaSDK::GetCurrentCamera()->Update();
+	MafiaSDK::GetCurrentCamera()->UpdateWMatrixProc();
+	return true;
+}
+
 // Found on the internet
 inline auto WorldToScreen2(D3DXVECTOR3 pos, float matrix[16], int windowWidth, int windowHeight) -> D3DXVECTOR3
 {
@@ -440,6 +456,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 		pCameraNamespace->RegisterFunction(_gstr("lookFromEyes"), _gstr(""), FunctionSetCameraLookFromEyes);
 		pCameraNamespace->RegisterFunction(_gstr("lookAround"), _gstr("i"), FunctionSetCameraLookAround);
 		pCameraNamespace->RegisterFunction(_gstr("restore"), _gstr(""), FunctionRestoreCamera);
+		pCameraNamespace->RegisterFunction(_gstr("setSwing"), _gstr("bf"), FunctionSetCameraSwing);
 		//pCameraNamespace->AddProperty(pClientManager, _gstr("fov"), ARGUMENT_FLOAT, FunctionGetCameraFieldOfView, FunctionSetCameraFieldOfView);
 
 		// Compatibility with GTAC

@@ -221,6 +221,8 @@ public:
 	bool m_bLocalTrafficEnabled = false;
 	bool m_bLocalCiviliansEnabled = false;
 
+	std::unordered_map<const GChar*, MafiaSDK::I3D_Model*> g_umapModelCache;
+
 	inline CMultiplayer* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayer* GetActiveMultiplayer(void) { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
@@ -305,6 +307,9 @@ public:
 	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
 
 	bool IsGameComponentEnabled(eGameComponent GameComponent);
+
+	void AddModelToCache(const GChar* model);
+	MafiaSDK::I3D_Model* GetModelFromCache(const GChar* model);
 };
 
 extern CClientGame* g_pClientGame;
