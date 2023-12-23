@@ -415,6 +415,9 @@ void CScriptingFunctions::RegisterUtilDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_PHYSICAL"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Physical);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_TRUCK"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::Truck);
 	pDefineHandlers->Define(_gstr("ACTOR_TYPE_INITSCRIPT"), (uint32_t)MafiaSDK::C_Mission_Enum::ObjectTypes::InitScript);
+
+	pDefineHandlers->Define(_gstr("MAX_VEHICLES"), MAX_VEHICLES);
+	pDefineHandlers->Define(_gstr("MAX_PEDS"), MAX_PEDS);
 }
 
 void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripting, CClientGame* pClientGame)
