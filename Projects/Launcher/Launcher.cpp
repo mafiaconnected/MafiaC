@@ -51,11 +51,11 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 	m_NetGamesList.Register(_gstr("mafia:one_de"), GAME_MAFIA_ONE_DE);
 }
 
-int CMafiaCModLauncher::WinMain(HINSTANCE hInstance)
+int CMafiaCModLauncher::WinMain()
 {
 	try
 	{
-		Context Context(hInstance);
+		Context Context(m_hInstance);
 
 		try
 		{
@@ -90,7 +90,7 @@ int CMafiaCModLauncher::WinMain(HINSTANCE hInstance)
 		}
 		else
 		{
-			iResult = Main(&Context, hInstance);
+			iResult = Main();
 		}
 
 		ShutDown();
@@ -113,5 +113,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_WNDW);
 	}
 
-	return CMafiaCModLauncher().WinMain(hInstance);
+	CMafiaCModLauncher* pModLauncher = new CMafiaCModLauncher;
+
+	int iResult = pModLauncher->WinMain();
+
+	delete pModLauncher;
+
+	return iResult;
 }
