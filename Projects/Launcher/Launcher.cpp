@@ -10,8 +10,12 @@
 #include <crtdbg.h>
 #include <LauncherVersion.h>
 #include <AdditionalPackets.h>
+#include <GameVersion.h>
+#include <shellapi.h>
+#include <Shlwapi.h>
+#include <ModLauncher/ProgressWindow.h>
 
-CMafiaCModLauncher::CMafiaCModLauncher()
+CMafiaCModLauncher::CMafiaCModLauncher(HINSTANCE hInstance) : CModLauncher(hInstance)
 {
 #if PUBLIC_RELEASE
 	m_bCodeSignatureCheck = true;
@@ -27,8 +31,7 @@ CMafiaCModLauncher::CMafiaCModLauncher()
 
 	m_Launcher.m_Version.m_uiNetVersion = NETGAME_CURRENT_VERSION;
 
-	_gstrlcpy(m_szServerListing, _gstr("serverlisting.gtaconnected.com"), ARRAY_COUNT(m_szServerListing));
-
+	_gstrlcpy(m_szServerListing, _gstr("serverlisting.mafiaconnected.com"), ARRAY_COUNT(m_szServerListing));
 	_gstrlcpy(m_szHacksFolder, _gstr(""), ARRAY_COUNT(m_szHacksFolder));
 
 	_gstrcpy_s(m_Launcher.m_szName, ARRAY_COUNT(m_Launcher.m_szName), _gstr("MafiaC"));
@@ -69,7 +72,7 @@ int CMafiaCModLauncher::WinMain()
 		RegisterDirect3D11DeviceFactory(&Context);
 		RegisterDirect3D9DeviceFactory(&Context);
 
-		if (!Initialise(&Context, hInstance))
+		if (!Initialise(&Context))
 			return EXIT_FAILURE;
 
 		int iResult = EXIT_SUCCESS;
@@ -113,7 +116,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_WNDW);
 	}
 
-	CMafiaCModLauncher* pModLauncher = new CMafiaCModLauncher;
+	CMafiaCModLauncher* pModLauncher = new CMafiaCModLauncher(hInstance);
 
 	int iResult = pModLauncher->WinMain();
 
