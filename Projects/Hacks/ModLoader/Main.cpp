@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "MafiaHackSupport.h"
+
 
 tHack* g_pHack;
 static Context* g_pContext;
@@ -9,7 +11,7 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
-//std::unordered_map <const char*, Galactic3D::Stream> g_umapFileNames;
+std::unordered_map<const char*, const char*> g_umapFileNames;
 
 static void ForceDTARead(bool state)
 {
@@ -18,23 +20,17 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	//if (g_umapFileNames.count(file) > 0) {	
+	_glogprintf(_gstr("Read file: %hs"), file);
+
+	if (g_umapFileNames.count(file) > 0) {
 		// Custom file is available, use it
-		//return dtaOpen(file, params);
-	//}
+		return dtaOpen(g_umapFileNames[file], params);
+	} else {
+		// Custom file is not available, use the original file
+		return dtaOpen(file, params);
+	}
 
-	//_glogprintf(_gstr("Read file: %hs"), file);
-
-	//CString File(false, file);
-
-	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
-	//strFile += File;
-
-	//UTF8String String(false, strFile.c_str());
-
-	//return dtaOpen(String, params);
-	
-	return dtaOpen(file, params);
+	//return dtaOpen(file, params);
 }
 
 static void Load(tHackEventDataLoad* pData)
@@ -97,21 +93,12 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 			return HACKEVENTRESULT_NORMAL;
 			break;
 		}
-		case HACKEVENT_REGISTERFUNCTIONS:
+		case HACKEVENT_ADDCUSTOMFILE:
 		{
-			/*
-			Interfaces::IScripting* pScripting = ((tHackEventDataRegisterFunctions*)pData)->m_pScripting;
-
-			Strong<Interfaces::IReflectedNamespace> pGlobal;
-			if (!Failed(pScripting->GetGlobal(&pGlobal)))
-			{
-				Strong<Interfaces::IReflectedNamespace> pModLoader;
-				if (!Failed(pGlobal->AddNamespace("modloader", &pModLoader)))
-				{
-					pModLoader->RegisterFunction("addFile", "xs", FunctionAddGameFile, nullptr);
-				}
-			}
-			*/
+			tHackEventDataCustomFile* pAddCustomFile = (tHackEventDataCustomFile*)pData;
+			g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
+			return HACKEVENTRESULT_NORMAL;
+			break;
 		}
 		return HACKEVENTRESULT_NORMAL;
 		break;
