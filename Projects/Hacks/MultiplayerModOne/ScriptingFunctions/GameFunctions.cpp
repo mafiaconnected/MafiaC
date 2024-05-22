@@ -213,7 +213,7 @@ static bool FunctionGameAnnounce(IScriptState* pState, int argc, void* pUser)
 	float time = 1.5f;
 	if (!pState->CheckNumber(1, time))
 		return false;
-	
+
 	MafiaSDK::GetIndicators()->RaceFlashText(message.CString(), time);
 	return true;
 }
@@ -623,32 +623,28 @@ static bool FunctionGameSetActorAI(IScriptState* pState, int argc, void* pUser)
 	return true;
 }
 
-/*
-static bool FunctionAudioSetWorldPosition(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	Galactic3D::Audio::CSound* pAudioObject;
-
-	if (!pState->GetThis(Galactic3D::Audio::CSound, &pAudioObject))
+	const GChar* szFilePath = pState->CheckString(0);
+	if (!szFilePath)
 		return false;
 
-	CVector3D pos = { 0, 0, 0 };
-	if (!pState->CheckVector3D(0, pos))
+	const GChar* szGameFilePath = pState->CheckString(1);
+	if (!szGameFilePath)
 		return false;
 
-	CVector3D orient = { 0, 0, 0 };
-	if (!pState->CheckVector3D(1, orient))
-		return false;
+	UTF8String filePath(true, _gstr("%s/%s", pState->m_pResource->m_RootPath, szFilePath));
+	UTF8String gameFilePath(true, szGameFilePath);
 
-	CVector3D vel = { 0, 0, 0 };
-	if (!pState->CheckVector3D(2, vel))
-		return false;
+	tHackEventDataCustomFile pCustomFileData;
+	pCustomFileData.pszFilePath = filePath;
+	pCustomFileData.pszGameFilePath = gameFilePath;
+	TriggerHackEvent(HACKEVENT_ADDCUSTOMFILE, &pCustomFileData);
 
-	BASS_ChannelSet3DPosition(pAudioObject->m_pAudioInstance, pos, orient, vel);
-	return true;
+	//g_umapFileNames[file] = stream;
 }
-*/
 
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
@@ -784,6 +780,8 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createPlayer"), _gstr("vfs"), FunctionGameCreatePlayer, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
+
+	pGameNamespace->RegisterFunction(_gstr("addCustomGameFile"), _gstr("ss"), FunctionGameAddCustomGameFile, pClientManager);
 
 	//g_pClientGame->m_pAudioScriptingFunctions->m_pSoundClass->RegisterFunction(_gstr("setWorldPosition"), _gstr("v"), FunctionAudioSetWorldPosition, pClientManager);
 }

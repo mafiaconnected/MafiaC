@@ -14,7 +14,7 @@ enum eMafiaHackEvent
 	HACKEVENT_OND3D9DEVICELOST,
 	HACKEVENT_OND3D9DEVICERESET,
 
-	HACKEVENT_REGISTERFUNCTIONS,
+	HACKEVENT_ADDCUSTOMFILE,
 };
 
 struct tHackEventDataRegisterFunctions : public tHackEventData
@@ -30,4 +30,10 @@ struct tHackEventDataD3D8 : public tHackEventData
 struct tHackEventDataD3D9 : public tHackEventData
 {
 	struct IDirect3DDevice9* m_pD3DDevice;
+};
+
+struct tHackEventDataCustomFile : public tHackEventData
+{
+	const char* pszFilePath;
+	const char* pszGameFilePath;
 };
