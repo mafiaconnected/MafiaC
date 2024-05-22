@@ -533,11 +533,11 @@ inline void M2::Initialize(m2sdk_callback callback) {
 
 inline void M2::InitializeSDKHandlers()
 {
-    M2::C_Door_Hooks::HookSolveContact([&](C_Door *instance, S_ContactEventInfo const& ev, E_DoorContactType contactType) {
+    C_Door_Hooks::HookSolveContact([&](C_Door *instance, S_ContactEventInfo const& ev, E_DoorContactType contactType) {
         //instance->Lock();
     });
 
-    M2::C_CarActionOpenHood_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionOpenHood_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -546,7 +546,7 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_CarActionCloseHood_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionCloseHood_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -555,7 +555,7 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_CarActionOpenTrunk_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionOpenTrunk_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -564,7 +564,7 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_CarActionCloseTrunk_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionCloseTrunk_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -573,15 +573,15 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_CarActionEnter_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionEnter_Hooks::HookTestAction([&](C_Car * car) {
         return true;
     });
 
-    M2::C_CarActionBreakIn_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionBreakIn_Hooks::HookTestAction([&](C_Car * car) {
         return false;
     });
 
-    M2::C_CarActionTankFuel_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionTankFuel_Hooks::HookTestAction([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -590,11 +590,11 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_CarActionThrowFrom_Hooks::HookTestAction([&](C_Car * car) {
+    C_CarActionThrowFrom_Hooks::HookTestAction([&](C_Car * car) {
         return false;
     });
 
-    M2::C_Human2CarWrapper_Hooks::HookIsFreeToGetIn([&](C_Car * car) {
+    C_Human2CarWrapper_Hooks::HookIsFreeToGetIn([&](C_Car * car) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)car;
         }
@@ -603,7 +603,7 @@ inline void M2::InitializeSDKHandlers()
         return (bool)event.arg5;
     });
 
-    M2::C_Player2_Hooks::HookEnterCar([&](C_Player2 *player, C_Actor *car, char seat) {
+    C_Player2_Hooks::HookEnterCar([&](C_Player2 *player, C_Actor *car, char seat) {
         m2sdk_event event = { 0 }; {
             event.arg1 = (void *)player;
             event.arg2 = (void *)car;
@@ -613,7 +613,7 @@ inline void M2::InitializeSDKHandlers()
         M2::TriggerHandler(M2_EVENT_CAR_ENTER, &event);
     });
 
-    M2::C_Human2_Hooks::HookSetupDeath([&](C_Human2 *human, C_EntityMessageDamage *message) {
+    C_Human2_Hooks::HookSetupDeath([&](C_Human2 *human, C_EntityMessageDamage *message) {
         if (human == reinterpret_cast<C_Human2*>(C_Game::Get()->GetLocalPed())) {
             m2sdk_log("The player just died\n");
         }
@@ -622,12 +622,12 @@ inline void M2::InitializeSDKHandlers()
         }
     });
 
-    M2::C_Human2_Hooks::HookDoDamage([&](C_Human2 *human, C_EntityMessageDamage *message) {
+    C_Human2_Hooks::HookDoDamage([&](C_Human2 *human, C_EntityMessageDamage *message) {
         printf("damage lol\n");
     });
 }
 
-inline void M2::Free() {}
+void M2::Free() {}
 
 #endif // MAFIA2_SDK_IMPLEMENTATION
 

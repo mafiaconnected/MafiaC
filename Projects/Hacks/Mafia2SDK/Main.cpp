@@ -1,7 +1,7 @@
 
 #include "stdafx.h"
 #include "pch.h"
-#include "m2sdk.h"
+//#include "m2sdk.h"
 
 tHack* g_pHack;
 
