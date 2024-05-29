@@ -32,11 +32,13 @@ void CScriptingFunctions::RegisterFunctions(Galactic3D::CScripting* pScripting, 
 	RegisterUtilFunctions(pScripting, pClientGame);
 	RegisterRenderingFunctions(pScripting, pClientGame);
 
-#if !MAFIA_SCRIPTING_ALWAYS_INITIALISED
-	auto pScriptingInterface = Strong<Interfaces::IScripting>::New(pScripting->GetInterface());
-	tHackEventDataRegisterFunctions Data;
-	Data.m_Size = sizeof(Data);
-	Data.m_pScripting = pScriptingInterface;
-	TriggerHackEvent(HACKEVENT_REGISTERFUNCTIONS, &Data);
-#endif
+	/*
+	#if !MAFIA_SCRIPTING_ALWAYS_INITIALISED
+		auto pScriptingInterface = Strong<Interfaces::IScripting>::New(pScripting->GetInterface());
+		tHackEventDataRegisterFunctions Data;
+		Data.m_Size = sizeof(Data);
+		Data.m_pScripting = pScriptingInterface;
+		TriggerHackEvent(HACKEVENT_REGISTERFUNCTIONS, &Data);
+	#endif
+	*/
 }

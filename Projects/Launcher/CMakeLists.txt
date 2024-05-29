@@ -33,6 +33,9 @@ set_target_properties(Launcher PROPERTIES LINK_FLAGS "/MANIFEST:NO")
 target_link_libraries(
 	Launcher
 	PRIVATE
+	RmlCore_static
+	RmlDebugger_static
+	RmlGUI_static
 	asmjit_static
 	Audio_static
 	LucasFont_static

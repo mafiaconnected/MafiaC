@@ -1,5 +1,5 @@
 del GTAC.tar
-set PATH=%PATH%;%CD%\Tools;%GALACTIC_HOME%\Lib\x86\v141_xp\Release
+set PATH=%CD%\Tools;%CD%\..\Galactic\Lib\x86\v141_xp_static\Release;%CD%\..\Galactic\Lib\x86\v142_static\Release;%PATH%
 set DIR=%CD%
 cls
 hbfelements Projects\Launcher\Launcher.xml Launcher.xml
