@@ -215,5 +215,5 @@ RAWCODE HookRender2DStuffII()
 
 void CGameHooksII::InstallHooks()
 {
-	M2::Initialize(OnGameInitII);
+	//M2::Initialize(OnGameInitII);
 }
