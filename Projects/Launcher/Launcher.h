@@ -13,6 +13,4 @@ public:
 
 	virtual bool Initialise(Context* pContext) override;
 	virtual void ShutDown() override;
-
-	virtual bool VerifyGameEXE(tGame& Game, const IMAGE_DOS_HEADER& DOSHeader, const IMAGE_NT_HEADERS32& NTHeader, Stream* pStream, bool& bShowError) override;
 };
