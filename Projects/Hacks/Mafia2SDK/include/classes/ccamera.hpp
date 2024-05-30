@@ -66,12 +66,12 @@ namespace M2
 			return this->m_pGameCamera->m_fov * 57.29577791868205;
 		}
 
-        Vector3 GetPos() 
+        Vector3 GetPos()
         {
             return { *(float*)((DWORD)this + 0x14), *(float*)((DWORD)this + 0x24), *(float*)((DWORD)this + 0x34) };
         }
 
-        Vector3 GetRot() 
+        Vector3 GetRot()
         {
             return { *(float*)((DWORD)this + 0x0C), *(float*)((DWORD)this + 0x1C), *(float*)((DWORD)this + 0x2C) };
         }
@@ -96,7 +96,7 @@ namespace M2
 			return (Mem::InvokeFunction<Mem::call_this, int>(0x1082B30, this, unk1, unk2));
 		}
 
-        void SetPos(const Vector3 & new_pos) 
+        void SetPos(const Vector3 & new_pos)
         {
             *(float*)((DWORD)this + 0x14) = new_pos.x;
             *(float*)((DWORD)this + 0x24) = new_pos.y;
@@ -119,7 +119,7 @@ namespace M2
             }
         }
 
-        void SetRot(const Vector3 & new_rot) 
+        void SetRot(const Vector3 & new_rot)
         {
             *(float*)((DWORD)this + 0x0C) = new_rot.x;
             *(float*)((DWORD)this + 0x1C) = new_rot.y;

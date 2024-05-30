@@ -145,90 +145,37 @@ namespace M2
         }
 	};
 
-#ifdef MAFIA2_SDK_IMPLEMENTATION
+
     namespace C_Human2_Hooks
     {
-        void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)>);
-        void HookDoDamage(std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)>);
+        inline void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)>);
+        inline void HookDoDamage(std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)>);
 
+#ifdef MAFIA2_SDK_IMPLEMENTATION
         namespace FunctionPointers
         {
-            std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> setupDeath;
-            std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)> doDamage;
+            extern std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> setupDeath;
+            extern std::function<void(M2::C_Human2 *human, M2::C_EntityMessageDamage *message)> doDamage;
         };
 
         namespace Functions
         {
-            inline void SetupDeath(M2::C_Human2* human, M2::C_EntityMessageDamage* message)
-            {
-                if (FunctionPointers::setupDeath != nullptr) {
-                    FunctionPointers::setupDeath(human, message);
-                }
-            }
-
-            inline void DoDamage(M2::C_Human2* human, M2::C_EntityMessageDamage* message)
-            {
-                if (FunctionPointers::doDamage != nullptr) {
-                    FunctionPointers::doDamage(human, message);
-                }
-            }
+            extern void SetupDeath(M2::C_Human2* human, M2::C_EntityMessageDamage* message);
+            extern void DoDamage(M2::C_Human2* human, M2::C_EntityMessageDamage* message);
         };
 
         namespace NakedFunctions
         {
-            DWORD MineDeathHook_JumpBack = 0x00990CFF;
-            DWORD _CHuman2__SetupDeath = 0x0098C160;
-            inline void __declspec(naked) CHuman2__SetupDeath_Hook()
-            {
-                __asm {
-                    pushad
-                    push esi
-                    push ebp
-                    call Functions::SetupDeath
-                    add esp, 0x8
-                    popad
+            extern void CHuman2__SetupDeath_Hook();
 
-                    push    esi
-                    mov     ecx, ebp
-                    call    _CHuman2__SetupDeath
+            extern void CHuman2__DoDamage__Hook();
 
-                    jmp MineDeathHook_JumpBack
-                }
-            }
+            extern void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr);
 
-            DWORD _CHuman2__DoDamage = 0x09907D0;
-            DWORD _DoDamage__JumpBack = 0x042FC6F;
-            inline void __declspec(naked) CHuman2__DoDamage__Hook()
-            {
-                __asm
-                {
-                    pushad;
-                    push esi;
-                    push edi;
-                    call Functions::DoDamage;
-                    add esp, 0x8;
-                    popad;
-
-                    push edi;
-                    mov ecx, esi;
-                    call _CHuman2__DoDamage;
-
-                    jmp _DoDamage__JumpBack;
-                }
-            }
+            extern void HookDoDamage(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr);
         };
 
-        inline void HookSetupDeath(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
-        {
-            FunctionPointers::setupDeath = ptr;
-            Mem::Hooks::InstallJmpPatch(0x00990CF7, (DWORD)NakedFunctions::CHuman2__SetupDeath_Hook);
-        }
-
-        inline void HookDoDamage(std::function<void(M2::C_Human2* human, M2::C_EntityMessageDamage* message)> ptr)
-        {
-            FunctionPointers::doDamage = ptr;
-            Mem::Hooks::InstallJmpPatch(0x042FC63, (DWORD)NakedFunctions::CHuman2__DoDamage__Hook);
-        }
-    };
 #endif
+    };
+
 };

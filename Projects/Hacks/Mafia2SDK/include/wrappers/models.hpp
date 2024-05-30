@@ -166,8 +166,8 @@ namespace M2
             }
 
             GameModelManager(ICPlayerModelManager * pModelManager)
-            { 
-                m_pModelManager = pModelManager; 
+            {
+                m_pModelManager = pModelManager;
             }
 
             ~GameModelManager()
@@ -202,7 +202,7 @@ namespace M2
                 strcpy(pModelManager->m_sModelName, model);
 
                 SetDir(SDS_LOAD_DIR_PLAYER);
-                
+
                 return result;
             }
 

@@ -95,69 +95,24 @@ namespace M2
 
     namespace C_Door_Hooks
     {
-        void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const&, E_DoorContactType)>);
-        DWORD HookSolveContact__Return;
+        extern void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const&, E_DoorContactType)>);
 
         namespace FunctionPointers
         {
-            std::function<void(C_Door *, S_ContactEventInfo const&, E_DoorContactType)> solveContact;
+            extern std::function<void(C_Door *, S_ContactEventInfo const&, E_DoorContactType)> solveContact;
         }
 
         namespace Functions
         {
-            inline void SolveContact(C_Door *thisInstance, S_ContactEventInfo const& ev, E_DoorContactType contactType)
-            {
-                if (FunctionPointers::solveContact != nullptr) {
-                    FunctionPointers::solveContact(thisInstance, ev, contactType);
-                }
-            }
+            extern void SolveContact(C_Door *thisInstance, S_ContactEventInfo const& ev, E_DoorContactType contactType);
         }
 
         namespace NakedFunctions
         {
-            inline void __declspec(naked) SolveContact()
-            {
-                __asm {
-                    sub esp, 10h;
-                    mov eax, [ecx + 358h];
-
-                    pushad;
-                }
-
-                static C_Door *instance = nullptr;
-                static S_ContactEventInfo info;
-                static void *infoPtr = nullptr;
-                static E_DoorContactType eventType;
-
-                __asm {
-                    mov instance, ecx;
-
-                    mov ecx, [esp + 24];
-                    mov infoPtr, ecx;
-
-                    mov eax, [esp + 28];
-                    mov eventType, eax;
-                }
-
-                if (infoPtr) {
-                    memcpy(&info, infoPtr, sizeof infoPtr);
-                }
-
-                Functions::SolveContact(instance, info, eventType);
-
-                __asm {
-                    popad;
-                    jmp[HookSolveContact__Return];
-                }
-            }
+            extern void SolveContact();
         }
 
-        inline void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const& ev, E_DoorContactType contactType)> ptr)
-        {
-           FunctionPointers::solveContact = ptr;
-
-           HookSolveContact__Return = Mem::Hooks::InstallNotDumbJMP(0x4F1190, (M2_Address)NakedFunctions::SolveContact, 9);
-        }
+        extern void HookSolveContact(std::function<void(C_Door *, S_ContactEventInfo const& ev, E_DoorContactType contactType)> ptr);
     }
 #endif
 };

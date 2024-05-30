@@ -26,7 +26,6 @@ extern C2D* g_p2DII;
 
 static void OnGameInitII()
 {
-	/*
 	M2::AttachHandler(M2_EVENT_MOD_MESSAGE, [](m2sdk_event* data) {
 		auto message = (int)data->arg1;
 
@@ -98,7 +97,6 @@ static void OnGameInitII()
 		auto seat = (uint32_t)data->arg3;
 		g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
 	});
-	*/
 
 	g_pClientGame->OnPreStartInGame(false);
 	g_pClientGame->OnStartInGame(false);
@@ -215,5 +213,5 @@ RAWCODE HookRender2DStuffII()
 
 void CGameHooksII::InstallHooks()
 {
-	//M2::Initialize(OnGameInitII);
+	M2::Initialize(OnGameInitII);
 }

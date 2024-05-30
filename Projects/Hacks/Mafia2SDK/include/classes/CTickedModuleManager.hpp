@@ -53,7 +53,7 @@ namespace M2
     };
 
     struct I_TickedModuleCallEventContext {};
-    class C_TickedModule 
+    class C_TickedModule
     {
     public:
         virtual void Tick(I_TickedModuleCallEventContext &) {};

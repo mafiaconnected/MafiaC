@@ -51,7 +51,7 @@ namespace M2
         pad(ICVehicle, pad4, 0xE);                  // 083E - 084C
         C_VehicleEffectManager  *m_pEffectManager;  // 084C - 0850
         pad(ICVehicle, pad5, 0x4F8);                // 0850 - 0D48
-        char*                   m_sPainting;        // 0D48 - 
+        char*                   m_sPainting;        // 0D48 -
 	};
 
 	class C_Vehicle : public ICVehicle

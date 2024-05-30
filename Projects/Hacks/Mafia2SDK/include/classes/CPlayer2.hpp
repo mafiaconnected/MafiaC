@@ -61,55 +61,22 @@ namespace M2
 #ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_Player2_Hooks
     {
-        inline void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)>);
+        extern void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)>);
 
         namespace FunctionPointers
         {
-            std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> enterCar;
+            extern std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> enterCar;
         };
 
         namespace Functions
         {
-            inline void EnterCar(M2::C_Player2 *player, M2::C_Actor *car, char seat)
-            {
-                if (FunctionPointers::enterCar != nullptr) {
-                    FunctionPointers::enterCar(player, car, seat);
-                }
-            }
+            extern void EnterCar(M2::C_Player2 *player, M2::C_Actor *car, char seat);
         };
 
         namespace NakedFunctions
         {
-            DWORD CPlayer__EnterCar__Call = 0x42CAC0;
-            DWORD CPlayer__EnterCar_JumpBack = 0x437945;
-            void __declspec(naked) CPlayer2__EnterCar()
-            {
-                __asm {
-                    mov eax, dword ptr ss : [esp + 0x10]
-                    mov ecx, dword ptr ds : [edi + 0x44]
-
-                    pushad
-                    push eax
-                    push ecx
-                    push esi
-                    call Functions::EnterCar;
-                    add esp, 0xC
-                    popad
-
-                    push eax
-                    push ecx
-                    mov ecx, esi
-                    call CPlayer__EnterCar__Call
-                    jmp CPlayer__EnterCar_JumpBack
-                }
-            }
+            extern void CPlayer2__EnterCar();
         };
-
-        inline void HookEnterCar(std::function<void(M2::C_Player2 *player, M2::C_Actor *car, char seat)> ptr)
-        {
-            FunctionPointers::enterCar = ptr;
-            Mem::Hooks::InstallJmpPatch(0x437935, (DWORD)NakedFunctions::CPlayer2__EnterCar);
-        }
     };
 #endif
 };

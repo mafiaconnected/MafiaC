@@ -133,7 +133,7 @@ namespace M2
         {
             return Mem::InvokeFunction<Mem::call_this, double>(0x9A1DC0, this);
         }
-        
+
         Vector3 GetWheelPos(int index)
         {
             if (index <= 0) {

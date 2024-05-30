@@ -23,53 +23,24 @@ namespace M2
 #ifdef MAFIA2_SDK_IMPLEMENTATION
     namespace C_CarActionOpenHood_Hooks
     {
-        inline void HookTestAction(std::function<bool(C_Car *)>);
+        extern void HookTestAction(std::function<bool(C_Car *)>);
 
         namespace FunctionPointers
         {
-            std::function<bool(C_Car *)> testAction;
+            extern std::function<bool(C_Car *)> testAction;
         };
 
         namespace Functions
         {
-            inline bool TestAction(C_Car *car)
-            {
-                if (FunctionPointers::testAction != nullptr) {
-                    return FunctionPointers::testAction(car);
-                }
-                return false;
-            }
+            inline bool TestAction(C_Car *car);
         };
 
         namespace NakedFunctions
         {
-            C_Car *tryHoodOpenCar = nullptr;
-            bool tryHoodOpenAnswer;
-            void __declspec(naked) CCarActionOpenHood__TestAction__Hook()
-            {
-                __asm
-                {
-                    mov tryHoodOpenCar, esi;
-                }
-
-                tryHoodOpenAnswer = Functions::TestAction(tryHoodOpenCar);
-
-
-                __asm {
-                    pop     edi;
-                    pop     esi;
-                    mov     al, tryHoodOpenAnswer;
-                    pop     ebx;
-                    retn    4;
-                }
-            }
+            extern void CCarActionOpenHood__TestAction__Hook();
         };
 
-        inline void HookTestAction(std::function<bool(C_Car *)> ptr)
-        {
-            FunctionPointers::testAction = ptr;
-            Mem::Hooks::InstallJmpPatch(0xA23088, (DWORD)NakedFunctions::CCarActionOpenHood__TestAction__Hook);
-        }
+        extern void HookTestAction(std::function<bool(C_Car *)> ptr);
     };
 #endif
 }

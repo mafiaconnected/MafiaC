@@ -42,57 +42,30 @@ namespace M2
         }
     };
 
-#ifdef MAFIA2_SDK_IMPLEMENTATION
+
     namespace C_Human2CarWrapper_Hooks
     {
-        inline void HookIsFreeToGetIn(std::function<bool(C_Car *)>);
+        extern void HookIsFreeToGetIn(std::function<bool(C_Car *)>);
 
+#ifdef MAFIA2_SDK_IMPLEMENTATION
         namespace FunctionPointers
         {
-            std::function<bool(C_Car *)> isFreeToGetIn;
+            extern std::function<bool(C_Car *)> isFreeToGetIn;
         };
 
         namespace Functions
         {
-            inline bool TestAction(C_Car *car)
-            {
-                if (FunctionPointers::isFreeToGetIn != nullptr) {
-                    return FunctionPointers::isFreeToGetIn(car);
-                }
-                return false;
-            }
+            extern inline bool TestAction(C_Car *car);
         };
 
         namespace NakedFunctions
         {
-            DWORD CHuman2CarWrapper__GetCar = 0x9235F0;
-            C_Car *tryCar = nullptr;
-            C_Human2CarWrapper *carWrapper;
-            bool tryAnswer = false;
-            inline void __declspec(naked) CHuman2CarWrapper__IsFreeToGetIn__Hook()
-            {
-                __asm {
-                    mov carWrapper, esi;
-                }
-
-                if(carWrapper != nullptr){
-                    tryCar = carWrapper->GetCar();
-                    tryAnswer = Functions::TestAction(tryCar);
-                }
-
-                __asm {
-                    mov     al, tryAnswer
-                    pop     esi
-                    retn    8
-                }
-            }
+            extern void CHuman2CarWrapper__IsFreeToGetIn__Hook();
         };
 
-        inline void HookIsFreeToGetIn(std::function<bool(C_Car *)> ptr)
-        {
-            FunctionPointers::isFreeToGetIn = ptr;
-            Mem::Hooks::InstallJmpPatch(0x956143, (DWORD)NakedFunctions::CHuman2CarWrapper__IsFreeToGetIn__Hook);
-        }
-    };
+        extern void HookIsFreeToGetIn(std::function<bool(C_Car *)> ptr);
+
 #endif
+    };
+
 }
