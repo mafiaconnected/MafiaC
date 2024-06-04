@@ -58,7 +58,7 @@ static void OnGameInit()
 	}
 
 	CArguments Args;
-	Args.AddString((const GChar*)mName);
+	Args.AddString(CString(false, mName).CString());
 	bool bPreventDefault = false;
 	g_pClientGame->m_pOnMapLoadedEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault)

@@ -11,7 +11,7 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
-std::unordered_map<const char*, const char*> g_umapFileNames;
+std::unordered_map<std::string, std::string> g_umapFileNames;
 
 static void ForceDTARead(bool state)
 {
@@ -20,11 +20,12 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	_glogprintf(_gstr("Read file: %hs"), file);
+	//_glogprintf(_gstr("Read file: %s"), CString(false, file).CString());
 
-	if (g_umapFileNames.count(file) > 0) {
+	if (g_umapFileNames.find(file) != g_umapFileNames.end()) {
 		// Custom file is available, use it
-		return dtaOpen(g_umapFileNames[file], params);
+		//_glogwarnprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
+		return dtaOpen(g_umapFileNames[file].c_str(), params);
 	} else {
 		// Custom file is not available, use the original file
 		return dtaOpen(file, params);
@@ -94,10 +95,12 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		}
 		case HACKEVENT_ADDCUSTOMFILE:
 		{
-			tHackEventDataCustomFile* pAddCustomFile = (tHackEventDataCustomFile*)pData;
-			g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
-			return HACKEVENTRESULT_NORMAL;
-			break;
+            tHackEventDataCustomFile* pAddCustomFile = (tHackEventDataCustomFile*)pData;
+            CString GameFilePath(false, pAddCustomFile->pszGameFilePath);
+            CString FilePath(false, pAddCustomFile->pszFilePath);
+            //_glogwarnprintf(_gstr("Adding custom file for: %s (%s)"), GameFilePath.CString(), FilePath.CString());
+            g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
+            return HACKEVENTRESULT_NORMAL;
 		}
 		return HACKEVENTRESULT_NORMAL;
 		break;

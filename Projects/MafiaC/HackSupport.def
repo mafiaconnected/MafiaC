@@ -14,5 +14,4 @@ EXPORTS
    HackEntryPoint3_WindowHacks
    HackEntryPoint3_ModLoader
    HackEntryPoint3_MultiplayerModOne
-   HackEntryPoint3_MultiplayerModTwo
    GuessCrashReason

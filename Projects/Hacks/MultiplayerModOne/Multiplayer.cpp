@@ -648,9 +648,9 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			size_t size = 0;
 			GChar* map = Reader.ReadString(&size);
 
-			_glogprintf(_gstr("Recieved map name from server: %s"), map);
+			_glogprintf(_gstr("Recieved map name from server: %s"), CString(false, map).CString());
 
-			UTF8String mapName(true, map);
+			UTF8String mapName(false, map);
 
 			//if (!strcmp(MafiaSDK::GetCurrentMissionName(), mapName.CString()))
 			//{

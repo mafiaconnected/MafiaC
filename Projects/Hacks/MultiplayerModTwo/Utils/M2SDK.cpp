@@ -1010,3 +1010,196 @@ namespace M2
 		}
 	}
 }
+
+namespace Mem
+{
+	void Initialize(void)
+	{
+		// Prepare headers
+		PBYTE pbImageBase = (PBYTE)GetModuleHandle(NULL);
+		PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)pbImageBase;
+		PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)(pbImageBase + pDosHeader->e_lfanew);
+		PIMAGE_SECTION_HEADER pSection = IMAGE_FIRST_SECTION(pNtHeaders);
+
+		// Loop thought all sections
+		for (int iSection = 0; iSection < pNtHeaders->FileHeader.NumberOfSections; iSection++, pSection++)
+		{
+			char* szSectionName = (char*)pSection->Name;
+			if (!strcmp(szSectionName, ".text") || !strcmp(szSectionName, ".rdata") || !strcmp(szSectionName, ".textnc"))
+			{
+				// Unprotect segment
+				DWORD dwOld = 0;//Temp variable
+				VirtualProtect((void*)(pbImageBase + pSection->VirtualAddress), ((pSection->Misc.VirtualSize + 4095) & ~4095), PAGE_EXECUTE_READWRITE, &dwOld);
+			}
+		}
+	}
+
+	namespace Utilites {
+		void InstallNopPatch(uint32_t dwAddress, int iSize)
+		{
+			ScopedProtect(dwAddress, iSize);
+			memset((void*)dwAddress, NOP, iSize);
+		}
+
+		bool bDataCompare(const unsigned char* pData, const unsigned char* bMask, const char* szMask)
+		{
+			for (; *szMask; ++szMask, ++pData, ++bMask)
+			{
+				if (*szMask == 'x' && *pData != *bMask)
+				{
+					return false;
+				}
+			}
+
+			return (*szMask) == 0;
+		}
+
+		unsigned long FindPattern2(uint32_t dwAddress, uint32_t dwLen, unsigned char* bMask, char* szMask)
+		{
+			for (unsigned long i = 0; i < dwLen; i++)
+			{
+				if (bDataCompare((unsigned char*)(dwAddress + i), bMask, szMask))
+				{
+					return (unsigned long)(dwAddress + i);
+				}
+			}
+
+			return 0;
+		}
+
+		unsigned long FindPattern(unsigned char* bMask, char* szMask)
+		{
+			return FindPattern2((uint32_t)GetModuleHandle(NULL), 0xFFFFFFFF, bMask, szMask);
+		}
+
+		void DumpVFTable(uint32_t dwAddress, int iFunctionCount)
+		{
+			/*CLogFile::Printf("Dumping Virtual Function Table at 0x%p...", dwAddress);
+			for (int i = 0; i < iFunctionCount; i++)
+			{
+				CLogFile::Printf("VFTable Offset: %d, Function: 0x%p (At M2_Address: 0x%p)", (i * 4), *(Puint32_t)(dwAddress + (i * 4)), (dwAddress + (i * 4)));
+			}*/
+		}
+
+		void PatchAddress(uint32_t dwAddress, BYTE* bPatch, size_t iSize)
+		{
+			ScopedProtect(dwAddress, sizeof(iSize));
+			memcpy((void*)dwAddress, bPatch, iSize);
+		}
+
+		void PatchAddress(uint32_t dwAddress, uint32_t dwPatch)
+		{
+			ScopedProtect(dwAddress, sizeof(uint32_t));
+			*(uint32_t*)(dwAddress) = dwPatch;
+		}
+	}
+
+	namespace Hooks {
+		BYTE* InstallDetourPatchInternal(uint32_t dwAddress, uint32_t dwDetourAddress, BYTE byteType, int iSize)
+		{
+			BYTE* pbyteTrampoline = (BYTE*)malloc(iSize + 5);
+			Unprotect((DWORD)pbyteTrampoline, (iSize + 5));
+			ProtectionInfo protectionInfo = Unprotect(dwAddress, (iSize + 5));
+			memcpy(pbyteTrampoline, (void*)dwAddress, iSize);
+			DWORD dwTrampoline = (DWORD)(pbyteTrampoline + iSize);
+			*(BYTE*)dwTrampoline = byteType;
+			*(DWORD*)(dwTrampoline + 1) = ((dwAddress + iSize) - dwTrampoline - 5);
+			*(BYTE*)dwAddress = byteType;
+			*(DWORD*)(dwAddress + 1) = (dwDetourAddress - dwAddress - 5);
+			Reprotect(protectionInfo);
+			return pbyteTrampoline;
+		}
+
+		void UninstallDetourPatchInternal(uint32_t dwAddress, void** pTrampoline, int iSize)
+		{
+			ProtectionInfo protectionInfo = Unprotect(dwAddress, iSize);
+			memcpy((void*)dwAddress, pTrampoline, iSize);
+			Reprotect(protectionInfo);
+			free(pTrampoline);
+		}
+
+		void* InstallDetourPatch(char* szLibrary, char* szFunction, uint32_t dwFunctionAddress)
+		{
+			return DetourFunction(DetourFindFunction(szLibrary, szFunction), (BYTE*)dwFunctionAddress);
+		}
+
+		void* InstallDetourPatch(uint32_t dwAddress, uint32_t dwFunctionAddress)
+		{
+			return DetourFunction((BYTE*)dwAddress, (BYTE*)dwFunctionAddress);
+		}
+
+		bool UninstallDetourPatch(void* pTrampoline, uint32_t dwFunctionAddress)
+		{
+			return DetourRemove((BYTE*)pTrampoline, (BYTE*)dwFunctionAddress);
+		}
+
+		void* InstallCallPatch(uint32_t dwAddress, uint32_t dwCallAddress, int iSize)
+		{
+			return InstallDetourPatchInternal(dwAddress, dwCallAddress, CALL, iSize);
+		}
+
+		void* InstallJmpPatch(uint32_t dwAddress, uint32_t dwJmpAddress, int iSize)
+		{
+			return InstallDetourPatchInternal(dwAddress, dwJmpAddress, JMP, iSize);
+		}
+
+		M2_Address InstallNotDumbJMP(M2_Address target_addr, M2_Address hookfnc_addr, size_t len)
+		{
+			ScopedProtect(target_addr, len);
+			std::vector<Byte> patch_data(len, 0x90);
+			patch_data[0] = X86Instructions::JMP;
+			*reinterpret_cast<M2_Address*>(patch_data.data() + 1) = hookfnc_addr - (target_addr + 5);
+			std::copy_n(patch_data.data(), patch_data.size(), reinterpret_cast<std::vector<Byte>::value_type*>(target_addr));
+			// zpl_memcopy(reinterpret_cast<std::vector<Byte>::value_type*>(target_addr), patch_data.data(), patch_data.size());
+			return target_addr + len;
+		}
+	}
+}
+
+ProtectionInfo Unprotect(DWORD dwAddress, int iSize)
+{
+	ProtectionInfo protectionInfo;
+	protectionInfo.dwAddress = dwAddress;
+	protectionInfo.iSize = iSize;
+#ifdef WIN32
+	VirtualProtect((void*)dwAddress, iSize, PAGE_EXECUTE_READWRITE, &protectionInfo.dwOldProtection);
+#else
+	mprotect((void*)((dwAddress / PAGESIZE) * PAGESIZE), PAGESIZE, (PROT_EXEC | PROT_READ | PROT_WRITE));
+#endif
+	return protectionInfo;
+}
+
+void InstallCallHook(DWORD address, DWORD function)
+{
+	DWORD lpflOldProtect;
+	VirtualProtect((void*)address, 5, PAGE_EXECUTE_READWRITE, &lpflOldProtect);
+	*(BYTE*)(address) = 0xE8;
+	*(DWORD*)(address + 1) = (unsigned long)function - (address + 5);
+	VirtualProtect((void*)address, 5, lpflOldProtect, &lpflOldProtect);
+}
+
+void Reprotect(ProtectionInfo protectionInfo)
+{
+#ifdef WIN32
+	DWORD dwProtection;
+	VirtualProtect((void*)protectionInfo.dwAddress, protectionInfo.iSize, protectionInfo.dwOldProtection, &dwProtection);
+#else
+	//get old protection
+#endif
+}
+
+DWORD GetFunctionAddress(LPCWSTR szLibrary, char* szFunction)
+{
+	return (DWORD)GetProcAddress(LoadLibraryW(szLibrary), szFunction);
+}
+
+DWORD GetFunctionAddress(LPCWSTR szLibrary, unsigned int uOrdinal)
+{
+	return GetFunctionAddress(szLibrary, (char*)MAKELONG(uOrdinal, 0));
+}
+	
+
+
+
+
+	

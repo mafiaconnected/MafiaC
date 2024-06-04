@@ -635,15 +635,23 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	if (!szGameFilePath)
 		return false;
 
-	UTF8String filePath(true, _gstr("%s/%s", pState->m_pResource->m_RootPath, szFilePath));
-	UTF8String gameFilePath(true, szGameFilePath);
+	GChar szBuffer[512];
+	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_RootPath.c_str(), szFilePath);
+
+	_glogprintf(_gstr("BEFORE RESOLVE: %s"), szBuffer);
+
+	GString szFullFilePath;
+	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
+
+	_glogprintf(_gstr("AFTER RESOLVE: %s"), szFullFilePath);
+
+	UTF8String filePath(false, szFullFilePath.c_str());
+	UTF8String gameFilePath(false, szGameFilePath);
 
 	tHackEventDataCustomFile pCustomFileData;
 	pCustomFileData.pszFilePath = filePath;
 	pCustomFileData.pszGameFilePath = gameFilePath;
 	TriggerHackEvent(HACKEVENT_ADDCUSTOMFILE, &pCustomFileData);
-
-	//g_umapFileNames[file] = stream;
 }
 
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
