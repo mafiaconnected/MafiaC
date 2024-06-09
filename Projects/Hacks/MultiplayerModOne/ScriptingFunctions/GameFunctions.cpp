@@ -638,12 +638,12 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	GChar szBuffer[512];
 	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_RootPath.c_str(), szFilePath);
 
-	_glogprintf(_gstr("BEFORE RESOLVE: %s"), szBuffer);
+	//_glogprintf(_gstr("BEFORE RESOLVE: %s"), szBuffer);
 
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
 
-	_glogprintf(_gstr("AFTER RESOLVE: %s"), szFullFilePath);
+	//_glogprintf(_gstr("AFTER RESOLVE: %s"), szFullFilePath);
 
 	UTF8String filePath(false, szFullFilePath.c_str());
 	UTF8String gameFilePath(false, szGameFilePath);
