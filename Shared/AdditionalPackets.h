@@ -2,8 +2,7 @@
 
 #pragma pack(push,1)
 
-#define NETGAME_CURRENT_VERSION 3
-#define NETGAME_CURRENT_VERSION_STRING "3"
+#define NETGAME_CURRENT_VERSION 4
 
 #include <Multiplayer/Packets.h>
 
@@ -83,6 +82,39 @@ struct tEntitySyncPacket
 	CVector3D rotationRel;
 };
 
+struct tMafia2EntityCreatePacket
+{
+	uint32_t model;
+	CVector3D position;
+	CVector3D positionRel;
+	CVector3D rotation;
+	CVector3D rotationRel;
+};
+
+struct tMafia2EntitySyncPacket
+{
+	CVector3D position;
+	CVector3D positionRel;
+	CVector3D rotation;
+	CVector3D rotationRel;
+};
+
+struct tMafia2HumanCreatePacket
+{
+};
+
+struct tMafia2HumanSyncPacket
+{
+};
+
+struct tMafia2VehicleCreatePacket
+{
+};
+
+struct tMafia2VehicleSyncPacket
+{
+};
+
 struct tHumanCreatePacket
 {
 	float health;
@@ -131,7 +163,7 @@ struct tVehicleCreatePacket
 	bool horn;
 	bool siren;
 	bool lights;
-	uint32_t gear;
+	int32_t gear;
 	float rpm;
 	float accel;
 	float brake;
@@ -157,7 +189,7 @@ struct tVehicleSyncPacket
 	bool horn;
 	bool siren;
 	bool lights;
-	uint32_t gear;
+	int32_t gear;
 	float rpm;
 	float accel;
 	float brake;

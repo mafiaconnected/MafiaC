@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "MafiaHackSupport.h"
+
 
 tHack* g_pHack;
 static Context* g_pContext;
@@ -9,7 +11,7 @@ typedef DWORD (_stdcall* dtaOpen_proc)(const char* file, DWORD params);
 
 dtaOpen_proc dtaOpen;
 
-//std::unordered_map<const char*, Stream> g_umapFileNames;
+std::unordered_map<std::string, std::string> g_umapFileNames;
 
 static void ForceDTARead(bool state)
 {
@@ -18,17 +20,18 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	//if (g_umapFileNames.count(file) > 0) {
+	//_glogprintf(_gstr("Read file: %s"), CString(false, file).CString());
+
+	if (g_umapFileNames.find(file) != g_umapFileNames.end()) {
 		// Custom file is available, use it
-	//}
+		//_glogwarnprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
+		return dtaOpen(g_umapFileNames[file].c_str(), params);
+	} else {
+		// Custom file is not available, use the original file
+		return dtaOpen(file, params);
+	}
 
-	//_glogprintf(_gstr("Read file: %hs"), file);
-
-	//std::wstring strFile = CHackSupport::m_pInstance->m_GamePath;
-	//strFile += (const GChar*)file;
-	//return dtaOpen(strFile, params);
-
-	return dtaOpen(file, params);
+	//return dtaOpen(file, params);
 }
 
 static void Load(tHackEventDataLoad* pData)
@@ -39,7 +42,6 @@ static void Load(tHackEventDataLoad* pData)
     hRwData = GetModuleHandle(_T("rw_data.dll"));
 	HMODULE hGame = GetModuleHandle(_T("Game.exe"));
 	HMODULE hLS3DF = GetModuleHandle(_T("LS3DF.dll"));
-
 	assert(hGame);
 	assert(hLS3DF);
 	assert(hRwData);
@@ -77,7 +79,7 @@ static void Load(tHackEventDataLoad* pData)
                 }
             }
             return true;
-            });
+        });
     }
 }
 
@@ -91,21 +93,14 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 			return HACKEVENTRESULT_NORMAL;
 			break;
 		}
-		case HACKEVENT_REGISTERFUNCTIONS:
+		case HACKEVENT_ADDCUSTOMFILE:
 		{
-			/*
-			Interfaces::IScripting* pScripting = ((tHackEventDataRegisterFunctions*)pData)->m_pScripting;
-
-			Strong<Interfaces::IReflectedNamespace> pGlobal;
-			if (!Failed(pScripting->GetGlobal(&pGlobal)))
-			{
-				Strong<Interfaces::IReflectedNamespace> pModLoader;
-				if (!Failed(pGlobal->AddNamespace("modloader", &pModLoader)))
-				{
-					pModLoader->RegisterFunction("addFile", "xs", FunctionAddGameFile, nullptr);
-				}
-			}
-			*/
+            tHackEventDataCustomFile* pAddCustomFile = (tHackEventDataCustomFile*)pData;
+            CString GameFilePath(false, pAddCustomFile->pszGameFilePath);
+            CString FilePath(false, pAddCustomFile->pszFilePath);
+            //_glogwarnprintf(_gstr("Adding custom file for: %s (%s)"), GameFilePath.CString(), FilePath.CString());
+            g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
+            return HACKEVENTRESULT_NORMAL;
 		}
 		return HACKEVENTRESULT_NORMAL;
 		break;

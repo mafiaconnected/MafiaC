@@ -1,20 +1,20 @@
 #pragma once
 
 #include <Windows.h>
-#include <malloc.h> 
+#include <malloc.h>
 
-#ifndef WIN32 
-#include <sys/mman.h> 
-#ifndef PAGESIZE 
-#define PAGESIZE 4096 
-#endif 
-#endif 
+#ifndef WIN32
+#include <sys/mman.h>
+#ifndef PAGESIZE
+#define PAGESIZE 4096
+#endif
+#endif
 
 
-#define X86_NOP 0x90 
-#define X86_RETN 0xC3 
-#define X86_CALL 0xE8 
-#define X86_JMP 0xE9 
+#define X86_NOP 0x90
+#define X86_RETN 0xC3
+#define X86_CALL 0xE8
+#define X86_JMP 0xE9
 
 struct ProtectionInfo
 {
@@ -31,11 +31,11 @@ public:
 		ProtectionInfo protectionInfo;
 		protectionInfo.dwAddress = dwAddress;
 		protectionInfo.iSize = iSize;
-#ifdef WIN32 
+#ifdef WIN32
 		VirtualProtect((void *)dwAddress, iSize, PAGE_EXECUTE_READWRITE, &protectionInfo.dwOldProtection);
-#else 
+#else
 		mprotect((void *)((dwAddress / PAGESIZE) * PAGESIZE), PAGESIZE, (PROT_EXEC | PROT_READ | PROT_WRITE));
-#endif 
+#endif
 		return protectionInfo;
 	}
 
@@ -50,12 +50,12 @@ public:
 
 	static void Reprotect(ProtectionInfo protectionInfo)
 	{
-#ifdef WIN32 
+#ifdef WIN32
 		DWORD dwProtection;
 		VirtualProtect((void *)protectionInfo.dwAddress, protectionInfo.iSize, protectionInfo.dwOldProtection, &dwProtection);
-#else 
-		//get old protection 
-#endif 
+#else
+		//get old protection
+#endif
 	}
 
 	static void InstallNopPatch(DWORD dwAddress, int iSize)

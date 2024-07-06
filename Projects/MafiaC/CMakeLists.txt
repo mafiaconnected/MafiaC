@@ -31,7 +31,7 @@ target_link_libraries(
     IPCServer_static
     CustomWindow_static
     CrashHandler_static
-    MultiplayerMod)
+    MultiplayerModOne)
 
 target_link_libraries(
 	MafiaC
