@@ -192,9 +192,10 @@ Section "" SecLauncher
 
 	Delete "$INSTDIR\Hacks\*.dll"
 
-	File "Redistributable\vc_redist.x86.exe"
-	ExecWait '"$INSTDIR\vc_redist.x86.exe" /install /quiet /norestart'
-	Delete "$INSTDIR\vc_redist.x86.exe"
+	; Visual C++ 2015-2019 runtime
+	;File "Redistributable\vc_redist.x86.exe"
+	;ExecWait '"$INSTDIR\vc_redist.x86.exe" /install /quiet /norestart'
+	;Delete "$INSTDIR\vc_redist.x86.exe"
 
 	;File "Redistributable\dxwebsetup.exe"
 	;ExecWait '"$INSTDIR\dxwebsetup.exe" /Q'
@@ -202,12 +203,12 @@ Section "" SecLauncher
 
 	RMDir "$INSTDIR\Redistributable"
 
-	File "..\Lib\x86\v141_xp\Release\Launcher.exe"
-	File "..\Lib\x86\v141_xp\Release\Updater.exe"
-	File "..\Lib\x86\v141_xp\Release\*.dll"
+	File "..\Lib\x86\v141_xp_static\Release\Launcher.exe"
+	File "..\Lib\x86\v141_xp_static\Release\Updater.exe"
+	File "..\Lib\x86\v141_xp_static\Release\*.dll"
 	SetOutPath "$INSTDIR"
 	File "cacert.pem"
-	File "..\Lib\x86\v141_xp\Release\MafiaC.tar"
+	File "..\Lib\x86\v141_xp_static\Release\MafiaC.tar"
 	File "resources.xml"
 
 	;SetOutPath "$INSTDIR\resources"
