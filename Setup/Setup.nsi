@@ -77,10 +77,10 @@ ShowInstDetails show
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
-
+  
 ;--------------------------------
 ;Languages
-
+ 
   !insertmacro MUI_LANGUAGE "English" ;first language is the default language
   !insertmacro MUI_LANGUAGE "French"
   !insertmacro MUI_LANGUAGE "German"
@@ -141,20 +141,18 @@ ShowInstDetails show
 VIProductVersion "${PRODUCT_VERSION_FULL}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${PRODUCT_VERSION_FULL}"
-;VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "A test comment"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jack's Mini Network"
-;VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "Test Application is a trademark of Fake company"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright Â© 2023 Jack's Mini Network"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © 2024 Jack's Mini Network"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION_FULL}"
 
 ;--------------------------------
 ;Reserve Files
-
+  
   ;If you are using solid compression, files that are required before
   ;the actual installation should be stored first in the data block,
   ;because this will make your installer start faster.
-
+  
   !insertmacro MUI_RESERVEFILE_LANGDLL
 
 ;--------------------------------
@@ -192,6 +190,10 @@ Section "" SecLauncher
 
 	Delete "$INSTDIR\Hacks\*.dll"
 
+	;File "Redistributable\vcredist_x86.exe"
+	;ExecWait '"$INSTDIR\vcredist_x86.exe" /Q'
+	;Delete "$INSTDIR\vcredist_x86.exe"
+
 	; Visual C++ 2015-2019 runtime
 	;File "Redistributable\vc_redist.x86.exe"
 	;ExecWait '"$INSTDIR\vc_redist.x86.exe" /install /quiet /norestart'
@@ -211,14 +213,14 @@ Section "" SecLauncher
 	File "..\Lib\x86\v141_xp_static\Release\MafiaC.tar"
 	File "resources.xml"
 
-	;SetOutPath "$INSTDIR\resources"
-	;File "resources\*.tar"
+	SetOutPath "$INSTDIR\resources"
+	File "resources\*.tar"
 
 	SetOutPath "$INSTDIR"
 
 	;Store installation folder
 	WriteRegStr ${INSTALL_REGISTRY_ROOT} "Software\Jack's Mini Network\${PRODUCT_NAME}" "Installation Directory" $INSTDIR
-
+  
 	;Create uninstaller
 	WriteUninstaller "$INSTDIR\Uninstall.exe"
 
@@ -287,7 +289,7 @@ Section "Uninstall"
 	RMDir "$INSTDIR"
 
 	; Clean registry entries used
-	;DeleteRegKey HKCR "mafiac"
+	DeleteRegValue ${INSTALL_REGISTRY_ROOT} "Software\Jack's Mini Network\${PRODUCT_NAME}" "Installation Directory"
 	DeleteRegKey HKLM "Software\Classes\mafiac"
 	DeleteRegKey HKCU "Software\Classes\mafiac"
 	DeleteRegKey ${INSTALL_REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_NAME}"
@@ -304,4 +306,3 @@ FunctionEnd
 Function LaunchLink
 	ExecShell "" "$INSTDIR\Launcher.exe"
 FunctionEnd
-
