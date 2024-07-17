@@ -213,8 +213,8 @@ Section "" SecLauncher
 	File "..\Lib\x86\v141_xp_static\Release\MafiaC.tar"
 	File "resources.xml"
 
-	SetOutPath "$INSTDIR\resources"
-	File "resources\*.tar"
+	;SetOutPath "$INSTDIR\resources"
+	;File "resources\*.tar"
 
 	SetOutPath "$INSTDIR"
 
