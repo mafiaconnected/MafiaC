@@ -629,21 +629,19 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 
 	const GChar* szFilePath = pState->CheckString(0);
 	if (!szFilePath)
-		return false;
+		return pState->Error(_gstr("Custom file path is invalid! Use a relative file path, where the root is the resource directory!"));
 
 	const GChar* szGameFilePath = pState->CheckString(1);
 	if (!szGameFilePath)
-		return false;
+		return pState->Error(_gstr("Game file path is invalid! Use a relative file path, where the root is the game folder if you have the game files extracted!"));
 
 	GChar szBuffer[512];
 	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_RootPath.c_str(), szFilePath);
 
-	//_glogprintf(_gstr("BEFORE RESOLVE: %s"), szBuffer);
-
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
 
-	//_glogprintf(_gstr("AFTER RESOLVE: %s"), szFullFilePath);
+	_glogverbosef(_gstr("Added custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
 
 	UTF8String filePath(false, szFullFilePath.c_str());
 	UTF8String gameFilePath(false, szGameFilePath);
