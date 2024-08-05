@@ -1,4 +1,4 @@
-del GTAC.tar
+del MafiaC.tar
 set PATH=%CD%\Tools;%CD%\..\Galactic\Lib\x86\v141_xp_static\Release;%CD%\..\Galactic\Lib\x86\v142_static\Release;%PATH%
 set DIR=%CD%
 cls
