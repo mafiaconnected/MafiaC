@@ -50,10 +50,10 @@
         <Mod Name="WindowHacks" Title="WindowHacks" Category="Mod" Visible="false" Enabled="true">
             <Game>*</Game>
         </Mod>
-		<Mod Name="ModLoader" Title="Mod Loader" Category="Mod" Visible="false" Enabled="true">
+		<Mod Name="ModLoader" Title="Mod Loader" Category="Mod" Visible="true" Enabled="true">
 			<Game>*</Game>
 		</Mod>
-		<Mod Name="MultiplayerModOne" Title="MultiplayerOne" Category="Mod" Visible="true" Enabled="true">
+		<Mod Name="MultiplayerModOne" Title="MultiplayerOne" Category="Mod" Visible="false" Enabled="true">
 			<Game>mafia:one</Game>
 		</Mod>
 		<!--
