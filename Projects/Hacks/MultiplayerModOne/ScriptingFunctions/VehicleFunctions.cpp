@@ -1425,8 +1425,6 @@ static bool FunctionVehicleSetTest(IScriptState* pState, int argc, void* pUser)
 		return false;
 	}
 
-	
-
 	//_glogprintf(_gstr("%p\n"), offsetof(MafiaSDK::C_Vehicle_Interface, engine_on));
 	return true;
 }
@@ -1525,6 +1523,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("getComponentState"), _gstr("ti"), FunctionVehicleGetComponent, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("removeComponent"), _gstr("ti"), FunctionVehicleRemoveComponent, pClientManager);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setCollisionsEnabled"), _gstr("ti"), FunctionVehicleSetCollisionsEnabled, pClientManager);
+	//pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("setLights"), _gstr("tf"), FunctionVehicleSetLights, pClientManager);
 
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("siren"), ARGUMENT_BOOLEAN, FunctionVehicleGetSiren, FunctionVehicleSetSiren);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("lights"), ARGUMENT_BOOLEAN, FunctionVehicleGetLights, FunctionVehicleSetLights);
