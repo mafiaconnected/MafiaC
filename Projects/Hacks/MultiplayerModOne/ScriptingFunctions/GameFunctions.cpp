@@ -641,7 +641,7 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
 
-	_glogverbosef(_gstr("Added custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
+	_glogverboseprintf(_gstr("Adding custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
 
 	UTF8String filePath(false, szFullFilePath.c_str());
 	UTF8String gameFilePath(false, szGameFilePath);
@@ -650,6 +650,16 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	pCustomFileData.pszFilePath = filePath;
 	pCustomFileData.pszGameFilePath = gameFilePath;
 	TriggerHackEvent(HACKEVENT_ADDCUSTOMFILE, &pCustomFileData);
+}
+
+static bool FunctionGameGetMainVolume(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	float currentMainVolume = *reinterpret_cast<float*>(0x6D4B10);
+
+	pState->ReturnNumber(currentMainVolume);
+	return true;
 }
 
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
