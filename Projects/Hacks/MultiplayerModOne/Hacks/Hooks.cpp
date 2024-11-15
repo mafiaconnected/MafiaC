@@ -32,7 +32,7 @@ static void OnGameInit()
 	MafiaSDK::GetIGraph()->SetAppName("Mafia Connected");
 
 	// We don't want the game to be initialized in menu
-	if (!strcmp(mName, "00menu")) return;
+	//if (!strcmp(mName, "00menu")) return;
 
 	if (g_pClientGame->m_bFullReload) {
 		g_pClientGame->OnPreStartInGame(false);
