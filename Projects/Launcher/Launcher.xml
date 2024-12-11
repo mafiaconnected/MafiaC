@@ -39,7 +39,7 @@
 			<Game>*</Game>
 		</Mod>
 		<Mod Name="WindowHacks" Title="WindowHacks" Category="Mod" Visible="false" Enabled="true">
-            <Game>*</Game>
+            <Game>mafia:one</Game>
         </Mod>
 		<Mod Name="DirectInputHook" Title="DirectInput hook" Category="Advanced" Visible="false" Enabled="true">
 			<Game>*</Game>
@@ -47,11 +47,13 @@
         <Mod Name="Direct3D9" Title="Direct3D9" Category="Mod" Visible="false" Enabled="true">
             <Game>*</Game>
         </Mod>
+		<!--
         <Mod Name="WindowHacks" Title="WindowHacks" Category="Mod" Visible="false" Enabled="true">
             <Game>*</Game>
         </Mod>
+		-->
 		<Mod Name="ModLoader" Title="Mod Loader" Category="Mod" Visible="true" Enabled="true">
-			<Game>*</Game>
+			<Game>mafia:one</Game>
 		</Mod>
 		<Mod Name="MultiplayerModOne" Title="MultiplayerOne" Category="Mod" Visible="false" Enabled="true">
 			<Game>mafia:one</Game>
