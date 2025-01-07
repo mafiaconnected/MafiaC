@@ -20,11 +20,11 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	//_glogprintf(_gstr("Read file: %s"), CString(false, file).CString());
+	_glogprintf(_gstr("Read file: %s"), CString(false, file).CString());
 
 	if (g_umapFileNames.find(file) != g_umapFileNames.end()) {
 		// Custom file is available, use it
-		//_glogwarnprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
+		_glogwarnprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
 		return dtaOpen(g_umapFileNames[file].c_str(), params);
 	} else {
 		// Custom file is not available, use the original file
@@ -54,7 +54,7 @@ static void Load(tHackEventDataLoad* pData)
                 if (strcmp(pszName, "_dtaOpen@8") == 0)
                 {
                     // Note (Sevenisko): Force the game to load files ONLY from DTA files
-                    ForceDTARead(true);
+                    ForceDTARead(false);
 
                     dtaOpen = (dtaOpen_proc)*ppFunction;
 
@@ -72,6 +72,9 @@ static void Load(tHackEventDataLoad* pData)
             {
                 if (strcmp(pszName, "_dtaOpen@8") == 0)
                 {
+                    // Note (Sevenisko): Force the game to load files ONLY from DTA files
+                    ForceDTARead(false);
+
                     dtaOpen = (dtaOpen_proc)*ppFunction;
 
                     new CHackValueHack(g_pHack, ppFunction, sizeof(void*), &HookDtaOpen);
@@ -95,13 +98,25 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		}
 		case HACKEVENT_ADDCUSTOMFILE:
 		{
-            tHackEventDataCustomFile* pAddCustomFile = (tHackEventDataCustomFile*)pData;
+            tHackEventDataAddCustomFile* pAddCustomFile = (tHackEventDataAddCustomFile*)pData;
             CString GameFilePath(false, pAddCustomFile->pszGameFilePath);
             CString FilePath(false, pAddCustomFile->pszFilePath);
             //_glogwarnprintf(_gstr("Adding custom file for: %s (%s)"), GameFilePath.CString(), FilePath.CString());
-            g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
+            if (g_umapFileNames.find(pAddCustomFile->pszGameFilePath) == g_umapFileNames.end()) {
+                g_umapFileNames[pAddCustomFile->pszGameFilePath] = pAddCustomFile->pszFilePath;
+            }
             return HACKEVENTRESULT_NORMAL;
 		}
+        case HACKEVENT_REMOVECUSTOMFILE:
+        {
+            tHackEventDataRemoveCustomFile* pRemoveCustomFile = (tHackEventDataRemoveCustomFile*)pData;
+            CString GameFilePath(false, pRemoveCustomFile->pszGameFilePath);
+            //_glogwarnprintf(_gstr("Adding custom file for: %s (%s)"), GameFilePath.CString(), FilePath.CString());
+            if (g_umapFileNames.find(pRemoveCustomFile->pszGameFilePath) != g_umapFileNames.end()) {
+                g_umapFileNames.erase(pRemoveCustomFile->pszGameFilePath);
+            }
+            return HACKEVENTRESULT_NORMAL;
+        }
 		return HACKEVENTRESULT_NORMAL;
 		break;
 		default:

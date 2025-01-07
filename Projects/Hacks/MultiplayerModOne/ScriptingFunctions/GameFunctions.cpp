@@ -629,11 +629,11 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 
 	const GChar* szFilePath = pState->CheckString(0);
 	if (!szFilePath)
-		return pState->Error(_gstr("Custom file path is invalid! Use a relative file path, where the root is the resource directory!"));
+		return false;
 
 	const GChar* szGameFilePath = pState->CheckString(1);
 	if (!szGameFilePath)
-		return pState->Error(_gstr("Game file path is invalid! Use a relative file path, where the root is the game folder if you have the game files extracted!"));
+		return false;
 
 	GChar szBuffer[512];
 	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_RootPath.c_str(), szFilePath);
@@ -641,15 +641,34 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
 
-	_glogverboseprintf(_gstr("Adding custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
+	//_glogverboseprintf(_gstr("Adding custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
 
 	UTF8String filePath(false, szFullFilePath.c_str());
 	UTF8String gameFilePath(false, szGameFilePath);
 
-	tHackEventDataCustomFile pCustomFileData;
+	tHackEventDataAddCustomFile pCustomFileData;
 	pCustomFileData.pszFilePath = filePath;
 	pCustomFileData.pszGameFilePath = gameFilePath;
 	TriggerHackEvent(HACKEVENT_ADDCUSTOMFILE, &pCustomFileData);
+
+	return true;
+}
+
+static bool FunctionGameRemoveCustomGameFile(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* szGameFilePath = pState->CheckString(0);
+	if (!szGameFilePath)
+		return false;
+
+	UTF8String gameFilePath(false, szGameFilePath);
+
+	tHackEventDataRemoveCustomFile pCustomFileData;
+	pCustomFileData.pszGameFilePath = gameFilePath;
+	TriggerHackEvent(HACKEVENT_REMOVECUSTOMFILE, &pCustomFileData);
+
+	return true;
 }
 
 static bool FunctionGameGetMainVolume(IScriptState* pState, int argc, void* pUser)
@@ -797,7 +816,11 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("setLocalPlayer"), _gstr("x"), FunctionGameSetLocalPlayer, pClientManager);
 	}
 
-	pGameNamespace->RegisterFunction(_gstr("addCustomGameFile"), _gstr("ss"), FunctionGameAddCustomGameFile, pClientManager);
+	{
+		// Modloader
+		pGameNamespace->RegisterFunction(_gstr("addCustomGameFile"), _gstr("ss"), FunctionGameAddCustomGameFile, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("removeCustomGameFile"), _gstr("s"), FunctionGameRemoveCustomGameFile, pClientManager);
+	}
 
 	//g_pClientGame->m_pAudioScriptingFunctions->m_pSoundClass->RegisterFunction(_gstr("setWorldPosition"), _gstr("v"), FunctionAudioSetWorldPosition, pClientManager);
 }
