@@ -173,6 +173,8 @@ struct tVehicleCreatePacket
 	float wheelAngle;
 	CVector3D speed;
 	CVector3D rotSpeed;
+	bool collisionsEnabled;
+	float alpha;
 };
 
 struct tVehicleSyncPacket

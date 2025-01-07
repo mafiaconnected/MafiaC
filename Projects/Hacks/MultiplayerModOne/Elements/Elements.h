@@ -6,3 +6,5 @@
 #include "ClientVehicle.h"
 #include "ClientDummy.h"
 #include "ClientObject.h"
+#include "ClientDoor.h"
+#include "ClientBridge.h"

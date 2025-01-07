@@ -498,9 +498,10 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_EngineRPM = Packet.rpm;
 
 	GetGameVehicle()->SetActive(true);
-	GetGameVehicle()->SetActState(0);
+	GetGameVehicle()->SetActState(1);
 	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
-	GetGameVehicle()->SetColsOn(TRUE);
+	GetGameVehicle()->SetColsOn(Packet.collisionsEnabled);
+	GetGameVehicle()->SetTransparency(Packet.alpha);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 
 	//_glogprintf(_gstr("Vehicle::ReadCreatePacket for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tRotation: {%f, %f, %f}\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), szModel, vecPos.x, vecPos.y, vecPos.z, vecRot.x, vecRot.y, vecRot.z, pGameVehicle->health, pGameVehicle->engine_health, pGameVehicle->fuel, pGameVehicle->sound_enabled ? L"Yes" : L"No", pGameVehicle->engine_on ? L"Yes" : L"No", pGameVehicle->horn ? L"Yes" : L"No", pGameVehicle->siren ? L"Yes" : L"No", pGameVehicle->gear, pGameVehicle->engine_rpm, pGameVehicle->accelerating, pGameVehicle->break_val, pGameVehicle->hand_break, pGameVehicle->speed_limit, pGameVehicle->clutch, pGameVehicle->wheel_angle);
@@ -887,7 +888,8 @@ bool CClientVehicle::SetRoof(bool state)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	//m_MafiaVehicle->GetInterface()->vehicle_interface.roof = state;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.roof = state;
+	m_MafiaVehicle->Update(0.0);
 	//m_MafiaVehicle->Do_Roof(state);
 	return true;
 }
@@ -1085,6 +1087,7 @@ void CClientVehicle::SetFromExistingEntity(MafiaSDK::C_Car* car)
 
 	m_Horn = false;
 	m_EngineRPM = 0.0f;
+	m_Alpha = 0.0;
 
 	m_vecCachedPositionForTraffic = m_Position;
 }
@@ -1101,4 +1104,22 @@ void CClientVehicle::CreateNetBlender()
 void CClientVehicle::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4)
 {
 	GetGameVehicle()->ForceAI(value1, value2, value3, value4);
+}
+
+void CClientVehicle::SetAlpha(float alpha) {
+	m_Alpha = alpha;
+	m_MafiaVehicle->SetTransparency(alpha);
+}
+
+float CClientVehicle::GetAlpha() {
+	return m_Alpha;
+}
+
+void CClientVehicle::SetCollisionsEnabled(bool enabled) {
+	m_CollisionsEnabled = enabled;
+	m_MafiaVehicle->SetColsOn(enabled);
+}
+
+bool CClientVehicle::GetCollisionsEnabled() {
+	return m_CollisionsEnabled;
 }

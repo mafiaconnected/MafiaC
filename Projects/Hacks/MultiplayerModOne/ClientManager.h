@@ -25,6 +25,8 @@ enum eMafiaElementType
 	ELEMENT_VEHICLE = ELEMENT_ENTITY | 32,
 	ELEMENT_DUMMY = ELEMENT_ENTITY | 64,
 	ELEMENT_OBJECT = ELEMENT_ENTITY | 128,
+	ELEMENT_DOOR = ELEMENT_ENTITY | 256,
+	ELEMENT_BRIDGE = ELEMENT_ENTITY | 512,
 };
 
 class CMafiaClientManager : public Galactic3D::CClientManager
@@ -41,6 +43,8 @@ public:
 	Galactic3D::ReflectedClass* m_pClientVehicleClass;
 	Galactic3D::ReflectedClass* m_pClientDummyClass;
 	Galactic3D::ReflectedClass* m_pClientObjectClass;
+	Galactic3D::ReflectedClass* m_pClientDoorClass;
+	Galactic3D::ReflectedClass* m_pClientBridgeClass;
 
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
@@ -55,11 +59,15 @@ public:
 	virtual CClientPlayer* FindPlayer(MafiaSDK::C_Player* pPlayer);
 	virtual CClientVehicle* FindVehicle(MafiaSDK::C_Car* pVehicle);
 	virtual CClientObject* FindObject(MafiaSDK::C_Actor* pObject);
+	virtual CClientDoor* FindDoor(MafiaSDK::C_Door* pDoor);
+	virtual CClientBridge* FindBridge(MafiaSDK::C_Bridge* pBridge);
 	
 	Galactic3D::Weak<CClientVehicle> m_rgpVehicles[MAX_VEHICLES];
 	Galactic3D::Weak<CClientHuman> m_rgpPeds[MAX_PEDS];
 	Galactic3D::Weak<CClientPlayer> m_rgpPlayers[MAX_PEDS];
 	Galactic3D::Weak<CClientObject> m_rgpObjects[MAX_OBJECTS];
+	Galactic3D::Weak<CClientDoor> m_rgpDoors[MAX_DOORS];
+	Galactic3D::Weak<CClientBridge> m_rgpBridges[MAX_BRIDGES];
 };
 
 class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr

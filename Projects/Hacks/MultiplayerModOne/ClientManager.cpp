@@ -24,6 +24,8 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
     m_pClientVehicleClass = pElements->NewClass(_gstr("Vehicle"), m_pClientEntityClass);
 	m_pClientDummyClass = pElements->NewClass(_gstr("Dummy"), m_pClientEntityClass);
 	m_pClientObjectClass = pElements->NewClass(_gstr("Object"), m_pClientEntityClass);
+	m_pClientDoorClass = pElements->NewClass(_gstr("Door"), m_pClientEntityClass);
+	m_pClientBridgeClass = pElements->NewClass(_gstr("Bridge"), m_pClientEntityClass);
 
 	m_pSurfaceClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Surface"));
 	m_pTextureClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Texture"), m_pSurfaceClass);
@@ -37,6 +39,8 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 	CClientHuman* ped;
 	CClientPlayer* player;
 	CClientObject* object;
+	CClientDoor* door;
+	CClientBridge* bridge;
 
 	switch (nType)
 	{
@@ -85,6 +89,28 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 			{
 				m_rgpObjects[i] = object;
 				return object;
+			}
+		}
+		break;
+	case ELEMENT_DOOR:
+		door = new CClientDoor(this);
+		for (int i = 0; i < MAX_DOORS; i++)
+		{
+			if (m_rgpDoors[i].IsNull())
+			{
+				m_rgpDoors[i] = door;
+				return door;
+			}
+		}
+		break;
+	case ELEMENT_BRIDGE:
+		bridge = new CClientBridge(this);
+		for (int i = 0; i < MAX_BRIDGES; i++)
+		{
+			if (m_rgpBridges[i].IsNull())
+			{
+				m_rgpBridges[i] = bridge;
+				return bridge;
 			}
 		}
 		break;
@@ -216,6 +242,36 @@ CClientObject* CMafiaClientManager::FindObject(MafiaSDK::C_Actor* pObject)
 	for (auto pElement : m_rgpObjects)
 	{
 		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameObject() == pObject)
+		{
+			return pElement.GetPointer();
+		}
+	}
+	return nullptr;
+}
+
+CClientDoor* CMafiaClientManager::FindDoor(MafiaSDK::C_Door* pDoor)
+{
+	if (pDoor == nullptr)
+		return nullptr;
+
+	for (auto pElement : m_rgpDoors)
+	{
+		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameDoor() == pDoor)
+		{
+			return pElement.GetPointer();
+		}
+	}
+	return nullptr;
+}
+
+CClientBridge* CMafiaClientManager::FindBridge(MafiaSDK::C_Bridge* pBridge)
+{
+	if (pBridge == nullptr)
+		return nullptr;
+
+	for (auto pElement : m_rgpBridges)
+	{
+		if (pElement != NULL && pElement.GetPointer() != nullptr && pElement.GetPointer()->GetGameBridge() == pBridge)
 		{
 			return pElement.GetPointer();
 		}

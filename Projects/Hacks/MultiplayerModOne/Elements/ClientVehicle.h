@@ -21,6 +21,8 @@ private:
 
 	bool m_Horn = false;
 	float m_EngineRPM = 0.0f;
+	float m_Alpha = 0.0;
+	bool m_CollisionsEnabled = true;
 
 public:
 	CVector3D m_vecCachedPositionForTraffic{ 0, 0, 0 };
@@ -127,4 +129,10 @@ public:
 	virtual void CreateNetBlender() override;
 
 	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
+
+	virtual void SetAlpha(float alpha);
+	virtual float GetAlpha();
+
+	virtual void SetCollisionsEnabled(bool enabled);
+	virtual bool GetCollisionsEnabled();
 };
