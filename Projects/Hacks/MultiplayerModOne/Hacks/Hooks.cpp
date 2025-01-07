@@ -189,6 +189,10 @@ RAWCODECALL HumanUseActor(void)
 					g_bCancelHumanUseActor = true;
 				}
 			}
+			else 
+			{
+				//g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor);
+			}
 		}
 	}
 }
@@ -387,6 +391,21 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 
 	// Grab model from frame with g_umapModelNames[(uint32_t)frame_ex]
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->CreateActor(type);
+
+	//auto pClientEntity = Strong<CClientEntity>::New(g_pClientGame->m_pClientManager->Create(ELEMENT_ELEMENT));
+	//pClientEntity->m_pEntity = actor;
+	//pClientEntity->m_Position = CVecTools::ConvertFromMafiaVec(actor->GetInterface()->entity.position);
+	//pClientEntity->m_Rotation = CVecTools::ConvertFromMafiaVec(actor->GetInterface()->entity.rotation);
+	//g_pClientGame->m_pClientManager->RegisterNetObject(pClientEntity);
+	//{
+	//	pClientEntity->GenerateGUID();
+	//	pClientEntity->SetSyncer(pMultiplayer->m_NetMachines.GetMachine(pMultiplayer->m_iLocalIndex));
+	//
+	//	if (pMultiplayer->m_bNetworkedEntities)
+	//	{
+	//		pMultiplayer->EnqueuePeerElement(pClientEntity);
+	//	}
+	//}
 
 	//if (g_pClientGame->IsGameComponentEnabled(GAMECOMPONENT_TRAFFIC)) {
 	//	if ((type == ObjTypes::Car || type == ObjTypes::Traffic) && frame != NULL) {
@@ -850,6 +869,7 @@ void CGameHooks::InstallHooks()
 	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
 	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
+
 
 	// Fix bug where window border disappears and bugs out the bottom of the window
 	//DWORD uiOldProt = 0;
