@@ -1824,6 +1824,10 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 {
 	int8_t iSeat = (iHopSeatsBool == 1 && iDoor > 0) ? iDoor - 1 : iDoor;
 
+	if (iDoor == -1) {
+		iDoor = 0;
+	}
+
 	_glogprintf(_gstr("Human entering vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
