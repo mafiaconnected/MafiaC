@@ -116,10 +116,7 @@ int CMafiaCModLauncher::WinMain()
 	}
 }
 
-int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPTSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int APIENTRY _tWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int nCmdShow)
 {
 	{
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
@@ -133,25 +130,4 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	delete pModLauncher;
 
 	return iResult;
-}
-
-
-HANDLE CMafiaCModLauncher::BeginStartingGame(HMODULE hHackSupport, const wchar_t* pszGamePath, const wchar_t* pszGameEXEPath, const wchar_t* pszGameCommandLine, CInjectedData::tLauncherData* pLauncherData, bool& bError)
-{
-	HANDLE hProcess = CModLauncher::BeginStartingGame(hHackSupport, pszGamePath, pszGameEXEPath, pszGameCommandLine, pLauncherData, bError);
-
-	return hProcess;
-}
-
-bool CMafiaCModLauncher::Initialise(Context* pContext)
-{
-	if (!CModLauncher::Initialise(pContext))
-		return false;
-
-	return true;
-}
-
-void CMafiaCModLauncher::ShutDown()
-{
-	CModLauncher::ShutDown();
 }
