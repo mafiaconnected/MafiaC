@@ -30,7 +30,7 @@ BEGIN \
             VALUE "FileDescription", descr \
             VALUE "FileVersion", LAUNCHER_VERSION \
             VALUE "InternalName", intName \
-            VALUE "LegalCopyright", "Copyright © 2023 Jack's Mini Network" \
+            VALUE "LegalCopyright", "Copyright \xA9 2025 Jack's Mini Network" \
             VALUE "OriginalFilename", origName \
             VALUE "ProductName", "Mafia Connected" \
             VALUE "ProductVersion", LAUNCHER_VERSION \

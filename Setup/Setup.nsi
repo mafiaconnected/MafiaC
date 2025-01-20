@@ -148,7 +148,7 @@ VIProductVersion "${PRODUCT_VERSION_FULL}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${PRODUCT_VERSION_FULL}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jack's Mini Network"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © 2024 Jack's Mini Network"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © 2025 Jack's Mini Network"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION_FULL}"
 
