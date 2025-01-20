@@ -115,16 +115,7 @@ void CMafiaClientResourceMgrII::RemoveThingsAssociatedWithResource(CResource* pR
 		g_pClientGame->m_GUISystem.m_pPage->m_Elements.Remove(pResource);
 	if (g_pClientGame->m_GUISystem.m_pScriptPage != nullptr)
 		g_pClientGame->m_GUISystem.m_pScriptPage->m_Elements.Remove(pResource);
-	Galactic3D::LinkedList<Galactic3D::Audio::ISound*>::Node* pNode = g_pClientGame->m_pAudioScriptingFunctions->m_Sounds.GetFirstNode();
-	while (pNode != NULL)
-	{
-		Galactic3D::LinkedList<Galactic3D::Audio::ISound*>::Node* pThisNode = pNode;
-		pNode = pNode->GetNextNode();
-		if (pThisNode->m_Value->m_pResource != NULL && pThisNode->m_Value->m_pResource == pResource)
-		{
-			pThisNode->m_Value->Stop();
-		}
-	}
+	g_pClientGame->m_pAudioScriptingFunctions->OnResourceStop(pResource);
 	CClientResourceMgr::RemoveThingsAssociatedWithResource(pResource);
 }
 
