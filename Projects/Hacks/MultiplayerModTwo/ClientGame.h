@@ -83,87 +83,82 @@ class CClientGameII
 {
 public:
 	CClientGameII(Galactic3D::Context* pContext);
-	~CClientGameII(void);
 
 	Galactic3D::Context* m_pContext;
 	Galactic3D::CVarSystem m_CVars;
-	bool m_bCEGUIInitialised;
-	class CMafiaClientManagerII* m_pClientManager;
+	class CMafiaClientManagerII* m_pClientManager = nullptr;
 	Galactic3D::CInternetCache m_InternetCache;
 	Galactic3D::CInternetRequestMgr m_InternetRequestMgr;
-	bool m_bStopMultiplayerGame;
-	int m_iStopMultiplayerGameReason;
-	bool m_bMultiplayerWorld;
-	bool m_bForceMultiplayerWorld;
-	class CMultiplayerII* m_pMultiplayer;
-	class CMultiplayerII* m_pNewMultiplayer;
-	class CMafiaClientResourceMgrII* m_pResourceMgr;
-	Galactic3D::CGalacticFunctions* m_pGalacticFunctions;
-	Galactic3D::Audio::CAudioScriptingFunctions* m_pAudioScriptingFunctions;
+	bool m_bStopMultiplayerGame = false;
+	int m_iStopMultiplayerGameReason = -1;
+	bool m_bMultiplayerWorld = false;
+	bool m_bForceMultiplayerWorld = false;
+	class CMultiplayerII* m_pMultiplayer = nullptr;
+	class CMultiplayerII* m_pNewMultiplayer = nullptr;
+	class CMafiaClientResourceMgrII* m_pResourceMgr = nullptr;
+	Galactic3D::CGalacticFunctions* m_pGalacticFunctions = nullptr;
+	Galactic3D::Audio::CAudioScriptingFunctions* m_pAudioScriptingFunctions = nullptr;
 	Galactic3D::CLucasFontFunctions m_LucasFontFunctions;
-	Galactic3D::EventHandlers::CEventType* m_pOnEntityProcessEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnDrawHUDEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnDrawnHUDEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnCameraProcessEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnGUIAnchorClickEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnGUIClickEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnExampleEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnMapLoadedEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnKeyPressedEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanHitEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanSpawnEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanDeathEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanEnteringVehicleEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanEnteredVehicleEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType;
-	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType;
+	Galactic3D::EventHandlers::CEventType* m_pOnEntityProcessEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnDrawHUDEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnDrawnHUDEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnCameraProcessEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnGUIAnchorClickEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnGUIClickEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnExampleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnMapLoadedEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnKeyPressedEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanHitEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanSpawnEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanDeathEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanEnteringVehicleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanEnteredVehicleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType = nullptr;
 
-	Galactic3D::CChatWindow* m_pChatWindow;
-	Galactic3D::CCmdWindow2* m_pCmdWindow;
-	LucasGUI::GUI::CPage* m_pCmdWindowPage;
-	Galactic3D::CClientDownloadManager* m_pDownloadManager;
+	Galactic3D::CChatWindow* m_pChatWindow = nullptr;
+	Galactic3D::CCmdWindow2* m_pCmdWindow = nullptr;
+	LucasGUI::GUI::CPage* m_pCmdWindowPage = nullptr;
+	Galactic3D::CClientDownloadManager* m_pDownloadManager = nullptr;
 	Galactic3D::TimeManager m_TimeManager;
 	LucasGUI::CFonts m_Fonts;
 	CTextDrawingII m_TextDrawing;
-	bool m_bTrainsEnabled;
+	bool m_bTrainsEnabled = true;
 
 	//CProxy2DRenderer m_Proxy2D;
 	C2D m_p2D;
 
-	bool m_bD3D9;
-	bool m_bDebugMode;
+	bool m_bD3D9 = true;
 
 	POINT m_OldCursorPos;
 
-	int m_iIcon;
-
-	bool m_bMouseClipped;
+	bool m_bMouseClipped = false;
 	SDL_SystemCursor m_Cursor;
 	SDL_SystemCursor m_NewCursor;
 	SDL_Cursor* m_rgpCursors[SDL_NUM_SYSTEM_CURSORS];
 
-	bool m_bScriptCursorEnabled;
-	bool m_bScriptControlsDisabled;
+	bool m_bScriptCursorEnabled = false;
+	bool m_bScriptControlsDisabled = false;
 private:
-	bool m_bFocused;
+	bool m_bFocused = true;
 public:
-	bool m_bFocusedSupressInput;
+	bool m_bFocusedSupressInput = false;
 private:
-	bool m_bCursorEnabled;
-	bool m_bEnableCmdWindowOnCharPress;
+	bool m_bCursorEnabled = false;
+	bool m_bEnableCmdWindowOnCharPress = false;
 public:
-	bool m_bShowGameStatistics;
-	bool m_bFPSCounter;
+	bool m_bShowGameStatistics = false;
+	bool m_bFPSCounter = false;
 
-	bool m_bHandledKeyEvent;
+	bool m_bHandledKeyEvent = false;
 
-	const Galactic3D::FrameTimeInfo* m_pTime;
-	Uint32 m_LastFrameTicks;
+	const Galactic3D::FrameTimeInfo* m_pTime = nullptr;
+	uint32_t m_LastFrameTicks = 0;
 
-	bool m_bPreviousServerExists;
+	bool m_bPreviousServerExists = false;
 	GChar m_szPreviousHost[256];
-	unsigned short m_usPreviousPort;
+	unsigned short m_usPreviousPort = 0;
 	GChar m_szPreviousPassword[1024];
 
 	LucasGUI::CLanguageLocalisation m_LanguageLocalisation;
@@ -175,19 +170,19 @@ public:
 	GString m_DiscordUserId;
 
 #ifdef MAFIA_NAMETAGS
-	CNametagsII* m_pNametags;
+	CNametagsII* m_pNametags = nullptr;
 #endif
 
-	CHtmlContainer* m_pHtmlContainer;
+	CHtmlContainer* m_pHtmlContainer = nullptr;
 	litehtml::context m_BrowserContext;
-	CHtmlView* m_pHtmlView;
+	CHtmlView* m_pHtmlView = nullptr;
 
-	bool m_bCapured;
+	bool m_bCapured = false;
 
-	bool m_bSupressNetworkedEntities;
+	bool m_bSupressNetworkedEntities = false;
 
-	bool m_b2DReady;
-	bool m_bChangeMap;
+	//bool m_b2DReady = false;
+	//bool m_bChangeMap = false;
 
 	GChar m_szMap[32];
 
@@ -197,8 +192,8 @@ public:
 	bool m_bHumanSetAimPoseInvokedByGame = true;
 	bool m_bHumanSetNormalPoseInvokedByGame = true;
 
-	bool m_bReconnectOnDisconnect;
-	bool m_bFullReload;
+	bool m_bReconnectOnDisconnect = false;
+	bool m_bFullReload = true;
 
 	inline CMultiplayerII* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
 	inline CMultiplayerII* GetActiveMultiplayer(void) { return m_pMultiplayer; }

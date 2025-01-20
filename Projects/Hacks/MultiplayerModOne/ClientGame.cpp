@@ -119,50 +119,6 @@ CClientGame::CClientGame(Galactic3D::Context* pContext)
 	: m_GUISystem(pContext, &m_Fonts, &m_LanguageLocalisation, &m_SlotMgr), m_InternetCache(pContext), m_InternetRequestMgr(pContext, &m_InternetCache)
 {
 	m_pContext = pContext;
-	m_bCEGUIInitialised = false;
-	m_pClientManager = NULL;
-	m_bStopMultiplayerGame = false;
-	m_bMultiplayerWorld = false;
-	m_bForceMultiplayerWorld = false;
-	m_pMultiplayer = NULL;
-	m_pNewMultiplayer = NULL;
-	m_pResourceMgr = nullptr;
-	m_pGalacticFunctions = nullptr;
-	m_pAudioScriptingFunctions = nullptr;
-	m_pChatWindow = NULL;
-	m_pCmdWindow = NULL;
-	m_pDownloadManager = nullptr;
-	//m_pFonts = nullptr;
-	//m_pFonts = new CFonts;
-	//m_pFonts->LoadFonts(L"Fonts");
-	m_bScriptCursorEnabled = false;
-	m_bScriptControlsDisabled = false;
-	m_bFocused = true;
-	m_bFocusedSupressInput = false;
-	m_bCursorEnabled = false;
-
-#if MAFIAC_RMLUI
-	m_pRmlUi = new CRmlUi2(m_pContext);
-	m_pRmlUi->Initialise();
-#endif
-
-	m_bShowGameStatistics = false;
-	m_bFPSCounter = false;
-	//m_bMap = false;
-	//m_pGUITest = nullptr;
-	m_bEnableCmdWindowOnCharPress = false;
-	m_bPreviousServerExists = false;
-	m_pTime = nullptr;
-	m_iIcon = IDI_LAUNCHER;
-	m_bD3D9 = true;
-	m_bTrainsEnabled = true;
-	m_bSupressNetworkedEntities = false;
-	m_iStopMultiplayerGameReason = -1;
-	m_bReconnectOnDisconnect = false;
-}
-
-CClientGame::~CClientGame(void)
-{
 }
 
 void CClientGame::Initialise()
@@ -261,7 +217,7 @@ void CClientGame::ShutDown()
 	assert(m_pMultiplayer == nullptr);
 	if (m_pMultiplayer != NULL)
 	{
-		m_pMultiplayer->Disconnect(Galactic3D::DISCONNECT_GRACEFUL);
+		m_pMultiplayer->Disconnect();
 		delete m_pMultiplayer;
 		m_pMultiplayer = NULL;
 	}
@@ -281,12 +237,14 @@ void CClientGame::InitialiseCVars()
 
 void CClientGame::InitialiseScripting(void)
 {
-	if (!m_bFullReload)
-		return;
-
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
 	m_bCursorEnabled = false;
+
+#if MAFIAC_RMLUI
+	m_pRmlUi = new CRmlUi2(m_pContext);
+	m_pRmlUi->Initialise();
+#endif
 
 	m_pResourceMgr = new CMafiaClientResourceMgr(m_pContext);
 
@@ -357,9 +315,6 @@ void CClientGame::InitialiseScripting(void)
 
 void CClientGame::ShutdownScripting(void)
 {
-	if (!m_bFullReload)
-		return;
-
 	if (m_pCmdWindow != nullptr)
 	{
 		delete m_pCmdWindow;
@@ -392,7 +347,6 @@ void CClientGame::ShutdownScripting(void)
 	m_pResourceMgr = nullptr;
 	m_Fonts.DeleteHWResources();
 	m_SlotMgr.DeleteHWResources();
-
 #if MAFIAC_RMLUI
 	delete m_pRmlUi;
 #endif
@@ -611,8 +565,8 @@ bool CClientGame::OnWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			MapWindowPoints(NULL, hWnd, &Point, 1);
 
 			CVector2D vecPos;
-			vecPos.m_X = (float)GET_X_LPARAM(lParam);
-			vecPos.m_Y = (float)GET_Y_LPARAM(lParam);
+			vecPos.x = (float)GET_X_LPARAM(lParam);
+			vecPos.y = (float)GET_Y_LPARAM(lParam);
 		}
 	}
 	break;

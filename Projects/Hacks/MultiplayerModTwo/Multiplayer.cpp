@@ -13,10 +13,6 @@ using namespace Galactic3D;
 
 CMultiplayerII::CMultiplayerII(CClientManager* pClientManager, CVarSystem* pCVars) : CClientNetGame(pClientManager, pCVars)
 {
-	m_bRestartingGame = false;
-	m_bNametags = true;
-	m_bNetworkedEntities = true;
-
 	g_pClientGame->m_pContext->GetSettings()->GetString(NULL, _gstr("Name"), m_LocalPlayerName);
 
 	m_Version.m_uiVersion = NETGAME_CURRENT_VERSION;

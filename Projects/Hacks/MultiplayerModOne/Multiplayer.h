@@ -18,9 +18,9 @@ class CMultiplayer : public Galactic3D::CClientNetGame
 public:
 	CMultiplayer(Galactic3D::CClientManager* pClientManager, CVarSystem* pCVars);
 
-	bool m_bRestartingGame;
-	bool m_bNametags;
-	bool m_bNetworkedEntities;
+	bool m_bRestartingGame = false;
+	bool m_bNametags = true;
+	bool m_bNetworkedEntities = true;
 
 	std::vector<Weak<CClientEntity>> m_PendingPeerElements;
 
