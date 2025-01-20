@@ -14,19 +14,29 @@
 #include <shellapi.h>
 #include <Shlwapi.h>
 #include <ModLauncher/ProgressWindow.h>
+#include <Audio/BassRenderer.h>
+#include <Audio/BassRenderer.hpp>
+
+#ifdef WIN32
+#ifdef _M_X64
+#pragma comment(lib,"bass64.lib")
+#else
+#pragma comment(lib,"bass.lib")
+#endif
+#endif
 
 CMafiaCModLauncher::CMafiaCModLauncher(HINSTANCE hInstance) : CModLauncher(hInstance)
 {
 #if PUBLIC_RELEASE
 	m_bCodeSignatureCheck = true;
-	m_bAllowMap = false;
-	m_bAllowLargeIcons = false;
-	m_bAllowLicenses = false;
+	m_Options.m_bAllowMap = false;
+	m_Options.m_bAllowLargeIcons = false;
+	m_Options.m_bAllowLicenses = false;
 #else
 	m_bCodeSignatureCheck = false;
-	m_bAllowMap = true;
-	m_bAllowLargeIcons = true;
-	m_bAllowLicenses = true;
+	m_Options.m_bAllowMap = true;
+	m_Options.m_bAllowLargeIcons = true;
+	m_Options.m_bAllowLicenses = true;
 #endif
 
 	m_Launcher.m_Version.m_uiNetVersion = NETGAME_CURRENT_VERSION;
@@ -77,7 +87,7 @@ int CMafiaCModLauncher::WinMain()
 
 		int iResult = EXIT_SUCCESS;
 
-		if (m_bNewLauncher)
+		if (m_Options.m_bNewLauncher && m_Options.m_bShowLauncher && !m_Options.m_bSilent)
 		{
 #if !PUBLIC_RELEASE
 			IApp* pApp = CreateSDLApp(&Context);

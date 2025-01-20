@@ -4,6 +4,8 @@ EXPORTS
    _GReAlloc
    _GFree
    HookMainThread
+   HookMainThread2
+   RunDllEntryPointW
    HackEntryPoint3_MafiaC
    HackEntryPoint3_DirectInputHook
    HackEntryPoint3_CrashHandler

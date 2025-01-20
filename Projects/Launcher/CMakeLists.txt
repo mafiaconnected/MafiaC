@@ -91,6 +91,7 @@ target_link_libraries(
 	psapi
 	dbghelp
 	iphlpapi
+	Rpcrt4
 	legacy_stdio_definitions)
 
 if(MSVC)
