@@ -30,7 +30,8 @@ InstallDir "$LOCALAPPDATA\Jack's Mini Network\${PRODUCT_NAME}"
 ;InstallDirRegKey ${INSTALL_REGISTRY_ROOT} "Software\Jack's Mini Network\${PRODUCT_NAME}" "Installation Directory"
 
 ;Request application privileges for Windows Vista
-RequestExecutionLevel highest
+;RequestExecutionLevel highest
+RequestExecutionLevel user
 
 SetCompressor /SOLID lzma
 
@@ -54,6 +55,11 @@ ShowInstDetails show
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Start ${PRODUCT_NAME}"
 !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
+
+!define MUI_FINISHPAGE_SHOWREADME ""
+!define MUI_FINISHPAGE_SHOWREADME_CHECKED
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Create Desktop Shortcut"
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION "DesktopShortcut"
 
 ;--------------------------------
 ;Language Selection Dialog Settings
@@ -305,4 +311,9 @@ FunctionEnd
 
 Function LaunchLink
 	ExecShell "" "$INSTDIR\Launcher.exe"
+	Exec '"$INSTDIR\Launcher.exe" /update'
+FunctionEnd
+
+Function DesktopShortcut
+	Exec '"$INSTDIR\Launcher.exe" /desktopshortcut /silent'
 FunctionEnd
