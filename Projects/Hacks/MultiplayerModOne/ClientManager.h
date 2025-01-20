@@ -13,6 +13,8 @@ class CClientPlayer;
 class CClientVehicle;
 class CClientDummy;
 class CClientObject;
+class CClientDoor;
+class CClientBridge;
 
 // Changable limits
 #include <IncreasedLimits.h>

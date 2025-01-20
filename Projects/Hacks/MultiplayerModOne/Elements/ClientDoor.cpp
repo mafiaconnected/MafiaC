@@ -18,8 +18,8 @@ CClientDoor::CClientDoor(CMafiaClientManager* pClientManager) : CClientEntity(pC
 
 	m_pEntity = NULL;
 
-	m_Locked = false;
-	m_OpenAngle = 0.0f;
+	m_bLocked = false;
+	m_DoorOpenAngle = 0.0f;
 }
 
 Galactic3D::ReflectedClass* CClientDoor::GetReflectedClass(void)
@@ -30,4 +30,34 @@ Galactic3D::ReflectedClass* CClientDoor::GetReflectedClass(void)
 MafiaSDK::C_Door* CClientDoor::GetGameDoor()
 {
 	return m_MafiaDoor;
+}
+
+bool CClientDoor::ReadCreatePacket(Galactic3D::Stream* pStream)
+{
+	abort();
+}
+
+bool CClientDoor::WriteCreatePacket(Galactic3D::Stream* pStream)
+{
+	abort();
+}
+
+bool CClientDoor::SetOpenAngle(float angle)
+{
+	abort();
+}
+
+float CClientDoor::GetOpenAngle()
+{
+	abort();
+}
+
+bool CClientDoor::SetLocked(bool locked)
+{
+	abort();
+}
+
+bool CClientDoor::GetLocked()
+{
+	abort();
 }

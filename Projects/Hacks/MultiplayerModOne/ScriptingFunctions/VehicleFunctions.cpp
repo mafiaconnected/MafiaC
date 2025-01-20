@@ -1355,10 +1355,7 @@ static bool FunctionVehicleGetCollisionsEnabled(IScriptState* pState, int argc, 
 		return false;
 
 	if (pClientVehicle->GetGameVehicle() == nullptr)
-	{
-		pState->Error(_gstr("vehicle not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("vehicle not spawned"));
 
 	pState->ReturnBoolean(pClientVehicle->GetCollisionsEnabled());
 	return true;
@@ -1374,10 +1371,7 @@ static bool FunctionVehicleSetCollisionsEnabled(IScriptState* pState, int argc, 
 		return false;
 
 	if (pClientVehicle->GetGameVehicle() == nullptr)
-	{
-		pState->Error(_gstr("vehicle not spawned"));
-		return false;
-	}
+		return pState->Error(_gstr("vehicle not spawned"));
 
 	bool bCollisions;
 	if (!pState->CheckBoolean(0, bCollisions))
@@ -1583,7 +1577,7 @@ void CScriptingFunctions::RegisterVehicleFunctions(Galactic3D::CScripting* pScri
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("health"), ARGUMENT_FLOAT, FunctionVehicleGetHealth, FunctionVehicleSetHealth);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("engineRPM"), ARGUMENT_FLOAT, FunctionVehicleGetEngineRPM, FunctionVehicleSetEngineRPM);
 	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("alpha"), ARGUMENT_FLOAT, FunctionVehicleGetAlpha, FunctionVehicleSetAlpha);
-	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("collisionsEnabled"), ARGUMENT_BOOLEAN, FunctionVehicleGetCollisionsEnabled, FunctionVehicleCollisionsEnabled);
+	pClientManager->m_pClientVehicleClass->AddProperty(pClientManager, _gstr("collisionsEnabled"), ARGUMENT_BOOLEAN, FunctionVehicleGetCollisionsEnabled, FunctionVehicleSetCollisionsEnabled);
 	pClientManager->m_pClientVehicleClass->RegisterFunction(_gstr("forceAI"), _gstr("tiiii"), FunctionVehicleForceAI, pClientManager);
 
 

@@ -29,6 +29,7 @@ Galactic3D::ReflectedClass* CClientBridge::GetReflectedClass(void)
 bool CClientBridge::SetEnabled(bool enabled) {
 	m_Enabled = enabled;
 	m_MafiaBridge->Shutdown(enabled);
+	return true;
 }
 
 bool CClientBridge::GetEnabled() {
@@ -38,4 +39,14 @@ bool CClientBridge::GetEnabled() {
 MafiaSDK::C_Bridge* CClientBridge::GetGameBridge()
 {
 	return m_MafiaBridge;
+}
+
+bool CClientBridge::ReadCreatePacket(Galactic3D::Stream* pStream)
+{
+	abort();
+}
+
+bool CClientBridge::WriteCreatePacket(Galactic3D::Stream* pStream)
+{
+	abort();
 }
