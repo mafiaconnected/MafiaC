@@ -241,18 +241,18 @@ CMatrix4x4 CVecTools::ConvertFromMafiaMatrix(S_matrix mat) {
 
 CQuaternion CVecTools::ConvertFromMafiaQuat(S_quat quat) {
 	CQuaternion newQuat;
-	newQuat.m_X = quat.x;
-	newQuat.m_Y = quat.y;
-	newQuat.m_Z = quat.z;
-	newQuat.m_W = quat.w;
+	newQuat.x = quat.x;
+	newQuat.y = quat.y;
+	newQuat.z = quat.z;
+	newQuat.w = quat.w;
 	return newQuat;
 }
 
 S_quat CVecTools::ConvertToMafiaQuat(CQuaternion quat) {
 	S_quat newQuat;
-	newQuat.x = quat.m_X;
-	newQuat.y = quat.m_Y;
-	newQuat.z = quat.m_Z;
-	newQuat.w = quat.m_W;
+	newQuat.x = quat.x;
+	newQuat.y = quat.y;
+	newQuat.z = quat.z;
+	newQuat.w = quat.w;
 	return newQuat;
 }
