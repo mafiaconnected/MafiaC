@@ -8,7 +8,7 @@ public:
 	CNetBlenderHuman(CClientHuman* pEntity);
 
 	CClientHuman* m_pEntity;
-	float m_fRotationMaxError;
+	float m_fRotationMaxError = 1.0f;
 
 	void SetTargetRotation(CVector3D& vecRotation);
 

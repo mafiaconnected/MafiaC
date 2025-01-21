@@ -8,7 +8,7 @@
 IDirect3DTexture9* pD3DTexture = nullptr;
 Direct3D9* g_pD3D9 = nullptr;
 
-void CClientRenderer::OnDeviceLost(void)
+void CClientRenderer::OnDeviceLost()
 {
 	if (g_pD3D9)
 		g_pD3D9->OnDeviceLost();
@@ -113,16 +113,16 @@ MafiaDirect3D9::MafiaDirect3D9(Device* pDevice) : Direct3D9(pDevice)
 {
 }
 
-MafiaDirect3D9::~MafiaDirect3D9(void)
+MafiaDirect3D9::~MafiaDirect3D9()
 {
 }
 
-bool MafiaDirect3D9::EnterFrame(void)
+bool MafiaDirect3D9::EnterFrame()
 {
 	return true;
 }
 
-void MafiaDirect3D9::EndFrame(void)
+void MafiaDirect3D9::EndFrame()
 {
 }
 

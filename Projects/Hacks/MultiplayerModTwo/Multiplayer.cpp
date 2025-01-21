@@ -848,7 +848,7 @@ void CMultiplayerII::OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason
 	}
 }
 
-void CMultiplayerII::OnFinishConnecting(void)
+void CMultiplayerII::OnFinishConnecting()
 {
 	tHackEventDataDiscordUpdate Data = {};
 	Data.m_Size = sizeof(Data);
@@ -909,7 +909,7 @@ bool CMultiplayerII::MigrateEntity(CClientEntityII* pElement)
 	return false;
 }
 
-void CMultiplayerII::ProcessNewPeerElements(void)
+void CMultiplayerII::ProcessNewPeerElements()
 {
 	for (auto it = m_PendingPeerElements.begin(); it != m_PendingPeerElements.end();)
 	{

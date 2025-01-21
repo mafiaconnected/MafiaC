@@ -16,12 +16,8 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_Flags.m_bFindSyncer = true;
 	m_Flags.m_bSendSync = true;
 
-	m_pEntity = NULL;
 	m_mat.SetIdentity();
-	m_pRelativeElement = nullptr;
 	m_uiLastReceivedSyncTicks = OS::GetTicks();
-	m_uiLastSendSyncTicks = 0;
-	m_fPacketArrivalRatio = 0.0f;
 	m_szModel[0] = '\0';
 	m_Position = CVector3D(0, 0, 0);
 	m_RelativePosition = CVector3D(0, 0, 0);
@@ -29,7 +25,7 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_RelativeRotation = CVector3D(0, 0, 0);
 }
 
-Galactic3D::ReflectedClass* CClientEntity::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientEntity::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientEntityClass;
 }
@@ -70,19 +66,19 @@ bool CClientEntity::SetHeading(float heading)
 	return true;
 }
 
-void CClientEntity::Remove(void)
+void CClientEntity::Remove()
 {
 	CNetObject::Remove();
 	Delete();
 }
 
 // Note (Sevenisko): The Actor creation in Mafia must be specified type (Enemy, Player, Physical, Vehicle, etc)
-bool CClientEntity::Create(void)
+bool CClientEntity::Create()
 {
 	return false;
 }
 
-void CClientEntity::Delete(void)
+void CClientEntity::Delete()
 {
 	if (m_pEntity != nullptr)
 	{
@@ -168,7 +164,7 @@ bool CClientEntity::WriteSyncPacket(Stream* pStream)
 	return true;
 }
 
-void CClientEntity::OnCreated(void)
+void CClientEntity::OnCreated()
 {
 	CNetObject::OnCreated();
 
@@ -179,7 +175,7 @@ void CClientEntity::OnCreated(void)
 	}
 }
 
-void CClientEntity::Process(void)
+void CClientEntity::Process()
 {
 	if (m_pEntity == nullptr)
 		return;

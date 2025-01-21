@@ -13,7 +13,6 @@ IDirect3D9* WINAPI HookDirect3DCreate9(UINT SDKVersion)
 IDirect3D9Hook::IDirect3D9Hook(IDirect3D9* pDirect3D9)
 {
 	m_pDirect3D9 = pDirect3D9;
-	m_RefCount = 1;
 }
 
 HRESULT IDirect3D9Hook::QueryInterface(REFIID riid, void** ppvObj)
@@ -21,14 +20,14 @@ HRESULT IDirect3D9Hook::QueryInterface(REFIID riid, void** ppvObj)
 	return m_pDirect3D9->QueryInterface(riid,ppvObj);
 }
 
-ULONG IDirect3D9Hook::AddRef(void)
+ULONG IDirect3D9Hook::AddRef()
 {
 	//m_pDirect3D9->AddRef();
 	m_RefCount++;
 	return m_RefCount;
 }
 
-ULONG IDirect3D9Hook::Release(void)
+ULONG IDirect3D9Hook::Release()
 {
 	if (m_RefCount <= 1)
 	{
@@ -45,7 +44,7 @@ HRESULT IDirect3D9Hook::RegisterSoftwareDevice(void* pInitializeFunction)
 	return m_pDirect3D9->RegisterSoftwareDevice(pInitializeFunction);
 }
 
-UINT IDirect3D9Hook::GetAdapterCount(void)
+UINT IDirect3D9Hook::GetAdapterCount()
 {
 	return m_pDirect3D9->GetAdapterCount();
 }

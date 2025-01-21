@@ -42,11 +42,6 @@ static float UnlerpClamped(float fStart, float fPos, float fEnd)
 	return Clamp(Unlerp(fStart, fPos, fEnd), 0.0f, 1.0f);
 }
 
-CNetBlenderLerp::CInterpolation::CInterpolation() :
-	m_uiFinishTime(0)
-{
-}
-
 void CNetBlenderLerp::CInterpolation::Update(CVector3D& vecResult, float fMaxError)
 {
 	// Get the factor of time spent from the interpolation start

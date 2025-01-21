@@ -11,7 +11,6 @@ IDirectInput8Hook::IDirectInput8Hook(IDirectInput8* pDirectInput)
 	g_Instances.insert(this);
 
 	m_pDirectInput = pDirectInput;
-	m_RefCount = 1;
 }
 
 IDirectInput8Hook::~IDirectInput8Hook()

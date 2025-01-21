@@ -10,11 +10,9 @@ using namespace Galactic3D;
 CClientObject::CClientObject(CMafiaClientManager* pClientManager) : CClientEntity(pClientManager)
 {
 	m_Type = ELEMENT_OBJECT;
-
-	m_MafiaObject = nullptr;
 }
 
-Galactic3D::ReflectedClass* CClientObject::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientObject::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientObjectClass;
 }
@@ -93,7 +91,7 @@ const GChar* CClientObject::GetModel()
 	return CClientEntity::GetModel();
 }
 
-void CClientObject::UpdateGameMatrix(void)
+void CClientObject::UpdateGameMatrix()
 {
 	if (m_MafiaObject->GetFrame() == nullptr)
 		return;

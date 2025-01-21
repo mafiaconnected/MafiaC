@@ -16,7 +16,7 @@ public:
 class CClientHuman : public CClientEntity
 {
 private:
-	MafiaSDK::C_Human* m_MafiaHuman;
+	MafiaSDK::C_Human* m_MafiaHuman = nullptr;
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
@@ -25,31 +25,31 @@ private:
 public:
 	CClientHuman(CMafiaClientManager* pClientManager);
 
-	bool m_isLocalPlayer;
+	bool m_isLocalPlayer = false;
 
-	int32_t m_nVehicleNetworkIndex;
-	int8_t m_nVehicleSeatIndex;
+	int32_t m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+	int8_t m_nVehicleSeatIndex = 0;
 
-	bool m_bEnteredVehicleEvent;
-	bool m_bEnteringVehicleEvent;
+	bool m_bEnteredVehicleEvent = false;
+	bool m_bEnteringVehicleEvent = false;
 
-	bool m_bExitedVehicleEvent;
-	bool m_bExitingVehicleEvent;
+	bool m_bExitedVehicleEvent = false;
+	bool m_bExitingVehicleEvent = false;
 
 	CVector3D m_vecCamera;
 	CVector3D m_AimVector;
 
 	float m_InCarRotation;
 
-	CClientVehicle* m_pVehicleEvent;
+	CClientVehicle* m_pVehicleEvent = nullptr;
 	
 	Galactic3D::Weak<CClientVehicle> m_pCurrentVehicle;
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual MafiaSDK::C_Human* GetGameHuman();
 
-	void UpdateGameMatrix(void);
+	void UpdateGameMatrix();
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;
@@ -69,16 +69,16 @@ public:
 	virtual bool SetRotationVelocity(const CVector3D& vecRotVel);
 	virtual bool GetRotationVelocity(CVector3D& vecRotVel);
 
-	virtual void OnCreated(void);
-	virtual void Process(void) override;
+	virtual void OnCreated();
+	virtual void Process() override;
 
 	virtual void Spawn(const CVector3D& pos, float angle, bool isLocal);
-	virtual void Kill(void);
-	virtual void InstantDeath(void);
-	virtual void Despawn(void);
+	virtual void Kill();
+	virtual void InstantDeath();
+	virtual void Despawn();
 
-	virtual bool Create(void);
-	virtual void Delete(void) override;
+	virtual bool Create();
+	virtual void Delete() override;
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
@@ -86,16 +86,16 @@ public:
 	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
 
-	CClientVehicle* GetOccupiedVehicle(void);
-	CClientVehicle* GetEnteringExitingVehicle(void);
-	int8_t GetVehicleSeat(void);
+	CClientVehicle* GetOccupiedVehicle();
+	CClientVehicle* GetEnteringExitingVehicle();
+	int8_t GetVehicleSeat();
 
-	bool IsInVehicle(void);
+	bool IsInVehicle();
 	bool IsInVehicle(CClientVehicle* pClientVehicle);
 	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t iSeat);
 	void EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat);
-	void RemoveFromVehicle(void);
-	void ExitVehicle(void);
+	void RemoveFromVehicle();
+	void ExitVehicle();
 	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat);
 
 	virtual bool SetModel(const GChar* modelName) override;

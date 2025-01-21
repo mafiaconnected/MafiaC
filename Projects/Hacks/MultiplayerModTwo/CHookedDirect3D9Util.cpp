@@ -39,7 +39,7 @@ void CHookedDirect3D9Util::OnPostLostDevice(IDirect3DDevice9* pD3DDevice, IDirec
 		g_pD3D9->OnDeviceLost();
 }
 
-void CHookedDirect3D9Util::ForceDeviceReset(void)
+void CHookedDirect3D9Util::ForceDeviceReset()
 {
 	m_bSimulateDeviceLost = true;
 }

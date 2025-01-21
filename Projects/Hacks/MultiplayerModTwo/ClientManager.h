@@ -39,10 +39,10 @@ public:
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
 	virtual CNetObject* Create(int Type) override;
-	virtual bool IsConnecting(void) override;
+	virtual bool IsConnecting() override;
 	virtual bool Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword) override;
-	virtual bool Disconnect(void) override;
-	virtual bool OnProcess(void);
+	virtual bool Disconnect() override;
+	virtual bool OnProcess();
 
 	virtual CClientHumanII* FindHuman(M2::C_Human2* pHuman);
 	virtual CClientPlayerII* FindPlayer(M2::C_Player2* pPlayer);

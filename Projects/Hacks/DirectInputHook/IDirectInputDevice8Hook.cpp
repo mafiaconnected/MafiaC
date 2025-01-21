@@ -10,7 +10,6 @@ IDirectInputDevice8Hook::IDirectInputDevice8Hook(IDirectInputDevice8* pDirectInp
 	g_Instances.insert(this);
 
 	m_pDirectInputDevice = pDirectInputDevice;
-	m_RefCount = 1;
 }
 
 IDirectInputDevice8Hook::~IDirectInputDevice8Hook()

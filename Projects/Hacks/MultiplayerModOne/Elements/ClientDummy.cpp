@@ -16,7 +16,7 @@ CClientDummy::CClientDummy(CMafiaClientManager* pClientManager) : CClientEntity(
 	//m_Flags.m_bNetworked = false;
 }
 
-Galactic3D::ReflectedClass* CClientDummy::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientDummy::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientDummyClass;
 }

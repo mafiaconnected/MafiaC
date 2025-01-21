@@ -9,15 +9,15 @@ class IDirect3D9Hook : public IDirect3D9
 public:
 	IDirect3D9Hook(IDirect3D9* pDirect3D9);
 
-	size_t m_RefCount;
+	size_t m_RefCount = 1;
 	IDirect3D9* m_pDirect3D9;
 
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj) override;
-	virtual ULONG __stdcall AddRef(void) override;
-	virtual ULONG __stdcall Release(void) override;
+	virtual ULONG __stdcall AddRef() override;
+	virtual ULONG __stdcall Release() override;
 
 	virtual HRESULT __stdcall RegisterSoftwareDevice(void* pInitializeFunction) override;
-	virtual UINT __stdcall GetAdapterCount(void) override;
+	virtual UINT __stdcall GetAdapterCount() override;
 	virtual HRESULT __stdcall GetAdapterIdentifier(UINT Adapter, DWORD Flags, D3DADAPTER_IDENTIFIER9* pIdentifier) override;
 	virtual UINT __stdcall GetAdapterModeCount(UINT Adapter, D3DFORMAT Format) override;
 	virtual HRESULT __stdcall EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode) override;
@@ -37,17 +37,17 @@ class IDirect3DDevice9Hook : public IDirect3DDevice9
 public:
 	IDirect3DDevice9Hook(IDirect3D9* pDirect3D9, IDirect3DDevice9* pDirect3DDevice9);
 
-	size_t m_RefCount;
+	size_t m_RefCount = 1;
 	IDirect3D9* m_pDirect3D9;
 	IDirect3DDevice9* m_pDirect3DDevice9;
 
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj) override;
-	virtual ULONG __stdcall AddRef(void) override;
-	virtual ULONG __stdcall Release(void) override;
+	virtual ULONG __stdcall AddRef() override;
+	virtual ULONG __stdcall Release() override;
 
-	virtual HRESULT __stdcall TestCooperativeLevel(void) override;
-	virtual UINT __stdcall GetAvailableTextureMem(void) override;
-	virtual HRESULT __stdcall EvictManagedResources(void) override;
+	virtual HRESULT __stdcall TestCooperativeLevel() override;
+	virtual UINT __stdcall GetAvailableTextureMem() override;
+	virtual HRESULT __stdcall EvictManagedResources() override;
 	virtual HRESULT __stdcall GetDirect3D(IDirect3D9** ppD3D9) override;
 	virtual HRESULT __stdcall GetDeviceCaps(D3DCAPS9* pCaps) override;
 	virtual HRESULT __stdcall GetDisplayMode(UINT iSwapChain, D3DDISPLAYMODE* pMode) override;
@@ -57,7 +57,7 @@ public:
 	virtual BOOL __stdcall ShowCursor(BOOL bShow) override;
 	virtual HRESULT __stdcall CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DSwapChain9** pSwapChain) override;
 	virtual HRESULT __stdcall GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9** pSwapChain) override;
-	virtual UINT __stdcall GetNumberOfSwapChains(void) override;
+	virtual UINT __stdcall GetNumberOfSwapChains() override;
 	virtual HRESULT __stdcall Reset(D3DPRESENT_PARAMETERS* pPresentationParameters) override;
 	virtual HRESULT __stdcall Present(CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion) override;
 	virtual HRESULT __stdcall GetBackBuffer(UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9** ppBackBuffer) override;
@@ -83,8 +83,8 @@ public:
 	virtual HRESULT __stdcall GetRenderTarget(DWORD RenderTargetIndex, IDirect3DSurface9** ppRenderTarget) override;
 	virtual HRESULT __stdcall SetDepthStencilSurface(IDirect3DSurface9* pNewZStencil) override;
 	virtual HRESULT __stdcall GetDepthStencilSurface(IDirect3DSurface9** ppZStencilSurface) override;
-	virtual HRESULT __stdcall BeginScene(void) override;
-	virtual HRESULT __stdcall EndScene(void) override;
+	virtual HRESULT __stdcall BeginScene() override;
+	virtual HRESULT __stdcall EndScene() override;
 	virtual HRESULT __stdcall Clear(DWORD Count, CONST D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil) override;
 	virtual HRESULT __stdcall SetTransform(D3DTRANSFORMSTATETYPE State, CONST D3DMATRIX* pMatrix) override;
 	virtual HRESULT __stdcall GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix) override;
@@ -102,7 +102,7 @@ public:
 	virtual HRESULT __stdcall SetRenderState(D3DRENDERSTATETYPE State, DWORD Value) override;
 	virtual HRESULT __stdcall GetRenderState(D3DRENDERSTATETYPE State, DWORD* pValue) override;
 	virtual HRESULT __stdcall CreateStateBlock(D3DSTATEBLOCKTYPE Type, IDirect3DStateBlock9** ppSB) override;
-	virtual HRESULT __stdcall BeginStateBlock(void) override;
+	virtual HRESULT __stdcall BeginStateBlock() override;
 	virtual HRESULT __stdcall EndStateBlock(IDirect3DStateBlock9** ppSB) override;
 	virtual HRESULT __stdcall SetClipStatus(CONST D3DCLIPSTATUS9* pClipStatus) override;
 	virtual HRESULT __stdcall GetClipStatus(D3DCLIPSTATUS9* pClipStatus) override;
@@ -120,9 +120,9 @@ public:
 	virtual HRESULT __stdcall SetScissorRect(CONST RECT* pRect) override;
 	virtual HRESULT __stdcall GetScissorRect(RECT* pRect) override;
 	virtual HRESULT __stdcall SetSoftwareVertexProcessing(BOOL bSoftware) override;
-	virtual BOOL __stdcall GetSoftwareVertexProcessing(void) override;
+	virtual BOOL __stdcall GetSoftwareVertexProcessing() override;
 	virtual HRESULT __stdcall SetNPatchMode(float nSegments) override;
-	virtual float __stdcall GetNPatchMode(void) override;
+	virtual float __stdcall GetNPatchMode() override;
 	virtual HRESULT __stdcall DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount) override;
 	virtual HRESULT __stdcall DrawIndexedPrimitive(D3DPRIMITIVETYPE, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount) override;
 	virtual HRESULT __stdcall DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT PrimitiveCount, CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride) override;

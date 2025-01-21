@@ -15,13 +15,9 @@ CClientBridge::CClientBridge(CMafiaClientManager* pClientManager) : CClientEntit
 
 	m_Flags.m_bFindSyncer = false;
 	m_Flags.m_bSendSync = false;
-
-	m_MafiaBridge = NULL;
-
-	m_Enabled = false;
 }
 
-Galactic3D::ReflectedClass* CClientBridge::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientBridge::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientBridgeClass;
 }

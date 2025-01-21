@@ -136,7 +136,7 @@ HOOKVAR uint32_t g_pModelOpen_Arg1;
 HOOKVAR uint32_t g_pModelOpen_Arg2;
 HOOKVAR bool g_bCancelModelOpen;
 
-RAWCODECALL HumanDoThrowCocotFromCar(void)
+RAWCODECALL HumanDoThrowCocotFromCar()
 {
 	if (g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame)
 	{
@@ -161,7 +161,7 @@ RAWCODECALL HumanDoThrowCocotFromCar(void)
 	}
 }
 
-RAWCODECALL HumanUseActor(void)
+RAWCODECALL HumanUseActor()
 {
 	if (g_pClientGame->m_bUseActorInvokedByGame)
 	{
@@ -197,7 +197,7 @@ RAWCODECALL HumanUseActor(void)
 	}
 }
 
-RAWCODECALL CreateActor(void)
+RAWCODECALL CreateActor()
 {
 	if (g_pClientGame->m_bCreateActorInvokedByGame)
 	{
@@ -214,7 +214,7 @@ RAWCODECALL CreateActor(void)
 	}
 }
 
-RAWCODECALL ModelOpen(void)
+RAWCODECALL ModelOpen()
 {
 	//if (g_pClientGame->m_bModelOpenInvokedByGame)
 	{
@@ -224,7 +224,7 @@ RAWCODECALL ModelOpen(void)
 	}
 }
 
-RAWCODECALL CarUpdate(void)
+RAWCODECALL CarUpdate()
 {
 	//if (!g_bTrafficEnabled)
 	//	return;
@@ -416,7 +416,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 	return actor;
 }
 
-RAWCODECALL HumanSetAimPose(void)
+RAWCODECALL HumanSetAimPose()
 {
 	if (g_pClientGame->m_bHumanSetAimPoseInvokedByGame)
 	{
@@ -434,7 +434,7 @@ RAWCODECALL HumanSetAimPose(void)
 	}
 }
 
-RAWCODECALL HumanSetNormalPose(void)
+RAWCODECALL HumanSetNormalPose()
 {
 	if (g_pClientGame->m_bHumanSetNormalPoseInvokedByGame)
 	{
@@ -452,7 +452,7 @@ RAWCODECALL HumanSetNormalPose(void)
 	}
 }
 
-RAWCODE HookHumanDoThrowCocotFromCar(void)
+RAWCODE HookHumanDoThrowCocotFromCar()
 {
 	_asm
 	{
@@ -483,7 +483,7 @@ RAWCODE HookHumanDoThrowCocotFromCar(void)
 	}
 }
 
-RAWCODE HookHumanUseActor(void)
+RAWCODE HookHumanUseActor()
 {
 	_asm
 	{
@@ -516,7 +516,7 @@ RAWCODE HookHumanUseActor(void)
 	}
 }
 
-RAWCODE HookCreateActor(void)
+RAWCODE HookCreateActor()
 {
 	_asm
 	{
@@ -542,7 +542,7 @@ RAWCODE HookCreateActor(void)
 	}
 }
 
-RAWCODE HookCarUpdate(void)
+RAWCODE HookCarUpdate()
 {
 	_asm
 	{
@@ -570,7 +570,7 @@ RAWCODE HookSceneCreateActor()
 	}
 }
 
-RAWCODE HookModelOpen(void)
+RAWCODE HookModelOpen()
 {
 	_asm
 	{
@@ -598,7 +598,7 @@ RAWCODE HookModelOpen(void)
 	}
 }
 
-RAWCODE HookHumanSetAimPose(void)
+RAWCODE HookHumanSetAimPose()
 {
 	_asm
 	{
@@ -625,7 +625,7 @@ RAWCODE HookHumanSetAimPose(void)
 	}
 }
 
-RAWCODE HookHumanSetNormalPose(void)
+RAWCODE HookHumanSetNormalPose()
 {
 	_asm
 	{

@@ -235,7 +235,7 @@ void CClientGame::InitialiseCVars()
 	m_CVars.Clear();
 }
 
-void CClientGame::InitialiseScripting(void)
+void CClientGame::InitialiseScripting()
 {
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
@@ -313,7 +313,7 @@ void CClientGame::InitialiseScripting(void)
 	}
 }
 
-void CClientGame::ShutdownScripting(void)
+void CClientGame::ShutdownScripting()
 {
 	if (m_pCmdWindow != nullptr)
 	{
@@ -738,7 +738,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	}
 }
 
-void CClientGame::OnEndInGame(void)
+void CClientGame::OnEndInGame()
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -812,7 +812,7 @@ void CClientGame::OnEndInGame(void)
 	UpdateCursorEnabled();
 }
 
-void CClientGame::ResetWorld(void)
+void CClientGame::ResetWorld()
 {
 	m_pResourceMgr->ClearAllResources();
 	//m_pCmdWindow->ReInitialise();
@@ -820,7 +820,7 @@ void CClientGame::ResetWorld(void)
 	RegisterCommands();
 }
 
-void CClientGame::LoadLobbyResource(void)
+void CClientGame::LoadLobbyResource()
 {
 	m_pResourceMgr->RefreshResources(false);
 
@@ -919,7 +919,7 @@ void CClientGame::LoadLobbyResource(void)
 	}
 }
 
-void CClientGame::OnProcess(void)
+void CClientGame::OnProcess()
 {
 	if (!IsCursorEnabled())
 	{
@@ -1001,7 +1001,7 @@ void CClientGame::OnProcess(void)
 	m_pClientManager->OnProcess();
 }
 
-void CClientGame::OnFrame(void)
+void CClientGame::OnFrame()
 {
 	m_FPSCounter.Frame();
 
@@ -1149,7 +1149,7 @@ void CClientGame::OnCharacter(wchar_t c)
 	}
 }
 
-void CClientGame::OnRender2DStuff(void)
+void CClientGame::OnRender2DStuff()
 {
 	CVector2D vecSize;
 
@@ -1245,7 +1245,7 @@ void CClientGame::OnRender2DStuff(void)
 #endif
 }
 
-bool CClientGame::OnCameraProcess(void)
+bool CClientGame::OnCameraProcess()
 {
 	{
 		bool bPreventDefault = false;
@@ -1258,7 +1258,7 @@ bool CClientGame::OnCameraProcess(void)
 	return true;
 }
 
-void CClientGame::NoName(void)
+void CClientGame::NoName()
 {
 	m_pChatWindow->AddMessage(_gstr("Please set your name by using /setname <name>"), Galactic3D::COLOUR::Red);
 }
@@ -1406,7 +1406,7 @@ void CClientGame::StopMultiplayerGameWhenSafe(int iReason)
 	}
 }
 
-bool CClientGame::CanRotateCamera(void)
+bool CClientGame::CanRotateCamera()
 {
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return false;
@@ -1417,7 +1417,7 @@ bool CClientGame::CanRotateCamera(void)
 	return true;
 }
 
-bool CClientGame::IsInputDisabled(void)
+bool CClientGame::IsInputDisabled()
 {
 	if (!m_bFocused)
 		return true;
@@ -1436,14 +1436,14 @@ bool CClientGame::IsInputDisabled(void)
 	return false;
 }
 
-bool CClientGame::IsCursorEnabled(void)
+bool CClientGame::IsCursorEnabled()
 {
 	if (!m_bFocused)
 		return true;
 	return IsCursorEnabled2();
 }
 
-bool CClientGame::IsCursorEnabled2(void)
+bool CClientGame::IsCursorEnabled2()
 {
 	if (!MafiaSDK::IsWindowFocused())
 		return false;
@@ -1529,7 +1529,7 @@ void CClientGame::UpdateCursor(SDL_SystemCursor Cursor)
 	}
 }
 
-void CClientGame::UpdateCursor(void)
+void CClientGame::UpdateCursor()
 {
 }
 
@@ -1751,7 +1751,7 @@ void CClientGame::OnJoinRequest(tHackEventDataDiscordUser* pUser)
 	pAvatar->m_Material.SetTexture(pRequest->m_pTexture);
 }
 
-void CClientGame::OnDeviceLost(void)
+void CClientGame::OnDeviceLost()
 {
 }
 

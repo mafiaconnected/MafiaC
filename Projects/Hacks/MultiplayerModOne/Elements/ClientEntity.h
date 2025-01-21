@@ -10,26 +10,26 @@ public:
 
 	CMafiaClientManager* m_pClientManager;
 
-	MafiaSDK::C_Actor* m_pEntity;
+	MafiaSDK::C_Actor* m_pEntity = nullptr;
 	CMatrix4x4 m_mat;
 	GChar m_szModel[64];
-	CClientEntity* m_pRelativeElement;
-	unsigned int m_uiLastReceivedSyncTicks;
-	unsigned int m_uiLastSendSyncTicks;
-	float m_fPacketArrivalRatio;
+	CClientEntity* m_pRelativeElement = nullptr;
+	uint32_t m_uiLastReceivedSyncTicks;
+	uint32_t m_uiLastSendSyncTicks = 0;
+	float m_fPacketArrivalRatio = 0.0f;
 
 	CVector3D m_Position;
 	CVector3D m_Rotation;
 	CVector3D m_RelativePosition;
 	CVector3D m_RelativeRotation;
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
-	virtual bool Create(void);
+	virtual bool Create();
 
-	virtual void Remove(void);
+	virtual void Remove();
 
-	virtual void Delete(void);
+	virtual void Delete();
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
@@ -37,8 +37,8 @@ public:
 	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
 
-	virtual void OnCreated(void);
-	virtual void Process(void);
+	virtual void OnCreated();
+	virtual void Process();
 
 	virtual bool SetModel(const GChar* modelName);
 	virtual const GChar* GetModel();

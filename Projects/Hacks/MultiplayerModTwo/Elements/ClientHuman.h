@@ -17,7 +17,7 @@ public:
 class CClientHumanII : public CClientEntityII
 {
 private:
-	M2::C_Human2* m_MafiaHuman;
+	M2::C_Human2* m_MafiaHuman = nullptr;
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
@@ -28,10 +28,10 @@ public:
 
 	bool m_isLocalPlayer = false;
 
-	int32_t m_nVehicleNetworkIndex;
-	uint32_t m_nVehicleSeatIndex;
+	int32_t m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+	uint32_t m_nVehicleSeatIndex = 0;
 
-	bool m_bEnteredVehicleEvent = true;
+	bool m_bEnteredVehicleEvent = false;
 	bool m_bEnteringVehicleEvent = false;
 
 	bool m_bExitedVehicleEvent = false;
@@ -43,7 +43,7 @@ public:
 	
 	Galactic3D::Weak<CClientVehicleII> m_pCurrentVehicle;
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual M2::C_Human2* GetGameHuman();
 
@@ -65,15 +65,15 @@ public:
 	virtual bool SetRotationVelocity(const CVector3D& vecRotVel);
 	virtual bool GetRotationVelocity(CVector3D& vecRotVel);
 
-	virtual void OnCreated(void);
-	virtual void Process(void) override;
+	virtual void OnCreated();
+	virtual void Process() override;
 
 	virtual void Spawn(const CVector3D& pos, float angle, bool isLocal);
-	virtual void Kill(void);
-	virtual void Despawn(void);
+	virtual void Kill();
+	virtual void Despawn();
 
-	virtual bool Create(void);
-	virtual void Delete(void) override;
+	virtual bool Create();
+	virtual void Delete() override;
 
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
@@ -81,16 +81,16 @@ public:
 	virtual bool WriteCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool WriteSyncPacket(Galactic3D::Stream* pStream) override;
 
-	CClientVehicleII* GetOccupiedVehicle(void);
-	CClientVehicleII* GetEnteringExitingVehicle(void);
-	int8_t GetVehicleSeat(void);
+	CClientVehicleII* GetOccupiedVehicle();
+	CClientVehicleII* GetEnteringExitingVehicle();
+	int8_t GetVehicleSeat();
 
-	bool IsInVehicle(void);
+	bool IsInVehicle();
 	bool IsInVehicle(CClientVehicleII* pClientVehicle);
 	bool IsInVehicle(CClientVehicleII* pClientVehicle, uint8_t ucSeat);
 	void EnterVehicle(CClientVehicleII* pVehicle, uint8_t ucSeat);
-	void RemoveFromVehicle(void);
-	void ExitVehicle(void);
+	void RemoveFromVehicle();
+	void ExitVehicle();
 	bool WarpIntoVehicle(CClientVehicleII* pClientVehicle, uint8_t byteSeat);
 
 	virtual bool SetModel(uint32_t modelName) override;

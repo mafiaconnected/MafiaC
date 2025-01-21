@@ -12,20 +12,19 @@ using namespace Galactic3D;
 CClientEntityII::CClientEntityII(CMafiaClientManagerII* pClientManager) : CNetObject(pClientManager), m_pClientManager(pClientManager)
 {
 	m_Type = ELEMENT_ENTITY;
-	m_pEntity = NULL;
+
+	m_Flags.m_bFindSyncer = true;
+	m_Flags.m_bSendSync = true;
+
 	m_mat.SetIdentity();
-	m_pRelativeElement = nullptr;
 	m_uiLastReceivedSyncTicks = OS::GetTicks();
-	m_uiLastSendSyncTicks = 0;
-	m_fPacketArrivalRatio = 0.0f;
-	m_Model = 0;
 	m_Position = CVector3D(0, 0, 0);
 	m_RelativePosition = CVector3D(0, 0, 0);
 	m_Rotation = CVector3D(0, 0, 0);
 	m_RelativeRotation = CVector3D(0, 0, 0);
 }
 
-Galactic3D::ReflectedClass* CClientEntityII::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientEntityII::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientEntityClass;
 }
@@ -54,19 +53,19 @@ bool CClientEntityII::GetRotation(CVector3D& vecRotation)
 	return true;
 }
 
-void CClientEntityII::Remove(void)
+void CClientEntityII::Remove()
 {
 	CNetObject::Remove();
 	Delete();
 }
 
 // Note (Sevenisko): The Actor creation in Mafia must be specified type (Enemy, Player, Physical, Vehicle, etc)
-bool CClientEntityII::Create(void)
+bool CClientEntityII::Create()
 {
 	return false;
 }
 
-void CClientEntityII::Delete(void)
+void CClientEntityII::Delete()
 {
 	if (m_pEntity != nullptr)
 	{
@@ -150,7 +149,7 @@ bool CClientEntityII::WriteSyncPacket(Stream* pStream)
 	return true;
 }
 
-void CClientEntityII::OnCreated(void)
+void CClientEntityII::OnCreated()
 {
 	CNetObject::OnCreated();
 
@@ -161,7 +160,7 @@ void CClientEntityII::OnCreated(void)
 	}
 }
 
-void CClientEntityII::Process(void)
+void CClientEntityII::Process()
 {
 	if (m_pEntity == nullptr)
 		return;

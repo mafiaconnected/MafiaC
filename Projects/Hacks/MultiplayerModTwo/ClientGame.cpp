@@ -237,7 +237,7 @@ void CClientGameII::InitialiseCVars()
 	m_CVars.Clear();
 }
 
-void CClientGameII::InitialiseScripting(void)
+void CClientGameII::InitialiseScripting()
 {
 	m_bScriptCursorEnabled = false;
 	m_bScriptControlsDisabled = false;
@@ -315,7 +315,7 @@ void CClientGameII::InitialiseScripting(void)
 	}
 }
 
-void CClientGameII::ShutdownScripting(void)
+void CClientGameII::ShutdownScripting()
 {
 	if (m_pCmdWindow != nullptr)
 	{
@@ -754,7 +754,7 @@ void CClientGameII::OnStartInGame(bool bRestarted)
 	}
 }
 
-void CClientGameII::OnEndInGame(void)
+void CClientGameII::OnEndInGame()
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -834,7 +834,7 @@ void CClientGameII::OnEndInGame(void)
 	UpdateCursorEnabled();
 }
 
-void CClientGameII::ResetWorld(void)
+void CClientGameII::ResetWorld()
 {
 	m_pResourceMgr->ClearAllResources();
 	//m_pCmdWindow->ReInitialise();
@@ -842,7 +842,7 @@ void CClientGameII::ResetWorld(void)
 	RegisterCommands();
 }
 
-void CClientGameII::LoadLobbyResource(void)
+void CClientGameII::LoadLobbyResource()
 {
 	m_pResourceMgr->RefreshResources(false);
 
@@ -941,7 +941,7 @@ void CClientGameII::LoadLobbyResource(void)
 	}
 }
 
-void CClientGameII::OnProcess(void)
+void CClientGameII::OnProcess()
 {
 	if (!IsCursorEnabled())
 	{
@@ -1038,7 +1038,7 @@ void CClientGameII::OnProcess(void)
 	m_pClientManager->OnProcess();
 }
 
-void CClientGameII::OnFrame(void)
+void CClientGameII::OnFrame()
 {
 	m_FPSCounter.Frame();
 
@@ -1177,7 +1177,7 @@ void CClientGameII::OnCharacter(wchar_t c)
 	}
 }
 
-void CClientGameII::OnRender2DStuff(void)
+void CClientGameII::OnRender2DStuff()
 {
 	CVector2D vecSize;
 
@@ -1286,7 +1286,7 @@ void CClientGameII::OnRender2DStuff(void)
 #endif
 }
 
-bool CClientGameII::OnCameraProcess(void)
+bool CClientGameII::OnCameraProcess()
 {
 	{
 		bool bPreventDefault = false;
@@ -1299,7 +1299,7 @@ bool CClientGameII::OnCameraProcess(void)
 	return true;
 }
 
-void CClientGameII::NoName(void)
+void CClientGameII::NoName()
 {
 	m_pChatWindow->AddMessage(_gstr("Please set your name by using /setname <name>"), Galactic3D::COLOUR::Red);
 }
@@ -1444,7 +1444,7 @@ void CClientGameII::StopMultiplayerGameWhenSafe(int iReason)
 	}
 }
 
-bool CClientGameII::CanRotateCamera(void)
+bool CClientGameII::CanRotateCamera()
 {
 	if (m_pCmdWindow != nullptr && m_pCmdWindow->IsEnabled())
 		return false;
@@ -1455,7 +1455,7 @@ bool CClientGameII::CanRotateCamera(void)
 	return true;
 }
 
-bool CClientGameII::IsInputDisabled(void)
+bool CClientGameII::IsInputDisabled()
 {
 	if (!m_bFocused)
 		return true;
@@ -1474,14 +1474,14 @@ bool CClientGameII::IsInputDisabled(void)
 	return false;
 }
 
-bool CClientGameII::IsCursorEnabled(void)
+bool CClientGameII::IsCursorEnabled()
 {
 	if (!m_bFocused)
 		return true;
 	return IsCursorEnabled2();
 }
 
-bool CClientGameII::IsCursorEnabled2(void)
+bool CClientGameII::IsCursorEnabled2()
 {
 	if (!M2::C_MafiaFramework::GetActive())
 		return false;
@@ -1547,7 +1547,7 @@ void CClientGameII::UpdateCursor(SDL_SystemCursor Cursor)
 	}
 }
 
-void CClientGameII::UpdateCursor(void)
+void CClientGameII::UpdateCursor()
 {
 }
 
@@ -1769,7 +1769,7 @@ void CClientGameII::OnJoinRequest(tHackEventDataDiscordUser* pUser)
 	pAvatar->m_Material.SetTexture(pRequest->m_pTexture);
 }
 
-void CClientGameII::OnDeviceLost(void)
+void CClientGameII::OnDeviceLost()
 {
 }
 

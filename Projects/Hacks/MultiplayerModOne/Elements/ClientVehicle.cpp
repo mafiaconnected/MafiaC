@@ -17,7 +17,7 @@ CClientVehicle::CClientVehicle(CMafiaClientManager* pClientManager) : CClientEnt
 	m_MafiaVehicle = nullptr;
 }
 
-Galactic3D::ReflectedClass* CClientVehicle::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientVehicle::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientVehicleClass;
 }
@@ -27,7 +27,7 @@ MafiaSDK::C_Car* CClientVehicle::GetGameVehicle()
 	return m_MafiaVehicle;
 }
 
-void CClientVehicle::Process(void)
+void CClientVehicle::Process()
 {
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	{
@@ -176,7 +176,7 @@ const GChar* CClientVehicle::GetModel()
 	return CClientEntity::GetModel();
 }
 
-void CClientVehicle::UpdateGameMatrix(void)
+void CClientVehicle::UpdateGameMatrix()
 {
 	if (m_MafiaVehicle->GetFrame() == nullptr)
 		return;

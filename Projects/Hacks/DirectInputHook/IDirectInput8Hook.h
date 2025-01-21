@@ -9,7 +9,7 @@ public:
 	IDirectInput8Hook(IDirectInput8* pDirectInput);
 	~IDirectInput8Hook();
 
-	size_t m_RefCount;
+	size_t m_RefCount = 1;
 	IDirectInput8* m_pDirectInput;
 
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj) override;

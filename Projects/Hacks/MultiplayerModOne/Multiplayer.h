@@ -26,10 +26,7 @@ public:
 
 	virtual void ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream) override;
 	virtual void OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason) override;
-	virtual void OnFinishConnecting(void) override;
-#if LIBCAT_SECURITY && GALACTIC_NETGAME_ENCRYPTION
-	virtual void OnPong(void) override;
-#endif
+	virtual void OnFinishConnecting() override;
 	virtual void OnSetGameMode(const GChar* pszGameMode, size_t Length) override;
 	virtual void OnSetServerName(const GChar* pszName, size_t Length) override;
 	virtual void UpdatePlayerCounts(size_t CurrentPlayers, size_t MaxPlayers) override;

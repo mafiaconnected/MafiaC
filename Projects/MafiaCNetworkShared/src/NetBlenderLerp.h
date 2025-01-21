@@ -11,15 +11,13 @@ public:
 	class CInterpolation
 	{
 	public:
-		CInterpolation();
-
 		CVector3D m_vecTarget;
 		CVector3D m_vecError;
 		CQuaternion m_quatTarget;
 		CQuaternion m_quatError;
 		float m_fLastAlpha;
-		uint32_t m_uiStartTime;
-		uint32_t m_uiFinishTime;
+		uint32_t m_uiStartTime = 0;
+		uint32_t m_uiFinishTime = 0;
 
 		inline bool HasTarget() { return m_uiFinishTime != 0; }
 		inline void RemoveTarget() { m_uiFinishTime = 0; }

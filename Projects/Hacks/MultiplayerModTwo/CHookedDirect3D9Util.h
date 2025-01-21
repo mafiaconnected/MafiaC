@@ -17,7 +17,7 @@ public:
 	static void OnPreLostDevice(IDirect3DDevice9* pD3DDevice, IDirect3D9* pHookedDirect3D8, bool bDelete);
 	static void OnPostLostDevice(IDirect3DDevice9* pD3DDevice, IDirect3D9* pHookedDirect3D8, bool bDelete);
 
-	static void ForceDeviceReset(void);
+	static void ForceDeviceReset();
 };
 
 #endif

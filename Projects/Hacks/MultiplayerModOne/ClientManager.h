@@ -52,10 +52,10 @@ public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
 	virtual CNetObject* Create(int Type) override;
 	virtual void Remove(CNetObject* pNetObject);
-	virtual bool IsConnecting(void) override;
+	virtual bool IsConnecting() override;
 	virtual bool Connect(const GChar* pszHost, unsigned short usPort, const GChar* pszPassword) override;
-	virtual bool Disconnect(void) override;
-	virtual bool OnProcess(void);
+	virtual bool Disconnect() override;
+	virtual bool OnProcess();
 
 	virtual CClientHuman* FindHuman(MafiaSDK::C_Human* pHuman);
 	virtual CClientPlayer* FindPlayer(MafiaSDK::C_Player* pPlayer);

@@ -16,7 +16,7 @@ CClientPlayerII::CClientPlayerII(CMafiaClientManagerII* pClientManager) : CClien
 	m_uiMoney = 0;
 }
 
-Galactic3D::ReflectedClass* CClientPlayerII::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientPlayerII::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientPlayerClass;
 }

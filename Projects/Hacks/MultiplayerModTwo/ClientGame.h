@@ -195,8 +195,8 @@ public:
 	bool m_bReconnectOnDisconnect = false;
 	bool m_bFullReload = true;
 
-	inline CMultiplayerII* GetMultiplayer(void) { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
-	inline CMultiplayerII* GetActiveMultiplayer(void) { return m_pMultiplayer; }
+	inline CMultiplayerII* GetMultiplayer() { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
+	inline CMultiplayerII* GetActiveMultiplayer() { return m_pMultiplayer; }
 	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
 
 	void Initialise();
@@ -204,8 +204,8 @@ public:
 
 	void InitialiseCVars();
 
-	void InitialiseScripting(void);
-	void ShutdownScripting(void);
+	void InitialiseScripting();
+	void ShutdownScripting();
 
 	void LoadFonts();
 
@@ -214,26 +214,26 @@ public:
 
 	void OnPreStartInGame(bool bRestarted);
 	void OnStartInGame(bool bRestarted);
-	void OnEndInGame(void);
+	void OnEndInGame();
 
 	void RegisterCommands();
-	void ResetWorld(void);
-	void LoadLobbyResource(void);
+	void ResetWorld();
+	void LoadLobbyResource();
 
 	void ShowDisconnectReason();
 
-	void OnProcess(void);
-	void OnFrame(void);
+	void OnProcess();
+	void OnFrame();
 
 	bool OnKeyUp(const SDL_Event& Event);
 	bool OnKeyDown(const SDL_Event& Event);
 	void OnCharacter(wchar_t c);
 
-	void OnRender2DStuff(void);
+	void OnRender2DStuff();
 
-	bool OnCameraProcess(void);
+	bool OnCameraProcess();
 
-	void NoName(void);
+	void NoName();
 
 	bool Connect(const GString& str);
 	bool Connect(const GString& str, const GChar* pszPassword);
@@ -241,11 +241,11 @@ public:
 	void StopMultiplayerGame(int iReason = Galactic3D::DISCONNECT_GRACEFUL, bool bPreventRestart = false);
 	void StopMultiplayerGameWhenSafe(int iReason = Galactic3D::DISCONNECT_GRACEFUL);
 
-	bool CanRotateCamera(void);
-	bool IsInputDisabled(void);
-	bool IsCursorEnabled(void);
-	bool IsCursorEnabled2(void);
-	bool IsDebugMode(void);
+	bool CanRotateCamera();
+	bool IsInputDisabled();
+	bool IsCursorEnabled();
+	bool IsCursorEnabled2();
+	bool IsDebugMode();
 	bool UsePlayerInfo();
 
 	bool DontClipCursor();
@@ -253,7 +253,7 @@ public:
 	void SetCursorEnabled(bool bEnabled);
 	void UpdateCursorEnabled(bool bForce = false);
 	void UpdateCursor(SDL_SystemCursor Cursor);
-	void UpdateCursor(void);
+	void UpdateCursor();
 	void SetMouseCapture(bool bEnabled);
 	void EnableInput(bool bEnabled);
 
@@ -261,7 +261,7 @@ public:
 	bool OnAction(const GChar* pszAction, LucasGUI::GUI::CButton* pButton);
 	void OnJoinRequest(tHackEventDataDiscordUser* pUser);
 
-	void OnDeviceLost(void);
+	void OnDeviceLost();
 	void OnDeviceReset(struct IDirect3DDevice8* pD3DDevice);
 
 	void LockControls(bool state);

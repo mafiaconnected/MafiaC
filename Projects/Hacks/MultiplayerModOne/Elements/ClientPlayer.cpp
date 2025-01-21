@@ -15,11 +15,9 @@ CClientPlayer::CClientPlayer(CMafiaClientManager* pClientManager) : CClientHuman
 	m_Type = ELEMENT_PLAYER;
 
 	m_Flags.m_bAlwaysExistForSyncer = true;
-
-	m_uiMoney = 0;
 }
 
-Galactic3D::ReflectedClass* CClientPlayer::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientPlayer::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientPlayerClass;
 }

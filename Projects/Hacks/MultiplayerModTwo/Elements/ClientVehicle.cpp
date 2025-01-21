@@ -11,10 +11,9 @@ using namespace Galactic3D;
 CClientVehicleII::CClientVehicleII(CMafiaClientManagerII* pClientManager) : CClientEntityII(pClientManager)
 {
 	m_Type = ELEMENT_VEHICLE;
-	m_MafiaVehicle = nullptr;
 }
 
-Galactic3D::ReflectedClass* CClientVehicleII::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientVehicleII::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientVehicleClass;
 }
@@ -24,7 +23,7 @@ M2::C_Car* CClientVehicleII::GetGameVehicle()
 	return m_MafiaVehicle;
 }
 
-void CClientVehicleII::Process(void)
+void CClientVehicleII::Process()
 {
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	{

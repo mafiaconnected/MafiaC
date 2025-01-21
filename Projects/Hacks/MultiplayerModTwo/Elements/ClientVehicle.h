@@ -9,7 +9,7 @@
 class CClientVehicleII : public CClientEntityII
 {
 private:
-	M2::C_Car* m_MafiaVehicle;
+	M2::C_Car* m_MafiaVehicle = nullptr;
 
 	CVector3D prevPos{ 0,0,0 }, prevRot{ 0,0,0 }, relPos{ 0,0,0 }, relRot{ 0,0,0 }, targetPos{ 0,0,0 }, targetRot{ 0,0,0 };
 
@@ -27,20 +27,20 @@ private:
 public:
 	CClientVehicleII(CMafiaClientManagerII* pClientManager);
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual M2::C_Car* GetGameVehicle();
 
-	virtual void Process(void) override;
+	virtual void Process() override;
 	virtual void Create(uint32_t model, const CVector3D& pos, const CVector3D& rot);
-	virtual void Delete(void);
-	virtual void Despawn(void);
-	virtual void Remove(void);
+	virtual void Delete();
+	virtual void Despawn();
+	virtual void Remove();
 
 	virtual bool SetModel(uint32_t model) override;
 	virtual uint32_t GetModel() override;
 
-	void UpdateGameMatrix(void);
+	void UpdateGameMatrix();
 
 	virtual bool SetPosition(const CVector3D& vecPos) override;
 	virtual bool GetPosition(CVector3D& vecPos) override;

@@ -7,14 +7,14 @@ class IDirect3DDevice8Hook : public IDirect3DDevice8
 private:
 	IDirect3D8* m_pD3D;
 	IDirect3DDevice8* m_pDevice;
-	int iRefs;
+	int iRefs = 1;
 public:
 	IDirect3DDevice8Hook(IDirect3D8* pDevice, IDirect3DDevice8* pD3DDevice);
-	~IDirect3DDevice8Hook(void);
+	~IDirect3DDevice8Hook();
 
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    virtual ULONG __stdcall AddRef(void);
-    virtual ULONG __stdcall Release(void);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     virtual HRESULT __stdcall TestCooperativeLevel();
     virtual UINT __stdcall GetAvailableTextureMem();
@@ -47,8 +47,8 @@ public:
     virtual HRESULT __stdcall SetRenderTarget(IDirect3DSurface8* pRenderTarget,IDirect3DSurface8* pNewZStencil);
     virtual HRESULT __stdcall GetRenderTarget(IDirect3DSurface8** ppRenderTarget);
     virtual HRESULT __stdcall GetDepthStencilSurface(IDirect3DSurface8** ppZStencilSurface);
-    virtual HRESULT __stdcall BeginScene(void);
-    virtual HRESULT __stdcall EndScene(void);
+    virtual HRESULT __stdcall BeginScene();
+    virtual HRESULT __stdcall EndScene();
     virtual HRESULT __stdcall Clear(DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil);
     virtual HRESULT __stdcall SetTransform(D3DTRANSFORMSTATETYPE State,CONST D3DMATRIX* pMatrix);
     virtual HRESULT __stdcall GetTransform(D3DTRANSFORMSTATETYPE State,D3DMATRIX* pMatrix);
@@ -65,7 +65,7 @@ public:
     virtual HRESULT __stdcall GetClipPlane(DWORD Index,float* pPlane);
     virtual HRESULT __stdcall SetRenderState(D3DRENDERSTATETYPE State,DWORD Value);
     virtual HRESULT __stdcall GetRenderState(D3DRENDERSTATETYPE State,DWORD* pValue);
-    virtual HRESULT __stdcall BeginStateBlock(void);
+    virtual HRESULT __stdcall BeginStateBlock();
     virtual HRESULT __stdcall EndStateBlock(DWORD* pToken);
     virtual HRESULT __stdcall ApplyStateBlock(DWORD Token);
     virtual HRESULT __stdcall CaptureStateBlock(DWORD Token);

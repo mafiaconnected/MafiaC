@@ -9,13 +9,11 @@ class CClientDoor : public CClientEntity
 public:
 	CClientDoor(CMafiaClientManager* pClientManager);
 
-	CMafiaClientManager* m_pClientManager;
+	float m_DoorOpenAngle = 0.0f;
+	bool m_bLocked = false;
+	MafiaSDK::C_Door* m_MafiaDoor = nullptr;
 
-	float m_DoorOpenAngle;
-	bool m_bLocked;
-	MafiaSDK::C_Door* m_MafiaDoor;
-
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual MafiaSDK::C_Door* GetGameDoor();
 

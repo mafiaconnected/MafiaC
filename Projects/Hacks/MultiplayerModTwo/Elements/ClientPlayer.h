@@ -14,7 +14,7 @@ public:
 
 	int32_t m_uiMoney;
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual void SetMoney(int32_t uiMoney);
 	virtual int32_t GetMoney();

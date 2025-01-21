@@ -9,7 +9,6 @@ IDirect3DDevice8Hook::IDirect3DDevice8Hook(IDirect3D8 * pD3D, IDirect3DDevice8 *
 {
 	m_pD3D = pD3D;
 	m_pDevice = pDevice;
-	iRefs = 1;
 	//pDevice->AddRef();
 	//iRefs = pDevice->Release();
 	//g_pClientGame->OnDeviceReset(this);
@@ -27,9 +26,8 @@ IDirect3DDevice8Hook::IDirect3DDevice8Hook(IDirect3D8 * pD3D, IDirect3DDevice8 *
 	}
 }
 
-IDirect3DDevice8Hook::~IDirect3DDevice8Hook(void)
+IDirect3DDevice8Hook::~IDirect3DDevice8Hook()
 {
-
 }
 
 HRESULT IDirect3DDevice8Hook::QueryInterface(REFIID iid, void **ppvObject)
@@ -37,13 +35,13 @@ HRESULT IDirect3DDevice8Hook::QueryInterface(REFIID iid, void **ppvObject)
 	return m_pDevice->QueryInterface(iid, ppvObject);
 }
 
-ULONG IDirect3DDevice8Hook::AddRef(void)
+ULONG IDirect3DDevice8Hook::AddRef()
 {
 	iRefs++;
 	return m_pDevice->AddRef();
 }
 
-ULONG IDirect3DDevice8Hook::Release(void)
+ULONG IDirect3DDevice8Hook::Release()
 {
 	iRefs--;
 	if (iRefs <= 0)
@@ -70,7 +68,7 @@ ULONG IDirect3DDevice8Hook::Release(void)
 
 //extern DWORD g_dwResetDevice;
 
-HRESULT IDirect3DDevice8Hook::TestCooperativeLevel(void)
+HRESULT IDirect3DDevice8Hook::TestCooperativeLevel()
 {
 	//if (g_dwResetDevice == 1)
 	//{
@@ -85,7 +83,7 @@ HRESULT IDirect3DDevice8Hook::TestCooperativeLevel(void)
 	return m_pDevice->TestCooperativeLevel();
 }
 
-UINT IDirect3DDevice8Hook::GetAvailableTextureMem(void)
+UINT IDirect3DDevice8Hook::GetAvailableTextureMem()
 {
 	return m_pDevice->GetAvailableTextureMem();
 }
@@ -263,12 +261,12 @@ HRESULT IDirect3DDevice8Hook::GetDepthStencilSurface(IDirect3DSurface8** ppZSten
 	return m_pDevice->GetDepthStencilSurface(ppZStencilSurface);
 }
 
-HRESULT IDirect3DDevice8Hook::BeginScene(void)
+HRESULT IDirect3DDevice8Hook::BeginScene()
 {
 	return m_pDevice->BeginScene();
 }
 
-HRESULT IDirect3DDevice8Hook::EndScene(void)
+HRESULT IDirect3DDevice8Hook::EndScene()
 {	
 	return m_pDevice->EndScene();
 }
@@ -354,7 +352,7 @@ HRESULT IDirect3DDevice8Hook::GetRenderState(D3DRENDERSTATETYPE State, DWORD* pV
 	return m_pDevice->GetRenderState(State, pValue);
 }
 
-HRESULT IDirect3DDevice8Hook::BeginStateBlock(void)
+HRESULT IDirect3DDevice8Hook::BeginStateBlock()
 {
 	return m_pDevice->BeginStateBlock();
 }

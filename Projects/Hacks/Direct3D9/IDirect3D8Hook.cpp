@@ -8,12 +8,10 @@ IDirect3D8Hook::IDirect3D8Hook(IDirect3D8* pD3D)
 	m_pD3D = pD3D;
 	//pD3D->AddRef();
 	//iRefs = pD3D->Release();
-	iRefs = 1;
 }
 
 IDirect3D8Hook::~IDirect3D8Hook()
 {
-
 }
 
 HRESULT IDirect3D8Hook::QueryInterface(REFIID iid, void** ppvObject)
@@ -21,13 +19,13 @@ HRESULT IDirect3D8Hook::QueryInterface(REFIID iid, void** ppvObject)
 	return m_pD3D->QueryInterface(iid, ppvObject);
 }
 
-ULONG IDirect3D8Hook::AddRef(void)
+ULONG IDirect3D8Hook::AddRef()
 {
 	iRefs++;
 	return m_pD3D->AddRef();
 }
 
-ULONG IDirect3D8Hook::Release(void)
+ULONG IDirect3D8Hook::Release()
 {
 	iRefs--;
 	ULONG ulResult = m_pD3D->Release();
@@ -41,7 +39,7 @@ HRESULT IDirect3D8Hook::RegisterSoftwareDevice(void*pInitializeFunction)
 	return m_pD3D->RegisterSoftwareDevice(pInitializeFunction);
 }
 
-UINT IDirect3D8Hook::GetAdapterCount(void)
+UINT IDirect3D8Hook::GetAdapterCount()
 {
 	return m_pD3D->GetAdapterCount();
 }

@@ -18,9 +18,9 @@ public:
 	CInterpolation m_EngineRPM;
 	CInterpolation m_WheelAngle;
 
-	float m_fRotationMaxError;
-	float m_fWheelAngleMaxError;
-	float m_fEngineRPMMaxError;
+	float m_fRotationMaxError = 1.0f;
+	float m_fWheelAngleMaxError = 1.0f;
+	float m_fEngineRPMMaxError = 1.0f;
 
 	void SetTargetRotationMat(CVector3D& front, CVector3D& up, CVector3D& right);
 	void SetTargetRotationQuat(CQuaternion& quatNewRotation);

@@ -10,5 +10,5 @@ class CClientDummy : public CClientEntity
 public:
 	CClientDummy(CMafiaClientManager* pClientManager);
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 };

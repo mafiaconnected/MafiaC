@@ -6,14 +6,14 @@ class IDirect3D8Hook : public IDirect3D8
 {
 private:
 	IDirect3D8* m_pD3D;
-	int iRefs;
+	int iRefs = 1;
 public:
 	IDirect3D8Hook(IDirect3D8 * pDevice);
-	~IDirect3D8Hook(void);
+	~IDirect3D8Hook();
 
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    virtual ULONG __stdcall AddRef(void);
-    virtual ULONG __stdcall Release(void);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     virtual HRESULT __stdcall RegisterSoftwareDevice(void* pInitializeFunction);
     virtual UINT __stdcall GetAdapterCount();

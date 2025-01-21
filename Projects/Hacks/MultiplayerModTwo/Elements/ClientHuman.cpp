@@ -13,19 +13,11 @@ using namespace Galactic3D;
 CClientHumanII::CClientHumanII(CMafiaClientManagerII* pClientManager) : CClientEntityII(pClientManager)
 {
 	m_Type = ELEMENT_PED;
-	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
-	m_nVehicleSeatIndex = 0;
-	m_MafiaHuman = nullptr;
-
-	m_bEnteredVehicleEvent = false;
-	m_bExitedVehicleEvent = false;
-	m_bExitingVehicleEvent = false;
-	m_bEnteringVehicleEvent = false;
 
 	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
 
-Galactic3D::ReflectedClass* CClientHumanII::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientHumanII::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManagerII*>(m_pClientManager)->m_pClientHumanClass;
 }
@@ -175,17 +167,17 @@ void CClientHumanII::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	return;
 }
 
-void CClientHumanII::Kill(void)
+void CClientHumanII::Kill()
 {
 	GetGameHuman()->GetScript()->SetHealth(0);
 }
 
-bool CClientHumanII::Create(void)
+bool CClientHumanII::Create()
 {
 	return false;
 }
 
-void CClientHumanII::Despawn(void)
+void CClientHumanII::Despawn()
 {
 	if (GetGameHuman() != nullptr)
 	{
@@ -201,7 +193,7 @@ void CClientHumanII::Despawn(void)
 	}
 }
 
-void CClientHumanII::Delete(void)
+void CClientHumanII::Delete()
 {
 	Despawn();
 }
@@ -246,7 +238,7 @@ bool CClientHumanII::WriteSyncPacket(Galactic3D::Stream* pStream)
 	return true;
 }
 
-void CClientHumanII::OnCreated(void)
+void CClientHumanII::OnCreated()
 {
 	// Initial vehicle
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
@@ -260,7 +252,7 @@ void CClientHumanII::OnCreated(void)
 	g_pClientGame->m_pOnHumanSpawnEventType->Trigger(Args);
 }
 
-void CClientHumanII::Process(void)
+void CClientHumanII::Process()
 {
 	if(!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
@@ -270,7 +262,7 @@ void CClientHumanII::Process(void)
 	CClientEntityII::Process();
 }
 
-bool CClientHumanII::IsInVehicle(void)
+bool CClientHumanII::IsInVehicle()
 {
 	return GetOccupiedVehicle() != nullptr;
 }
@@ -280,7 +272,7 @@ bool CClientHumanII::IsInVehicle(CClientVehicleII* pClientVehicle)
 	return GetOccupiedVehicle() == pClientVehicle;
 }
 
-CClientVehicleII* CClientHumanII::GetOccupiedVehicle(void)
+CClientVehicleII* CClientHumanII::GetOccupiedVehicle()
 {
 	M2::C_Car* pVehicle = GetGameHuman()->m_pCurrentCar;
 
@@ -288,12 +280,12 @@ CClientVehicleII* CClientHumanII::GetOccupiedVehicle(void)
 	return pClientVehicle;
 }
 
-CClientVehicleII* CClientHumanII::GetEnteringExitingVehicle(void)
+CClientVehicleII* CClientHumanII::GetEnteringExitingVehicle()
 {
 	return nullptr;
 }
 
-int8_t CClientHumanII::GetVehicleSeat(void)
+int8_t CClientHumanII::GetVehicleSeat()
 {
 	CClientVehicleII* pClientVehicle = GetEnteringExitingVehicle();
 	if (pClientVehicle == nullptr)
@@ -325,7 +317,7 @@ void CClientHumanII::EnterVehicle(CClientVehicleII* pVehicle, uint8_t iSeat)
 	m_nVehicleNetworkIndex = pVehicle->GetId();
 }
 
-void CClientHumanII::RemoveFromVehicle(void)
+void CClientHumanII::RemoveFromVehicle()
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -339,7 +331,7 @@ void CClientHumanII::RemoveFromVehicle(void)
 	}
 }
 
-void CClientHumanII::ExitVehicle(void)
+void CClientHumanII::ExitVehicle()
 {
 	_glogverboseprintf(__gstr(__FUNCTION__));
 	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);

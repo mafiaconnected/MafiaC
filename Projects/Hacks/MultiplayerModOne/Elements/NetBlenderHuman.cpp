@@ -23,11 +23,8 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
 }
 
-CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity) :
-	m_pEntity(pEntity),
-	m_fRotationMaxError(1.0f)
+CNetBlenderHuman::CNetBlenderHuman(CClientHuman* pEntity) : m_pEntity(pEntity)
 {
-	m_pEntity = pEntity;
 }
 
 void CNetBlenderHuman::SetTargetRotation(CVector3D& vecRotation)

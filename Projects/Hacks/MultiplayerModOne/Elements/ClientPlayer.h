@@ -12,9 +12,9 @@ private:
 public:
 	CClientPlayer(CMafiaClientManager* pClientManager);
 
-	int32_t m_uiMoney;
+	int32_t m_uiMoney = 0;
 
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual void SetMoney(int32_t uiMoney);
 	virtual int32_t GetMoney();

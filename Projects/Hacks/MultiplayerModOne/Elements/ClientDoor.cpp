@@ -15,14 +15,9 @@ CClientDoor::CClientDoor(CMafiaClientManager* pClientManager) : CClientEntity(pC
 
 	m_Flags.m_bFindSyncer = false;
 	m_Flags.m_bSendSync = false;
-
-	m_pEntity = NULL;
-
-	m_bLocked = false;
-	m_DoorOpenAngle = 0.0f;
 }
 
-Galactic3D::ReflectedClass* CClientDoor::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientDoor::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientDoorClass;
 }

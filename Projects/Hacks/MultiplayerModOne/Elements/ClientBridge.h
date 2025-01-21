@@ -9,12 +9,10 @@ class CClientBridge : public CClientEntity
 public:
 	CClientBridge(CMafiaClientManager* pClientManager);
 
-	CMafiaClientManager* m_pClientManager;
+	bool m_Enabled = false;
+	MafiaSDK::C_Bridge* m_MafiaBridge = nullptr;
 
-	bool m_Enabled;
-	MafiaSDK::C_Bridge* m_MafiaBridge;
-
-	virtual Galactic3D::ReflectedClass* GetReflectedClass(void);
+	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual MafiaSDK::C_Bridge* GetGameBridge();
 

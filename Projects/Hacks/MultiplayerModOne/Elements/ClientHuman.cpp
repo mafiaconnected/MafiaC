@@ -14,28 +14,15 @@ CClientHuman::CClientHuman(CMafiaClientManager* pClientManager) : CClientEntity(
 {
 	m_Type = ELEMENT_PED;
 
-	bool m_isLocalPlayer = false;
-
-	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
-	m_nVehicleSeatIndex = 0;
-	m_MafiaHuman = nullptr;
-
-	m_bEnteredVehicleEvent = false;
-	m_bExitedVehicleEvent = false;
-	m_bExitingVehicleEvent = false;
-	m_bEnteringVehicleEvent = false;
-
-	CClientVehicle* m_pVehicleEvent = nullptr;
-
 	m_vecCamera = CVector3D(0.0f, 0.0f, 0.0f);
 }
 
-Galactic3D::ReflectedClass* CClientHuman::GetReflectedClass(void)
+Galactic3D::ReflectedClass* CClientHuman::GetReflectedClass()
 {
 	return static_cast<CMafiaClientManager*>(m_pClientManager)->m_pClientHumanClass;
 }
 
-void CClientHuman::UpdateGameMatrix(void)
+void CClientHuman::UpdateGameMatrix()
 {
 	if (m_MafiaHuman->GetFrame() == nullptr)
 		return;
@@ -245,7 +232,7 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 	//_glogprintf(_gstr("Spawned human for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tAngle: %f"), GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, angle);
 }
 
-void CClientHuman::Kill(void)
+void CClientHuman::Kill()
 {
 	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
 	// Note (Vortrex): Fixed with new death call, old way is moved to CClientHuman::InstantDeath
@@ -255,19 +242,19 @@ void CClientHuman::Kill(void)
 	GetGameHuman()->Do_DeadBodyDrop();
 }
 
-void CClientHuman::InstantDeath(void)
+void CClientHuman::InstantDeath()
 {
 	// Note (Sevenisko): Currently no other way available - missing animations and screams (need some RE to get better result)
 	// Note (Vortrex): Fixed with new death call
 	GetGameHuman()->Intern_ForceDeath();
 }
 
-bool CClientHuman::Create(void)
+bool CClientHuman::Create()
 {
 	return false;
 }
 
-void CClientHuman::Despawn(void)
+void CClientHuman::Despawn()
 {
 	if (GetGameHuman() != nullptr)
 	{
@@ -284,7 +271,7 @@ void CClientHuman::Despawn(void)
 	}
 }
 
-void CClientHuman::Delete(void)
+void CClientHuman::Delete()
 {
 	Despawn();
 }
@@ -586,7 +573,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	return true;
 }
 
-void CClientHuman::OnCreated(void)
+void CClientHuman::OnCreated()
 {
 	// Initial vehicle
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
@@ -602,7 +589,7 @@ void CClientHuman::OnCreated(void)
 	g_pClientGame->m_pOnHumanSpawnEventType->Trigger(Args);
 }
 
-void CClientHuman::Process(void)
+void CClientHuman::Process()
 {
 	//if (IsInVehicle()) {
 	//	GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
@@ -630,7 +617,7 @@ void CClientHuman::Process(void)
 	CClientEntity::Process();
 }
 
-bool CClientHuman::IsInVehicle(void)
+bool CClientHuman::IsInVehicle()
 {
 	return GetOccupiedVehicle() != nullptr;
 }
@@ -640,7 +627,7 @@ bool CClientHuman::IsInVehicle(CClientVehicle* pClientVehicle)
 	return GetOccupiedVehicle() == pClientVehicle;
 }
 
-CClientVehicle* CClientHuman::GetOccupiedVehicle(void)
+CClientVehicle* CClientHuman::GetOccupiedVehicle()
 {
 	MafiaSDK::C_Car* pVehicle = GetGameHuman()->GetInterface()->playersCar;
 	if (pVehicle == nullptr)
@@ -650,7 +637,7 @@ CClientVehicle* CClientHuman::GetOccupiedVehicle(void)
 	return pClientVehicle;
 }
 
-CClientVehicle* CClientHuman::GetEnteringExitingVehicle(void)
+CClientVehicle* CClientHuman::GetEnteringExitingVehicle()
 {
 	MafiaSDK::C_Car* pVehicle = GetGameHuman()->GetInterface()->carLeavingOrEntering;
 	if (pVehicle == nullptr)
@@ -660,7 +647,7 @@ CClientVehicle* CClientHuman::GetEnteringExitingVehicle(void)
 	return pClientVehicle;
 }
 
-int8_t CClientHuman::GetVehicleSeat(void)
+int8_t CClientHuman::GetVehicleSeat()
 {
 	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
 	if (pClientVehicle == nullptr)
@@ -694,7 +681,7 @@ void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
 	m_nVehicleNetworkIndex = pVehicle->GetId();
 }
 
-void CClientHuman::RemoveFromVehicle(void)
+void CClientHuman::RemoveFromVehicle()
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -716,7 +703,7 @@ void CClientHuman::RemoveFromVehicle(void)
 	}
 }
 
-void CClientHuman::ExitVehicle(void)
+void CClientHuman::ExitVehicle()
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);

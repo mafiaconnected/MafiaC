@@ -26,12 +26,7 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 
 
 
-CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) :
-	CNetBlenderLerp(),
-	m_pEntity(pEntity),
-	m_fRotationMaxError(1.0f),
-	m_fWheelAngleMaxError(1.0f),
-	m_fEngineRPMMaxError(1.0f)
+CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) : m_pEntity(pEntity)
 {
 }
 

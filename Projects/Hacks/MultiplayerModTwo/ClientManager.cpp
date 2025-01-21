@@ -79,7 +79,7 @@ CNetObject* CMafiaClientManagerII::Create(int Type)
 	return nullptr;
 }
 
-bool CMafiaClientManagerII::IsConnecting(void)
+bool CMafiaClientManagerII::IsConnecting()
 {
 	if (IsConnected())
 		return false;
@@ -91,7 +91,7 @@ bool CMafiaClientManagerII::Connect(const GChar* pszHost, unsigned short usPort,
 	return g_pClientGame->Connect(pszHost, usPort, pszPassword);
 }
 
-bool CMafiaClientManagerII::Disconnect(void)
+bool CMafiaClientManagerII::Disconnect()
 {
 	if (g_pClientGame->m_pMultiplayer != nullptr)
 		g_pClientGame->StopMultiplayerGame();
@@ -172,7 +172,8 @@ CClientPlayerII* CMafiaClientManagerII::FindPlayer(M2::C_Player2* pPlayer)
 	return nullptr;
 }
 
-bool CMafiaClientManagerII::OnProcess(void) {
+bool CMafiaClientManagerII::OnProcess()
+{
 	for (auto pPed : m_rgpPeds)
 	{
 		if (pPed != NULL && pPed.GetPointer() != nullptr && pPed.GetPointer()->GetGameHuman() != nullptr) {

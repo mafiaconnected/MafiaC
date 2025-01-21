@@ -18,7 +18,7 @@ public:
 
 	eDIDeviceType m_DeviceType;
 
-	size_t m_RefCount;
+	size_t m_RefCount = 1;
 	IDirectInputDevice8* m_pDirectInputDevice;
 
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj) override;

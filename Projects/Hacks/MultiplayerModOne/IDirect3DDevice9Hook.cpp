@@ -10,7 +10,6 @@ IDirect3DDevice9Hook::IDirect3DDevice9Hook(IDirect3D9* pDirect3D9, IDirect3DDevi
 	g_pD3DDevice = pDirect3DDevice9;
 	m_pDirect3D9 = pDirect3D9;
 	m_pDirect3DDevice9 = pDirect3DDevice9;
-	m_RefCount = 1;
 }
 
 HRESULT IDirect3DDevice9Hook::QueryInterface(REFIID riid, void** ppvObj)
@@ -18,14 +17,14 @@ HRESULT IDirect3DDevice9Hook::QueryInterface(REFIID riid, void** ppvObj)
 	return m_pDirect3DDevice9->QueryInterface(riid,ppvObj);
 }
 
-ULONG IDirect3DDevice9Hook::AddRef(void)
+ULONG IDirect3DDevice9Hook::AddRef()
 {
 	//m_pDirect3DDevice9->AddRef();
 	m_RefCount++;
 	return m_RefCount;
 }
 
-ULONG IDirect3DDevice9Hook::Release(void)
+ULONG IDirect3DDevice9Hook::Release()
 {
 	if (m_RefCount <= 1)
 	{
@@ -37,17 +36,17 @@ ULONG IDirect3DDevice9Hook::Release(void)
 	return m_RefCount;
 }
 
-HRESULT IDirect3DDevice9Hook::TestCooperativeLevel(void)
+HRESULT IDirect3DDevice9Hook::TestCooperativeLevel()
 {
 	return m_pDirect3DDevice9->TestCooperativeLevel();
 }
 
-UINT IDirect3DDevice9Hook::GetAvailableTextureMem(void)
+UINT IDirect3DDevice9Hook::GetAvailableTextureMem()
 {
 	return m_pDirect3DDevice9->GetAvailableTextureMem();
 }
 
-HRESULT IDirect3DDevice9Hook::EvictManagedResources(void)
+HRESULT IDirect3DDevice9Hook::EvictManagedResources()
 {
 	return m_pDirect3DDevice9->EvictManagedResources();
 }
@@ -97,7 +96,7 @@ HRESULT IDirect3DDevice9Hook::GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9*
 	return m_pDirect3DDevice9->GetSwapChain(iSwapChain, pSwapChain);
 }
 
-UINT IDirect3DDevice9Hook::GetNumberOfSwapChains(void)
+UINT IDirect3DDevice9Hook::GetNumberOfSwapChains()
 {
 	return m_pDirect3DDevice9->GetNumberOfSwapChains();
 }
@@ -237,12 +236,12 @@ HRESULT IDirect3DDevice9Hook::GetDepthStencilSurface(IDirect3DSurface9** ppZSten
 	return m_pDirect3DDevice9->GetDepthStencilSurface(ppZStencilSurface);
 }
 
-HRESULT IDirect3DDevice9Hook::BeginScene(void)
+HRESULT IDirect3DDevice9Hook::BeginScene()
 {
 	return m_pDirect3DDevice9->BeginScene();
 }
 
-HRESULT IDirect3DDevice9Hook::EndScene(void)
+HRESULT IDirect3DDevice9Hook::EndScene()
 {
 	return m_pDirect3DDevice9->EndScene();
 }
@@ -332,7 +331,7 @@ HRESULT IDirect3DDevice9Hook::CreateStateBlock(D3DSTATEBLOCKTYPE Type, IDirect3D
 	return m_pDirect3DDevice9->CreateStateBlock(Type, ppSB);
 }
 
-HRESULT IDirect3DDevice9Hook::BeginStateBlock(void)
+HRESULT IDirect3DDevice9Hook::BeginStateBlock()
 {
 	return m_pDirect3DDevice9->BeginStateBlock();
 }
@@ -422,7 +421,7 @@ HRESULT IDirect3DDevice9Hook::SetSoftwareVertexProcessing(BOOL bSoftware)
 	return m_pDirect3DDevice9->SetSoftwareVertexProcessing(bSoftware);
 }
 
-BOOL IDirect3DDevice9Hook::GetSoftwareVertexProcessing(void)
+BOOL IDirect3DDevice9Hook::GetSoftwareVertexProcessing()
 {
 	return m_pDirect3DDevice9->GetSoftwareVertexProcessing();
 }
@@ -432,7 +431,7 @@ HRESULT IDirect3DDevice9Hook::SetNPatchMode(float nSegments)
 	return m_pDirect3DDevice9->SetNPatchMode(nSegments);
 }
 
-float IDirect3DDevice9Hook::GetNPatchMode(void)
+float IDirect3DDevice9Hook::GetNPatchMode()
 {
 	return m_pDirect3DDevice9->GetNPatchMode();
 }
