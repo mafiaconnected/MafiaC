@@ -17,14 +17,6 @@
 #include <Audio/BassRenderer.h>
 #include <Audio/BassRenderer.hpp>
 
-#ifdef WIN32
-#ifdef _M_X64
-#pragma comment(lib,"bass64.lib")
-#else
-#pragma comment(lib,"bass.lib")
-#endif
-#endif
-
 CMafiaCModLauncher::CMafiaCModLauncher(HINSTANCE hInstance) : CModLauncher(hInstance)
 {
 #if PUBLIC_RELEASE
