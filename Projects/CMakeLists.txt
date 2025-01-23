@@ -31,15 +31,6 @@ if(WIN32)
 endif()
 
 if(MSVC)
-	# declaration of 'identifier' hides previous local declaration
-	disable_warning(4456)
-
-	# 'conversion' conversion from 'type1' to 'type2', possible loss of data
-	disable_warning(4244)
-
-	# 'equality-operator' : signed/unsigned mismatch
-	disable_warning(4389)
-
 	# export 'exportname' specified multiple times; using first specification
 	disable_linker_warning(4197)
 endif()
