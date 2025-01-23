@@ -38,6 +38,7 @@ target_link_libraries(
 	RmlGUI_static
 	asmjit_static
 	Audio_static
+	bass
 	LucasFont_static
 	LucasGUI_static
 	litehtml_LucasGUI_static

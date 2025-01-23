@@ -20,6 +20,7 @@ target_link_libraries(
 	asmjit_static
 	Direct3D9Renderer_static
 	Audio_static
+	bass
 	LucasFont_static
 	LucasGUI_static
 	litehtml_LucasGUI_static
