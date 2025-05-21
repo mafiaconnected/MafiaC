@@ -133,6 +133,8 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
+	m_MafiaVehicle->SetActState(1);
+	m_MafiaVehicle->Engine(0.083f, 0.083f, 0.083f);
 
 	MafiaSDK::GetMission()->GetGame()->AddTemporaryActor(m_MafiaVehicle);
 
