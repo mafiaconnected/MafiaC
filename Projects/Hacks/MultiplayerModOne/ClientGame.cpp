@@ -1778,11 +1778,11 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 {
 	int8_t iSeat = (iHopSeatsBool == 1 && iDoor > 0) ? iDoor - 1 : iDoor;
 
-	if (iDoor == -1) {
-		iDoor = 0;
+	if (iSeat == -1) {
+		iSeat = 0;
 	}
 
-	_glogprintf(_gstr("Human entering vehicle"));
+	//_glogprintf(_gstr("Human entering vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1814,7 +1814,7 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogprintf(_gstr("Human entered vehicle"));
+	//_glogprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1848,7 +1848,7 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
-	_glogprintf(_gstr("Human exiting vehicle"));
+	//_glogprintf(_gstr("Human exiting vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1880,7 +1880,7 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogprintf(_gstr("Human exited vehicle"));
+	//_glogprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1969,7 +1969,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		fNewHealth = 0.0f;
 	}
 
-	_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
+	//_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
 
 	pClientHumanTarget->SetHealth(fNewHealth);
 
@@ -1987,6 +1987,38 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		{
 			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
 			pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
+		}
+	}
+}
+
+void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnk1, uint32_t iUnk2, uint32_t iUnk3)
+{
+	//_glogprintf(_gstr("Human using actor"));
+	CArguments Args;
+	Args.AddObject(pClientHuman);
+	Args.AddString((GChar*)pActor->GetFrame()->GetInterface()->name);
+	Args.AddNumber(iUnk1);
+	Args.AddNumber(iUnk2);
+	Args.AddNumber(iUnk3);
+	m_pOnHumanUsingActorEventType->Trigger(Args);
+
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
+	{
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_USINGACTOR);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<GString>((GChar*)pActor->GetFrame()->GetInterface()->name);
+			Packet.Write<int32_t>(iUnk1);
+			Packet.Write<int32_t>(iUnk2);
+			Packet.Write<int32_t>(iUnk3);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			g_pClientGame->m_bUseActorInvokedByGame = false;
+			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnk1, iUnk2, iUnk3);
+			g_pClientGame->m_bUseActorInvokedByGame = true;
 		}
 	}
 }

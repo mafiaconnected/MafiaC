@@ -732,13 +732,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
 			uint32_t nAction;
-			uint32_t nUnknown;
+			uint32_t nHopSeatsBool;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
-			Reader.ReadUInt32(&nUnknown, 1);
+			Reader.ReadUInt32(&nHopSeatsBool, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -754,7 +754,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 							{
 								if (!pClientHuman->IsSyncer())
 								{
-									g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+									g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nHopSeatsBool);
 								}
 							}
 						}
@@ -770,13 +770,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
 			uint32_t nAction;
-			uint32_t nUnknown;
+			uint32_t nHopSeatsBool;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
-			Reader.ReadUInt32(&nUnknown, 1);
+			Reader.ReadUInt32(&nHopSeatsBool, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -790,7 +790,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 						{
 							if (!pClientHuman->IsSyncer())
 							{
-								g_pClientGame->HumanEnteredVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+								g_pClientGame->HumanEnteredVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nHopSeatsBool);
 							}
 						}
 					}
@@ -805,13 +805,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
 			uint32_t nAction;
-			uint32_t nUnknown;
+			uint32_t nHopSeatsBool;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
-			Reader.ReadUInt32(&nUnknown, 1);
+			Reader.ReadUInt32(&nHopSeatsBool, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -825,7 +825,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 						{
 							if (!pClientHuman->IsSyncer())
 							{
-								g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+								g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nHopSeatsBool);
 							}
 						}
 					}
@@ -840,13 +840,13 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
 			uint32_t nAction;
-			uint32_t nUnknown;
+			uint32_t nHopSeatsBool;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
-			Reader.ReadUInt32(&nUnknown, 1);
+			Reader.ReadUInt32(&nHopSeatsBool, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -860,9 +860,40 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 						{
 						if (!pClientHuman->IsSyncer())
 						{
-							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nHopSeatsBool);
 						}
 						}
+					}
+				}
+			}
+		}
+		break;
+
+		case MAFIAPACKET_HUMAN_USINGACTOR:
+		{
+			int32_t nHumanNetworkIndex;
+			GChar* szName;
+			uint32_t nUnk1;
+			uint32_t nUnk2;
+			uint32_t nUnk3;
+
+			size_t size = 0;
+
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			GChar* szName = Reader.ReadString(&size);
+			Reader.ReadUInt32(&nUnk1, 1);
+			Reader.ReadUInt32(&nUnk2, 1);
+			Reader.ReadUInt32(&nUnk3, 1);
+
+			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+				if (pClientHuman != nullptr)
+				{
+					if (!pClientHuman->IsSyncer())
+					{
+						UTF8String actorName(true, szName);
+						g_pClientGame->HumanUsingActor(pClientHuman, MafiaSDK::GetMission()->FindActorByName(actorName), nUnk1, nUnk2, nUnk3);
 					}
 				}
 			}

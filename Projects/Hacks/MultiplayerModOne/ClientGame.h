@@ -127,6 +127,7 @@ public:
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitingVehicleEventType = nullptr;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanExitedVehicleEventType = nullptr;
 	Galactic3D::EventHandlers::CEventType* m_pOnHumanJackVehicleEventType = nullptr;
+	Galactic3D::EventHandlers::CEventType* m_pOnHumanUsingActorEventType = nullptr;
 	Galactic3D::EventHandlers::CEventType* m_pOnAddActorEventType = nullptr;
 
 	Galactic3D::CChatWindow* m_pChatWindow = nullptr;
@@ -292,6 +293,7 @@ public:
 	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat);
 	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);
+	void HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnk1, uint32_t iUnk2, uint32_t iUnk3);
 
 	void DestroyUninitializedGameElements();
 

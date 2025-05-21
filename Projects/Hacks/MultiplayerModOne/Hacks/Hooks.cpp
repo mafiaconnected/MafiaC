@@ -191,7 +191,7 @@ RAWCODECALL HumanUseActor()
 			}
 			else 
 			{
-				//g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor);
+				g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
 			}
 		}
 	}
