@@ -23,7 +23,7 @@ CMultiplayer::CMultiplayer(CClientManager* pClientManager, CVarSystem* pCVars) :
 	m_Version.m_Game = pClientManager->m_Games.GetGameId(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Game.m_szName);
 }
 
-void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
+void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 {
 	Galactic3D::CBinaryReader Reader(pStream);
 
@@ -36,7 +36,7 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
 
-	CClientNetGame::ProcessPacket(Peer, PacketID, pStream);
+	CClientNetGame::ProcessPacket(PacketID, pStream);
 
 	switch (PacketID)
 	{
@@ -872,7 +872,6 @@ void CMultiplayer::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, G
 		case MAFIAPACKET_HUMAN_USINGACTOR:
 		{
 			int32_t nHumanNetworkIndex;
-			GChar* szName;
 			uint32_t nUnk1;
 			uint32_t nUnk2;
 			uint32_t nUnk3;

@@ -55,6 +55,7 @@ target_link_libraries(
 	ssl_static
 	curl_static
 	FileIntegrity_static
+	RakNet_static
 	mongoose6_static
 	Network_static
 	Galactic_static

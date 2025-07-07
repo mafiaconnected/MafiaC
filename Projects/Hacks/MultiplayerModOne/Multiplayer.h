@@ -24,7 +24,7 @@ public:
 
 	std::vector<Weak<CClientEntity>> m_PendingPeerElements;
 
-	virtual void ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream) override;
+	virtual void ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream) override;
 	virtual void OnPlayerDisconnect(const Peer_t Peer, unsigned int uiReason) override;
 	virtual void OnFinishConnecting() override;
 	virtual void OnSetGameMode(const GChar* pszGameMode, size_t Length) override;

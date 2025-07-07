@@ -23,7 +23,7 @@ CMultiplayerII::CMultiplayerII(CClientManager* pClientManager, CVarSystem* pCVar
 	m_Version.m_Game = pClientManager->m_Games.GetGameId(CHackSupport::m_pInstance->m_InjectedData.m_InjectData.m_LauncherData.m_Game.m_szName);
 }
 
-void CMultiplayerII::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID, Galactic3D::Stream* pStream)
+void CMultiplayerII::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 {
 	Galactic3D::CBinaryReader Reader(pStream);
 
@@ -34,7 +34,7 @@ void CMultiplayerII::ProcessPacket(const tPeerInfo& Peer, unsigned int PacketID,
 		g_pClientGame->m_pChatWindow->FlushBuffers();
 		g_pClientGame->m_pResourceMgr->ClearAllResources();
 	}
-	CClientNetGame::ProcessPacket(Peer, PacketID, pStream); // this is asking for problems, MOVE IT TO DEFAULT CASE IDIOT
+	CClientNetGame::ProcessPacket(PacketID, pStream); // this is asking for problems, MOVE IT TO DEFAULT CASE IDIOT
 
 	switch (PacketID)
 	{
