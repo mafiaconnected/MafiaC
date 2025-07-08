@@ -11,7 +11,7 @@ ManifestSupportedOS all
 
 !define PRODUCT_NAME "Mafia Connected"
 !define PRODUCT_NAME_SHORT "MafiaC"
-!define PRODUCT_VERSION "2.0.0"
+!define PRODUCT_VERSION "2.1.0"
 !define PRODUCT_VERSION_BUILD "0"
 !define PRODUCT_VERSION_FULL "${PRODUCT_VERSION}.${PRODUCT_VERSION_BUILD}"
 !define PRODUCT_ICON "..\Projects\Launcher\MafiaC.ico"
@@ -148,7 +148,7 @@ VIProductVersion "${PRODUCT_VERSION_FULL}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${PRODUCT_VERSION_FULL}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jack's Mini Network"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © 2025 Jack's Mini Network"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright   2025 Jack's Mini Network"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION_FULL}"
 
