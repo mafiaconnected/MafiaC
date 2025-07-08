@@ -8,7 +8,7 @@ class CClientHumanII;
 class CClientPlayerII;
 class CClientVehicleII;
 
-#define MAFIA_P2P_SERVER_IDS 1
+#define MAFIAC_P2P_SERVER_IDS 1
 
 class CMultiplayerII : public Galactic3D::CClientNetGame
 {

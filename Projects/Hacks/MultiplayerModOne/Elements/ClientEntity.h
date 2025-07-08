@@ -23,6 +23,9 @@ public:
 	CVector3D m_RelativePosition;
 	CVector3D m_RelativeRotation;
 
+	uint8_t m_ucCreatedBy = ELEMENTCREATEDBY_USER;
+	bool m_bMigrating = false;
+
 	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
 
 	virtual bool Create();

@@ -1089,18 +1089,59 @@ bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
 
 		if (pGameVehicle != nullptr)
 		{
-			Packet Packet(MAFIAPACKET_VEHICLE_CREATE);
-			Packet.Write<uint64_t>(pClientVehicle->GetGUID());
-			pClientVehicle->WriteCreatePacket(&Packet);
-			//pClientVehicle->WriteSyncPacket(&Packet);
-			SendHostPacket(&Packet);
+			pClientVehicle->GenerateGUID();
 
-			//_glogprintf(_gstr("PEER2PEER: Sending vehicle %d modelIndex %d"), nRef, pVehicle->GetModelIndex());
+#if MAFIAC_P2P_SERVER_IDS
+			{
+				Packet Packet(MAFIAPACKET_PEER_CREATECAR);
+				Packet.Write<uint64_t>(pClientVehicle->GetGUID());
+				pClientVehicle->WriteCreatePacket(&Packet);
+				pClientVehicle->WriteSyncPacket(&Packet);
+
+				SendHostPacket(&Packet);
+
+				//_glogprintf(_gstr("PEER2PEER: Sending vehicle %d modelIndex %d"), nRef, pVehicle->GetModelIndex());
+			}
+#endif
+
+			//pClientVehicle->m_bMigrating = true;
 
 			return true;
 		}
 	}
-	return false;
+	else if (pElement->IsType(ELEMENT_PED))
+	{
+		auto pClientPed = static_cast<CClientHuman*>(pElement);
+		auto pPed = pClientPed->GetGameHuman();
+
+		if (pPed != nullptr)
+		{
+			auto pClientVehicle = pClientPed->GetOccupiedVehicle();
+			if (pClientVehicle == nullptr || (pClientVehicle != nullptr && pClientVehicle->GetId() != INVALID_NETWORK_ID))
+			{
+				pClientPed->GenerateGUID();
+
+#if MAFIAC_P2P_SERVER_IDS
+				{
+					Packet Packet(MAFIAPACKET_PEER_CREATECIVILIAN);
+					Packet.Write<uint64_t>(pClientPed->GetGUID());
+					pClientPed->WriteCreatePacket(&Packet);
+					pClientPed->WriteSyncPacket(&Packet);
+
+					SendHostPacket(&Packet);
+				}
+#endif
+
+				//pClientPed->m_bMigrating = true;
+
+				//_glogprintf(_gstr("PEER2PEER: Sending ped %d modelIndex %d"), nRef, pPed->GetModelIndex());
+
+				return true;
+			}
+		}
+	}
+
+
 }
 
 void CMultiplayer::ProcessNewPeerElements()
