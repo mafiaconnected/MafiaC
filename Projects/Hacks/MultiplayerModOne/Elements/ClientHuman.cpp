@@ -594,13 +594,16 @@ void CClientHuman::Process()
 	//if (IsInVehicle()) {
 	//	GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
 	//}
-	
-	GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
 
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr && !IsInVehicle())
 	{
 		m_pBlender->Interpolate();
 	}
+
+	if (GetGameHuman()->GetInterface()->isInAnimWithCar)
+		GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
+
+	GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
 
 	//auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	//if (pMultiplayer != nullptr)
