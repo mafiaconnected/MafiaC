@@ -89,22 +89,23 @@ void CClientEntity::Delete()
 
 bool CClientEntity::ReadCreatePacket(Stream* pStream)
 {
-    if (!CNetObject::ReadCreatePacket(pStream))
-        return false;
-
-	tEntityCreatePacket Packet;
-
-	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+	if (!CNetObject::ReadCreatePacket(pStream))
 		return false;
 
-	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), Packet.model);
+	CBinaryReader Reader(pStream);
+	AutoFree<const GChar> mdl = Reader.ReadString(nullptr);
+	_gstrcpy_s(m_szModel, ARRAY_COUNT(m_szModel), mdl);
+
+	tEntityCreatePacket Packet;
+	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
+		return false;
 
 	m_Position = Packet.position;
 	m_RelativePosition = Packet.positionRel;
 	m_Rotation = Packet.rotation;
 	m_RelativeRotation = Packet.rotationRel;
 
-    return true;
+	return true;
 }
 
 bool CClientEntity::ReadSyncPacket(Stream* pStream)
@@ -130,9 +131,10 @@ bool CClientEntity::WriteCreatePacket(Stream* pStream)
 	if (!CNetObject::WriteCreatePacket(pStream))
 		return false;
 
-	tEntityCreatePacket Packet;
+	CBinaryWriter Writer(pStream);
+	Writer.WriteString(m_szModel);
 
-	_gstrcpy_s(Packet.model, ARRAY_COUNT(Packet.model), m_szModel);
+	tEntityCreatePacket Packet;
 
 	Packet.position = m_Position;
 	Packet.positionRel = m_RelativePosition;

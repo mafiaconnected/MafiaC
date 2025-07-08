@@ -134,7 +134,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
 	m_MafiaVehicle->SetActState(1);
-	m_MafiaVehicle->Engine(0.083f, 0.083f, 0.083f);
+	//m_MafiaVehicle->Engine(0.083f, 0.083f, 0.083f);
 
 	MafiaSDK::GetMission()->GetGame()->AddTemporaryActor(m_MafiaVehicle);
 
@@ -452,16 +452,12 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_RotationUp = Packet.rotationUp;
 	m_RotationRight = Packet.rotationRight;
 
-	GChar szModel[64];
-	wmemset(szModel, _gstr('\0'), 64);
-	wmemcpy(szModel, m_szModel, 64);
-
 	CVector3D vecPos = m_Position;
 	CVector3D vecRot = m_Rotation;
 
 	if (GetGameVehicle() == nullptr)
 	{
-		Create(szModel, vecPos, vecRot);
+		Create(m_szModel, vecPos, vecRot);
 	}
 	else
 	{
@@ -502,8 +498,8 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	GetGameVehicle()->SetActive(true);
 	GetGameVehicle()->SetActState(1);
 	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
-	GetGameVehicle()->SetColsOn(Packet.collisionsEnabled);
-	GetGameVehicle()->SetTransparency(Packet.alpha);
+	//GetGameVehicle()->SetColsOn(Packet.collisionsEnabled);
+	//GetGameVehicle()->SetTransparency(Packet.alpha);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 
 	//_glogprintf(_gstr("Vehicle::ReadCreatePacket for element #%d:\n\tModel: %s\n\tPosition: {%f, %f, %f}\n\tRotation: {%f, %f, %f}\n\tHealth: %f\n\tEngine health: %f\n\tFuel: %f\n\tSound: %s\n\tEngine on: %s\n\tHorn: %s\n\tSiren: %s\n\tGear: %d\n\tEngine RPM: %f\n\tAcceleration: %f\n\tBrake: %f\n\tHandbrake: %f\n\tSpeed limit: %f\n\tClutch: %f\n\tWheel angle: %f"), GetId(), szModel, vecPos.x, vecPos.y, vecPos.z, vecRot.x, vecRot.y, vecRot.z, pGameVehicle->health, pGameVehicle->engine_health, pGameVehicle->fuel, pGameVehicle->sound_enabled ? L"Yes" : L"No", pGameVehicle->engine_on ? L"Yes" : L"No", pGameVehicle->horn ? L"Yes" : L"No", pGameVehicle->siren ? L"Yes" : L"No", pGameVehicle->gear, pGameVehicle->engine_rpm, pGameVehicle->accelerating, pGameVehicle->break_val, pGameVehicle->hand_break, pGameVehicle->speed_limit, pGameVehicle->clutch, pGameVehicle->wheel_angle);
