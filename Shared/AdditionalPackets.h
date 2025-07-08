@@ -68,7 +68,6 @@ enum eElementCreatedBy : uint8_t
 
 struct tEntityCreatePacket
 {
-	GChar model[64];
 	CVector3D position;
 	CVector3D positionRel;
 	CVector3D rotation;
@@ -174,8 +173,6 @@ struct tVehicleCreatePacket
 	float wheelAngle;
 	CVector3D speed;
 	CVector3D rotSpeed;
-	bool collisionsEnabled;
-	float alpha;
 };
 
 struct tVehicleSyncPacket
