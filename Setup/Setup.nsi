@@ -11,7 +11,7 @@ ManifestSupportedOS all
 
 !define PRODUCT_NAME "Mafia Connected"
 !define PRODUCT_NAME_SHORT "MafiaC"
-!define PRODUCT_VERSION "2.1.0"
+!define PRODUCT_VERSION "2.1.1"
 !define PRODUCT_VERSION_BUILD "0"
 !define PRODUCT_VERSION_FULL "${PRODUCT_VERSION}.${PRODUCT_VERSION_BUILD}"
 !define PRODUCT_ICON "..\Projects\Launcher\MafiaC.ico"
