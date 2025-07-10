@@ -1797,8 +1797,8 @@ void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iDoor);
-			Packet.Write<int32_t>(iAction);
-			Packet.Write<int32_t>(iHopSeatsBool);
+			Packet.Write<uint32_t>(iAction);
+			Packet.Write<uint32_t>(iHopSeatsBool);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -1829,8 +1829,8 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iSeat);
-			Packet.Write<int32_t>(iAction);
-			Packet.Write<int32_t>(iUnknown);
+			Packet.Write<uint32_t>(iAction);
+			Packet.Write<uint32_t>(iUnknown);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -1863,8 +1863,8 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iUnknown1);
-			Packet.Write<int32_t>(iAction);
-			Packet.Write<int32_t>(iUnknown2);
+			Packet.Write<uint32_t>(iAction);
+			Packet.Write<uint32_t>(iUnknown2);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -1895,8 +1895,8 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iSeat);
-			Packet.Write<int32_t>(iAction);
-			Packet.Write<int32_t>(iUnknown);
+			Packet.Write<uint32_t>(iAction);
+			Packet.Write<uint32_t>(iUnknown);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -2002,25 +2002,25 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 	Args.AddNumber(iUnk3);
 	m_pOnHumanUsingActorEventType->Trigger(Args);
 
-	//auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
-	//if (pMultiplayer != nullptr)
-	//{
-	//	if (pClientHuman->IsSyncer()) {
-	//		Packet Packet(MAFIAPACKET_HUMAN_USINGACTOR);
-	//		Packet.Write<int32_t>(pClientHuman->GetId());
-	//		Packet.Write<GString>((GChar*)pActor->GetFrame()->GetInterface()->name);
-	//		Packet.Write<int32_t>(iUnk1);
-	//		Packet.Write<int32_t>(iUnk2);
-	//		Packet.Write<int32_t>(iUnk3);
-	//		m_pMultiplayer->SendHostPacket(&Packet);
-	//	}
-	//	else
-	//	{
-	//		g_pClientGame->m_bUseActorInvokedByGame = false;
-	//		pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnk1, iUnk2, iUnk3);
-	//		g_pClientGame->m_bUseActorInvokedByGame = true;
-	//	}
-	//}
+	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	if (pMultiplayer != nullptr)
+	{
+		if (pClientHuman->IsSyncer()) {
+			Packet Packet(MAFIAPACKET_HUMAN_USINGACTOR);
+			Packet.Write<int32_t>(pClientHuman->GetId());
+			Packet.Write<GString>((GChar*)pActor->GetFrame()->GetInterface()->name);
+			Packet.Write<uint32_t>(iUnk1);
+			Packet.Write<uint32_t>(iUnk2);
+			Packet.Write<uint32_t>(iUnk3);
+			m_pMultiplayer->SendHostPacket(&Packet);
+		}
+		else
+		{
+			g_pClientGame->m_bUseActorInvokedByGame = false;
+			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnk1, iUnk2, iUnk3);
+			g_pClientGame->m_bUseActorInvokedByGame = true;
+		}
+	}
 }
 
 void CClientGame::DestroyUninitializedGameElements()
