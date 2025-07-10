@@ -171,22 +171,16 @@ RAWCODECALL HumanUseActor()
 			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)g_pHumanUseActor_Actor);
 			if (pClientVehicle != nullptr)
 			{
-				bool bAllow = true;
+				// To abort, use this:
+				// g_bCancelHumanUseActor = true;
 
-				if (bAllow)
+				if (g_pHumanUseActor_Unk1 == 2)
 				{
-					if (g_pHumanUseActor_Unk1 == 2)
-					{
-						g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
-					}
-					else
-					{
-						g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
-					}
+					g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
 				}
 				else
 				{
-					g_bCancelHumanUseActor = true;
+					g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
 				}
 			}
 			else 
