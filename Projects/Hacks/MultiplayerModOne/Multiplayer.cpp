@@ -869,35 +869,35 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		}
 		break;
 
-		case MAFIAPACKET_HUMAN_USINGACTOR:
-		{
-			int32_t nHumanNetworkIndex;
-			uint32_t nUnk1;
-			uint32_t nUnk2;
-			uint32_t nUnk3;
-
-			size_t size = 0;
-
-			Reader.ReadInt32(&nHumanNetworkIndex, 1);
-			GChar* szName = Reader.ReadString(&size);
-			Reader.ReadUInt32(&nUnk1, 1);
-			Reader.ReadUInt32(&nUnk2, 1);
-			Reader.ReadUInt32(&nUnk3, 1);
-
-			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
-			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
-				if (pClientHuman != nullptr)
-				{
-					if (!pClientHuman->IsSyncer())
-					{
-						UTF8String actorName(true, szName);
-						g_pClientGame->HumanUsingActor(pClientHuman, MafiaSDK::GetMission()->FindActorByName(actorName), nUnk1, nUnk2, nUnk3);
-					}
-				}
-			}
-		}
-		break;
+		//case MAFIAPACKET_HUMAN_USINGACTOR:
+		//{
+		//	int32_t nHumanNetworkIndex;
+		//	uint32_t nUnk1;
+		//	uint32_t nUnk2;
+		//	uint32_t nUnk3;
+		//
+		//	size_t size = 0;
+		//
+		//	Reader.ReadInt32(&nHumanNetworkIndex, 1);
+		//	GChar* szName = Reader.ReadString(&size);
+		//	Reader.ReadUInt32(&nUnk1, 1);
+		//	Reader.ReadUInt32(&nUnk2, 1);
+		//	Reader.ReadUInt32(&nUnk3, 1);
+		//
+		//	if (nHumanNetworkIndex != INVALID_NETWORK_ID)
+		//	{
+		//		CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+		//		if (pClientHuman != nullptr)
+		//		{
+		//			if (!pClientHuman->IsSyncer())
+		//			{
+		//				UTF8String actorName(true, szName);
+		//				g_pClientGame->HumanUsingActor(pClientHuman, MafiaSDK::GetMission()->FindActorByName(actorName), nUnk1, nUnk2, nUnk3);
+		//			}
+		//		}
+		//	}
+		//}
+		//break;
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
