@@ -287,9 +287,9 @@ public:
 
 	void LockControls(bool state);
 
-	void HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
+	bool HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
 	void HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown);
-	void HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iUnknown);
+	bool HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iUnknown);
 	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat);
 	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);

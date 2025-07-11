@@ -600,10 +600,17 @@ void CClientHuman::Process()
 		m_pBlender->Interpolate();
 	}
 
-	if (GetGameHuman()->GetInterface()->isInAnimWithCar)
-		GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
+	//if (!IsSyncer() && GetGameHuman()->GetInterface()->isInAnimWithCar && GetGameHuman()->GetInterface()->carLeavingOrEntering == nullptr) {
+	//	GetGameHuman()->GetInterface()->isInAnimWithCar = 0;
+	//}
 
-	GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
+	//*(BYTE*)((DWORD)GetGameHuman() + 0x4A4) = 50;
+	//*(BYTE*)((DWORD)GetGameHuman() + 0x4A8) = 50;
+	//*(float*)((DWORD)GetGameHuman() + 0x5F4) = GetGameHuman()->;
+
+	if (!IsSyncer()) {
+		GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
+	}
 
 	//auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	//if (pMultiplayer != nullptr)

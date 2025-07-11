@@ -1774,20 +1774,24 @@ void CClientGame::LockControls(bool state)
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
-void CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
+bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
-	int8_t iSeat = (iHopSeatsBool == 1 && iDoor > 0) ? iDoor - 1 : iDoor;
+	int8_t iSeat = (iHopSeatsBool == 1 && iDoor == 1) ? 0 : iDoor;
 
-	if (iSeat == -1) {
-		iSeat = 0;
-	}
-
-	//_glogprintf(_gstr("Human entering vehicle"));
+	//_glogprintf(_gstr("Ped %d entering vehicle %d in seat %d using door %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor);
+	
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
 	Args.AddNumber(iSeat);
-	m_pOnHumanEnteringVehicleEventType->Trigger(Args);
+
+	bool bPreventDefault = false;
+	m_pOnHumanEnteringVehicleEventType->Trigger(Args, bPreventDefault);
+	if (bPreventDefault)
+	{
+		//_glogprintf(_gstr("Prevented human entering vehicle"));
+		return false;
+	}
 	
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
@@ -1844,7 +1848,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
 }
 
-void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
+bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
@@ -1853,7 +1857,15 @@ void CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
 	Args.AddNumber(iSeat);
-	m_pOnHumanExitingVehicleEventType->Trigger(Args);
+
+
+	bool bPreventDefault = false;
+	m_pOnHumanExitingVehicleEventType->Trigger(Args, bPreventDefault);
+	if (bPreventDefault)
+	{
+		_glogprintf(_gstr("Prevented human exiting vehicle"));
+		return false;
+	}
 
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
@@ -2002,6 +2014,7 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 	Args.AddNumber(iUnk3);
 	m_pOnHumanUsingActorEventType->Trigger(Args);
 
+	/*
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
@@ -2021,6 +2034,7 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 			g_pClientGame->m_bUseActorInvokedByGame = true;
 		}
 	}
+	*/
 }
 
 void CClientGame::DestroyUninitializedGameElements()

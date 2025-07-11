@@ -176,16 +176,20 @@ RAWCODECALL HumanUseActor()
 
 				if (g_pHumanUseActor_Unk1 == 2)
 				{
-					g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
+					if (!g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3)) {
+						g_bCancelHumanUseActor = true;
+					}
 				}
 				else
 				{
-					g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3);
+					if (!g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3)) {
+						g_bCancelHumanUseActor = true;
+					}
 				}
 			}
 			else 
 			{
-				g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
+				//g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
 			}
 		}
 	}

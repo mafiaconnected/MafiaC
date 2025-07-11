@@ -869,6 +869,7 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		}
 		break;
 
+		/*
 		case MAFIAPACKET_HUMAN_USINGACTOR:
 		{
 			int32_t nHumanNetworkIndex;
@@ -898,6 +899,7 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 			}
 		}
 		break;
+		*/
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
