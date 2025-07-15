@@ -338,12 +338,14 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	_glogverboseprintf(L"Got sync packet for element #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f (%f, %f, %f)]\n\tRot. difference: [%f, %f, %f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, GetGameHuman()->GetInterface()->entity.rotation.x, GetGameHuman()->GetInterface()->entity.rotation.y, GetGameHuman()->GetInterface()->entity.rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, GetGameHuman()->GetInterface()->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, GetGameHuman()->GetInterface()->isDucking ? L"Yes" : L"No", GetGameHuman()->GetInterface()->isAiming ? L"Yes" : L"No", GetGameHuman()->GetInterface()->animState);
 
-	if (!IsSyncer() && !IsInVehicle())
+	if (!IsSyncer())
 	{
 		auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
 
-		pBlender->SetTargetPosition(vecPos);
-		pBlender->SetTargetRotation(vecRot);
+		if (!IsInVehicle()) {
+			pBlender->SetTargetPosition(vecPos);
+			pBlender->SetTargetRotation(vecRot);
+		}
 	}
 
 	return true;
@@ -477,12 +479,19 @@ void CClientHuman::OnCreated()
 
 void CClientHuman::Process()
 {
-	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr && !IsInVehicle())
+	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
-		m_pBlender->Interpolate();
+		if (IsInVehicle()) {
+			m_pBlender->Interpolate();
+		}
+		else 
+		{
+			// Interpolate aiming in vehicle
+		}
 	}
 
-	if (!IsSyncer()) {
+	if (!IsSyncer()) 
+	{
 		SetActiveWeapon(m_WeaponID);
 
 		if (GetEnteringExitingVehicle() == nullptr)
@@ -497,9 +506,6 @@ void CClientHuman::Process()
 				GetGameHuman()->GetInterface()->animStateLocal = m_AnimStateLocal;
 				GetGameHuman()->GetInterface()->animState = m_AnimState;
 				GetGameHuman()->GetInterface()->isInAnimWithCar = true;
-				*(BYTE*)((DWORD)GetGameHuman()->GetInterface() + 0x4A4) = 50;
-				*(BYTE*)((DWORD)GetGameHuman()->GetInterface() + 0x4A8) = 50;
-				GetGameHuman()->GetInterface()->inCarRotation = m_InCarRotation;
 			}
 
 			int32_t iAnimTimeLeft = GetGameHuman()->GetInterface()->animTimeLeft;
@@ -518,7 +524,8 @@ void CClientHuman::Process()
 		}
 
 		auto IHuman = GetGameHuman()->GetInterface();
-		if (!IsInVehicle()) {
+		if (!IsInVehicle()) 
+		{
 			if (m_vecCamera.GetLength() != 0.0f)
 			{
 				uint32_t uiCamera = (uint32_t)&m_vecCamera;
@@ -935,4 +942,17 @@ void CClientHuman::AttemptCorrectVehicle()
 			RemoveFromVehicle();
 		}
 	}
+}
+
+float CClientHuman::GetVehicleAim()
+{
+	return GetGameHuman()->GetInterface()->inCarRotation;
+}
+
+bool CClientHuman::SetVehicleAim(float aim)
+{
+	*(BYTE*)((DWORD)GetGameHuman()->GetInterface() + 0x4A4) = 50;
+	*(BYTE*)((DWORD)GetGameHuman()->GetInterface() + 0x4A8) = 50;
+	GetGameHuman()->GetInterface()->inCarRotation = aim;
+	return true;
 }
