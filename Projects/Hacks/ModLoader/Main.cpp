@@ -20,11 +20,11 @@ static void ForceDTARead(bool state)
 
 static DWORD _stdcall HookDtaOpen(const char* file, DWORD params)
 {
-	_glogprintf(_gstr("Read file: %s"), CString(false, file).CString());
+	_glogverboseprintf(_gstr("Read file: %s"), CString(false, file).CString());
 
 	if (g_umapFileNames.find(file) != g_umapFileNames.end()) {
 		// Custom file is available, use it
-		_glogwarnprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
+        _glogverboseprintf(_gstr("Using custom file for: %s (%s)"), CString(false, file).CString(), CString(false, g_umapFileNames[file].c_str()).CString());
 		return dtaOpen(g_umapFileNames[file].c_str(), params);
 	} else {
 		// Custom file is not available, use the original file
