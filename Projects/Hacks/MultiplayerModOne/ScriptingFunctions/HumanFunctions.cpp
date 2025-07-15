@@ -685,7 +685,7 @@ static bool FunctionHumanPlayAnimation(IScriptState* pState, int argc, void* pUs
 		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->PlayAnim(animName);
-	return false;
+	return true;
 }
 
 static bool FunctionHumanStopAnimation(IScriptState* pState, int argc, void* pUser)
@@ -705,7 +705,7 @@ static bool FunctionHumanStopAnimation(IScriptState* pState, int argc, void* pUs
 		return pState->Error(_gstr("human not spawned"));
 
 	pClientHuman->StopAnim();
-	return false;
+	return true;
 }
 
 static bool FunctionHumanGetCrouching(IScriptState* pState, int argc, void* pUser)
@@ -721,7 +721,6 @@ static bool FunctionHumanGetCrouching(IScriptState* pState, int argc, void* pUse
 		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnBoolean(pClientHuman->GetGameHuman()->GetInterface()->isDucking);
-	return false;
 }
 
 static bool FunctionHumanGetReloading(IScriptState* pState, int argc, void* pUser)
@@ -737,7 +736,6 @@ static bool FunctionHumanGetReloading(IScriptState* pState, int argc, void* pUse
 		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnBoolean(pClientHuman->GetGameHuman()->GetInterface()->isReloading);
-	return false;
 }
 
 static bool FunctionHumanGetAiming(IScriptState* pState, int argc, void* pUser)
@@ -769,7 +767,6 @@ static bool FunctionHumanGetPose(IScriptState* pState, int argc, void* pUser)
 		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(pClientHuman->GetGameHuman()->GetInterface()->pose));
-	return false;
 }
 
 static bool FunctionHumanGetEnteringExitingVehicle(IScriptState* pState, int argc, void* pUser)
@@ -792,7 +789,6 @@ static bool FunctionHumanGetEnteringExitingVehicle(IScriptState* pState, int arg
 		return pState->Error(_gstr("vehicle not spawned"));
 
 	pState->ReturnObject(pClientVehicle);
-	return true;
 }
 
 static bool FunctionHumanGetNeckPosition(IScriptState* pState, int argc, void* pUser)
@@ -808,7 +804,6 @@ static bool FunctionHumanGetNeckPosition(IScriptState* pState, int argc, void* p
 		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(pClientHuman->GetGameHuman()->GetInterface()->neckFrame->GetInterface()->position));
-	return true;
 }
 
 static bool FunctionHumanGetNeckRotation(IScriptState* pState, int argc, void* pUser)
@@ -824,7 +819,6 @@ static bool FunctionHumanGetNeckRotation(IScriptState* pState, int argc, void* p
 		return pState->Error(_gstr("human not spawned"));
 
 	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(pClientHuman->GetGameHuman()->GetInterface()->neckFrame->GetInterface()->rotation));
-	return true;
 }
 
 static bool FunctionHumanSetInCarRotation(IScriptState* pState, int argc, void* pUser)
