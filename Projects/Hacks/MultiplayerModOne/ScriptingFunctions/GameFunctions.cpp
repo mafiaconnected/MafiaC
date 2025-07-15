@@ -767,7 +767,7 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);
 
-	//_glogverboseprintf(_gstr("Adding custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
+	_glogverboseprintf(_gstr("Adding custom file for: %s (%s)"), szGameFilePath, szFullFilePath);
 
 	UTF8String filePath(false, szFullFilePath.c_str());
 	UTF8String gameFilePath(false, szGameFilePath);
@@ -955,7 +955,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("pauseSound"), _gstr("i"), FunctionGamePauseSound, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("destroySound"), _gstr("i"), FunctionGameDestroySound, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setProgramScript"), _gstr("s"), FunctionGameSetProgramScript, pClientManager);
+		//pGameNamespace->RegisterFunction(_gstr("setProgramScript"), _gstr("s"), FunctionGameSetProgramScript, pClientManager);
 	}
 
 	// Offline Only
