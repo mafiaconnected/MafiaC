@@ -418,6 +418,10 @@ static bool FunctionGameSetDoorState(IScriptState* pState, int argc, void* pUser
 		return false;
 
 	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Door not found: %s"), name);
+	}
+
 	actor->SetState((MafiaSDK::C_Door_Enum::States)iState1, MafiaSDK::GetMission()->GetGame()->GetLocalPlayer(), bState2, bState3);
 	return true;
 }
@@ -431,6 +435,10 @@ static bool FunctionGameGetDoorState(IScriptState* pState, int argc, void* pUser
 	UTF8String name2(true, name);
 
 	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Door not found: %s"), name);
+	}
+
 	pState->ReturnNumber(actor->GetInterface()->current_state);
 	return true;
 }
@@ -444,6 +452,10 @@ static bool FunctionGameGetDoorOpenAngle(IScriptState* pState, int argc, void* p
 	UTF8String name2(true, name);
 
 	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Door not found: %s"), name);
+	}
+
 	pState->ReturnNumber(actor->GetInterface()->open_angle);
 	return true;
 }
@@ -457,6 +469,10 @@ static bool FunctionGameGetDoorOpenDirection(IScriptState* pState, int argc, voi
 	UTF8String name2(true, name);
 
 	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Door not found: %s"), name);
+	}
+
 	pState->ReturnNumber(actor->GetInterface()->open_direction);
 	return true;
 }
@@ -474,7 +490,87 @@ static bool FunctionGameSetDoorOpenAngle(IScriptState* pState, int argc, void* p
 		return false;
 
 	MafiaSDK::C_Door* actor = (MafiaSDK::C_Door*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Door not found: %s"), name);
+	}
+
 	actor->SetOpenAngle(fAngle);
+	return true;
+}
+
+static bool FunctionGameGetActorPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(actor->GetFrame()->GetInterface()->position));
+	return true;
+}
+
+static bool FunctionGameSetActorPosition(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	CVector3D vecPosition;
+	if (!pState->CheckVector3D(1, vecPosition))
+		return false;
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	actor->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(vecPosition);
+	return true;
+}
+
+static bool FunctionGameGetActorRotation(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	pState->ReturnVector3D(CVecTools::ConvertFromMafiaVec(actor->GetFrame()->GetInterface()->rotation));
+	return true;
+}
+
+static bool FunctionGameSetActorRotation(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	CVector3D vecRotation;
+	if (!pState->CheckVector3D(1, vecRotation))
+		return false;
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	actor->GetInterface()->entity.rotation = CVecTools::ConvertToMafiaVec(vecRotation);
 	return true;
 }
 
@@ -490,7 +586,12 @@ static bool FunctionGameSetActorState(IScriptState* pState, int argc, void* pUse
 	if (!pState->CheckBoolean(1, bActive))
 		return false;
 
-	MafiaSDK::GetMission()->FindActorByName(name2)->SetActive(bActive);
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	actor->SetActive(bActive);
 	return true;
 }
 
@@ -506,7 +607,12 @@ static bool FunctionGameSetActorActState(IScriptState* pState, int argc, void* p
 	if (!pState->CheckNumber(1, iState))
 		return false;
 
-	MafiaSDK::GetMission()->FindActorByName(name2)->SetActState(iState);
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
+	actor->SetActState(iState);
 	return true;
 }
 
@@ -519,7 +625,27 @@ static bool FunctionGameUnloadActor(IScriptState* pState, int argc, void* pUser)
 	UTF8String name2(true, name);
 
 	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Actor not found: %s"), name);
+	}
+
 	MafiaSDK::GetMission()->UnloadActor(actor);
+	return true;
+}
+
+static bool FunctionGameIsActorSpawned(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -681,6 +807,19 @@ static bool FunctionGameGetMainVolume(IScriptState* pState, int argc, void* pUse
 	return true;
 }
 
+static bool FunctionGameSetProgramScript(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* script = pState->CheckString(0);
+	if (!script) return false;
+	UTF8String script2(true, script);
+
+	MafiaSDK::C_Program* program;
+	program->SetSourceCode(script2);
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -695,6 +834,7 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("ELEMENT_VEHICLE"), ELEMENT_VEHICLE);
 	pDefineHandlers->Define(_gstr("ELEMENT_DUMMY"), ELEMENT_DUMMY);
 	pDefineHandlers->Define(_gstr("ELEMENT_OBJECT"), ELEMENT_OBJECT);
+	pDefineHandlers->Define(_gstr("ELEMENT_BRIDGE"), ELEMENT_BRIDGE);
 
 	pDefineHandlers->Define(_gstr("GAME_UNKNOWN"), GAME_UNKNOWN);
 	pDefineHandlers->Define(_gstr("GAME_MAFIA_ONE"), GAME_MAFIA_ONE);
@@ -753,6 +893,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->AddProperty(pClientGame, _gstr("aspectRatio"), ARGUMENT_FLOAT, FunctionGetAspectRatio);
 	}
 
+	// Creating elements
 	{
 		pClientManager->m_pClientHumanClass->RegisterConstructor(_gstr("tsvf"), FunctionGameCreatePed, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("createPed"), _gstr("svf"), FunctionGameCreatePed, pClientManager);
@@ -767,16 +908,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("createObject"), _gstr("v"), FunctionGameCreateObject, pClientManager);
 	}
 
-	{
-		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("createSound"), _gstr("s"), FunctionGameCreateSound, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("playSound"), _gstr("i"), FunctionGamePlaySound, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("pauseSound"), _gstr("i"), FunctionGamePauseSound, pClientManager);
-		pGameNamespace->RegisterFunction(_gstr("destroySound"), _gstr("i"), FunctionGameDestroySound, pClientManager);
-	}
-
+	// HUD
 	{
 		auto pHUDNamespace = pGameNamespace->AddNamespace(_gstr("hud"));
 		pHUDNamespace->RegisterFunction(_gstr("message"), _gstr("si"), FunctionGameMessage, pClientManager);
@@ -792,6 +924,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pHUDNamespace->RegisterFunction(_gstr("setPlayerVehicleOnRadar"), _gstr(""), FunctionGameSetPlayerVehicleOnRadar, pClientManager);
 	}
 
+	// Doors
 	{
 		pGameNamespace->RegisterFunction(_gstr("getDoorState"), _gstr("s"), FunctionGameGetDoorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("getDoorOpenAngle"), _gstr("s"), FunctionGameGetDoorOpenAngle, pClientManager);
@@ -799,16 +932,35 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
 	}
 
+	// Actors (generic)
 	{
+		pGameNamespace->RegisterFunction(_gstr("getActorPosition"), _gstr("s"), FunctionGameGetActorPosition, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorPosition"), _gstr("s"), FunctionGameSetActorPosition, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("getActorRotation"), _gstr("s"), FunctionGameGetActorPosition, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setActorRotation"), _gstr("s"), FunctionGameSetActorPosition, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorState"), _gstr("sb"), FunctionGameSetActorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorActState"), _gstr("si"), FunctionGameSetActorActState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setActorAI"), _gstr("siiii"), FunctionGameSetActorAI, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("unloadActor"), _gstr("s"), FunctionGameUnloadActor, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("isActorSpawned"), _gstr("s"), FunctionGameIsActorSpawned, pClientManager);
 	}
 
+	// Misc
+	{
+		pGameNamespace->RegisterFunction(_gstr("createExplosion"), _gstr("vff"), FunctionGameCreateExplosion, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("fadeCamera"), _gstr("bf|i"), FunctionGameFadeScreen, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setPlayerControl"), _gstr("b"), FunctionSetPlayerControl, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("createSound"), _gstr("s"), FunctionGameCreateSound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("playSound"), _gstr("i"), FunctionGamePlaySound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("pauseSound"), _gstr("i"), FunctionGamePauseSound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("destroySound"), _gstr("i"), FunctionGameDestroySound, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setProgramScript"), _gstr("s"), FunctionGameSetProgramScript, pClientManager);
+	}
+
+	// Offline Only
 	if (pClientGame->GetMultiplayer() == nullptr)
 	{
-		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("changeMap"), _gstr("s|b"), FunctionGameChangeMap, pClientManager);
 
 		pClientManager->m_pClientPlayerClass->RegisterConstructor(_gstr("tvfs"), FunctionGameCreatePlayer, pClientManager);
@@ -821,6 +973,4 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("addCustomGameFile"), _gstr("ss"), FunctionGameAddCustomGameFile, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("removeCustomGameFile"), _gstr("s"), FunctionGameRemoveCustomGameFile, pClientManager);
 	}
-
-	//g_pClientGame->m_pAudioScriptingFunctions->m_pSoundClass->RegisterFunction(_gstr("setWorldPosition"), _gstr("v"), FunctionAudioSetWorldPosition, pClientManager);
 }
