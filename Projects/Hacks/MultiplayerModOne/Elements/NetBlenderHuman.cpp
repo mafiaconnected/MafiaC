@@ -97,3 +97,46 @@ void CNetBlenderHuman::UpdateTargetRotation()
 		SetRotation(vecNewRotation);
 	}
 }
+
+
+bool CNetBlenderHuman::IsInVehicle()
+{
+	return m_pEntity->IsInVehicle();
+}
+
+float CNetBlenderHuman::GetVehicleAim()
+{
+	return m_pEntity->GetVehicleAim();
+}
+
+void CNetBlenderHuman::SetVehicleAim(float aim)
+{
+	m_pEntity->SetVehicleAim(aim);
+}
+
+void CNetBlenderHuman::UpdateTargetVehicleAim()
+{
+	if (m_VehicleAim.HasTarget())
+	{
+		float fCurrentVehicleAim;
+		fCurrentVehicleAim = GetVehicleAim();
+
+		float fNewVehicleAim = fCurrentVehicleAim;
+		//m_VehicleAim.Update(vecNewVehicleAimPosition, m_fVehicleAimRotationMaxError);
+
+		SetVehicleAim(fNewVehicleAim);
+	}
+}
+
+void CNetBlenderHuman::ResetInterpolation()
+{
+	CNetBlenderLerp::ResetInterpolation();
+
+	m_VehicleAim.RemoveTarget();
+}
+
+void CNetBlenderHuman::Interpolate()
+{
+	CNetBlenderLerp::Interpolate();
+	UpdateTargetVehicleAim();
+}
