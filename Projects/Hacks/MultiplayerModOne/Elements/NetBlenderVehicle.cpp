@@ -23,23 +23,15 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
 }
 
-
-
-
 CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) : m_pEntity(pEntity)
 {
 }
-
-
 
 void CNetBlenderVehicle::UpdateTargetRotation()
 {
 	UpdateTargetRotationMat();
 	UpdateTargetRotationQuat();
 }
-
-
-
 
 void CNetBlenderVehicle::SetTargetRotationMat(CVector3D& frontNew, CVector3D& upNew, CVector3D& rightNew)
 {
@@ -86,9 +78,6 @@ void CNetBlenderVehicle::UpdateTargetRotationMat()
 	SetRotationMat(vecNewRotationFront, vecNewRotationUp, vecNewRotationRight);
 }
 
-
-
-
 void CNetBlenderVehicle::SetTargetRotationQuat(CQuaternion& quatNewRotation)
 {
 	UpdateTargetRotationQuat();
@@ -117,10 +106,6 @@ void CNetBlenderVehicle::UpdateTargetRotationQuat()
 
 	SetRotationQuat(quatNewRotation);
 }
-
-
-
-
 
 void CNetBlenderVehicle::GetPosition(CVector3D& vecPos)
 {
@@ -252,13 +237,13 @@ void CNetBlenderVehicle::UpdateTargetEngineRPM()
 	}
 }
 
-void CNetBlenderVehicle:: ResetInterpolation()
+void CNetBlenderVehicle::ResetInterpolation()
 {
 	CNetBlenderLerp::ResetInterpolation();
 
 	if (m_RotationFront.HasTarget() && m_RotationUp.HasTarget() && m_RotationRight.HasTarget())
 		SetRotationMat(m_RotationFront.m_vecTarget, m_RotationUp.m_vecTarget, m_RotationRight.m_vecTarget);
-	
+
 	m_RotationFront.RemoveTarget();
 	m_RotationUp.RemoveTarget();
 	m_RotationRight.RemoveTarget();
