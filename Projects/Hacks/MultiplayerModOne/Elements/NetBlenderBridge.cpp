@@ -23,7 +23,7 @@ static CVector3D GetDifferenceBetweenAngles2(const CVector3D& a, const CVector3D
 	return CVector3D(GetDifferenceBetweenAngles2(a.x, b.x), GetDifferenceBetweenAngles2(a.y, b.y), GetDifferenceBetweenAngles2(a.z, b.z));
 }
 
-CNetBlenderBridge::CNetBlenderBridge(CClientHuman* pEntity) : m_pEntity(pEntity)
+CNetBlenderBridge::CNetBlenderBridge(CClientBridge* pEntity) : m_pEntity(pEntity)
 {
 }
 
@@ -64,26 +64,6 @@ void CNetBlenderBridge::SetRotation(const CVector3D& vecRotation)
 	m_pEntity->m_pBlender = pBlender;
 }
 
-void CNetBlenderBridge::GetMoveSpeed(CVector3D& vecMoveSpeed)
-{
-	m_pEntity->GetVelocity(vecMoveSpeed);
-}
-
-void CNetBlenderBridge::SetMoveSpeed(const CVector3D& vecMoveSpeed)
-{
-	m_pEntity->SetVelocity(vecMoveSpeed);
-}
-
-void CNetBlenderBridge::GetTurnSpeed(CVector3D& vecTurnSpeed)
-{
-	m_pEntity->GetRotationVelocity(vecTurnSpeed);
-}
-
-void CNetBlenderBridge::SetTurnSpeed(const CVector3D& vecTurnSpeed)
-{
-	m_pEntity->SetRotationVelocity(vecTurnSpeed);
-}
-
 void CNetBlenderBridge::UpdateTargetRotation()
 {
 	if (m_Rotation.HasTarget())
@@ -96,4 +76,25 @@ void CNetBlenderBridge::UpdateTargetRotation()
 
 		SetRotation(vecNewRotation);
 	}
+}
+
+
+void CNetBlenderBridge::GetMoveSpeed(CVector3D& vecMoveSpeed)
+{
+	
+}
+
+void CNetBlenderBridge::SetMoveSpeed(const CVector3D& vecMoveSpeed)
+{
+	
+}
+
+void CNetBlenderBridge::GetTurnSpeed(CVector3D& vecTurnSpeed)
+{
+	
+}
+
+void CNetBlenderBridge::SetTurnSpeed(const CVector3D& vecTurnSpeed)
+{
+	
 }
