@@ -36,13 +36,25 @@ public:
 	bool m_bExitedVehicleEvent = false;
 	bool m_bExitingVehicleEvent = false;
 
+	float m_Health;
+	int16_t m_WeaponID;
+
 	CVector3D m_vecCamera;
 	CVector3D m_AimVector;
 
 	float m_InCarRotation;
+	float m_CarAim;
+
+	uint32_t m_AnimStateLocal;
+	uint32_t m_AnimState;
+	uint32_t m_AnimStopTime;
+
+	bool m_IsCrouching = false;
+	bool m_IsShooting = false;
+	bool m_IsAiming = false;
 
 	CClientVehicle* m_pVehicleEvent = nullptr;
-	
+
 	Galactic3D::Weak<CClientVehicle> m_pCurrentVehicle;
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
@@ -134,4 +146,6 @@ public:
 	virtual void CreateNetBlender() override;
 
 	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
+
+	void AttemptCorrectVehicle();
 };
