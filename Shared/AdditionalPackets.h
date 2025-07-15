@@ -201,4 +201,26 @@ struct tVehicleSyncPacket
 	CVector3D rotSpeed;
 };
 
+struct tBridgeCreatePacket
+{
+	bool enabled;
+};
+
+struct tBridgeSyncPacket
+{
+	bool enabled;
+};
+
+struct tTrolleyCreatePacket
+{
+
+};
+
+struct tTrolleySyncPacket
+{
+
+};
+
+
+
 #pragma pack(pop)
