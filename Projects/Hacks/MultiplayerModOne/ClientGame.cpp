@@ -1778,7 +1778,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 {
 	int8_t iSeat = (iHopSeatsBool == 1 && iDoor == 1) ? 0 : iDoor;
 
-	//_glogprintf(_gstr("Ped %d entering vehicle %d in seat %d using door %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor);
+	_glogverboseprintf(_gstr("Ped %d entering vehicle %d in seat %d using door %d. Hopped seats: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool);
 	
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1818,7 +1818,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	//_glogprintf(_gstr("Human entered vehicle"));
+	_glogverboseprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1852,18 +1852,17 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
-	//_glogprintf(_gstr("Human exiting vehicle"));
+	_glogverboseprintf(_gstr("Human exiting vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
 	Args.AddNumber(iSeat);
 
-
 	bool bPreventDefault = false;
 	m_pOnHumanExitingVehicleEventType->Trigger(Args, bPreventDefault);
 	if (bPreventDefault)
 	{
-		_glogprintf(_gstr("Prevented human exiting vehicle"));
+		_glogverboseprintf(_gstr("Prevented human exiting vehicle"));
 		return false;
 	}
 
@@ -1892,7 +1891,7 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	//_glogprintf(_gstr("Human exited vehicle"));
+	_glogverboseprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1981,7 +1980,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		fNewHealth = 0.0f;
 	}
 
-	//_glogprintf(_gstr("Old Health: %f\nNew Health: %f\nDamage: %f"), fOldHealth, fNewHealth, fDamage);
+	_glogverboseprintf(_gstr("[OnPedHit] Ped: %d, Old Health: %f, New Health: %f, Damage: %f"), pClientHumanTarget->GetId(), fOldHealth, fNewHealth, fDamage);
 
 	pClientHumanTarget->SetHealth(fNewHealth);
 
@@ -2005,7 +2004,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 
 void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnk1, uint32_t iUnk2, uint32_t iUnk3)
 {
-	//_glogprintf(_gstr("Human using actor"));
+	_glogverboseprintf(_gstr("Human %d using actor %s"), pClientHuman->GetId(), (GChar*)pActor->GetFrame()->GetInterface()->name);
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddString((GChar*)pActor->GetFrame()->GetInterface()->name);
