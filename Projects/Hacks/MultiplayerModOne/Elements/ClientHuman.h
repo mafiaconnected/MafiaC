@@ -148,4 +148,7 @@ public:
 	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 
 	void AttemptCorrectVehicle();
+
+	float GetVehicleAim();
+	bool SetVehicleAim(float aim);
 };
