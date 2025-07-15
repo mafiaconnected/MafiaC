@@ -179,7 +179,7 @@ void CClientEntity::OnCreated()
 
 void CClientEntity::Process()
 {
-	if (m_pEntity == nullptr)
+	if (m_pEntity == nullptr && m_Type != ELEMENT_DUMMY)
 		return;
 
 	{
