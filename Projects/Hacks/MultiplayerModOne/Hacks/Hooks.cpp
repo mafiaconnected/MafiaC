@@ -665,21 +665,23 @@ static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1
 {
 	auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
 
-	/*
-	auto entityAttacker = nullptr;
-
-	if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Enemy || attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Player) {
-		entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
-	}
-	else if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Car) 
+	if (humanTarget != nullptr)
 	{
-		entityAttacker = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)attacker);
-		g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+		if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Human || attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Player) {
+			CClientHuman* entityAttacker = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)attacker);
+			g_pClientGame->HumanHit(humanTarget, entityAttacker, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+		}
+		else if (attacker->GetInterface()->entity.objectType == MafiaSDK::C_Mission_Enum::ObjectTypes::Car)
+		{
+			CClientVehicle* entityAttacker = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)attacker);
+			g_pClientGame->HumanHit(humanTarget, entityAttacker, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+		}
+		else
+		{
+			g_pClientGame->HumanHit(humanTarget, nullptr, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
+		}
 	}
-	*/
-		
-	g_pClientGame->HumanHit(humanTarget, CVecTools::ConvertFromMafiaVec(v1), CVecTools::ConvertFromMafiaVec(v2), CVecTools::ConvertFromMafiaVec(v3), hitType, damage, bodyPart);
-
+	
 	return 1;
 }
 
@@ -695,7 +697,7 @@ static void OnHumanWeaponChange(MafiaSDK::C_Human* target, int8_t weapon)
 
 static void OnHumanWeaponDrop(MafiaSDK::C_Human* target)
 {
-	_glogprintf(_gstr("Human dropped the weapon"));
+	_glogverboseprintf(_gstr("Human dropped the weapon"));
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
@@ -706,7 +708,7 @@ static void OnHumanWeaponDrop(MafiaSDK::C_Human* target)
 
 static void OnHumanShoot(const S_vector& pos)
 {
-	_glogprintf(_gstr("Player shooting to: {%f, %f, %f}"), pos.x, pos.y, pos.z);
+	_glogverboseprintf(_gstr("Player shooting to: {%f, %f, %f}"), pos.x, pos.y, pos.z);
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{

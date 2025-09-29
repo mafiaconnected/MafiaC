@@ -858,10 +858,10 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 					{
 						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
 						{
-						if (!pClientHuman->IsSyncer())
-						{
-							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
-						}
+							if (!pClientHuman->IsSyncer())
+							{
+								g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
+							}
 						}
 					}
 				}
@@ -990,6 +990,51 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 			}
 		}
 		break;
+
+		/*
+		case MAFIAPACKET_HUMAN_HIT:
+		{
+			int32_t nHumanNetworkIndex;
+			int32_t nAttackerNetworkIndex;
+			CVector3D v1;
+			CVector3D v2;
+			CVector3D v3;
+			int32_t nHitType;
+			float fDamage;
+			int32_t nBodyPart;
+
+			Reader.ReadInt32(&nHumanNetworkIndex, 1);
+			Reader.ReadInt32(&nAttackerNetworkIndex, 1);
+			Reader.ReadVector3D(&v1, 1);
+			Reader.ReadVector3D(&v2, 1);
+			Reader.ReadVector3D(&v3, 1);
+			Reader.ReadInt32(&nHitType, 1);
+			Reader.ReadSingle(&fDamage, 1);
+			Reader.ReadInt32(&nBodyPart, 1);
+
+			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
+			{
+				CClientHuman* pAttacked = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
+
+				if (nAttackerNetworkIndex != INVALID_NETWORK_ID) {
+					CClientHuman* pHumanAttacker = static_cast<CClientHuman*>(m_pClientManager->FromId(nAttackerNetworkIndex, ELEMENT_PED));
+					if (pHumanAttacker != nullptr)
+					{
+						g_pClientGame->HumanHit(pAttacked, pHumanAttacker, v1, v2, v3, nHitType, fDamage, nBodyPart);
+					}
+					else 
+					{
+						CClientHuman* pVehicleAttacker = static_cast<CClientHuman*>(m_pClientManager->FromId(nAttackerNetworkIndex, ELEMENT_PED));
+						if (pVehicleAttacker != nullptr)
+						{
+							g_pClientGame->HumanHit(pAttacked, pVehicleAttacker, v1, v2, v3, nHitType, fDamage, nBodyPart);
+						}
+					}
+				}
+			}
+		}
+		break;
+		*/
 
 		default:
 		{
@@ -1200,7 +1245,7 @@ void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 	SendHostPacket(&Packet);
 }
 
-void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
+void CMultiplayer::SendHumanHit(CClientHuman* target, CClientEntity* pAttacker, CVector3D v1, CVector3D v2, CVector3D v3, int hitType, float damage, int bodyPart)
 {
 	if (target == nullptr)
 		return;
@@ -1210,7 +1255,14 @@ void CMultiplayer::SendHumanHit(CClientHuman* target, CVector3D v1, CVector3D v2
 
 	Packet Packet(MAFIAPACKET_HUMAN_HIT);
 	Packet.Write<int32_t>(target->GetId());
-	//Packet.Write<int32_t>(pClientHumanAttacker->GetId());
+	if (pAttacker == nullptr)
+	{
+		Packet.Write<int32_t>(INVALID_NETWORK_ID);
+	}
+	else
+	{
+		Packet.Write<int32_t>(pAttacker->GetId());
+	}
 	Packet.Write<CVector3D>(v1);
 	Packet.Write<CVector3D>(v2);
 	Packet.Write<CVector3D>(v3);

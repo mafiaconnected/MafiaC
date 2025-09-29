@@ -1949,12 +1949,19 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	}
 }
 
-void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
+void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CClientEntity* pAttacker, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
 	bool bPreventDefault = false;
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
-	//args.AddObject(pClientHumanAttacker);
+	if (pAttacker == nullptr)
+	{
+		args.AddNull();
+	}
+	else
+	{
+		args.AddObject(pAttacker);
+	}
 	args.AddVector3D(vec1);
 	args.AddVector3D(vec2);
 	args.AddVector3D(vec3);
@@ -1969,7 +1976,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
-		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
+		pMultiplayer->SendHumanHit(pClientHumanTarget, pAttacker, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
 	}
 
 	float fOldHealth = pClientHumanTarget->GetHealth();
@@ -1990,14 +1997,21 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 
 		CArguments args;
 		args.AddObject(pClientHumanTarget);
-		//args.AddObject(entityAttacker);
+		if (pAttacker == nullptr)
+		{
+			args.AddNull();
+		}
+		else
+		{
+			args.AddObject(pAttacker);
+		}
 		g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
 
 		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
 		if (pMultiplayer != nullptr)
 		{
-			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
-			pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
+			pMultiplayer->SendHumanDeath(pClientHumanTarget, pAttacker);
+			//pMultiplayer->SendHumanDeath(pClientHumanTarget, nullptr);
 		}
 	}
 }
