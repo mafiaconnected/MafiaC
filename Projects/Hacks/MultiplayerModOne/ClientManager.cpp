@@ -130,6 +130,15 @@ void CMafiaClientManager::Remove(CNetObject* pNetObject)
 			return;
 		}
 	}
+
+	for (int i = 0; i < MAX_PEDS; i++)
+	{
+		if (m_rgpPeds[i] != nullptr && !m_rgpPeds[i].IsNull() && m_rgpPeds[i].GetPointer() == pNetObject)
+		{
+			m_rgpPeds[i].SetNull();
+			return;
+		}
+	}
 }
 
 bool CMafiaClientManager::IsConnecting()
