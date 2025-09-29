@@ -32,8 +32,8 @@ void CClientVehicle::Process()
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameVehicle() != nullptr)
 	{
 		m_pBlender->Interpolate();
-		GetGameVehicle()->GetInterface()->vehicle_interface.horn = m_Horn;
-		GetGameVehicle()->GetInterface()->vehicle_interface.engine_rpm = m_EngineRPM;
+		GetGameVehicle()->GetInterface()->vehicle_interface.m_bHorn = m_Horn;
+		GetGameVehicle()->GetInterface()->vehicle_interface.m_fEngineRpm = m_EngineRPM;
 
 		/*
 	 	GetGameVehicle()->SetActive(true);
@@ -210,7 +210,7 @@ bool CClientVehicle::SetPosition(const CVector3D& vecPos)
 
 	CClientEntity::SetPosition(vecPos);
 	m_MafiaVehicle->GetInterface()->entity.position = vecPos2;
-	m_MafiaVehicle->GetInterface()->vehicle_interface.position = vecPos2;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_vPosition = vecPos2;
 
 	if (GetGameVehicle()->GetFrame() != nullptr)
 	{
@@ -234,9 +234,9 @@ bool CClientVehicle::GetPosition(CVector3D& vecPos)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	vecPos.x = m_MafiaVehicle->GetInterface()->vehicle_interface.position.x;
-	vecPos.y = m_MafiaVehicle->GetInterface()->vehicle_interface.position.y;
-	vecPos.z = m_MafiaVehicle->GetInterface()->vehicle_interface.position.z;
+	vecPos.x = m_MafiaVehicle->GetInterface()->vehicle_interface.m_vPosition.x;
+	vecPos.y = m_MafiaVehicle->GetInterface()->vehicle_interface.m_vPosition.y;
+	vecPos.z = m_MafiaVehicle->GetInterface()->vehicle_interface.m_vPosition.z;
 	return true;
 }
 
@@ -346,9 +346,9 @@ bool CClientVehicle::SetRotationMat(const CVector3D& rotationFront, const CVecto
 	//m_RotationUp = rotationUp;
 	//m_RotationRight = rotationRight;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward = CVecTools::ConvertToMafiaVec(rotationFront);
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up = CVecTools::ConvertToMafiaVec(rotationUp);
-	m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right = CVecTools::ConvertToMafiaVec(rotationRight);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_vForwardDir = CVecTools::ConvertToMafiaVec(rotationFront);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_vUpDir = CVecTools::ConvertToMafiaVec(rotationUp);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_vRightDir = CVecTools::ConvertToMafiaVec(rotationRight);
 
 	// Disable interpolation
 	if (m_pBlender != nullptr)
@@ -363,9 +363,9 @@ bool CClientVehicle::GetRotationMat(CVector3D& rotationFront, CVector3D& rotatio
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	rotationFront = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_forward);
-	rotationUp = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_up);
-	rotationRight = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.rot_right);
+	rotationFront = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.m_vForwardDir);
+	rotationUp = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.m_vUpDir);
+	rotationRight = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.m_vRightDir);
 
 	//_glogprintf(_gstr("Vehicle GetRotationMat #%d:\n\tMafiaRotationFront: {%f, %f, %f}\n\tMafiaRotationUp: {%f, %f, %f}\n\tMafiaRotationRight: {%f, %f, %f}\n"), GetId(), rotationFront.x, rotationFront.y, rotationFront.z, rotationUp.x, rotationUp.y, rotationUp.z, rotationRight.x, rotationRight.y, rotationRight.z);
 	return true;
@@ -394,6 +394,7 @@ bool CClientVehicle::GetRotationQuat(CQuaternion& quatRot)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
+	/*
 	if (m_MafiaVehicle->GetFrame() != nullptr)
 	{
 		uint32_t uiFrameQuatAddr = ((uint32_t)m_MafiaVehicle->GetFrame()->GetInterface()) + 0x9C;
@@ -412,6 +413,14 @@ bool CClientVehicle::GetRotationQuat(CQuaternion& quatRot)
 		quatRot.z = pEntityQuat->z;
 		quatRot.w = pEntityQuat->w;
 	}
+	*/
+
+	uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
+	CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
+	quatRot.x = pEntityQuat->x;
+	quatRot.y = pEntityQuat->y;
+	quatRot.z = pEntityQuat->z;
+	quatRot.w = pEntityQuat->w;
 	return true;
 }
 
@@ -420,7 +429,7 @@ bool CClientVehicle::SetRotationVelocity(const CVector3D& vecRotVel)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	GetGameVehicle()->GetInterface()->vehicle_interface.rot_speed = CVecTools::ConvertToMafiaVec(vecRotVel);
+	GetGameVehicle()->GetInterface()->vehicle_interface.m_vAngularVelocity = CVecTools::ConvertToMafiaVec(vecRotVel);
 
 	return true;
 }
@@ -430,7 +439,7 @@ bool CClientVehicle::GetRotationVelocity(CVector3D& vecRotVel)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	vecRotVel = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetInterface()->vehicle_interface.rot_speed);
+	vecRotVel = CVecTools::ConvertFromMafiaVec(GetGameVehicle()->GetInterface()->vehicle_interface.m_vAngularVelocity);
 
 	return true;
 }
@@ -477,18 +486,18 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	auto pGameVehicle = &GetGameVehicle()->GetInterface()->vehicle_interface;
 	auto pGameCar = GetGameVehicle();
 
-	pGameVehicle->health = Packet.health;
-	pGameVehicle->engine_health = Packet.engineHealth;
-	pGameVehicle->fuel = Packet.fuel;
-	pGameVehicle->sound_enabled = Packet.sound;
-	pGameVehicle->accelerating = Packet.accel;
-	pGameVehicle->break_val = Packet.brake;
-	pGameVehicle->hand_break = Packet.handBrake;
-	pGameVehicle->speed_limit = Packet.speedLimit;
-	pGameVehicle->clutch = Packet.clutch;
-	pGameVehicle->gear = Packet.gear;
-	pGameVehicle->siren = Packet.siren;
-	pGameVehicle->lights = Packet.lights;
+	pGameVehicle->m_fHealth = Packet.health;
+	pGameVehicle->m_bIsEngineOn = Packet.engineHealth;
+	pGameVehicle->m_fFuel = Packet.fuel;
+	pGameVehicle->m_bSoundEnabled = Packet.sound;
+	pGameVehicle->m_fAccelerating = Packet.accel;
+	pGameVehicle->m_fBrake = Packet.brake;
+	pGameVehicle->m_fHandbrake = Packet.handBrake;
+	pGameVehicle->m_fSpeedLimit = Packet.speedLimit;
+	pGameVehicle->m_fClutch = Packet.clutch;
+	pGameVehicle->m_iGear = Packet.gear;
+	pGameVehicle->m_bSiren = Packet.siren;
+	pGameVehicle->m_uLightFlags = Packet.lights;
 
 	SetEngine(Packet.engineOn, true);
 
@@ -529,18 +538,18 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_RotationUp = Packet.rotationUp;
 	m_RotationRight = Packet.rotationRight;
 
-	pGameVehicle->health = Packet.health;
-	pGameVehicle->engine_health = Packet.engineHealth;
-	pGameVehicle->fuel = Packet.fuel;
-	pGameVehicle->sound_enabled = Packet.sound;
-	pGameVehicle->siren = Packet.siren;
-	pGameVehicle->lights = Packet.lights;
-	pGameVehicle->accelerating = Packet.accel;
-	pGameVehicle->break_val = Packet.brake;
-	pGameVehicle->hand_break = Packet.handBrake;
-	pGameVehicle->speed_limit = Packet.speedLimit;
-	pGameVehicle->clutch = Packet.clutch;
-	pGameVehicle->wheel_angle = Packet.wheelAngle;
+	pGameVehicle->m_fHealth = Packet.health;
+	pGameVehicle->m_bIsEngineOn = Packet.engineHealth;
+	pGameVehicle->m_fFuel = Packet.fuel;
+	pGameVehicle->m_bSoundEnabled = Packet.sound;
+	pGameVehicle->m_bSiren = Packet.siren;
+	pGameVehicle->m_uLightFlags = Packet.lights;
+	pGameVehicle->m_fAccelerating = Packet.accel;
+	pGameVehicle->m_fBrake = Packet.brake;
+	pGameVehicle->m_fHandbrake = Packet.handBrake;
+	pGameVehicle->m_fSpeedLimit = Packet.speedLimit;
+	pGameVehicle->m_fClutch = Packet.clutch;
+	pGameVehicle->m_fSteerAngle = Packet.wheelAngle;
 
 	if (Packet.gear != GetGear())
 	{
@@ -611,22 +620,22 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 
 	Packet.health = 100.0f; // IVehicle.health;
 	Packet.engineHealth = 100.0f; // IVehicle.engine_health;
-	Packet.fuel = IVehicle.fuel;
-	Packet.sound = IVehicle.sound_enabled;
-	Packet.engineOn = IVehicle.engine_on;
-	Packet.horn = IVehicle.horn;
-	Packet.siren = IVehicle.siren;
-	Packet.lights = IVehicle.lights;
-	Packet.gear = IVehicle.gear;
-	Packet.rpm = IVehicle.engine_rpm;
-	Packet.accel = IVehicle.accelerating;
-	Packet.brake = IVehicle.break_val;
-	Packet.handBrake = IVehicle.hand_break;
-	Packet.speedLimit = IVehicle.speed_limit;
-	Packet.clutch = IVehicle.clutch;
-	Packet.wheelAngle = IVehicle.wheel_angle;
-	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
-	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
+	Packet.fuel = IVehicle.m_fFuel;
+	Packet.sound = IVehicle.m_bIsEngineOn;
+	Packet.engineOn = IVehicle.m_bIsEngineOn;
+	Packet.horn = IVehicle.m_bHorn;
+	Packet.siren = IVehicle.m_bSiren;
+	Packet.lights = IVehicle.m_uLightFlags;
+	Packet.gear = IVehicle.m_iGear;
+	Packet.rpm = IVehicle.m_fEngineRpm;
+	Packet.accel = IVehicle.m_fAccelerating;
+	Packet.brake = IVehicle.m_fBrake;
+	Packet.handBrake = IVehicle.m_fHandbrake;
+	Packet.speedLimit = IVehicle.m_fSpeedLimit;
+	Packet.clutch = IVehicle.m_fClutch;
+	Packet.wheelAngle = IVehicle.m_fSteerAngle;
+	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.m_vVelocity);
+	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.m_vAngularVelocity);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -641,16 +650,16 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
+	//printf("veh write sync. Element ID %i. Position %f %f %f\n", GetId(), m_Position.x, m_Position.y, m_Position.z);
+
+	if (!CClientEntity::WriteSyncPacket(pStream))
+		return false;
+
 	CQuaternion quatRot;
 	GetPosition(m_Position);
 	GetRotation(m_Rotation);
 	GetRotationQuat(quatRot);
 	GetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
-
-	//printf("veh write sync. Element ID %i. Position %f %f %f\n", GetId(), m_Position.x, m_Position.y, m_Position.z);
-
-	if (!CClientEntity::WriteSyncPacket(pStream))
-		return false;
 
 	auto IVehicle = GetGameVehicle()->GetInterface()->vehicle_interface;
 
@@ -662,24 +671,24 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 
 	Packet.quatRot = quatRot;
 
-	Packet.health = IVehicle.health;
-	Packet.engineHealth = IVehicle.engine_health;
-	Packet.fuel = IVehicle.fuel;
-	Packet.sound = IVehicle.sound_enabled;
-	Packet.engineOn = IVehicle.engine_on;
-	Packet.horn = IVehicle.horn;
-	Packet.siren = IVehicle.siren;
-	Packet.lights = IVehicle.lights;
-	Packet.gear = IVehicle.gear;
-	Packet.rpm = IVehicle.engine_rpm;
-	Packet.accel = IVehicle.accelerating;
-	Packet.brake = IVehicle.break_val;
-	Packet.handBrake = IVehicle.hand_break;
-	Packet.speedLimit = IVehicle.speed_limit;
-	Packet.clutch = IVehicle.clutch;
-	Packet.wheelAngle = IVehicle.wheel_angle;
-	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.speed);
-	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.rot_speed);
+	Packet.health = IVehicle.m_fHealth;
+	Packet.engineHealth = IVehicle.m_fEngineHealth;
+	Packet.fuel = IVehicle.m_fFuel;
+	Packet.sound = IVehicle.m_bSoundEnabled;
+	Packet.engineOn = IVehicle.m_bIsEngineOn;
+	Packet.horn = IVehicle.m_bHorn;
+	Packet.siren = IVehicle.m_bSiren;
+	Packet.lights = IVehicle.m_uLightFlags;
+	Packet.gear = IVehicle.m_iGear;
+	Packet.rpm = IVehicle.m_fEngineRpm;
+	Packet.accel = IVehicle.m_fAccelerating;
+	Packet.brake = IVehicle.m_fBrake;
+	Packet.handBrake = IVehicle.m_fHandbrake;
+	Packet.speedLimit = IVehicle.m_fSpeedLimit;
+	Packet.clutch = IVehicle.m_fClutch;
+	Packet.wheelAngle = IVehicle.m_fSteerAngle;
+	Packet.speed = CVecTools::ConvertFromMafiaVec(IVehicle.m_vVelocity);
+	Packet.rotSpeed = CVecTools::ConvertFromMafiaVec(IVehicle.m_vAngularVelocity);
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -692,7 +701,7 @@ bool CClientVehicle::SetVelocity(const CVector3D& vecVel)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.speed = CVecTools::ConvertToMafiaVec(vecVel);
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_vVelocity = CVecTools::ConvertToMafiaVec(vecVel);
 
 	return true;
 }
@@ -702,7 +711,7 @@ bool CClientVehicle::GetVelocity(CVector3D& vecVel)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	vecVel = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.speed);
+	vecVel = CVecTools::ConvertFromMafiaVec(m_MafiaVehicle->GetInterface()->vehicle_interface.m_vVelocity);
 
 	return true;
 }
@@ -741,7 +750,7 @@ bool CClientVehicle::SetFuel(float fuel)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.fuel = fuel;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fFuel = fuel;
 
 	return true;
 }
@@ -751,7 +760,15 @@ float CClientVehicle::GetFuel()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.fuel;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fFuel;
+}
+
+float CClientVehicle::GetFuel()
+{
+	if (m_MafiaVehicle == nullptr)
+		return -1;
+
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fFuel;
 }
 
 bool CClientVehicle::SetGear(uint32_t gear)
@@ -759,7 +776,7 @@ bool CClientVehicle::SetGear(uint32_t gear)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.gear = gear;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_iGear = gear;
 	GetGameVehicle()->GearSnd();
 	return true;
 }
@@ -769,7 +786,7 @@ uint32_t CClientVehicle::GetGear()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.gear;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_iGear;
 }
 
 bool CClientVehicle::SetSpeedLimit(float speedLimit)
@@ -777,7 +794,7 @@ bool CClientVehicle::SetSpeedLimit(float speedLimit)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.speed_limit = speedLimit;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fSpeedLimit = speedLimit;
 
 	return true;
 }
@@ -787,7 +804,7 @@ float CClientVehicle::GetSpeedLimit()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.speed_limit;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fSpeedLimit;
 }
 
 bool CClientVehicle::SetEngineHealth(float engineHealth)
@@ -795,7 +812,7 @@ bool CClientVehicle::SetEngineHealth(float engineHealth)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.engine_health = engineHealth;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fEngineHealth = engineHealth;
 
 	return true;
 }
@@ -805,7 +822,7 @@ float CClientVehicle::GetEngineHealth()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.engine_health;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fEngineHealth;
 }
 
 bool CClientVehicle::SetHealth(float health)
@@ -813,7 +830,7 @@ bool CClientVehicle::SetHealth(float health)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.health = health;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fHealth = health;
 
 	return true;
 }
@@ -823,7 +840,7 @@ float CClientVehicle::GetHealth()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.health;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fHealth;
 }
 
 bool CClientVehicle::SetEngineRPM(float engineRPM)
@@ -831,7 +848,7 @@ bool CClientVehicle::SetEngineRPM(float engineRPM)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.engine_rpm = engineRPM;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fEngineRpm = engineRPM;
 
 	return true;
 }
@@ -841,7 +858,7 @@ float CClientVehicle::GetEngineRPM()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.engine_rpm;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fEngineRpm;
 }
 
 bool CClientVehicle::SetWheelAngle(float wheelAngle)
@@ -849,7 +866,7 @@ bool CClientVehicle::SetWheelAngle(float wheelAngle)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.wheel_angle = wheelAngle;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_fSteerAngle = wheelAngle;
 
 	return true;
 }
@@ -859,7 +876,7 @@ float CClientVehicle::GetWheelAngle()
 	if (m_MafiaVehicle == nullptr)
 		return -1;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.wheel_angle;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_fSteerAngle;
 }
 
 bool CClientVehicle::SetOdometer(float odometer)
@@ -881,26 +898,6 @@ float CClientVehicle::GetOdometer()
 	return 0.0f;
 }
 
-bool CClientVehicle::SetRoof(bool state)
-{
-	if (m_MafiaVehicle == nullptr)
-		return false;
-
-	m_MafiaVehicle->GetInterface()->vehicle_interface.roof = state;
-	m_MafiaVehicle->Update(0.0);
-	//m_MafiaVehicle->Do_Roof(state);
-	return true;
-}
-
-bool CClientVehicle::GetRoof()
-{
-	if (m_MafiaVehicle == nullptr)
-		return false;
-
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.roof;
-	//return false;
-}
-
 bool CClientVehicle::SetLocked(bool state)
 {
 	if (m_MafiaVehicle == nullptr)
@@ -919,23 +916,23 @@ bool CClientVehicle::GetLocked()
 	return false;
 }
 
-bool CClientVehicle::SetLights(bool state)
+bool CClientVehicle::SetLights(uint32_t state)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
 	auto* pVehicleInterface = &m_MafiaVehicle->GetInterface()->vehicle_interface;
-	pVehicleInterface->lights = state;
+	pVehicleInterface->m_uLightFlags = state;
 	return true;
 }
 
-bool CClientVehicle::GetLights()
+uint32_t CClientVehicle::GetLights()
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
 	auto* pVehicleInterface = &m_MafiaVehicle->GetInterface()->vehicle_interface;
-	return pVehicleInterface->lights;
+	return pVehicleInterface->m_uLightFlags;
 }
 
 bool CClientVehicle::SetEngine(bool state, bool unknown1 = true)
@@ -954,7 +951,7 @@ bool CClientVehicle::GetEngine()
 		return false;
 
 	auto* pVehicleInterface = &m_MafiaVehicle->GetInterface()->vehicle_interface;
-	return pVehicleInterface->engine_on;
+	return pVehicleInterface->m_bIsEngineOn;
 }
 
 bool CClientVehicle::Explode()
@@ -1019,7 +1016,7 @@ bool CClientVehicle::SetSiren(bool state)
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	m_MafiaVehicle->GetInterface()->vehicle_interface.siren = state;
+	m_MafiaVehicle->GetInterface()->vehicle_interface.m_bSiren = state;
 	return true;
 }
 
@@ -1028,7 +1025,7 @@ bool CClientVehicle::GetSiren()
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	return m_MafiaVehicle->GetInterface()->vehicle_interface.siren;
+	return m_MafiaVehicle->GetInterface()->vehicle_interface.m_bSiren;
 }
 
 bool CClientVehicle::Repair()
@@ -1073,9 +1070,9 @@ void CClientVehicle::SetFromExistingEntity(MafiaSDK::C_Car* car)
 	prevRot = m_Rotation;
 	targetRot = m_Rotation;
 
-	m_RotationFront = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.rot_forward);
-	m_RotationUp = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.rot_up);
-	m_RotationRight = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.rot_right);
+	m_RotationFront = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.m_vForwardDir);
+	m_RotationUp = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.m_vRightDir);
+	m_RotationRight = CVecTools::ConvertFromMafiaVec(car->GetInterface()->vehicle_interface.m_vRightDir);
 
 	// TODO
 	//m_pOccupants[0] = nullptr;
@@ -1121,3 +1118,32 @@ void CClientVehicle::SetCollisionsEnabled(bool enabled) {
 bool CClientVehicle::GetCollisionsEnabled() {
 	return m_CollisionsEnabled;
 }
+
+void CClientVehicle::SetTurnIndicator(uint8_t direction, bool enable) {
+	if (direction == 0) {
+		if (!(GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags & 8)) {
+			if (enable) {
+				GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags |= 1;
+				if (GetGameVehicle()->GetInterface()->vehicle_interface.m_pCallbackWU)
+					((void (*)(const void*))(GetGameVehicle()->GetInterface()->vehicle_interface.m_pCallbackWU))(GetGameVehicle()->GetInterface()->vehicle_interface.m_pCar);
+			}
+			else {
+				GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags &= 0xFE;
+			}
+		}
+	}
+	else if (direction == 1) {
+		if (!(GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags & 8)) {
+			if (enable) {
+				GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags |= 2;
+				if (GetGameVehicle()->GetInterface()->vehicle_interface.m_pCallbackWU)
+					((void (*)(const void*))(GetGameVehicle()->GetInterface()->vehicle_interface.m_pCallbackWU))(GetGameVehicle()->GetInterface()->vehicle_interface.m_pCar);
+
+			}
+			else {
+				GetGameVehicle()->GetInterface()->vehicle_interface.m_uLightFlags &= 0xFD;
+			}
+		}
+	}
+}
+

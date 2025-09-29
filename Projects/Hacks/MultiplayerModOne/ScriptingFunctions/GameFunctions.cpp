@@ -820,6 +820,18 @@ static bool FunctionGameSetProgramScript(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+static bool FunctionGameSetWeatherParam(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* szWeatherParamName = pState->CheckString(0);
+	if (!szWeatherParamName) return false;
+	UTF8String weatherParamName(true, szWeatherParamName);
+
+	MafiaSDK::SetWeatherSystemParam();
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);

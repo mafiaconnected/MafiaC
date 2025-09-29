@@ -101,9 +101,6 @@ public:
 	virtual bool SetOdometer(float odometer);
 	virtual float GetOdometer();
 
-	virtual bool SetRoof(bool state);
-	virtual bool GetRoof();
-
 	virtual bool SetLocked(bool state);
 	virtual bool GetLocked();
 
@@ -118,8 +115,8 @@ public:
 	virtual bool SetEngine(bool state, bool unknown1);
 	virtual bool GetEngine();
 
-	virtual bool SetLights(bool state);
-	virtual bool GetLights();
+	virtual bool SetLights(uint32_t state);
+	virtual uint32_t GetLights();
 
 	virtual bool Repair();
 	virtual bool Explode();
@@ -135,4 +132,6 @@ public:
 
 	virtual void SetCollisionsEnabled(bool enabled);
 	virtual bool GetCollisionsEnabled();
+
+	virtual void SetTurnIndicator(uint8_t direction, bool enable);
 };

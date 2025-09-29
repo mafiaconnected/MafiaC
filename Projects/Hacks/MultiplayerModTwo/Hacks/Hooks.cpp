@@ -26,6 +26,7 @@ extern C2D* g_p2DII;
 
 static void OnGameInitII()
 {
+	_glogprintf(_gstr("OnGameInitII called\n"));
 	M2::AttachHandler(M2_EVENT_MOD_MESSAGE, [](m2sdk_event* data) {
 		auto message = (int)data->arg1;
 
@@ -213,5 +214,6 @@ RAWCODE HookRender2DStuffII()
 
 void CGameHooksII::InstallHooks()
 {
+	_glogprintf(_gstr("OnGameInitII called\n"));
 	M2::Initialize(OnGameInitII);
 }

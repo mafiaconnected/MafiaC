@@ -53,3 +53,5 @@ namespace MafiaSDK {
 #include "Game/C_Bridge.hpp"
 #include "Game/C_Door.hpp"
 #include "Game/Input.hpp"
+
+#include "LS3D/I3D/I3D_scene.h"
