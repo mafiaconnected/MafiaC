@@ -44,6 +44,12 @@ static bool FunctionGetChatInputEnabled(IScriptState* pState, int argc, void* pU
 	return true;
 }
 
+static bool FunctionGetGameFocused(IScriptState* pState, int argc, void* pUser)
+{
+	pState->ReturnBoolean(MafiaSDK::IsWindowFocused());
+	return true;
+}
+
 static bool FunctionIsScancodePressed(IScriptState* pState, int argc, void* pUser)
 {
 	Sint32 Scancode;
@@ -428,6 +434,7 @@ void CScriptingFunctions::RegisterUtilFunctions(Galactic3D::CScripting* pScripti
 	pScripting->m_Global.RegisterFunction(_gstr("setChatWindowEnabled"), _gstr("b"), FunctionSetChatWindowEnabled, pClientGame);
 	pScripting->m_Global.AddProperty(pClientGame, _gstr("chatWindowEnabled"), ARGUMENT_BOOLEAN, FunctionGetChatWindowEnabled);
 	pScripting->m_Global.AddProperty(pClientGame, _gstr("chatInputEnabled"), ARGUMENT_BOOLEAN, FunctionGetChatInputEnabled);
+	pGameNamespace->AddProperty(pClientGame, _gstr("focused"), ARGUMENT_BOOLEAN, FunctionGetGameFocused);
 
 	pScripting->m_Global.RegisterFunction(_gstr("isScancodePressed"), _gstr("i"), FunctionIsScancodePressed);
 	pScripting->m_Global.RegisterFunction(_gstr("isKeyDown"), _gstr("i"), FunctionIsKeyDown);
