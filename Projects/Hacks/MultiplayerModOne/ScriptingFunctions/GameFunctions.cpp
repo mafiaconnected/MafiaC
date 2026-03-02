@@ -807,16 +807,11 @@ static bool FunctionGameGetMainVolume(IScriptState* pState, int argc, void* pUse
 	return true;
 }
 
-static bool FunctionGameSetProgramScript(IScriptState* pState, int argc, void* pUser)
+static bool FunctionGameReloadVehicleTables(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	const GChar* script = pState->CheckString(0);
-	if (!script) return false;
-	UTF8String script2(true, script);
-
-	MafiaSDK::C_Program* program;
-	program->SetSourceCode(script2);
+	((void(__thiscall*)(void*))0x60A350)((void*)0x6D4560);
 	return true;
 }
 
@@ -972,5 +967,6 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		// Modloader
 		pGameNamespace->RegisterFunction(_gstr("addCustomGameFile"), _gstr("ss"), FunctionGameAddCustomGameFile, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("removeCustomGameFile"), _gstr("s"), FunctionGameRemoveCustomGameFile, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("reloadVehicleTables"), _gstr(""), FunctionGameReloadVehicleTables, pClientManager);
 	}
 }
