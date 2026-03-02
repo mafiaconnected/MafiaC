@@ -20,18 +20,18 @@ set_target_properties(MafiaC PROPERTIES LINK_FLAGS_RELWITHDEBINFO ${LINK_CMD_DEB
 
 # Hacks
 target_link_libraries(
-    MafiaC
-    PRIVATE
+	MafiaC
+	PRIVATE
 	DirectInputHook
 	Direct3D9
 	WindowHacks
-    DebugTest
+	DebugTest
 	ModLoader
-    DiscordRichPresence_static
-    IPCServer_static
-    CustomWindow_static
-    CrashHandler_static
-    MultiplayerModOne)
+	DiscordRichPresence_static
+	IPCServer_static
+	CustomWindow_static
+	CrashHandler_static
+	MultiplayerModOne)
 
 target_link_libraries(
 	MafiaC
@@ -39,8 +39,8 @@ target_link_libraries(
 	MafiaCNetworkShared
 	lua53_static
 	Direct3D11Renderer_static
-	RmlCore_static
-	RmlDebugger_static
+	rmlui_core_static
+	rmlui_debugger_static
 	RmlGUI_static
 	enet
 	pixman_static

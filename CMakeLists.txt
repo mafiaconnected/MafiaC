@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.18...3.31)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo")
 
 project(MafiaC C CXX)
 

@@ -30,11 +30,16 @@ new_library_executable(Launcher "${SOURCES}" "LAUNCHER_STATIC")
 set_property(TARGET Launcher PROPERTY WIN32_EXECUTABLE true)
 set_target_properties(Launcher PROPERTIES LINK_FLAGS "/MANIFEST:NO")
 
+if(MSVC AND NOT SUPPORT_WINXP)
+	# Require Windows 7
+	target_link_options(Launcher PRIVATE "/SUBSYSTEM:WINDOWS,6.1")
+endif()
+
 target_link_libraries(
 	Launcher
 	PRIVATE
-	RmlCore_static
-	RmlDebugger_static
+	rmlui_core_static
+	rmlui_debugger_static
 	RmlGUI_static
 	asmjit_static
 	Audio_static
