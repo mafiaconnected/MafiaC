@@ -60,15 +60,15 @@ void CClientVehicle::Process()
 	//GetGameVehicle()->AI(g_pClientGame->m_pTime->m_fDeltaTime);
 	//GetGameVehicle()->Update(g_pClientGame->m_pTime->m_fDeltaTime);
 
-	//auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	//auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	//if (pMultiplayer != nullptr)
 	//{
 	//	_glogprintf(_gstr("Vehicle %i - IsSyncer: %i, IsLocal: %i, IsDirty: %i, IsCreatedFor: %i, m_bSendSync: %i, m_bRegistered: %i, m_RegisteredIndex"),
 	//		GetId(),
 	//		IsSyncer(),
 	//		IsLocal(),
-	//		IsDirty(g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex)),
-	//		IsCreatedFor(g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex)),
+	//		IsDirty(g_pClientGame->GetMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetMultiplayer()->m_iLocalIndex)),
+	//		IsCreatedFor(g_pClientGame->GetMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetMultiplayer()->m_iLocalIndex)),
 	//		CanSendSync(-1),
 	//		m_bSendSync,
 	//		m_bRegistered,
@@ -1093,7 +1093,7 @@ void CClientVehicle::SetFromExistingEntity(MafiaSDK::C_Car* car)
 void CClientVehicle::CreateNetBlender()
 {
 	auto pBlender = new CNetBlenderVehicle(this);
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 70;
 	m_pBlender = pBlender;

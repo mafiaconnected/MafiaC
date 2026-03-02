@@ -103,7 +103,6 @@ public:
 	bool m_bStopMultiplayerGame = false;
 	int m_iStopMultiplayerGameReason = -1;
 	bool m_bMultiplayerWorld = false;
-	bool m_bForceMultiplayerWorld = false;
 	class CMultiplayer* m_pMultiplayer = nullptr;
 	class CMultiplayer* m_pNewMultiplayer = nullptr;
 	class CMafiaClientResourceMgr* m_pResourceMgr = nullptr;
@@ -219,8 +218,7 @@ public:
 	bool m_bLocalCiviliansEnabled = false;
 
 	inline CMultiplayer* GetMultiplayer() { if (m_pNewMultiplayer != nullptr) return m_pNewMultiplayer; return m_pMultiplayer; }
-	inline CMultiplayer* GetActiveMultiplayer() { return m_pMultiplayer; }
-	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pMultiplayer != nullptr; }
+	inline bool IsMultiplayer() { return m_bMultiplayerWorld || m_pNewMultiplayer != nullptr || m_pMultiplayer != nullptr; }
 
 	void Initialise();
 	void ShutDown();

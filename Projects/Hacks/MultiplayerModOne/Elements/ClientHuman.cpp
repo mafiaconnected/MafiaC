@@ -291,7 +291,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	if (GetGameHuman() == nullptr)
 	{
-		bool isLocalPlayer = IsType(ELEMENT_PLAYER) && (GetSyncer() == g_pClientGame->GetActiveMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetActiveMultiplayer()->m_iLocalIndex));
+		bool isLocalPlayer = IsType(ELEMENT_PLAYER) && (GetSyncer() == g_pClientGame->GetMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetMultiplayer()->m_iLocalIndex));
 		Spawn(m_Position, CVecTools::DirToRotation180(m_Rotation), isLocalPlayer);
 	}
 
@@ -906,7 +906,7 @@ void CClientHuman::SetBehavior(uint32_t iBehavior)
 void CClientHuman::CreateNetBlender()
 {
 	auto pBlender = new CNetBlenderHuman(this);
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	if (pMultiplayer != nullptr)
 		pBlender->m_uiDelay = pMultiplayer->m_usSyncIntervalInMS + 20;
 	m_pBlender = pBlender;

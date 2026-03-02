@@ -38,7 +38,7 @@ static void OnGameInit()
 		g_pClientGame->OnPreStartInGame(false);
 		g_pClientGame->OnStartInGame(false);
 
-		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		auto pMultiplayer = g_pClientGame->GetMultiplayer();
 		if (pMultiplayer != nullptr)
 		{
 			pMultiplayer->Join(); // elements/resources are delayed until this call
@@ -70,8 +70,8 @@ static void OnGameInit()
 
 static void OnGameExit()
 {
-	if (g_pClientGame->GetActiveMultiplayer() != nullptr) {
-		g_pClientGame->GetActiveMultiplayer()->Disconnect(DISCONNECT_GRACEFUL);
+	if (g_pClientGame->GetMultiplayer() != nullptr) {
+		g_pClientGame->GetMultiplayer()->Disconnect(DISCONNECT_GRACEFUL);
 	}
 }
 
@@ -685,7 +685,7 @@ static int OnHumanHit(MafiaSDK::C_Human* target, int hitType, const S_vector& v1
 
 static void OnHumanWeaponChange(MafiaSDK::C_Human* target, int8_t weapon)
 {
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
@@ -696,7 +696,7 @@ static void OnHumanWeaponChange(MafiaSDK::C_Human* target, int8_t weapon)
 static void OnHumanWeaponDrop(MafiaSDK::C_Human* target)
 {
 	_glogprintf(_gstr("Human dropped the weapon"));
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		auto humanTarget = g_pClientGame->m_pClientManager->FindHuman(target);
@@ -707,7 +707,7 @@ static void OnHumanWeaponDrop(MafiaSDK::C_Human* target)
 static void OnHumanShoot(const S_vector& pos)
 {
 	_glogprintf(_gstr("Player shooting to: {%f, %f, %f}"), pos.x, pos.y, pos.z);
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		pMultiplayer->SendLocalPlayerShoot(true, CVecTools::ConvertFromMafiaVec(pos));

@@ -635,10 +635,8 @@ void CClientGame::OnStartInGame(bool bRestarted)
 		m_pMultiplayer->m_bRestartingGame = false;
 	}
 
-	if (bMultiplayerInProgress || m_bForceMultiplayerWorld)
+	if (bMultiplayerInProgress)
 		m_bMultiplayerWorld = true;
-
-	m_bForceMultiplayerWorld = false;
 
 	if (!bMultiplayerInProgress)
 	{
@@ -662,7 +660,7 @@ void CClientGame::OnStartInGame(bool bRestarted)
 	float fScale = 0.7f / 900.0f * (float)MafiaSDK::GetIGraph()->Scrn_sy();
 	//fScale *= *m_CVars.m_pfChatScale;
 	float fScale2;
-	if (g_pClientGame->m_pContext->GetSettings()->Read(_gstr("Chat Window"), _gstr("Scale"), &fScale2))
+	if (m_pContext->GetSettings()->Read(_gstr("Chat Window"), _gstr("Scale"), &fScale2))
 		fScale = fScale2;
 	if (m_pChatWindow == nullptr)
 	{
@@ -786,7 +784,7 @@ void CClientGame::OnEndInGame()
 		m_pCmdWindow = nullptr;
 	}
 
-	if (m_pChatWindow != nullptr && GetActiveMultiplayer() == nullptr) //&& !g_bStartNewGame && m_pMultiplayer == nullptr)
+	if (m_pChatWindow != nullptr && GetMultiplayer() == nullptr) //&& !g_bStartNewGame && m_pMultiplayer == nullptr)
 	{
 		delete m_pChatWindow;
 		m_pChatWindow = nullptr;
@@ -800,7 +798,7 @@ void CClientGame::OnEndInGame()
 	m_Fonts.DeleteHWResources();
 	m_SlotMgr.DeleteHWResources();
 
-	m_bMultiplayerWorld = m_bForceMultiplayerWorld;
+	m_bMultiplayerWorld = false;
 
 	if (m_pNewMultiplayer != nullptr)
 	{
@@ -1181,7 +1179,7 @@ void CClientGame::OnRender2DStuff()
 	{
 		GString Machines = _gstr("Machines: \n");
 		{
-			auto pMultiplayer = GetActiveMultiplayer();
+			auto pMultiplayer = GetMultiplayer();
 			if (pMultiplayer != nullptr)
 			{
 				size_t Count = 0;
@@ -1793,7 +1791,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		return false;
 	}
 	
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
@@ -1807,9 +1805,9 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		}
 		else
 		{
-			g_pClientGame->m_bUseActorInvokedByGame = false;
+			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
-			g_pClientGame->m_bUseActorInvokedByGame = true;
+			m_bUseActorInvokedByGame = true;
 		}
 	}
 
@@ -1825,7 +1823,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	Args.AddNumber(iSeat);
 	m_pOnHumanEnteredVehicleEventType->Trigger(Args);
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
@@ -1839,9 +1837,9 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 		}
 		else
 		{
-			//g_pClientGame->m_bUseActorInvokedByGame = false;
+			//m_bUseActorInvokedByGame = false;
 			//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
-			//g_pClientGame->m_bUseActorInvokedByGame = true;
+			//m_bUseActorInvokedByGame = true;
 		}
 	}
 
@@ -1866,7 +1864,7 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		return false;
 	}
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
@@ -1880,9 +1878,9 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		}
 		else
 		{
-			g_pClientGame->m_bUseActorInvokedByGame = false;
+			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
-			g_pClientGame->m_bUseActorInvokedByGame = true;
+			m_bUseActorInvokedByGame = true;
 		}
 	}
 
@@ -1898,7 +1896,7 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	Args.AddNumber(iSeat);
 	m_pOnHumanExitedVehicleEventType->Trigger(Args);
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
@@ -1912,9 +1910,9 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 		}
 		else
 		{
-			//g_pClientGame->m_bUseActorInvokedByGame = false;
+			//m_bUseActorInvokedByGame = false;
 			//pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iSeat, iUnknown);
-			//g_pClientGame->m_bUseActorInvokedByGame = true;
+			//m_bUseActorInvokedByGame = true;
 		}
 	}
 
@@ -1929,7 +1927,7 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 	Args.AddNumber(iSeat);
 	m_pOnHumanJackVehicleEventType->Trigger(Args);
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer())
@@ -1942,9 +1940,9 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 		}
 		else
 		{
-			g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = false;
+			m_bDoThrowCocotFromCarInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
-			g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame = true;
+			m_bDoThrowCocotFromCarInvokedByGame = true;
 		}
 	}
 }
@@ -1961,12 +1959,12 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 	args.AddNumber(uiHitType);
 	args.AddNumber(fDamage);
 	args.AddNumber(uiBodyPart);
-	g_pClientGame->m_pOnHumanHitEventType->Trigger(args, bPreventDefault);
+	m_pOnHumanHitEventType->Trigger(args, bPreventDefault);
 
 	if (bPreventDefault)
 		return;
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		pMultiplayer->SendHumanHit(pClientHumanTarget, vec1, vec2, vec3, uiHitType, fDamage, uiBodyPart);
@@ -1991,9 +1989,9 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		CArguments args;
 		args.AddObject(pClientHumanTarget);
 		//args.AddObject(entityAttacker);
-		g_pClientGame->m_pOnHumanDeathEventType->Trigger(args);
+		m_pOnHumanDeathEventType->Trigger(args);
 
-		auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+		auto pMultiplayer = GetMultiplayer();
 		if (pMultiplayer != nullptr)
 		{
 			//pMultiplayer->SendHumanDeath(pClientHumanTarget, entityAttacker);
@@ -2014,7 +2012,7 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 	m_pOnHumanUsingActorEventType->Trigger(Args);
 
 	/*
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
@@ -2028,9 +2026,9 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 		}
 		else
 		{
-			g_pClientGame->m_bUseActorInvokedByGame = false;
+			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnk1, iUnk2, iUnk3);
-			g_pClientGame->m_bUseActorInvokedByGame = true;
+			m_bUseActorInvokedByGame = true;
 		}
 	}
 	*/
@@ -2046,7 +2044,7 @@ bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)
 	if (pCar == nullptr)
 		return false;
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer == nullptr || !pMultiplayer->IsConnected() || !pMultiplayer->IsJoined())
 		return false;
 
@@ -2076,14 +2074,14 @@ bool CClientGame::OnTrafficCarReset(MafiaSDK::C_Car* pCar)
 	if (pCar == nullptr)
 		return false;
 
-	auto pMultiplayer = g_pClientGame->GetActiveMultiplayer();
+	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer == nullptr || !pMultiplayer->IsConnected() || !pMultiplayer->IsJoined())
 		return false;
 
 	//if (m_bSupressNetworkedEntities)
 	//	return true;
 
-	CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(pCar);
+	CClientVehicle* pClientVehicle = m_pClientManager->FindVehicle(pCar);
 	if (pClientVehicle == nullptr)
 		return false;
 
@@ -2100,7 +2098,7 @@ bool CClientGame::OnTrafficCarReset(MafiaSDK::C_Car* pCar)
 	m_pClientManager->Remove(pClientVehicle);
 
 	pClientVehicle->m_bDontRemoveGameItem = true;
-	g_pClientGame->m_pClientManager->DestroyObject(pClientVehicle, true, false);
+	m_pClientManager->DestroyObject(pClientVehicle, true, false);
 	pClientVehicle->m_bDontRemoveGameItem = false;
 
 	//pClientVehicle->SetFromExistingEntity(pCar);
