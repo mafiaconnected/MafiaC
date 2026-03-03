@@ -24,6 +24,9 @@ Galactic3D::ReflectedClass* CClientVehicle::GetReflectedClass()
 
 MafiaSDK::C_Car* CClientVehicle::GetGameVehicle()
 {
+	if (m_MafiaVehicle->GetInterface() == nullptr)
+		return nullptr;
+
 	return m_MafiaVehicle;
 }
 
@@ -104,7 +107,10 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 		//return;
 	}
 
-	pVehModel->SetName("SomeOrdinaryVehicles");
+	GChar* name = _gstr("Vehicle_%d", GetId());
+	UTF8String name2(true, name);
+
+	pVehModel->SetName(name2);
 	pVehModel->SetScale({ 1, 1, 1 });
 
 	//S_quat quat;
@@ -739,6 +745,9 @@ float CClientVehicle::GetSpeed()
 bool CClientVehicle::SetFuel(float fuel)
 {
 	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	if (m_MafiaVehicle->GetInterface() == nullptr)
 		return false;
 
 	m_MafiaVehicle->GetInterface()->vehicle_interface.fuel = fuel;
