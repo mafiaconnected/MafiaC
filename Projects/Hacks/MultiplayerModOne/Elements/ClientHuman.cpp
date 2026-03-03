@@ -751,6 +751,9 @@ void CClientHuman::Crouch(bool state)
 
 MafiaSDK::C_Human* CClientHuman::GetGameHuman()
 {
+	if (m_MafiaHuman->GetInterface() == nullptr)
+		return nullptr;
+
 	return m_MafiaHuman;
 }
 
