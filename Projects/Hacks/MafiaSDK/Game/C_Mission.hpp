@@ -66,6 +66,75 @@ namespace MafiaSDK
             Truck = 36,
             InitScript = 155
         };
+
+        enum PhysicsTypes
+        {
+            Stone = 0,
+            Crate = 1,
+            Barrel = 2,
+            TrashBin = 3,
+            TrafficSign = 4,
+            PaperBox = 5,
+            Concrete = 6,
+            MetalPlate = 7,
+            SmallWeapon0 = 8,
+            SmallWeapon1 = 9,
+            WoodenPlank = 10,
+            SmallMetal = 11,
+            BigWeapon = 12,
+            CarLight = 13
+        };
+
+        enum MaterialTypes
+        {
+            Invalid = 0,
+            Asphalt = 1,
+            Pavement = 2,
+            Sidewalk = 3,
+            Concrete = 4,
+            Grass = 5,
+            Sand = 6,
+            Clay = 7,
+            Gravel = 8,
+            Rock = 9,
+            RailwayLine = 10,
+            Leaves = 11,
+            DoNotUse1 = 12,
+            Wood0 = 13,
+            Wood30 = 14,
+            Wood70 = 15,
+            Parquet = 16,
+            Marble = 17,
+            Carpet = 18,
+            MetalConstruction = 19,
+            MetalPlate0 = 20,
+            MetalPlate30 = 21,
+            MetalPlate70 = 22,
+            DoNotUse2 = 23,
+            Glass = 24,
+            GlassUnbreakable = 25,
+            DoNotUse = 26,
+            WiredFence = 27,
+            WoodenFence = 28,
+            Hedge = 29,
+            DoNotUse3 = 30,
+            DeadlyWater = 31,
+            DoNotUse4 = 32,
+            Universal = 33,
+            DoNotUse5 = 34,
+            Body = 35,
+            Plaster = 36,
+            Junk = 37,
+            Bricks = 38,
+            DoNotUse6 = 39,
+            DeadlyCollision = 40,
+            DestructibleCollision = 41,
+            Straw = 42,
+            Butter = 43,
+            SlippingWater = 44,
+            StickingWater = 45,
+            DirtyRoad = 46
+        };
     }
 
     struct C_Mission_Interface
@@ -96,7 +165,7 @@ namespace MafiaSDK
                 mov ecx, this
                 push actorType
                 call funcAddress
-               
+
             }
         }
 
