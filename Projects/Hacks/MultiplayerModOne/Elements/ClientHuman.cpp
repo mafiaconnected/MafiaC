@@ -188,8 +188,11 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	MafiaSDK::GetModelCache()->Open(pModel, model.CString(), NULL, NULL, NULL, NULL);
 
-	//pModel->SetName(name.CString());
-	pModel->SetScale({ 1, 1, 1 });
+	GChar* name = _gstr("Player_%d", GetId());
+	UTF8String name2(true, name);
+
+	pModel->SetName(name2);
+	pModel->SetScale(CVecTools::ConvertToMafiaVec(m_Scale));
 	pModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
 	pModel->Update();
 

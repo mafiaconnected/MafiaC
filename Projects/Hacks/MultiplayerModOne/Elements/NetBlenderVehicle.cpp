@@ -30,7 +30,6 @@ CNetBlenderVehicle::CNetBlenderVehicle(CClientVehicle* pEntity) : m_pEntity(pEnt
 void CNetBlenderVehicle::UpdateTargetRotation()
 {
 	UpdateTargetRotationMat();
-	UpdateTargetRotationQuat();
 }
 
 void CNetBlenderVehicle::SetTargetRotationMat(CVector3D& frontNew, CVector3D& upNew, CVector3D& rightNew)
@@ -76,35 +75,6 @@ void CNetBlenderVehicle::UpdateTargetRotationMat()
 	}
 
 	SetRotationMat(vecNewRotationFront, vecNewRotationUp, vecNewRotationRight);
-}
-
-void CNetBlenderVehicle::SetTargetRotationQuat(CQuaternion& quatNewRotation)
-{
-	UpdateTargetRotationQuat();
-
-	CQuaternion quatLocal;
-	GetRotationQuat(quatLocal);
-
-	CQuaternion quat2(0,0,0,1);
-	quat2.SetInverse(quatLocal);
-	CQuaternion quatError = quat2 * quatNewRotation;
-	m_RotationQuat.SetTarget(quatNewRotation, quatError, m_uiDelay);
-}
-
-void CNetBlenderVehicle::UpdateTargetRotationQuat()
-{
-	CQuaternion quatCurrentRotation;
-
-	GetRotationQuat(quatCurrentRotation);
-
-	CQuaternion quatNewRotation = quatCurrentRotation;
-
-	if (m_RotationQuat.HasTarget())
-	{
-		m_RotationQuat.Update(quatNewRotation, m_fRotationMaxError);
-	}
-
-	SetRotationQuat(quatNewRotation);
 }
 
 void CNetBlenderVehicle::GetPosition(CVector3D& vecPos)
@@ -153,19 +123,6 @@ void CNetBlenderVehicle::SetRotationMat(const CVector3D& vecRotationFront, const
 	auto pBlender = m_pEntity->m_pBlender;
 	m_pEntity->m_pBlender = nullptr;
 	m_pEntity->SetRotationMat(vecRotationFront, vecRotationUp, vecRotationRight);
-	m_pEntity->m_pBlender = pBlender;
-}
-
-void CNetBlenderVehicle::GetRotationQuat(CQuaternion& quatRot)
-{
-	m_pEntity->GetRotationQuat(quatRot);
-}
-
-void CNetBlenderVehicle::SetRotationQuat(CQuaternion& quatRot)
-{
-	auto pBlender = m_pEntity->m_pBlender;
-	m_pEntity->m_pBlender = nullptr;
-	m_pEntity->SetRotationQuat(quatRot);
 	m_pEntity->m_pBlender = pBlender;
 }
 

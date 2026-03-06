@@ -111,12 +111,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	UTF8String name2(true, name);
 
 	pVehModel->SetName(name2);
-	pVehModel->SetScale({ 1, 1, 1 });
-
-	//S_quat quat;
-	//CVecTools::rotate(rot.z, rot.y, -M_PI, quat);
-	//pVehModel->SetRot(quat);
-	//pVehModel->SetWorldPos(CVecTools::ConvertToMafiaVec(pos));
+	pVehModel->SetScale(CVecTools::ConvertToMafiaVec(m_Scale));
 
 	pVehModel->Update();
 
@@ -377,57 +372,6 @@ bool CClientVehicle::GetRotationMat(CVector3D& rotationFront, CVector3D& rotatio
 	return true;
 }
 
-bool CClientVehicle::SetRotationQuat(CQuaternion& quatRot)
-{
-	if (GetGameVehicle() == nullptr)
-		return false;
-
-	*(CQuaternion*)(((uint32_t)m_MafiaVehicle) + 0x48) = quatRot;
-
-	if (m_MafiaVehicle->GetFrame() != nullptr)
-	{
-		uint32_t uiFrame = (uint32_t)(m_MafiaVehicle->GetFrame()->GetInterface());
-		*(CQuaternion*)(uiFrame + 0x9C) = quatRot;
-	}
-
-	UpdateGameMatrix();
-
-	return true;
-}
-
-bool CClientVehicle::GetRotationQuat(CQuaternion& quatRot)
-{
-	if (GetGameVehicle() == nullptr)
-		return false;
-
-	//if (m_MafiaVehicle->GetFrame() != nullptr)
-	//{
-	//	uint32_t uiFrameQuatAddr = ((uint32_t)m_MafiaVehicle->GetFrame()->GetInterface()) + 0x9C;
-	//	CQuaternion* pFrameQuat = (CQuaternion*)uiFrameQuatAddr;
-	//	quatRot.x = pFrameQuat->x;
-	//	quatRot.y = pFrameQuat->y;
-	//	quatRot.z = pFrameQuat->z;
-	//	quatRot.w = pFrameQuat->w;
-	//}
-	//else
-	//{
-	//	uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
-	//	CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
-	//	quatRot.x = pEntityQuat->x;
-	//	quatRot.y = pEntityQuat->y;
-	//	quatRot.z = pEntityQuat->z;
-	//	quatRot.w = pEntityQuat->w;
-	//}
-
-	uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
-	CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
-	quatRot.x = pEntityQuat->x;
-	quatRot.y = pEntityQuat->y;
-	quatRot.z = pEntityQuat->z;
-	quatRot.w = pEntityQuat->w;
-	return true;
-}
-
 bool CClientVehicle::SetRotationVelocity(const CVector3D& vecRotVel)
 {
 	if (GetGameVehicle() == nullptr)
@@ -480,10 +424,8 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	}
 
 	auto pBlender = static_cast<CNetBlenderVehicle*>(m_pBlender);
-	CQuaternion quatInitialRotation(0,0,0,1);
 	pBlender->SetTargetPosition(vecPos);
 	pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
-	pBlender->SetTargetRotationQuat(quatInitialRotation);
 	pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 	pBlender->ResetInterpolation();
 
@@ -591,7 +533,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 		pBlender->SetTargetPosition(vecPos);
 		pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
-		pBlender->SetTargetRotationQuat(Packet.quatRot);
 		pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
 		//pBlender->SetTargetEngineRPM(Packet.rpm);
 		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
@@ -657,7 +598,6 @@ bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 	CQuaternion quatRot;
 	GetPosition(m_Position);
 	GetRotation(m_Rotation);
-	GetRotationQuat(quatRot);
 	GetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 
 	//printf("veh write sync. Element ID %i. Position %f %f %f\n", GetId(), m_Position.x, m_Position.y, m_Position.z);

@@ -59,9 +59,6 @@ public:
 	virtual bool SetRotationMat(const CVector3D& rotationFront, const CVector3D& rotationUp, const CVector3D& rotationRight);
 	virtual bool GetRotationMat(CVector3D& rotationFront, CVector3D& rotationUp, CVector3D& rotationRight);
 
-	bool SetRotationQuat(CQuaternion& quatRot);
-	bool GetRotationQuat(CQuaternion& quatRot);
-
 	virtual bool ReadCreatePacket(Galactic3D::Stream* pStream) override;
 	virtual bool ReadSyncPacket(Galactic3D::Stream* pStream) override;
 

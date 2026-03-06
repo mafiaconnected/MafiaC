@@ -23,6 +23,8 @@ public:
 	CVector3D m_RelativePosition;
 	CVector3D m_RelativeRotation;
 
+	CVector3D m_Scale{ 1, 1, 1 };
+
 	uint8_t m_ucCreatedBy = ELEMENTCREATEDBY_USER;
 	bool m_bMigrating = false;
 
