@@ -91,7 +91,7 @@ namespace MafiaSDK
             Asphalt = 1,
             Pavement = 2,
             Sidewalk = 3,
-            Concrete = 4,
+            Concrete1 = 4,
             Grass = 5,
             Sand = 6,
             Clay = 7,
