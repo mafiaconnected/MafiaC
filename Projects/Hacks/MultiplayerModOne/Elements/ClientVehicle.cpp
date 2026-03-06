@@ -139,7 +139,7 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 
 	m_MafiaVehicle->Init(pVehModel);
 	m_MafiaVehicle->SetActive(true);
-	m_MafiaVehicle->SetActState(1);
+	m_MafiaVehicle->SetActState(0);
 	//m_MafiaVehicle->Engine(0.083f, 0.083f, 0.083f);
 
 	MafiaSDK::GetMission()->GetGame()->AddTemporaryActor(m_MafiaVehicle);
@@ -400,24 +400,31 @@ bool CClientVehicle::GetRotationQuat(CQuaternion& quatRot)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
-	if (m_MafiaVehicle->GetFrame() != nullptr)
-	{
-		uint32_t uiFrameQuatAddr = ((uint32_t)m_MafiaVehicle->GetFrame()->GetInterface()) + 0x9C;
-		CQuaternion* pFrameQuat = (CQuaternion*)uiFrameQuatAddr;
-		quatRot.x = pFrameQuat->x;
-		quatRot.y = pFrameQuat->y;
-		quatRot.z = pFrameQuat->z;
-		quatRot.w = pFrameQuat->w;
-	}
-	else
-	{
-		uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
-		CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
-		quatRot.x = pEntityQuat->x;
-		quatRot.y = pEntityQuat->y;
-		quatRot.z = pEntityQuat->z;
-		quatRot.w = pEntityQuat->w;
-	}
+	//if (m_MafiaVehicle->GetFrame() != nullptr)
+	//{
+	//	uint32_t uiFrameQuatAddr = ((uint32_t)m_MafiaVehicle->GetFrame()->GetInterface()) + 0x9C;
+	//	CQuaternion* pFrameQuat = (CQuaternion*)uiFrameQuatAddr;
+	//	quatRot.x = pFrameQuat->x;
+	//	quatRot.y = pFrameQuat->y;
+	//	quatRot.z = pFrameQuat->z;
+	//	quatRot.w = pFrameQuat->w;
+	//}
+	//else
+	//{
+	//	uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
+	//	CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
+	//	quatRot.x = pEntityQuat->x;
+	//	quatRot.y = pEntityQuat->y;
+	//	quatRot.z = pEntityQuat->z;
+	//	quatRot.w = pEntityQuat->w;
+	//}
+
+	uint32_t uiEntityQuatAddr = ((uint32_t)m_MafiaVehicle) + 0x48;
+	CQuaternion* pEntityQuat = (CQuaternion*)uiEntityQuatAddr;
+	quatRot.x = pEntityQuat->x;
+	quatRot.y = pEntityQuat->y;
+	quatRot.z = pEntityQuat->z;
+	quatRot.w = pEntityQuat->w;
 	return true;
 }
 
@@ -502,7 +509,7 @@ bool CClientVehicle::ReadCreatePacket(Galactic3D::Stream* pStream)
 	m_EngineRPM = Packet.rpm;
 
 	GetGameVehicle()->SetActive(true);
-	GetGameVehicle()->SetActState(1);
+	GetGameVehicle()->SetActState(0);
 	GetGameVehicle()->Engine(0.083f, 0.083f, 0.083f);
 	//GetGameVehicle()->SetColsOn(Packet.collisionsEnabled);
 	//GetGameVehicle()->SetTransparency(Packet.alpha);
