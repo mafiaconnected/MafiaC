@@ -646,6 +646,10 @@ static bool FunctionGameIsActorSpawned(IScriptState* pState, int argc, void* pUs
 		return false;
 	}
 
+	if (actor->GetInterface() == nullptr) {
+		return false;
+	}
+
 	return true;
 }
 
