@@ -88,6 +88,48 @@ static bool FunctionEntitySetRotation(IScriptState* pState, int argc, void* pUse
 	return false;
 }
 
+static bool FunctionEntityGetScale(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientEntity* pClientEntity;
+
+	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
+		return false;
+
+	CVector3D scale = { 1, 1, 1 };
+
+	if (pClientEntity->GetScale(scale))
+	{
+		pState->ReturnVector3D(scale);
+
+		return true;
+	}
+
+	pState->Error(_gstr("entity not spawned"));
+	return false;
+}
+
+static bool FunctionEntitySetScale(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientEntity* pClientEntity;
+
+	if (!pState->GetThis(pClientManager->m_pClientEntityClass, &pClientEntity))
+		return false;
+
+	CVector3D scale;
+	if (!pState->CheckVector3D(0, scale))
+		return false;
+
+	if (pClientEntity->SetScale(scale))
+		return true;
+
+	pState->Error(_gstr("entity not spawned"));
+	return false;
+}
+
 static bool FunctionEntityGetHeading(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -162,6 +204,7 @@ void CScriptingFunctions::RegisterEntityFunctions(Galactic3D::CScripting* pScrip
 
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("position"), ARGUMENT_VECTOR3D, FunctionEntityGetPosition, FunctionEntitySetPosition);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("rotation"), ARGUMENT_VECTOR3D, FunctionEntityGetRotation, FunctionEntitySetRotation);
+	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("scale"), ARGUMENT_VECTOR3D, FunctionEntityGetScale, FunctionEntitySetScale);
 	//pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("heading"), ARGUMENT_FLOAT, FunctionEntityGetHeading, FunctionEntitySetHeading);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("model"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel);
 	pClientManager->m_pClientEntityClass->AddProperty(pClientManager, _gstr("modelIndex"), ARGUMENT_STRING, FunctionEntityGetModel, FunctionEntitySetModel); // For GTAC compatibility
