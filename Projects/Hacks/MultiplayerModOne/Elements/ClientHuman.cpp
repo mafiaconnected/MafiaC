@@ -209,18 +209,18 @@ void CClientHuman::Spawn(const CVector3D& pos, float angle, bool isLocal)
 
 	MafiaSDK::GetMission()->GetGame()->AddTemporaryActor(m_MafiaHuman);
 
-	if (isLocal)
-	{
-		MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
-
-		if (pGame)
-		{
-			pGame->GetCamera()->SetCar(NULL);
-			pGame->GetCamera()->SetMode(true, 1);
-			pGame->GetCamera()->SetPlayer(m_MafiaHuman);
-			pGame->SetLocalPlayer((MafiaSDK::C_Player*)m_MafiaHuman);
-		}
-	}
+	//if (isLocal)
+	//{
+	//	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+	//
+	//	if (pGame)
+	//	{
+	//		pGame->GetCamera()->SetCar(NULL);
+	//		pGame->GetCamera()->SetMode(true, 1);
+	//		pGame->GetCamera()->SetPlayer(m_MafiaHuman);
+	//		pGame->SetLocalPlayer((MafiaSDK::C_Player*)m_MafiaHuman);
+	//	}
+	//}
 
 	auto rot = CVecTools::ComputeDirVector(angle);
 
