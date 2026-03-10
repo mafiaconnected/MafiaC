@@ -23,6 +23,7 @@ CClientEntity::CClientEntity(CMafiaClientManager* pClientManager) : CNetObject(p
 	m_RelativePosition = CVector3D(0, 0, 0);
 	m_Rotation = CVector3D(0, 0, 0);
 	m_RelativeRotation = CVector3D(0, 0, 0);
+	m_Scale = CVector3D(1, 1, 1);
 }
 
 Galactic3D::ReflectedClass* CClientEntity::GetReflectedClass()
@@ -51,6 +52,18 @@ bool CClientEntity::SetRotation(const CVector3D& vecRotation)
 bool CClientEntity::GetRotation(CVector3D& vecRotation)
 {
 	vecRotation = m_Rotation;
+	return true;
+}
+
+bool CClientEntity::SetScale(const CVector3D& vecScale)
+{
+	m_Scale = vecScale;
+	return true;
+}
+
+bool CClientEntity::GetScale(CVector3D& vecScale)
+{
+	vecScale = m_Scale;
 	return true;
 }
 

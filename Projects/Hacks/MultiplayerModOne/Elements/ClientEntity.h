@@ -54,6 +54,9 @@ public:
 	virtual bool SetRotation(const CVector3D& vecRotation) override;
 	virtual bool GetRotation(CVector3D& vecRotation) override;
 
+	virtual bool SetScale(const CVector3D& vecScale);
+	virtual bool GetScale(CVector3D& vecScale);
+
 	virtual bool SetHeading(float heading);
 	virtual float GetHeading();
 };
