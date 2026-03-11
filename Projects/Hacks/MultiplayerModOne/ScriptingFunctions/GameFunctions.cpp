@@ -115,7 +115,11 @@ static bool FunctionGameCreateVehicle(IScriptState* pState, int argc, void* pUse
 		return false;
 
 	CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pClientManager->Create(ELEMENT_VEHICLE));
-	CVector3D rot = CVecTools::ComputeDirEuler(CVecTools::RadToDeg(angle));
+	CVector3D rot = CVecTools::ComputeDirEuler(angle);
+	pClientVehicle->SetModel(mdl);
+	pClientVehicle->SetPosition(pos);
+	pClientVehicle->SetRotation(CVecTools::ComputeDirEuler(angle));
+	pClientVehicle->SetRotationMat(CVecTools::ComputeDirVector(CVecTools::RadToDeg(angle)), { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 });
 	pClientVehicle->Create(mdl, pos, rot);
 	pClientVehicle->m_pResource = pState->GetResource();
 	pClientManager->RegisterNetObject(pClientVehicle);
