@@ -710,7 +710,7 @@ float CClientVehicle::GetFuel()
 	return m_MafiaVehicle->GetInterface()->vehicle_interface.fuel;
 }
 
-bool CClientVehicle::SetGear(uint32_t gear)
+bool CClientVehicle::SetGear(int32_t gear)
 {
 	if (m_MafiaVehicle == nullptr)
 		return false;
@@ -720,7 +720,7 @@ bool CClientVehicle::SetGear(uint32_t gear)
 	return true;
 }
 
-uint32_t CClientVehicle::GetGear()
+int32_t CClientVehicle::GetGear()
 {
 	if (m_MafiaVehicle == nullptr)
 		return -1;

@@ -77,8 +77,8 @@ public:
 	virtual bool SetFuel(float fuel);
 	virtual float GetFuel();
 
-	virtual bool SetGear(uint32_t gear);
-	virtual uint32_t GetGear();
+	virtual bool SetGear(int32_t gear);
+	virtual int32_t GetGear();
 
 	virtual bool SetSpeedLimit(float speedLimit);
 	virtual float GetSpeedLimit();
