@@ -2172,3 +2172,16 @@ void CClientGame::ShowDisconnectReason()
 	};
 	m_pChatWindow->AddMessage(_gstr("Disconnected [%s]"), Galactic3D::COLOUR::Red, rgpszReasons[m_iStopMultiplayerGameReason]);
 }
+
+void CClientGame::SetLocalPlayer(CClientHuman* pClientHuman)
+{
+	MafiaSDK::C_Game* pGame = MafiaSDK::GetMission()->GetGame();
+
+	if (pGame)
+	{
+		pGame->GetCamera()->SetCar(NULL);
+		pGame->GetCamera()->SetMode(true, 1);
+		pGame->GetCamera()->SetPlayer(pClientHuman->GetGameHuman());
+		pGame->SetLocalPlayer((MafiaSDK::C_Player*)pClientHuman->GetGameHuman());
+	}
+}

@@ -300,6 +300,8 @@ public:
 	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
 
 	bool IsGameComponentEnabled(eGameComponent GameComponent);
+
+	void CClientGame::SetLocalPlayer(CClientHuman* pClientHuman);
 };
 
 extern CClientGame* g_pClientGame;

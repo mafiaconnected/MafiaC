@@ -329,14 +329,11 @@ static bool FunctionGameSetLocalPlayer(IScriptState* pState, int argc, void* pUs
 {
  	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	CClientPlayer* pClientPlayer;
-	if (!pState->CheckClass(pClientManager->m_pClientPlayerClass, 0, false, &pClientPlayer))
+	CClientHuman* pClientHuman;
+	if (!pState->CheckClass(pClientManager->m_pClientHumanClass, 0, false, &pClientHuman))
 		return false;
 
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetCar(NULL);
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetMode(true, 1);
-	MafiaSDK::GetMission()->GetGame()->GetCamera()->SetPlayer(pClientPlayer->GetGamePlayer());
-	MafiaSDK::GetMission()->GetGame()->SetLocalPlayer(pClientPlayer->GetGamePlayer());
+	g_pClientGame->SetLocalPlayer(pClientHuman);
 	return true;
 }
 

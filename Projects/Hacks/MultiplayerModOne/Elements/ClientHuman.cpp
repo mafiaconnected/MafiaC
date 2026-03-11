@@ -414,6 +414,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	{
 		pClientVehicle = GetOccupiedVehicle();
 	}
+
 	if (pClientVehicle != nullptr)
 	{
 		vehicleId = pClientVehicle->GetId();
