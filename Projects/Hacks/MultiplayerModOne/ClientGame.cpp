@@ -937,8 +937,8 @@ void CClientGame::OnProcess()
 	{
 		m_GUISystem.m_fLeft = 0.0f;
 		m_GUISystem.m_fTop = 0.0f;
-		m_GUISystem.m_fWidth = MafiaSDK::GetIGraph()->Scrn_sx();
-		m_GUISystem.m_fHeight = MafiaSDK::GetIGraph()->Scrn_sy();
+		m_GUISystem.m_fWidth = (float)MafiaSDK::GetIGraph()->Scrn_sx();
+		m_GUISystem.m_fHeight = (float)MafiaSDK::GetIGraph()->Scrn_sy();
 		m_GUISystem.m_fClipLeft = 0.0f;
 		m_GUISystem.m_fClipTop = 0.0f;
 		m_GUISystem.m_fClipRight = m_GUISystem.m_fWidth;
@@ -1812,6 +1812,8 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 	}
 
 	pClientVehicle->AssignSeat(pClientHuman, iSeat);
+
+	return true;
 }
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
@@ -1844,6 +1846,8 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	}
 
 	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
+
+	return;
 }
 
 bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
@@ -1885,6 +1889,8 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 	}
 
 	pClientVehicle->FreeSeat(iSeat);
+
+	return true;
 }
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
@@ -1917,6 +1923,8 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 	}
 
 	//pClientVehicle->FreeSeat(iSeat);
+
+	return;
 }
 
 void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat)
@@ -1949,6 +1957,9 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 
 void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVector3D vec2, CVector3D vec3, int uiHitType, float fDamage, int uiBodyPart)
 {
+	if (pClientHumanTarget == nullptr)
+		return;
+
 	bool bPreventDefault = false;
 	CArguments args;
 	args.AddObject(pClientHumanTarget);
