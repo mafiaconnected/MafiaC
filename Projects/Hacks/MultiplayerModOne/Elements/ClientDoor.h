@@ -10,7 +10,7 @@ public:
 	CClientDoor(CMafiaClientManager* pClientManager);
 
 	float m_DoorOpenAngle = 0.0f;
-	bool m_bLocked = false;
+	uint32_t m_uiState = 0;
 	MafiaSDK::C_Door* m_MafiaDoor = nullptr;
 
 	virtual Galactic3D::ReflectedClass* GetReflectedClass() override;
@@ -23,6 +23,8 @@ public:
 	virtual bool SetOpenAngle(float angle);
 	virtual float GetOpenAngle();
 
-	virtual bool SetLocked(bool locked);
-	virtual bool GetLocked();
+	virtual bool SetState(uint32_t state, MafiaSDK::C_Actor* actor, bool unk1, bool unk2);
+	uint32_t GetState();
+
+	virtual void SetFromExistingEntity(MafiaSDK::C_Door* door);
 };
