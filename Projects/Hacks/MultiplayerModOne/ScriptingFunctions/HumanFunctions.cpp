@@ -1191,6 +1191,43 @@ static bool FunctionHumanSetNormalPose(IScriptState* pState, int argc, void* pUs
 	return true;
 }
 
+static bool FunctionHumanEnterVehicle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	CClientVehicle* pVehicle;
+	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pVehicle))
+		return false;
+
+	uint8_t uiSeat;
+	if (!pState->CheckNumber(1, uiSeat))
+		return false;
+
+	pClientHuman->EnterVehicle(pVehicle, uiSeat);
+	return true;
+}
+
+static bool FunctionHumanExitVehicle(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	CClientHuman* pClientHuman;
+
+	if (!pState->GetThis(pClientManager->m_pClientHumanClass, &pClientHuman))
+		return false;
+
+	if(pClientHuman->GetOccupiedVehicle() == nullptr)
+		return pState->Error(_gstr("Ped not in a vehicle!"));
+
+	pClientHuman->ExitVehicle();
+	return true;
+}
+
 #pragma endregion
 
 void CScriptingFunctions::RegisterHumanDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
@@ -1270,6 +1307,8 @@ void CScriptingFunctions::RegisterHumanFunctions(Galactic3D::CScripting* pScript
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("throwGrenade"), _gstr("tv"), FunctionHumanThrowGrenade, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setProperty"), _gstr("tif"), FunctionHumanSetProperty, pClientManager);
 	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("setNormalPose"), _gstr("tv"), FunctionHumanSetNormalPose, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("enterVehicle"), _gstr("txi"), FunctionHumanEnterVehicle, pClientManager);
+	pClientManager->m_pClientHumanClass->RegisterFunction(_gstr("exitVehicle"), _gstr("t"), FunctionHumanExitVehicle, pClientManager);
 
 	
 	// Debug
