@@ -27,11 +27,11 @@ target_link_libraries(
 	WindowHacks
     DebugTest
 	ModLoader
-    DiscordRichPresence_static
-    IPCServer_static
-    CustomWindow_static
-    CrashHandler_static
-    MultiplayerModOne
+	DiscordRichPresence_static
+	IPCServer_static
+	CustomWindow_static
+	CrashHandler_static
+	MultiplayerModOne
 	MultiplayerModTwo)
 
 target_link_libraries(

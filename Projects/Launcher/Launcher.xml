@@ -56,7 +56,7 @@
 		<Mod Name="MultiplayerModOne" Title="MultiplayerOne" Category="Mod" Visible="true" Enabled="true">
 			<Game>mafia:one</Game>
 		</Mod>
-		<Mod Name="MultiplayerModTwo" Title="MultiplayerTwo" Category="Mod" Visible="true" Enabled="true">
+		<Mod Name="MultiplayerModTwo" Title="MultiplayerTwo" Category="Mod" Visible="false" Enabled="true">
 			<Game>mafia:two</Game>
 		</Mod>
 	</Mods>

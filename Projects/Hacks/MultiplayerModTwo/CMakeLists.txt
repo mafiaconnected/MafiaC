@@ -2,7 +2,7 @@ file(GLOB_RECURSE SOURCES *.cpp *.h *.rc)
 
 group_sources("${SOURCES}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Mafia2SDK")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../Direct3D9")
 
 if(MSVC)
@@ -10,6 +10,8 @@ if(MSVC)
 endif()
 
 new_hack_static(MultiplayerModTwo "${SOURCES}" "")
+
+target_link_spidermonkey(MultiplayerModTwo)
 
 target_link_libraries(
 	MultiplayerModTwo
@@ -30,7 +32,6 @@ target_link_libraries(
 	Multiplayer_static
 	Network_static
 	Scripting_static
-	mozjs-52
 	dxerr
 	dxguid
 	dsound

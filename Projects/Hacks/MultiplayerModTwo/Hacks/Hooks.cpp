@@ -98,6 +98,9 @@ static void OnGameInitII()
 		g_pClientGame->HumanEnteredVehicle(g_pClientGame->m_pClientManager->FindHuman(ped), g_pClientGame->m_pClientManager->FindVehicle(car), seat, 0, 0);
 	});
 
+	M2::C_GuiGame::Get()->StartGame(M2::E_iLoadType::TYPE_NEW_GAME, 0, 1, "freeride", false);
+	M2::C_GameGuiModule::Get()->FaderFadeIn(1);
+
 	g_pClientGame->OnPreStartInGame(false);
 	g_pClientGame->OnStartInGame(false);
 
@@ -213,5 +216,7 @@ RAWCODE HookRender2DStuffII()
 
 void CGameHooksII::InstallHooks()
 {
+	_glogprintf(_gstr("CGameHooksII::InstallHooks"));
 	M2::Initialize(OnGameInitII);
+	_glogprintf(_gstr("CGameHooksII::InstallHooks COMPLETE"));
 }

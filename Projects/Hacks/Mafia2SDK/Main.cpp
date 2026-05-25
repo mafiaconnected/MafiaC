@@ -1,7 +1,9 @@
 
 #include "stdafx.h"
 #include "pch.h"
-//#include "m2sdk.h"
+
+#define MAFIA2_SDK_IMPLEMENTATION
+#include "m2sdk.h"
 
 tHack* g_pHack;
 
