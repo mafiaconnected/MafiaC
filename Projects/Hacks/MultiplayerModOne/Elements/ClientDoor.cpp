@@ -30,8 +30,8 @@ MafiaSDK::C_Door* CClientDoor::GetGameDoor()
 
 bool CClientDoor::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
-	//if (GetGameDoor() == nullptr)
-	//	return false;
+	if (GetGameDoor() == nullptr)
+		return false;
 }
 
 bool CClientDoor::WriteCreatePacket(Galactic3D::Stream* pStream)
