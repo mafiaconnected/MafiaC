@@ -272,7 +272,7 @@ void CClientGame::InitialiseScripting()
 	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, true);
 	m_pOnHumanEnteredVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteredVehicle"), _gstr("Called whenever a ped finishes entering a vehicle"), 3, true);
 	m_pOnHumanExitingVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitingVehicle"), _gstr("Called whenever a ped starts exiting a vehicle"), 3, true);
-	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exited a vehicle"), 3, true);
+	m_pOnHumanExitedVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedExitedVehicle"), _gstr("Called whenever a ped finishes exiting a vehicle"), 3, true);
 	m_pOnHumanJackVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedJackVehicle"), _gstr("Called whenever a ped jacks a vehicle"), 3, true);
 	m_pOnAddActorEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnAddActor"), _gstr("Called whenever game actor is added"), 3, true);
 
@@ -1811,13 +1811,19 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		}
 	}
 
-	pClientVehicle->AssignSeat(pClientHuman, iSeat);
+	pClientHuman->m_nVehicleSeatIndex = -1;
+	pClientHuman->m_nVehicleEnteringSeatIndex = iSeat;
 
 	return true;
 }
 
-void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat)
 {
+
+	pClientVehicle->AssignSeat(pClientHuman, iSeat);
+	pClientHuman->m_nVehicleSeatIndex = iSeat;
+	pClientHuman->m_nVehicleEnteringSeatIndex = -1;
+
 	_glogverboseprintf(_gstr("Human entered vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1833,8 +1839,6 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iSeat);
-			Packet.Write<uint32_t>(iAction);
-			Packet.Write<uint32_t>(iUnknown);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -1844,9 +1848,7 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 			//m_bUseActorInvokedByGame = true;
 		}
 	}
-
-	//pClientVehicle->AssignSeat(pClientHuman, iSeat);
-
+	
 	return;
 }
 
@@ -1888,13 +1890,14 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		}
 	}
 
-	pClientVehicle->FreeSeat(iSeat);
-
 	return true;
 }
 
-void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
+void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat)
 {
+	pClientVehicle->FreeSeat(iSeat);
+	pClientHuman->m_nVehicleSeatIndex = iSeat;
+
 	_glogverboseprintf(_gstr("Human exited vehicle"));
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1910,8 +1913,6 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 			Packet.Write<int32_t>(pClientHuman->GetId());
 			Packet.Write<int32_t>(pClientVehicle->GetId());
 			Packet.Write<int8_t>(iSeat);
-			Packet.Write<uint32_t>(iAction);
-			Packet.Write<uint32_t>(iUnknown);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
 		else
@@ -1921,8 +1922,6 @@ void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle*
 			//m_bUseActorInvokedByGame = true;
 		}
 	}
-
-	//pClientVehicle->FreeSeat(iSeat);
 
 	return;
 }
@@ -2022,7 +2021,6 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 	Args.AddNumber(iUnk3);
 	m_pOnHumanUsingActorEventType->Trigger(Args);
 
-	/*
 	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
@@ -2042,7 +2040,6 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 			m_bUseActorInvokedByGame = true;
 		}
 	}
-	*/
 }
 
 void CClientGame::DestroyUninitializedGameElements()

@@ -494,6 +494,21 @@ void CClientHuman::Process()
 		}
 	}
 
+	if (IsSyncer() && GetGameHuman() != nullptr) 
+	{
+		if (GetOccupiedVehicle() != nullptr && GetEnteringExitingVehicle() == nullptr && m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
+		{
+			g_pClientGame->HumanEnteredVehicle(this, GetOccupiedVehicle(), m_nVehicleEnteringSeatIndex);
+		}
+		else
+		{
+			if (GetOccupiedVehicle() == nullptr && GetEnteringExitingVehicle() == nullptr && m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
+			{
+				g_pClientGame->HumanExitedVehicle(this, static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE)), m_nVehicleSeatIndex);
+			}
+		}
+	}
+
 	if (!IsSyncer()) 
 	{
 		SetActiveWeapon(m_WeaponID);
@@ -598,7 +613,8 @@ int8_t CClientHuman::GetVehicleSeat()
 		}
 	}
 
-	for (int8_t i = 0; i < 4; i++)
+	/*
+		for (int8_t i = 0; i < 4; i++)
 	{
 		CClientHuman* pClientHuman = pClientVehicle->GetHumanInSeat(i);
 		if (pClientHuman != nullptr && this == pClientHuman)
@@ -606,8 +622,9 @@ int8_t CClientHuman::GetVehicleSeat()
 			return i;
 		}
 	}
+	*/
 
-	return -1;
+	return m_nVehicleSeatIndex;
 }
 
 void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)

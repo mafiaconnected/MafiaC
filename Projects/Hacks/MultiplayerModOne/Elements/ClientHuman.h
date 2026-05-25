@@ -28,7 +28,9 @@ public:
 	bool m_isLocalPlayer = false;
 
 	int32_t m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
-	int8_t m_nVehicleSeatIndex = 0;
+	int8_t m_nVehicleSeatIndex = -1;
+
+	int8_t m_nVehicleEnteringSeatIndex = -1;
 
 	bool m_bEnteredVehicleEvent = false;
 	bool m_bEnteringVehicleEvent = false;
