@@ -32,16 +32,12 @@ bool CClientDoor::ReadCreatePacket(Galactic3D::Stream* pStream)
 {
 	//if (GetGameDoor() == nullptr)
 	//	return false;
-
-	return true;
 }
 
 bool CClientDoor::WriteCreatePacket(Galactic3D::Stream* pStream)
 {
 	if (GetGameDoor() == nullptr)
 		return false;
-
-	return true;
 }
 
 bool CClientDoor::SetOpenAngle(float angle)

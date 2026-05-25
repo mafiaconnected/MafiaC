@@ -769,10 +769,14 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 			int32_t nHumanNetworkIndex;
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
+			uint32_t nAction;
+			uint32_t nUnknown;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
+			Reader.ReadUInt32(&nAction, 1);
+			Reader.ReadUInt32(&nUnknown, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -786,7 +790,7 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 						{
 							if (!pClientHuman->IsSyncer())
 							{
-								g_pClientGame->HumanEnteredVehicle(pClientHuman, pClientVehicle, nSeatId);
+								g_pClientGame->HumanEnteredVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
 							}
 						}
 					}
@@ -835,10 +839,14 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 			int32_t nHumanNetworkIndex;
 			int32_t nVehicleNetworkIndex;
 			int8_t nSeatId;
+			uint32_t nAction;
+			uint32_t nUnknown;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
 			Reader.ReadInt8(&nSeatId, 1);
+			Reader.ReadUInt32(&nAction, 1);
+			Reader.ReadUInt32(&nUnknown, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -852,7 +860,7 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 						{
 						if (!pClientHuman->IsSyncer())
 						{
-							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId);
+							g_pClientGame->HumanExitedVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
 						}
 						}
 					}
@@ -861,6 +869,7 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		}
 		break;
 
+		/*
 		case MAFIAPACKET_HUMAN_USINGACTOR:
 		{
 			int32_t nHumanNetworkIndex;
@@ -884,15 +893,13 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 					if (!pClientHuman->IsSyncer())
 					{
 						UTF8String actorName(true, szName);
-						MafiaSDK::C_Actor* pActor = MafiaSDK::GetMission()->FindActorByName(actorName);
-						if (pActor != nullptr) {
-							g_pClientGame->HumanUsingActor(pClientHuman, pActor, nUnk1, nUnk2, nUnk3);
-						}
+						g_pClientGame->HumanUsingActor(pClientHuman, MafiaSDK::GetMission()->FindActorByName(actorName), nUnk1, nUnk2, nUnk3);
 					}
 				}
 			}
 		}
 		break;
+		*/
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
