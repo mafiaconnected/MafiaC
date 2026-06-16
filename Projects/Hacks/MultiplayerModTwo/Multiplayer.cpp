@@ -56,7 +56,7 @@ void CMultiplayerII::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStrea
 			if (nPlayerNetworkIndex == INVALID_NETWORK_ID)
 			{
 				pClient->SetPlayer(nullptr);
-				pClient->m_nPlayerObjectId = INVALID_NETWORK_ID;
+				pClient->SetPlayerId(INVALID_NETWORK_ID);
 			}
 			else
 			{
@@ -66,7 +66,7 @@ void CMultiplayerII::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStrea
 					// Set player with M2 SDK
 
 					pClient->SetPlayer(pClientPlayer);
-					pClient->m_nPlayerObjectId = pClientPlayer->GetId();
+					pClient->SetPlayerId(pClientPlayer->GetId());
 
 					_glogprintf(L"Assigned player %d to the local client", pClientPlayer->GetId());
 
