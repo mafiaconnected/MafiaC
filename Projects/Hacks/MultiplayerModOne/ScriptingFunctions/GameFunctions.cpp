@@ -820,6 +820,21 @@ static bool FunctionGameReloadVehicleTables(IScriptState* pState, int argc, void
 	return true;
 }
 
+static bool FunctionGameSetWeatherParam(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	uint32_t uiParam;
+	if (!pState->CheckNumber(0, uiParam))
+		return false;
+
+	float fValue = false;
+	if (!pState->CheckNumber(1, fValue))
+		return false;
+
+	return true;
+}
+
 void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefineHandlers)
 {
 	pDefineHandlers->Define(_gstr("NONE"), 0);
@@ -869,6 +884,17 @@ void CScriptingFunctions::RegisterGameDefines(Galactic3D::CDefineHandlers* pDefi
 	pDefineHandlers->Define(_gstr("WEAPON_BOTTLE"), 29);
 	pDefineHandlers->Define(_gstr("WEAPON_SWORD"), 31);
 	pDefineHandlers->Define(_gstr("WEAPON_DOGSHEAD"), 32);
+
+	pDefineHandlers->Define(_gstr("WEATHER_ON"), 0);
+	pDefineHandlers->Define(_gstr("WEATHER_COLOR_L"), 3);
+	pDefineHandlers->Define(_gstr("WEATHER_COLOR_H"), 4);
+	pDefineHandlers->Define(_gstr("WEATHER_SPEED"), 5);
+	pDefineHandlers->Define(_gstr("WEATHER_LEN"), 6);
+	pDefineHandlers->Define(_gstr("WEATHER_WIDTH"), 7);
+	pDefineHandlers->Define(_gstr("WEATHER_MAX_DIST"), 8);
+	pDefineHandlers->Define(_gstr("WEATHER_MAX_HEIGHT"), 9);
+	pDefineHandlers->Define(_gstr("WEATHER_MAX_CNT"), 10);
+	pDefineHandlers->Define(_gstr("WEATHER_MODE"), 14);
 
 	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_NOREACT"), MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactOnWeapon);
 	pDefineHandlers->Define(_gstr("PEDBEHAVIOR_NOREACT_GUARDPLAYER"), MafiaSDK::C_Human_Enum::BehaviorStates::DoesntReactGuard);
@@ -956,6 +982,7 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("destroySound"), _gstr("i"), FunctionGameDestroySound, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setTrafficEnabled"), _gstr("b"), FunctionGameSetTrafficEnabled, pClientManager);
 		//pGameNamespace->RegisterFunction(_gstr("setProgramScript"), _gstr("s"), FunctionGameSetProgramScript, pClientManager);
+		//pGameNamespace->RegisterFunction(_gstr("setWeatherParam"), _gstr("ii"), FunctionGameSetWeatherParam, pClientManager);
 	}
 
 	// Offline Only
