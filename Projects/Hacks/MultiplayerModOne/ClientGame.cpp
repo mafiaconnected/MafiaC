@@ -345,10 +345,11 @@ void CClientGame::ShutdownScripting()
 		m_pDownloadManager = nullptr;
 	delete m_pResourceMgr;
 	m_pResourceMgr = nullptr;
-	m_Fonts.DeleteHWResources();
+	m_LucasFontFunctions.m_Fonts.Flush();
+	m_Fonts.Flush();
 	m_SlotMgr.DeleteHWResources();
 #if MAFIAC_RMLUI
-	delete m_pRmlUi;
+	m_pRmlUi->Flush();
 #endif
 }
 
@@ -795,8 +796,15 @@ void CClientGame::OnEndInGame()
 
 	m_GUISystem.Clear();
 
-	m_Fonts.DeleteHWResources();
-	m_SlotMgr.DeleteHWResources();
+	m_LucasFontFunctions.m_Fonts.Flush();
+	m_Fonts.Flush();
+
+#if GTAC_RMLUI
+	{
+		CLockable::CLock RmlLock(&m_pRmlUi->m_Lockable, true);
+		m_pRmlUi->Flush();
+	}
+#endif
 
 	m_bMultiplayerWorld = false;
 
