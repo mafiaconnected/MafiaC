@@ -237,7 +237,7 @@ RAWCODECALL CarUpdate()
 		if (pClientVehicle == nullptr)
 		{
 			//_glogprintf(_gstr("[GAME] Car::Update - Added Vehicle 0x%X Frame 0x%X"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()));
-			_glogverboseprintf(_gstr("[GAME] Car::Update - Added traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
+			//_glogverboseprintf(_gstr("[GAME] Car::Update - Added traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
 
 			g_pClientGame->OnTrafficCarCreate(g_pCarUpdate_Car);
 		}
@@ -251,7 +251,7 @@ RAWCODECALL CarUpdate()
 			{
 				//_glogprintf(_gstr("[GAME] Car::Update - Respawned Vehicle 0x%X Frame 0x%X %f"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()), fDistance);
 				//printf("Model Name for Respawn: %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str());
-				_glogverboseprintf(_gstr("[GAME] Car::Update - Respawn traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
+				//_glogverboseprintf(_gstr("[GAME] Car::Update - Respawn traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
 
 				g_pClientGame->OnTrafficCarRespawn(pClientVehicle, g_pCarUpdate_Car);
 			}
