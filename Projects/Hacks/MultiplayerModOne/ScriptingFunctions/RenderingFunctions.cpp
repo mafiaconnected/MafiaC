@@ -10,20 +10,58 @@ static bool FunctionLoadBMP(IScriptState* pState, int argc, void* pUser)
 	Stream* pStream = pState->CheckStream(0);
 	if (!pStream)
 		return false;
-	auto pTexture = Strong<Texture>::New(Texture::CreateFromBMP(pStream,false));
-	pTexture->m_pReflectedClass = g_pClientGame->m_pClientManager->m_pTextureClass;
-	pState->ReturnObject(pTexture);
+	auto pTexture = Strong<Texture>::New(Texture::CreateFromBMP(pStream, false));
+	if (pTexture != nullptr)
+	{
+		pTexture->m_pReflectedClass = g_pClientGame->m_pClientManager->m_pTextureClass;
+		pState->ReturnObject(pTexture);
+	}
+	else
+	{
+		pState->ReturnNull();
+	}
 	return true;
 }
 
 static bool FunctionLoadPNG(IScriptState* pState, int argc, void* pUser)
 {
-	Stream* pStream = pState->CheckStream(0);
-	if (!pStream)
-		return false;
-	auto pTexture = Strong<Texture>::New(Texture::CreateFromPNG(pStream,false));
-	pTexture->m_pReflectedClass = g_pClientGame->m_pClientManager->m_pTextureClass;
-	pState->ReturnObject(pTexture);
+	Strong<Stream> pStream;
+	if (argc > 0 && pState->GetArgument(0)->IsString())
+	{
+		const GChar* pszPath = pState->CheckString(0);
+		auto pInternetRequestMgr = &g_pClientGame->m_InternetRequestMgr;
+		if (pInternetRequestMgr != nullptr)
+		{
+			if (pInternetRequestMgr->CanHandle(pszPath))
+			{
+				auto pRequest = new CInternetTextureRequest(pInternetRequestMgr);
+				pRequest->m_bCache = false;
+				pRequest->m_pTexture->m_pReflectedClass = g_pClientGame->m_pClientManager->m_pTextureClass;
+				pState->ReturnObject(pRequest->m_pTexture);
+				pInternetRequestMgr->Push(pRequest, 0, pszPath);
+				return true;
+			}
+		}
+		pStream = Strong<Stream>::New(pState->GetResource()->OpenFile(pszPath, false));
+		if (!pStream)
+			return pState->Error(_gstr("Unable to open file"));
+	}
+	else
+	{
+		pStream = pState->CheckStream(0);
+		if (!pStream)
+			return false;
+	}
+	auto pTexture = Strong<Texture>::New(Texture::CreateFromPNG(pStream, false));
+	if (pTexture != nullptr)
+	{
+		pTexture->m_pReflectedClass = g_pClientGame->m_pClientManager->m_pTextureClass;
+		pState->ReturnObject(pTexture);
+	}
+	else
+	{
+		pState->ReturnNull();
+	}
 	return true;
 }
 
