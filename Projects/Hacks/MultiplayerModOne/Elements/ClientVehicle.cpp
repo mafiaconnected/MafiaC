@@ -548,6 +548,9 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 	if (GetGameVehicle() == nullptr)
 		return false;
 
+	if (GetGameVehicle()->GetInterface() == nullptr)
+		return false;
+
 	GetPosition(m_Position);
 	GetRotation(m_Rotation);
 	GetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
@@ -593,6 +596,9 @@ bool CClientVehicle::WriteCreatePacket(Galactic3D::Stream* pStream)
 bool CClientVehicle::WriteSyncPacket(Galactic3D::Stream* pStream)
 {
 	if (GetGameVehicle() == nullptr)
+		return false;
+
+	if (GetGameVehicle()->GetInterface() == nullptr)
 		return false;
 
 	CQuaternion quatRot;
