@@ -485,7 +485,7 @@ void CClientHuman::Process()
 {
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
-		if (IsInVehicle()) {
+		if (!IsInVehicle()) {
 			m_pBlender->Interpolate();
 		}
 		else 
