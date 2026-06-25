@@ -290,7 +290,7 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 	if (pStream->Read(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
 
-	_glogverboseprintf(_gstr("Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%.2f, %.2f, %.2f - %.2f, %.2f, %.2f]\n\tRotation: [%.2f, %.2f, %.2f - %.2f, %.2f, %.2f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z));
+	//_glogverboseprintf(_gstr("Got create packet for element #%d:\n\tModel: %s\n\tPosition: [%.2f, %.2f, %.2f - %.2f, %.2f, %.2f]\n\tRotation: [%.2f, %.2f, %.2f - %.2f, %.2f, %.2f]\n", GetId(), m_szModel, m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z));
 
 	if (GetGameHuman() == nullptr)
 	{
@@ -339,7 +339,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 
 	SetActiveWeapon(m_WeaponID);
 
-	_glogverboseprintf(L"Got sync packet for element #%d:\n\tPosition: [%.2f, %.2f, %.2f]\n\tPos. difference: [%.2f, %.2f, %.2f]\n\tRotation: [%.2f, %.2f, %.2f (%.2f, %.2f, %.2f)]\n\tRot. difference: [%.2f, %.2f, %.2f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, GetGameHuman()->GetInterface()->entity.rotation.x, GetGameHuman()->GetInterface()->entity.rotation.y, GetGameHuman()->GetInterface()->entity.rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, GetGameHuman()->GetInterface()->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, GetGameHuman()->GetInterface()->isDucking ? L"Yes" : L"No", GetGameHuman()->GetInterface()->isAiming ? L"Yes" : L"No", GetGameHuman()->GetInterface()->animState);
+	//_glogverboseprintf(L"Got sync packet for element #%d:\n\tPosition: [%.2f, %.2f, %.2f]\n\tPos. difference: [%.2f, %.2f, %.2f]\n\tRotation: [%.2f, %.2f, %.2f (%.2f, %.2f, %.2f)]\n\tRot. difference: [%.2f, %.2f, %.2f]\n\tHealth: %f\n\tVehicle index: %d\n\tVehicle seat index: %d\n\tDucking: %s\n\tAiming: %s\n\tAnim state: %d", GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, GetGameHuman()->GetInterface()->entity.rotation.x, GetGameHuman()->GetInterface()->entity.rotation.y, GetGameHuman()->GetInterface()->entity.rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, GetGameHuman()->GetInterface()->health, m_nVehicleNetworkIndex, m_nVehicleSeatIndex, GetGameHuman()->GetInterface()->isDucking ? L"Yes" : L"No", GetGameHuman()->GetInterface()->isAiming ? L"Yes" : L"No", GetGameHuman()->GetInterface()->animState);
 
 	if (!IsSyncer())
 	{
