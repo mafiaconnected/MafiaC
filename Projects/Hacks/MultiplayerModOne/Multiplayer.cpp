@@ -869,21 +869,20 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		}
 		break;
 
-		/*
 		case MAFIAPACKET_HUMAN_USINGACTOR:
 		{
 			int32_t nHumanNetworkIndex;
-			uint32_t nUnk1;
-			uint32_t nUnk2;
-			uint32_t nUnk3;
+			uint32_t iUnknown1;
+			uint32_t iUnknown2;
+			uint32_t iUnknown3;
 		
 			size_t size = 0;
 		
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			GChar* szName = Reader.ReadString(&size);
-			Reader.ReadUInt32(&nUnk1, 1);
-			Reader.ReadUInt32(&nUnk2, 1);
-			Reader.ReadUInt32(&nUnk3, 1);
+			Reader.ReadUInt32(&iUnknown1, 1);
+			Reader.ReadUInt32(&iUnknown2, 1);
+			Reader.ReadUInt32(&iUnknown3, 1);
 		
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
 			{
@@ -893,13 +892,18 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 					if (!pClientHuman->IsSyncer())
 					{
 						UTF8String actorName(true, szName);
-						g_pClientGame->HumanUsingActor(pClientHuman, MafiaSDK::GetMission()->FindActorByName(actorName), nUnk1, nUnk2, nUnk3);
+						MafiaSDK::C_Actor* actor = MafiaSDK::GetMission()->FindActorByName(actorName);
+
+						_glogprintf(_gstr("[CMultiplayer::ProcessPacket] (MAFIAPACKET_HUMAN_USINGACTOR) Human: %d, Actor: %s, iUnknown1: %d, iUnknown2: %d, iUnknown3: %d"), pClientHuman->GetId(), szName, iUnknown1, iUnknown2, iUnknown3);
+						if (actor)
+						{
+							g_pClientGame->HumanUsingActor(pClientHuman, actor, iUnknown1, iUnknown2, iUnknown3);
+						}
 					}
 				}
 			}
 		}
 		break;
-		*/
 
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{

@@ -267,6 +267,7 @@ void CClientGame::InitialiseScripting()
 	m_pOnMapLoadedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnMapLoaded"), _gstr("Called whenever the map/mission is fully loaded and ready to play"), 1, true);
 	//m_pOnKeyPressedEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnKeyPressed"), _gstr("Called whenever the key is pressed"));
 	m_pOnHumanHitEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedInflictDamage"), _gstr("Called whenever a ped has been hit"), 7, true);
+	m_pOnHumanUsingActorEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedUseActor"), _gstr("Called whenever a ped uses an actor"), 5, false);
 	m_pOnHumanDeathEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedDeath"), _gstr("Called whenever a ped dies"), 1, true);
 	m_pOnHumanSpawnEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedSpawn"), _gstr("Called whenever a ped spawns"), 1, true);
 	m_pOnHumanEnteringVehicleEventType = m_pResourceMgr->m_pEventHandlers->CreateEventType(_gstr("OnPedEnteringVehicle"), _gstr("Called whenever a ped starts entering a vehicle"), 3, true);
@@ -1784,7 +1785,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 {
 	int8_t iSeat = (iHopSeatsBool == 1 && iDoor == 1) ? 0 : iDoor;
 
-	_glogverboseprintf(_gstr("Ped %d entering vehicle %d in seat %d using door %d. Hopped seats: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool);
+	_glogverboseprintf(_gstr("[CClientGame::HumanEnteredVehicle] pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iDoor: %d, iHopSeatsBool: %d, iAction: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool, iAction);
 	
 	CArguments Args;
 	Args.AddObject(pClientHuman);
@@ -1826,7 +1827,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogverboseprintf(_gstr("Human entered vehicle"));
+	_glogverboseprintf(_gstr("[CClientGame::HumanEnteredVehicle]: pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iAction: %d, iUnknown: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iAction, iUnknown);
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1862,7 +1863,7 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
-	_glogverboseprintf(_gstr("Human exiting vehicle"));
+	_glogverboseprintf(_gstr("[CClientGame::HumanExitingVehicle]: pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iUnknown1: %d, iAction: %d, iUnknown2: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iUnknown1, iAction, iUnknown2);
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1903,7 +1904,7 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
 {
-	_glogverboseprintf(_gstr("Human exited vehicle"));
+	_glogverboseprintf(_gstr("[CClientGame::HumanExitedVehicle]: pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iAction: %d, iUnknown: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iAction, iUnknown);
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1997,7 +1998,7 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 		fNewHealth = 0.0f;
 	}
 
-	_glogverboseprintf(_gstr("[OnPedHit] Ped: %d, Old Health: %f, New Health: %f, Damage: %f"), pClientHumanTarget->GetId(), fOldHealth, fNewHealth, fDamage);
+	_glogverboseprintf(_gstr("[CClientGame::HumanHit] Ped: %d, Old Health: %f, New Health: %f, Damage: %f"), pClientHumanTarget->GetId(), fOldHealth, fNewHealth, fDamage);
 
 	pClientHumanTarget->SetHealth(fNewHealth);
 
@@ -2019,38 +2020,39 @@ void CClientGame::HumanHit(CClientHuman* pClientHumanTarget, CVector3D vec1, CVe
 	}
 }
 
-void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnk1, uint32_t iUnk2, uint32_t iUnk3)
+void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnknown1, uint32_t iUnknown2, uint32_t iUnknown3)
 {
-	_glogverboseprintf(_gstr("Human %d using actor %s"), pClientHuman->GetId(), (GChar*)pActor->GetFrame()->GetInterface()->name);
+	_glogverboseprintf(_gstr("[CClientGame::HumanUsingActor] Human: %d, Actor: %s, iUnknown1: %d, iUnknown2: %d, iUnknown3: %d"), pClientHuman->GetId(), CString(false, pActor->GetFrame()->GetInterface()->name).CString(), iUnknown1, iUnknown2, iUnknown3);
+	
 	CArguments Args;
 	Args.AddObject(pClientHuman);
-	Args.AddString((GChar*)pActor->GetFrame()->GetInterface()->name);
-	Args.AddNumber(iUnk1);
-	Args.AddNumber(iUnk2);
-	Args.AddNumber(iUnk3);
+	Args.AddString(CString(false, pActor->GetFrame()->GetInterface()->name).CString());
+	Args.AddNumber(iUnknown1);
+	Args.AddNumber(iUnknown2);
+	Args.AddNumber(iUnknown3);
 	m_pOnHumanUsingActorEventType->Trigger(Args);
 
-	/*
 	auto pMultiplayer = GetMultiplayer();
 	if (pMultiplayer != nullptr)
 	{
 		if (pClientHuman->IsSyncer()) {
+
 			Packet Packet(MAFIAPACKET_HUMAN_USINGACTOR);
-			Packet.Write<int32_t>(pClientHuman->GetId());
-			Packet.Write<GString>((GChar*)pActor->GetFrame()->GetInterface()->name);
-			Packet.Write<uint32_t>(iUnk1);
-			Packet.Write<uint32_t>(iUnk2);
-			Packet.Write<uint32_t>(iUnk3);
-			m_pMultiplayer->SendHostPacket(&Packet);
+			CBinaryWriter Writer(&Packet);
+			Writer.WriteInt32(pClientHuman->GetId());
+			Writer.WriteString(CString(false, pActor->GetFrame()->GetInterface()->name).CString());
+			Writer.WriteUInt32(iUnknown1);
+			Writer.WriteUInt32(iUnknown2);
+			Writer.WriteUInt32(iUnknown3);
+			m_pMultiplayer->SendHostPacket(&Packet);			
 		}
 		else
 		{
 			m_bUseActorInvokedByGame = false;
-			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnk1, iUnk2, iUnk3);
+			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnknown1, iUnknown2, iUnknown3);
 			m_bUseActorInvokedByGame = true;
 		}
 	}
-	*/
 }
 
 void CClientGame::DestroyUninitializedGameElements()

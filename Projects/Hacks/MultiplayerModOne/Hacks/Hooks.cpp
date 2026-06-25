@@ -165,15 +165,13 @@ RAWCODECALL HumanUseActor()
 {
 	if (g_pClientGame->m_bUseActorInvokedByGame)
 	{
-		
-
 		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)g_pHumanUseActor_Human);
 		if (pClientHuman != nullptr)
 		{
 			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)g_pHumanUseActor_Actor);
 			if (pClientVehicle != nullptr)
 			{
-				_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
+				//_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
 
 				// To abort, use this:
 				// g_bCancelHumanUseActor = true;
@@ -193,7 +191,7 @@ RAWCODECALL HumanUseActor()
 			}
 			else 
 			{
-				//g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
+				g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
 			}
 		}
 	}
