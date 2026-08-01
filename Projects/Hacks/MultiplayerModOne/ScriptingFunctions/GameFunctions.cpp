@@ -767,7 +767,7 @@ static bool FunctionGameAddCustomGameFile(IScriptState* pState, int argc, void* 
 		return false;
 
 	GChar szBuffer[512];
-	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_RootPath.c_str(), szFilePath);
+	_gsnprintf(szBuffer, ARRAY_COUNT(szBuffer), _gstr("%s/%s"), pState->m_pResource->m_FileSystem.m_RootPath.c_str(), szFilePath);
 
 	GString szFullFilePath;
 	g_pClientGame->m_pContext->GetFileSystem()->ResolvePath(szBuffer, szFullFilePath);

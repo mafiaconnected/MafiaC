@@ -36,7 +36,7 @@ CMafiaCHtmlContainer::CMafiaCHtmlContainer(Context* pContext, CClientGame* pClie
 Galactic3D::Stream* CMafiaCHtmlContainer::OpenFile(const GChar* pszPath)
 {
 	if (m_pActiveView->m_pResource != nullptr)
-		return m_pActiveView->m_pResource->OpenFile(pszPath, false);
+		return m_pActiveView->m_pResource->m_FileSystem.Open(pszPath, false);
 	return CHtmlContainer::OpenFile(pszPath);
 }
 

@@ -42,7 +42,7 @@ static bool FunctionLoadPNG(IScriptState* pState, int argc, void* pUser)
 				return true;
 			}
 		}
-		pStream = Strong<Stream>::New(pState->GetResource()->OpenFile(pszPath, false));
+		pStream = Strong<Stream>::New(pState->GetResource()->m_FileSystem.Open(pszPath, false));
 		if (!pStream)
 			return pState->Error(_gstr("Unable to open file"));
 	}
