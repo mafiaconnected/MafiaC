@@ -1473,7 +1473,20 @@ bool CClientGame::DontClipCursor()
 
 void CClientGame::SetCursorClipped(bool bClipped, bool bForce)
 {
-	if (bForce || m_bMouseClipped)
+	if (bClipped)
+	{
+		if (bForce || !m_bMouseClipped)
+		{
+			GetCursorPos(&m_OldCursorPos);
+
+			RECT Rect;
+			GetClientRect(GHWND, &Rect);
+			MapWindowRect(GHWND, NULL, &Rect);
+			::ClipCursor(&Rect);
+			m_bMouseClipped = true;
+		}
+	}
+	else if (bForce || m_bMouseClipped)
 	{
 		::ClipCursor(nullptr);
 		if (m_bMouseClipped && !DontClipCursor())
