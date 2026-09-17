@@ -1820,7 +1820,11 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		}
 	}
 
-	pClientVehicle->AssignSeat(pClientHuman, iSeat);
+	if (pClientVehicle->AssignSeat(pClientHuman, iSeat))
+	{
+		pClientHuman->m_nVehicleNetworkIndex = pClientVehicle->GetId();
+		pClientHuman->m_nVehicleSeatIndex = iSeat;
+	}
 
 	return true;
 }
@@ -1897,7 +1901,11 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		}
 	}
 
-	pClientVehicle->FreeSeat(iSeat);
+	if (pClientVehicle->FreeSeat(iSeat))
+	{
+		pClientHuman->m_nVehicleSeatIndex = -1;
+		pClientHuman->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+	}
 
 	return true;
 }
