@@ -938,6 +938,9 @@ CClientHuman* CClientVehicle::GetHumanInSeat(int8_t iSeat)
 	if (m_MafiaVehicle == nullptr)
 		return nullptr;
 
+	if (iSeat < 0 || iSeat >= ARRAY_COUNT(m_pOccupants))
+		return nullptr;
+
 	if (m_pOccupants[iSeat] == nullptr)
 		return nullptr;
 
@@ -952,6 +955,9 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, int8_t iSeat)
 	if (pHuman == nullptr)
 		return false;
 
+	if (iSeat < 0 || iSeat >= ARRAY_COUNT(m_pOccupants))
+		return false;
+
 	if (IsSeatOccupied(iSeat))
 		return false;
 
@@ -961,12 +967,10 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, int8_t iSeat)
 
 bool CClientVehicle::FreeSeat(int8_t iSeat)
 {
-	_gassert(iSeat >= 0 && iSeat < ARRAY_COUNT(m_pOccupants));
-
 	if (m_MafiaVehicle == nullptr)
 		return false;
 
-	if (iSeat == -1)
+	if (iSeat < 0 || iSeat >= ARRAY_COUNT(m_pOccupants))
 		return false;
 
 	if (!IsSeatOccupied(iSeat))

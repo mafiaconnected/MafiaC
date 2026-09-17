@@ -382,7 +382,6 @@ bool CClientHuman::WriteCreatePacket(Galactic3D::Stream* pStream)
 	Packet.inCarRotation = GetGameHuman()->GetInterface()->inCarRotation;
 	Packet.animStopTime = GetGameHuman()->GetInterface()->animTimeLeft;
 	Packet.weaponId = *(int16_t*)(((uint32_t)GetGameHuman()->GetInterface()) + 1184);
-	Packet.seat = GetVehicleSeat();
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
 		return false;
@@ -407,7 +406,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	CVector3D diffRot = m_Rotation - prevRot;
 
 	int vehicleId = INVALID_NETWORK_ID;
-	int seatId = 0;
+	int seatId = m_nVehicleSeatIndex;
 
 	CClientVehicle* pClientVehicle = GetEnteringExitingVehicle();
 	if (pClientVehicle == nullptr)
@@ -418,7 +417,6 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	if (pClientVehicle != nullptr)
 	{
 		vehicleId = pClientVehicle->GetId();
-		seatId = GetVehicleSeat();
 	}
 
 	int32_t iStopAnimTime = *(int32_t*)(((uint32_t)GetGameHuman()->GetInterface()) + 2772);
@@ -610,12 +608,14 @@ int8_t CClientHuman::GetVehicleSeat()
 	return -1;
 }
 
-void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat)
+void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, int8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
+	if (!pVehicle->AssignSeat(this, iSeat))
+		return;
+
 	GetGameHuman()->Use_Actor((MafiaSDK::C_Actor*)pVehicle->GetGameVehicle(), iSeat, 0, 0);
-	pVehicle->AssignSeat(this, iSeat);
 	m_nVehicleNetworkIndex = pVehicle->GetId();
 	m_nVehicleSeatIndex = iSeat;
 }
@@ -645,14 +645,18 @@ void CClientHuman::RemoveFromVehicle()
 void CClientHuman::ExitVehicle()
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
-	GetOccupiedVehicle()->FreeSeat(m_nVehicleSeatIndex);
-	GetGameHuman()->Use_Actor(GetOccupiedVehicle()->GetGameVehicle(), m_nVehicleSeatIndex, 2, 0);
+	CClientVehicle* pVehicle = GetOccupiedVehicle();
+	if (pVehicle != nullptr)
+	{
+		pVehicle->FreeSeat(m_nVehicleSeatIndex);
+		GetGameHuman()->Use_Actor(pVehicle->GetGameVehicle(), m_nVehicleSeatIndex, 2, 0);
+	}
 
 	m_nVehicleSeatIndex = -1;
 	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 }
 
-bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat)
+bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
@@ -661,19 +665,17 @@ bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat
 
 	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
 
-	if (!pClientVehicle->IsSeatOccupied(iSeat))
+	if (IsInVehicle())
 	{
-		if (IsInVehicle())
-		{
-			RemoveFromVehicle();
-		}
-
-		pClientVehicle->AssignSeat(this, iSeat);
-
-		GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), iSeat);
-		m_nVehicleNetworkIndex = pClientVehicle->GetId();
-		m_nVehicleSeatIndex = iSeat;
+		RemoveFromVehicle();
 	}
+
+	if (!pClientVehicle->AssignSeat(this, iSeat))
+		return false;
+
+	GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), iSeat);
+	m_nVehicleNetworkIndex = pClientVehicle->GetId();
+	m_nVehicleSeatIndex = iSeat;
 	return true;
 }
 

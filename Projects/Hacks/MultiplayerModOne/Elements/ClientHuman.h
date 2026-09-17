@@ -105,10 +105,10 @@ public:
 	bool IsInVehicle();
 	bool IsInVehicle(CClientVehicle* pClientVehicle);
 	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t iSeat);
-	void EnterVehicle(CClientVehicle* pVehicle, uint8_t iSeat);
+	void EnterVehicle(CClientVehicle* pVehicle, int8_t iSeat);
 	void RemoveFromVehicle();
 	void ExitVehicle();
-	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, uint8_t iSeat);
+	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat);
 
 	virtual bool SetModel(const GChar* modelName) override;
 	virtual const GChar* GetModel() override;

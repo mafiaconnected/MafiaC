@@ -1204,11 +1204,11 @@ static bool FunctionHumanEnterVehicle(IScriptState* pState, int argc, void* pUse
 	if (!pState->CheckClass(pClientManager->m_pClientVehicleClass, 0, false, &pVehicle))
 		return false;
 
-	uint8_t uiSeat;
-	if (!pState->CheckNumber(1, uiSeat))
+	int8_t iSeat;
+	if (!pState->CheckNumber(1, iSeat))
 		return false;
 
-	pClientHuman->EnterVehicle(pVehicle, uiSeat);
+	pClientHuman->EnterVehicle(pVehicle, iSeat);
 	return true;
 }
 
