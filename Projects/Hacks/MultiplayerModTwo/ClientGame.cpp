@@ -184,6 +184,9 @@ void CClientGameII::Initialise()
 
 	CLoadScreen::LoadResources();
 
+	// LucasFontFunctions reads whatever's already loaded into m_Fonts rather than loading its own copy
+	m_LucasFontFunctions.m_pFonts = &m_Fonts;
+
 	// Load fonts once
 	LoadFonts();
 
@@ -370,11 +373,9 @@ static bool LoadSystemFontCB(const TCHAR* pszValueName, const TCHAR* pszValue)
 void CClientGameII::LoadFonts()
 {
 	// Clear the existing fonts first
-	m_LucasFontFunctions.m_Fonts.Clear();
 	m_Fonts.Clear();
 
 	_glogprintf(_gstr("Loading System Fonts\n"));
-	m_LucasFontFunctions.m_Fonts.LoadSystemFonts(LoadSystemFontCB);
 	m_Fonts.LoadSystemFonts(LoadSystemFontCB);
 
 	{
@@ -386,7 +387,6 @@ void CClientGameII::LoadFonts()
 			if (pStream != nullptr)
 			{
 				//_glogprintf(_gstr("Loading Font - %s\n"), Path.c_str());
-				pClientGame->m_LucasFontFunctions.m_Fonts.LoadFont(pStream);
 				pClientGame->m_Fonts.LoadFont(pStream);
 			}
 			return true;
