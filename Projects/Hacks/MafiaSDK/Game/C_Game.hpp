@@ -37,7 +37,8 @@ namespace MafiaSDK
             SetHuman = 0x005A07E0,
             UpdateMusicVolume = 0x005B6600,
             ReloadVehicleTables = 0x0060A350,
-            OnExit = 0x00612485
+            OnExit = 0x00612485,
+            Done = 0x005A3C60
         };
     };
 
@@ -586,7 +587,57 @@ namespace MafiaSDK
                 call funcAddr
             }
         }
+
+        void Done()
+        {
+            unsigned long funcAddr = C_Game_Enum::FunctionAddresses::Done;
+
+            __asm
+            {
+                mov ecx, this
+                call funcAddr
+            }
+        }
     };
+
+	class C_Mission; // defined later in Game/C_Mission.hpp - only needed here as a pointer type
+	class C_Program; // defined later in Game/C_Program.hpp - only needed here as a pointer type
+	class C_Schvestky; // opaque, not yet reverse-engineered
+
+	/*
+		Ported from reMafia's C_game.h (same author, MafiaOrbitCam/Vendors/reMafia) - a fuller
+		field layout than C_Game_Interface above (which only names mCamera/mLocalPlayer amid
+		opaque padding). Kept separate rather than merged in, for the same reason as
+		C_Vehicle_Extended/C_Mission_Extended: reconciling it against the already-relied-upon
+		mLocalPlayer offset (228) needs vc6_vector<T>'s exact compiled size, which could only
+		be estimated here. Field offsets below are exactly as reMafia declared them,
+		uncorrected - verify before relying on them.
+	*/
+	struct C_Game_Extended
+	{
+		PADDING(C_Game_Extended, _pad0, 0x44);
+		C_Mission* mission;
+		int state;
+		C_Camera camera;
+		PADDING(C_Game_Extended, _pad2, 0x8);
+		C_Human* human;
+		vc6_vector<C_Actor*> actors;
+		PADDING(C_Game_Extended, _pad3, 0x24);
+		vc6_vector<C_Actor*> tempActors;
+		PADDING(C_Game_Extended, _pad4, 0x28BC);
+		C_UsingObject* usingObject;
+		PADDING(C_Game_Extended, _pad5, 0x10C);
+		vc6_vector<C_Program*> programs;
+		int unk;
+		PADDING(C_Game_Extended, _pad6, 0x290);
+		C_Schvestky* schvestky;
+		PADDING(C_Game_Extended, _pad7, 0x89A);
+		bool updateScore;
+		PADDING(C_Game_Extended, _pad8, 0x3);
+		bool scoreOn;
+		int gameScore;
+		PADDING(C_Game_Extended, _pad9, 0x77);
+	};
 };
 
 #endif

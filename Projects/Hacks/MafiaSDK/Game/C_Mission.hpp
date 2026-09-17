@@ -72,6 +72,39 @@ namespace MafiaSDK
             InitScript = 155
         };
 
+        // Ported from reMafia's GetActorTypeName (Actors/C_actor.cpp, same author,
+        // MafiaOrbitCam/Vendors/reMafia), adapted to this enum's own names/values.
+        inline const char* GetObjectTypeName(ObjectTypes type)
+        {
+            switch (type)
+            {
+                case GhostObject: return "GhostObject";
+                case Player: return "Player";
+                case Car: return "Car";
+                case Script: return "Script";
+                case Door: return "Door";
+                case Trolley: return "Trolley";
+                case Model: return "Model";
+                case Bottle: return "Bottle";
+                case Traffic: return "Traffic";
+                case Pedestrian: return "Pedestrian";
+                case Bridge: return "Bridge";
+                case Dog: return "Dog";
+                case Plane: return "Plane";
+                case RailRoute: return "RailRoute";
+                case Pumpar: return "Pumpar";
+                case Human: return "Human";
+                case RaceCamera: return "RaceCamera";
+                case Wagon: return "Wagon";
+                case Clock: return "Clock";
+                case Physical: return "Physical";
+                case Truck: return "Truck";
+                case InitScript: return "InitScript";
+                default: break;
+            }
+            return "Unknown";
+        }
+
         enum PhysicsTypes
         {
             Stone = 0,
@@ -315,6 +348,46 @@ namespace MafiaSDK
         DWORD addr = (DWORD)GetModuleHandle(NULL) + 0x00247E60;
         return *(char**)(addr);
     }
+
+	class C_TShift;
+	class C_WebPath;
+	class C_Roads;
+	class C_ParticleManager;
+
+	/*
+		Ported from reMafia's C_mission.h (same author, MafiaOrbitCam/Vendors/reMafia) - a
+		fuller field layout than C_Mission_Interface above, which only names `mGame` amid a
+		single opaque 0x24-byte padding gap. Kept as its own separate type rather than merged
+		in: cross-checking reMafia's field order against that already-relied-upon mGame offset
+		(0x24 = 36) requires knowing vc6_vector<T>'s exact compiled size, and the estimate used
+		elsewhere in this pass (allocator + 3 pointers = ~12-16 bytes) lands m_pGame a handful
+		of bytes short of 36 - close enough to suspect the fields are right, not close enough
+		to safely renumber a struct nothing has broken by leaving alone (see C_Vehicle.hpp's
+		C_Vehicle_Extended for the same situation in more detail). Field offsets below are
+		exactly as reMafia declared them, uncorrected - verify before relying on them.
+	*/
+	struct C_Mission_Extended
+	{
+		vc6_vector<C_Actor*> actors;
+		I3D_Sector* scene; // reMafia calls this I3D_scene; MafiaSDK's own name for that type is I3D_Sector
+		vc6_vector<void*> animModels; // element type is C_anim_model*, not yet reverse-engineered
+		C_Game* game;
+		C_TShift* tShift;
+		C_WebPath* webPath;
+		C_Roads* roads;
+		vc6_vector<C_Actor*> sceneActors;
+		vc6_vector<C_Actor*> actors2;
+		vc6_vector<C_Program*> programs;
+		PADDING(C_Mission_Extended, _pad6, 0x4);
+		char* missionName;
+		C_ParticleManager* particleManager;
+		PADDING(C_Mission_Extended, _pad7, 0x10);
+		vc6_vector<C_Actor*> transparentObjects;
+		PADDING(C_Mission_Extended, _pad8, 0x1C);
+		vc6_vector<C_Actor*> models;
+		vc6_vector<C_Actor*> activeActors;
+		vc6_vector<C_Actor*> actorSounds;
+	};
 }
 
 #endif

@@ -24,7 +24,6 @@ namespace MafiaSDK
 	struct C_Car_Interface
 	{
 		C_Entity_Interface		 entity;
-		PADDING(C_Car_Interface, _pad0, 0x4);
 		C_Vehicle_Interface	vehicle_interface;
 	};
 

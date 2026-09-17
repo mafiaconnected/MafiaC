@@ -19,14 +19,30 @@
 
 namespace MafiaSDK
 {
+	// Ported from reMafia's G_Camera.h (same author, MafiaOrbitCam/Vendors/reMafia), which
+	// cross-checks: SetSniperFov/SetSniperMode there use the exact same addresses as
+	// C_Camera_Enum::SetSniperFov/SetSniperMode below. That file only reverse-engineered the
+	// leading fields plus the two sniper ones (not the swing/matrix region in between), so
+	// this keeps the original matrix1-4 guess as unverified padding rather than mixing the
+	// two into one (possibly wrong) merged layout.
 	struct C_Camera_Interface
 	{
-		I3D_Frame cameraFrame;									// 0-4
-		PADDING(C_Camera_Interface, _pad0, 0x160);
-		S_matrix matrix1;										// 356-420
-		S_matrix matrix2;										// 420-484
-		S_matrix matrix3;										// 484-548
-		S_matrix matrix4;										// 548-612
+		I3D_Frame* frame;										// 0-4
+		I3D_Frame* cameraFrame;									// 4-8
+		C_Human* followedHuman;									// 8-12
+		C_Car* followedCar;										// 12-16
+		int cameraState;										// 16-20
+		PADDING(C_Camera_Interface, _pad0, 0x44);
+		bool swingEnabled;										// 88-89
+		PADDING(C_Camera_Interface, _pad1, 0x3);
+		float swingIntensity;									// 92-96
+		I3D_Frame* swingTargetFrame;							// 96-100
+		PADDING(C_Camera_Interface, _pad2, 0x24);
+		I3D_Frame* unkFrame;									// 136-140
+		PADDING(C_Camera_Interface, _pad3, 0x2);
+		bool freeLookEnabled;									// 142-143
+		PADDING(C_Camera_Interface, _pad4, 0x1);
+		float sniperFov;										// 144-148
 	};
 
 	//const size_t Offset = offsetof(C_Camera_Interface, matrix4);
