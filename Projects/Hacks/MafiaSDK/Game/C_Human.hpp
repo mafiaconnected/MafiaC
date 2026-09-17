@@ -19,34 +19,152 @@
 
 namespace MafiaSDK
 {
+	// All 16 float slots addressed by C_Human_Enum::Property/C_Human::SetProperty|GetProperty,
+	// laid out in order. Ported from reMafia's Actors/C_human.h (same author,
+	// MafiaOrbitCam/Vendors/reMafia). NOTE: reMafia's own field order here starts with
+	// Strength at *relative offset 0*, but SetProperty/GetProperty compute
+	// `this + 0x640 + property * 4` with `Strength = 1` (i.e. relative offset 4, which this
+	// layout says is actually Health) - the two disagree by one slot. Left exactly as it was
+	// (still whatever real, presumably-tested behavior existed before this file was touched)
+	// since fixing the formula/enum would change what every existing setProperty(...) script
+	// call actually writes; flagging it here rather than silently changing it.
+	struct C_Human_Properties
+	{
+		float strength;
+		float health;
+		float healthHandL;
+		float healthHandR;
+		float healthLegL;
+		float healthLegR;
+		float reactions;
+		float speed;
+		float aggressivity;
+		float intelligence;
+		float shooting;
+		float sight;
+		float hearing;
+		float driving;
+		float mass;
+		float morale;
+	};
+
+	// Ported from reMafia's Actors/C_human.h.
+	enum CharacterVoice
+	{
+		CV_Paulie     = 0,
+		CV_Sam        = 1,
+		CV_Salieri    = 2,
+		CV_Tommy      = 3,
+		CV_Frank      = 4,
+		CV_Luigi      = 5,
+		CV_Ralph      = 6,
+		CV_Vincenzo   = 7,
+		CV_Man        = 8,
+		CV_Salvatore  = 9,
+		CV_Cop0       = 10,
+		CV_Com1       = 11,
+		CV_PortGuard0 = 12,
+		CV_PortGuard1 = 13,
+		CV_PortGuard2 = 14,
+		CV_PortGuard3 = 15,
+		CV_PortGuard4 = 16,
+		CV_Enemy0     = 17,
+		CV_Enemy1     = 18,
+		CV_Enemy2     = 19,
+		CV_Enemy3     = 20,
+		CV_Enemy4     = 21,
+		CV_Hoolig     = 22,
+		CV_Sergio     = 23,
+		CV_Enemy5     = 24,
+		CV_Joe        = 25,
+		CV_PedMan0    = 26,
+		CV_PedMan1    = 27,
+		CV_PedMan2    = 28,
+		CV_PedWoman0  = 29,
+		CV_PedWoman1  = 30,
+		CV_PedWoman2  = 31,
+		CV_NoVoice    = 32,
+		CV_Lucas      = 33,
+	};
+
+	/*
+		Cross-checked against reMafia's C_human (Actors/C_human.h) - its first two fields
+		(m_iAnimID/m_iAnimState) are modeled here as plain ints, but this SDK had already
+		identified specific *byte* meanings within that same region (animStateLocal/
+		isInAnimWithCarLocal/animState/isInAnimWithCar), which is more precise, so that part
+		was kept as-is. Everything from playersCar (152) through inventory (1152, an exact
+		independent match with the already-relied-on GetInventory() this+0x480 offset) is a
+		solid cross-check. Past m_vCollisions (~1668) reMafia's own vc6_vector<T> size had to
+		be estimated (allocator+3 pointers), so the tail fields (from voice onward) may drift
+		a handful of bytes - kept as best-effort, not to the same confidence as the rest.
+	*/
     struct C_Human_Interface
     {
-        C_Entity_Interface entity;								// 0-108
-        PADDING(C_Human_Interface, _pad0, 0x4);
+        C_Entity_Interface entity;								// 0-112 (grew by 4 bytes when its own padding got filled in - see C_Entity.hpp; this struct's own absolute-offset comments below are unaffected since they were already computed against the correct 112-byte size)
         byte animStateLocal;									// 112-113
         byte isInAnimWithCarLocal;								// 113-114
         PADDING(C_Human_Interface, _pad1, 0x2);
         byte animState;											// 116-117
         byte isInAnimWithCar;									// 117-118
-        PADDING(C_Human_Interface, _pad2, 0x22);
+        PADDING(C_Human_Interface, _pad1a, 0x1E);
+        unsigned long flags;									// 148-152
         C_Car* playersCar;										// 152-156
         C_Car* carLeavingOrEntering;							// 156-160
-        PADDING(C_Human_Interface, _pad3, 0x144);
+        C_Car* currentCar;										// 160-164
+        PADDING(C_Human_Interface, _pad2a, 0x4);
+        C_Car* currentCar2;										// 168-172
+        int seatID;												// 172-176
+        PADDING(C_Human_Interface, _pad2b, 0xC);
+        void* animationMachine;								// 188-192
+        PADDING(C_Human_Interface, _pad2c, 0x10C);
+        bool isDead;											// 460-461
+        PADDING(C_Human_Interface, _pad3a, 0x17);
         bool isDucking;											// 484-485
         bool isAiming;											// 485-486
         PADDING(C_Human_Interface, _pad4, 0x6);
         bool isShooting;										// 492-493
         PADDING(C_Human_Interface, _pad4b, 0x0F);
         bool isReloading;										// 508-509
-        PADDING(C_Human_Interface, _pad5, 0x11B);
+        PADDING(C_Human_Interface, _pad5a, 0x3);
+        S_vector shootTarget;									// 512-524
+        PADDING(C_Human_Interface, _pad5b, 0x24);
+        bool doChangeWeaponModel;								// 560-561
+        PADDING(C_Human_Interface, _pad5c, 0xF);
+        int deathAnimID;										// 576-580
+        PADDING(C_Human_Interface, _pad5d, 0x98);
+        void* shotSkeleton;										// 732-736
+        PADDING(C_Human_Interface, _pad5e, 0x38);
         I3D_Frame * neckFrame;									// 792-796
-        PADDING(C_Human_Interface, _pad6, 0x164);
-        G_Inventory inventory;									// 1152-1280
-        PADDING(C_Human_Interface, _pad7, 0xF4);
+        PADDING(C_Human_Interface, _pad6a, 0xF0);
+        int canWork;											// 1036-1040
+        PADDING(C_Human_Interface, _pad6b, 0x50);
+        int unk2;												// 1120-1124
+        PADDING(C_Human_Interface, _pad6c, 0x18);
+        void* fakeShadow;										// 1148-1152
+        G_Inventory inventory;									// 1152-1380 (grew by 100 bytes when its own layout got filled in - see Utils/Helpers.hpp; fields below are unaffected since this padding was shrunk to compensate)
+        I3D_Frame* weaponR;										// 1380-1384
+        I3D_Frame* weaponL;										// 1384-1388
+        I3D_Frame* gunR;										// 1388-1392
+        I3D_Frame* gunL;										// 1392-1396
+        I3D_Frame* targetR;										// 1396-1400
+        I3D_Frame* targetL;									// 1400-1404
+        I3D_Frame* baseMesh;									// 1404-1408
+        PADDING(C_Human_Interface, _pad7a, 0x8);
+        I3D_Frame* targetE;										// 1416-1420
+        I3D_Frame* targetN;									// 1420-1424
+        PADDING(C_Human_Interface, _pad7b, 0x54);
+        int unk3;												// 1508-1512
+        PADDING(C_Human_Interface, _pad7c, 0xC);
         float inCarRotation;									// 1524-1528
-        PADDING(C_Human_Interface, _pad8, 0x4C);
-        float health;											// 1604-1608
-		PADDING(C_Human_Interface, _pad9, 0x434);
+        PADDING(C_Human_Interface, _pad8, 0x8);
+        C_Human_Properties initProperties;						// 1536-1600
+        PADDING(C_Human_Interface, _pad8a, 0x4);				// properties.strength (unnamed, see health note above)
+        float health;											// 1604-1608 (= properties.health, offset 4 into the block above)
+        PADDING(C_Human_Interface, _pad8b, 0x38);				// rest of properties (healthHandL..morale)
+        CharacterVoice voice;									// 1664-1668
+        vc6_vector<tDynamicCollObject*> collisions;			// ~1668-1684 (approximate, see note above)
+        bool hasCollisions;										// ~1684-1685
+        PADDING(C_Human_Interface, _pad9, 0x3E7);				// approximate - see note above
 		S_vector pose;											// 2684-2696
 		PADDING(C_Human_Interface, _pad10, 0x4C);
 		int32_t animTimeLeft;									// 2772-2776
@@ -102,6 +220,14 @@ namespace MafiaSDK
 			Death = 0x00570570,
 			RecompileDeathPos = 0x0058B8D0,
 			Do_DeadBodyDrop = 0x0058B7E0,
+
+			// Patch targets (see C_Human_Patches / MultiplayerModOne's Hooks.cpp)
+			RemoveDroppedClipPatch = 0x0058D4C6,
+			RemoveDroppedClipPatchSkip = 0x0058D553,
+			DisableWeaponDropsPatch = 0x0057FAA0,
+			DisableWeaponDropsPatchSkip = 0x00580196,
+			Do_WeaponDropPatchSkip = 0x00585DCB,
+			ExitingVehiclePassengerFix = 0x00595040,
         };
 
         //Thanks for DjBozkosz Documentation
@@ -118,6 +244,18 @@ namespace MafiaSDK
             ProgrammedReacts = 128 //Used for Little Joe in mission 9 programmed reactions, can add a little variety to non gangster characters � Afra
         };
 
+        /*
+            POSSIBLE OFF-BY-ONE (found while cross-referencing reMafia's C_human_properties,
+            see C_Human_Properties above): SetProperty/GetProperty below compute
+            `this + 0x640 + property * 4`, and 0x640 (1600) is confirmed correct as the base
+            of the stats block (see C_Human_Interface::initProperties). But with Strength = 1,
+            that formula lands on relative offset 4 - which reMafia's field order says is
+            Health, not Strength - so every property here may currently read/write one slot
+            off from its name (Strength writes what's really Health, etc). This enum is
+            exposed to scripts (setProperty/PED_PROPERTY_* in MultiplayerModOne), so changing
+            it would change what already-written scripts actually do - left exactly as found,
+            not "fixed", pending a deliberate decision to change it.
+        */
         enum Property : unsigned int
         {
             Strength = 1,
@@ -778,6 +916,10 @@ namespace MafiaSDK
     namespace C_Human_Hooks
     {
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> funcitonPointer);
+        void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer);
+        void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer);
+        void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
+        void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
 
 #ifdef MAFIA_SDK_IMPLEMENTATION
         namespace FunctionsPointers
@@ -786,6 +928,10 @@ namespace MafiaSDK
             extern std::function<void(const S_vector &)> humanShoot;
             extern std::function<void(MafiaSDK::C_Human*, byte)> humanDoWeaponChange;
             extern std::function<void(MafiaSDK::C_Human*)> humanDoWeaponDrop;
+            extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
+            extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
+            extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
+            extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
         };
 
         namespace Functions
@@ -817,21 +963,57 @@ namespace MafiaSDK
                     FunctionsPointers::humanDoWeaponChange(thisInstance, weaponId);
                 }
             }
+
+            inline void UseActor(MafiaSDK::C_Human* human, MafiaSDK::C_Actor* actor, int unk1, int unk2, int unk3)
+            {
+                if (FunctionsPointers::useActor != nullptr)
+                    FunctionsPointers::useActor(human, actor, unk1, unk2, unk3);
+            }
+
+            inline void DoThrowCocotFromCar(MafiaSDK::C_Human* human, MafiaSDK::C_Car* car, int seatId)
+            {
+                if (FunctionsPointers::doThrowCocotFromCar != nullptr)
+                    FunctionsPointers::doThrowCocotFromCar(human, car, seatId);
+            }
+
+            inline void HumanSetAimPose(MafiaSDK::C_Human* human, const S_vector& pos)
+            {
+                if (FunctionsPointers::humanSetAimPose != nullptr)
+                    FunctionsPointers::humanSetAimPose(human, pos);
+            }
+
+            inline void HumanSetNormalPose(MafiaSDK::C_Human* human, const S_vector& pos)
+            {
+                if (FunctionsPointers::humanSetNormalPose != nullptr)
+                    FunctionsPointers::humanSetNormalPose(human, pos);
+            }
         };
 
         namespace NakedFunctions
         {
             extern void HumanHitOne();
-            
+
             extern void HumanHitTwo();
-            
+
             extern void HumanShoot();
-           
+
             extern void HumanDoWeaponChangeOne();
-            
+
             extern void HumanDoWeaponChangeTwo();
 
             extern void HumanDoWeaponDrop();
+
+            extern void UseActor();
+            extern void* useActorReturn;
+
+            extern void DoThrowCocotFromCar();
+            extern void* doThrowCocotFromCarReturn;
+
+            extern void SetAimPose();
+            extern void* setAimPoseReturn;
+
+            extern void SetNormalPose();
+            extern void* setNormalPoseReturn;
         };
 
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> functionPointer)
@@ -861,6 +1043,38 @@ namespace MafiaSDK
             FunctionsPointers::humanDoWeaponDrop = functionPointer;
 
             MemoryPatcher::InstallJmpHook(0x0059024D, (unsigned long)&NakedFunctions::HumanDoWeaponDrop);
+        }
+
+        inline void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer)
+        {
+            FunctionsPointers::useActor = functionPointer;
+
+            NakedFunctions::useActorReturn = (void*)(C_Human_Enum::FunctionsAddresses::Use_Actor + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::Use_Actor, (unsigned long)&NakedFunctions::UseActor);
+        }
+
+        inline void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer)
+        {
+            FunctionsPointers::doThrowCocotFromCar = functionPointer;
+
+            NakedFunctions::doThrowCocotFromCarReturn = (void*)(C_Human_Enum::FunctionsAddresses::Do_ThrowCocotFromCar + 7);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::Do_ThrowCocotFromCar, (unsigned long)&NakedFunctions::DoThrowCocotFromCar);
+        }
+
+        inline void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer)
+        {
+            FunctionsPointers::humanSetAimPose = functionPointer;
+
+            NakedFunctions::setAimPoseReturn = (void*)(C_Human_Enum::FunctionsAddresses::PoseSetPoseAimed + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::PoseSetPoseAimed, (unsigned long)&NakedFunctions::SetAimPose);
+        }
+
+        inline void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer)
+        {
+            FunctionsPointers::humanSetNormalPose = functionPointer;
+
+            NakedFunctions::setNormalPoseReturn = (void*)(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal, (unsigned long)&NakedFunctions::SetNormalPose);
         }
 #endif
     };

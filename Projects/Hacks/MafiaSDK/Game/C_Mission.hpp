@@ -31,7 +31,12 @@ namespace MafiaSDK
             DelActors = 0x00540240,
             FindActorByName = 0x00540490,
             Open = 0x005409D0,
-            Close = 0x005405E0
+            Close = 0x005405E0,
+
+            // Scene-graph actor creation path (separate from C_Mission::CreateActor); hook target/return
+            // for MultiplayerModOne's Hooks.cpp SceneCreateActor. Unfinished - see comment at its call site.
+            SceneCreateActor = 0x00544AFF,
+            SceneCreateActorReturn = 0x00544B07
         };
 
 		enum MissionID
@@ -66,6 +71,39 @@ namespace MafiaSDK
             Truck = 36,
             InitScript = 155
         };
+
+        // Ported from reMafia's GetActorTypeName (Actors/C_actor.cpp, same author,
+        // MafiaOrbitCam/Vendors/reMafia), adapted to this enum's own names/values.
+        inline const char* GetObjectTypeName(ObjectTypes type)
+        {
+            switch (type)
+            {
+                case GhostObject: return "GhostObject";
+                case Player: return "Player";
+                case Car: return "Car";
+                case Script: return "Script";
+                case Door: return "Door";
+                case Trolley: return "Trolley";
+                case Model: return "Model";
+                case Bottle: return "Bottle";
+                case Traffic: return "Traffic";
+                case Pedestrian: return "Pedestrian";
+                case Bridge: return "Bridge";
+                case Dog: return "Dog";
+                case Plane: return "Plane";
+                case RailRoute: return "RailRoute";
+                case Pumpar: return "Pumpar";
+                case Human: return "Human";
+                case RaceCamera: return "RaceCamera";
+                case Wagon: return "Wagon";
+                case Clock: return "Clock";
+                case Physical: return "Physical";
+                case Truck: return "Truck";
+                case InitScript: return "InitScript";
+                default: break;
+            }
+            return "Unknown";
+        }
 
         enum PhysicsTypes
         {
@@ -143,6 +181,41 @@ namespace MafiaSDK
         C_Game * mGame;
     };
 
+    namespace C_Mission_Hooks
+    {
+        void HookCreateActor(std::function<void(C_Mission_Enum::ObjectTypes)> functionPointer);
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+        namespace FunctionsPointers
+        {
+            extern std::function<void(C_Mission_Enum::ObjectTypes)> createActor;
+        };
+
+        namespace Functions
+        {
+            inline void CreateActor(C_Mission_Enum::ObjectTypes actorType)
+            {
+                if (FunctionsPointers::createActor != nullptr)
+                    FunctionsPointers::createActor(actorType);
+            }
+        };
+
+        namespace NakedFunctions
+        {
+            extern void CreateActor();
+            extern void* createActorReturn;
+        };
+
+        inline void HookCreateActor(std::function<void(C_Mission_Enum::ObjectTypes)> functionPointer)
+        {
+            FunctionsPointers::createActor = functionPointer;
+
+            NakedFunctions::createActorReturn = (void*)(C_Mission_Enum::FunctionAddresses::CreateActor + 6);
+            MemoryPatcher::InstallJmpHook(C_Mission_Enum::FunctionAddresses::CreateActor, (unsigned long)&NakedFunctions::CreateActor);
+        }
+#endif
+    };
+
     class C_Mission
     {
     public:
@@ -155,6 +228,9 @@ namespace MafiaSDK
         {
             return GetMissionInterface()->mGame;
         }
+
+        // Defined below, after C_Mission_Extended (which it reads through).
+        I3D_Sector* GetScene();
 
         C_Actor* CreateActor(C_Mission_Enum::ObjectTypes actorType)
         {
@@ -275,6 +351,61 @@ namespace MafiaSDK
         DWORD addr = (DWORD)GetModuleHandle(NULL) + 0x00247E60;
         return *(char**)(addr);
     }
+
+	class C_TShift;
+	class C_WebPath;
+	class C_Roads;
+	class C_ParticleManager;
+
+	/*
+		Ported from reMafia's C_mission.h (same author, MafiaOrbitCam/Vendors/reMafia) - a
+		fuller field layout than C_Mission_Interface above, which only names `mGame` amid a
+		single opaque 0x24-byte padding gap. Kept as its own separate type rather than merged
+		in: cross-checking reMafia's field order against that already-relied-upon mGame offset
+		(0x24 = 36) requires knowing vc6_vector<T>'s exact compiled size, and the estimate used
+		elsewhere in this pass (allocator + 3 pointers = ~12-16 bytes) lands m_pGame a handful
+		of bytes short of 36 - close enough to suspect the fields are right, not close enough
+		to safely renumber a struct nothing has broken by leaving alone (see C_Vehicle.hpp's
+		C_Vehicle_Extended for the same situation in more detail). Field offsets below are
+		exactly as reMafia declared them, uncorrected - verify before relying on them.
+	*/
+	struct C_Mission_Extended
+	{
+		vc6_vector<C_Actor*> actors;
+		I3D_Sector* scene; // reMafia calls this I3D_scene; MafiaSDK's own name for that type is I3D_Sector
+		vc6_vector<void*> animModels; // element type is C_anim_model*, not yet reverse-engineered
+		C_Game* game;
+		C_TShift* tShift;
+		C_WebPath* webPath;
+		C_Roads* roads;
+		vc6_vector<C_Actor*> sceneActors;
+		vc6_vector<C_Actor*> actors2;
+		vc6_vector<C_Program*> programs;
+		PADDING(C_Mission_Extended, _pad6, 0x4);
+		char* missionName;
+		C_ParticleManager* particleManager;
+		PADDING(C_Mission_Extended, _pad7, 0x10);
+		vc6_vector<C_Actor*> transparentObjects;
+		PADDING(C_Mission_Extended, _pad8, 0x1C);
+		vc6_vector<C_Actor*> models;
+		vc6_vector<C_Actor*> activeActors;
+		vc6_vector<C_Actor*> actorSounds;
+	};
+
+	/*
+		Resolves C_Mission_Extended's own "uncorrected, verify before relying on them" caveat
+		above, for its first three fields (actors, scene, animModels) specifically:
+		MafiaSDK::vc6_vector<T*>'s real layout ({ allocator; _First; _Last; _End; }) is a
+		1-byte empty allocator padded to 4 plus three 4-byte pointers = 16 bytes on this
+		build's x86 target, so actors(0x10) + scene(0x04) lands `game` at offset 0x24 -
+		exactly the offset already verified independently via C_Mission_Interface::mGame.
+		That match is what justifies reading `scene` here; fields after `game` are still
+		unverified.
+	*/
+	inline I3D_Sector* C_Mission::GetScene()
+	{
+		return reinterpret_cast<C_Mission_Extended*>(this)->scene;
+	}
 }
 
 #endif

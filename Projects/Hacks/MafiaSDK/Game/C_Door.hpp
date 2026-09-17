@@ -22,7 +22,6 @@ namespace MafiaSDK
     struct C_Door_Interface
     {
         C_Entity_Interface entity;
-        PADDING(C_Door_Interface, _pad1, 0x4);
         unsigned int current_state;
         float open_angle;
         PADDING(C_Door_Interface, _pad2, 0xA6);

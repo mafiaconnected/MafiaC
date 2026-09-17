@@ -75,173 +75,99 @@ static void OnGameExit()
 	}
 }
 
-__declspec(naked) void OnGameExit_Hook()
-{
-	__asm {
-		pushad
-		call OnGameExit
-		popad
-		retn
-	}
-}
-
-// UseActor
-HOOKADDRESS g_ReturnHumanUseActor;
-HOOKVAR MafiaSDK::C_Human* g_pHumanUseActor_Human;
-HOOKVAR MafiaSDK::C_Actor* g_pHumanUseActor_Actor;
-HOOKVAR int g_pHumanUseActor_Unk1;
-HOOKVAR int g_pHumanUseActor_Unk2;
-HOOKVAR int g_pHumanUseActor_Unk3;
-HOOKVAR bool g_bCancelHumanUseActor;
-
-// DoThrowCocotFromCar
-HOOKADDRESS g_ReturnHumanDoThrowCocotFromCar;
-HOOKVAR MafiaSDK::C_Human* g_pHumanDoThrowCocotFromCar_Human;
-HOOKVAR MafiaSDK::C_Car* g_pHumanDoThrowCocotFromCar_Car;
-HOOKVAR int g_pHumanDoThrowCocotFromCar_SeatID;
-HOOKVAR bool g_bCancelHumanDoThrowCocotFromCar;
-
-// CreateActor
-HOOKADDRESS g_ReturnCreateActor;
-HOOKVAR MafiaSDK::C_Actor* g_pCreateActor_Actor;
-HOOKVAR int g_pCreateActor_Arg1;
-HOOKVAR bool g_bCancelCreateActor;
-
-// CarCar
-HOOKADDRESS g_ReturnCarUpdate;
-HOOKVAR MafiaSDK::C_Car* g_pCarUpdate_Car;
-HOOKVAR bool g_bCancelCarUpdate;
-
 // SceneCreateActor
 HOOKADDRESS g_ReturnSceneCreateActor;
-HOOKVAR MafiaSDK::C_Mission_Enum::ObjectTypes g_pSceneCreateActor_Type;
-HOOKVAR DWORD g_pSceneCreateActor_Frame;
-HOOKVAR bool g_bCancelSceneCreateActor;
 
-// HumanSetAimPose
-HOOKADDRESS g_ReturnHumanSetAimPose;
-HOOKVAR MafiaSDK::C_Human* g_pHumanSetAimPose_Human;
-HOOKVAR CVector3D* g_pvecHumanSetAimPose_Vec;
-HOOKVAR bool g_bCancelHumanSetAimPose;
-
-// HumanSetNormalPose
-HOOKADDRESS g_ReturnHumanSetNormalPose;
-HOOKVAR MafiaSDK::C_Human* g_pHumanSetNormalPose_Human;
-HOOKVAR CVector3D* g_pvecHumanSetNormalPose_Vec;
-HOOKVAR bool g_bCancelHumanSetNormalPose;
-
-// HookModelOpen
-HOOKADDRESS g_ReturnModelOpen;
-HOOKVAR uint32_t g_pModelOpen_Arg1;
-HOOKVAR uint32_t g_pModelOpen_Arg2;
-HOOKVAR bool g_bCancelModelOpen;
-
-RAWCODECALL HumanDoThrowCocotFromCar()
+static void HumanDoThrowCocotFromCar(MafiaSDK::C_Human* pHuman, MafiaSDK::C_Car* pCar, int iSeatID)
 {
 	if (g_pClientGame->m_bDoThrowCocotFromCarInvokedByGame)
 	{
-		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(g_pHumanDoThrowCocotFromCar_Human);
+		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(pHuman);
 		if (pClientHuman != nullptr)
 		{
-			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(g_pHumanDoThrowCocotFromCar_Car);
+			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(pCar);
 			if (pClientVehicle != nullptr)
 			{
-				bool bAllow = true;
-
-				if (bAllow)
-				{
-					g_pClientGame->HumanJackVehicle(pClientHuman, pClientVehicle, g_pHumanDoThrowCocotFromCar_SeatID);
-				}
-				else
-				{
-					g_bCancelHumanDoThrowCocotFromCar = true;
-				}
+				g_pClientGame->HumanJackVehicle(pClientHuman, pClientVehicle, iSeatID);
 			}
 		}
 	}
 }
 
-RAWCODECALL HumanUseActor()
+static void HumanUseActor(MafiaSDK::C_Human* pHuman, MafiaSDK::C_Actor* pActor, int iUnk1, int iUnk2, int iUnk3)
 {
 	if (g_pClientGame->m_bUseActorInvokedByGame)
 	{
-		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman((MafiaSDK::C_Human*)g_pHumanUseActor_Human);
+		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(pHuman);
 		if (pClientHuman != nullptr)
 		{
-			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)g_pHumanUseActor_Actor);
+			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)pActor);
 			if (pClientVehicle != nullptr)
 			{
-				//_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
+				//_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), iUnk1, iUnk2, iUnk3);
 
-				// To abort, use this:
-				// g_bCancelHumanUseActor = true;
-
-				if (g_pHumanUseActor_Unk1 == 2)
+				if (iUnk1 == 2)
 				{
-					if (!g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3)) {
-						g_bCancelHumanUseActor = true;
-					}
+					g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
 				}
 				else
 				{
-					if (!g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk3)) {
-						g_bCancelHumanUseActor = true;
-					}
+					g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
 				}
 			}
-			else 
+			else
 			{
-				g_pClientGame->HumanUsingActor(pClientHuman, g_pHumanUseActor_Actor, g_pHumanUseActor_Unk1, g_pHumanUseActor_Unk2, g_pHumanUseActor_Unk3);
+				g_pClientGame->HumanUsingActor(pClientHuman, pActor, iUnk1, iUnk2, iUnk3);
 			}
 		}
 	}
 }
 
-RAWCODECALL CreateActor()
+static void CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes objectType)
 {
 	if (g_pClientGame->m_bCreateActorInvokedByGame)
 	{
-		//_glogprintf(_gstr("[GAME] CreateActor: %i"), g_pCreateActor_Arg1);
+		//_glogprintf(_gstr("[GAME] CreateActor: %i"), objectType);
 
 		// 2 = spawned player
 		// 4 = spawned vehicle
 
-		if (g_pCreateActor_Arg1 == 11)
+		if (objectType == 11)
 		{
 			// Human
-			//g_pClientGame->CreateGameHuman(g_pCreateActor_Actor, g_pCreateActor_Arg1);
+			//g_pClientGame->CreateGameHuman(pActor, objectType);
 		}
 	}
 }
 
-RAWCODECALL ModelOpen()
+static void ModelOpen(uint32_t uiFrame, const char* pszModelName)
 {
 	//if (g_pClientGame->m_bModelOpenInvokedByGame)
 	{
-		//printf("[Model::Open] Frame=0x%X ModelName=%s\n", g_pModelOpen_Arg1, (char*)g_pModelOpen_Arg2);
+		//printf("[Model::Open] Frame=0x%X ModelName=%s\n", uiFrame, pszModelName);
 
-		g_umapModelNames[(uint32_t)g_pModelOpen_Arg1] = (char*)g_pModelOpen_Arg2;
+		g_umapModelNames[uiFrame] = pszModelName;
 	}
 }
 
-RAWCODECALL CarUpdate()
+static void CarUpdate(MafiaSDK::C_Car* pCar)
 {
 	//if (!g_bTrafficEnabled)
 	//	return;
 
 	if (g_pClientGame->m_bCreateVehicleInvokedByGame)
 	{
-		if (g_pCarUpdate_Car == nullptr)
+		if (pCar == nullptr)
 			return;
 
-		CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(g_pCarUpdate_Car);
+		CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle(pCar);
 
 		if (pClientVehicle == nullptr)
 		{
-			//_glogprintf(_gstr("[GAME] Car::Update - Added Vehicle 0x%X Frame 0x%X"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()));
-			//_glogverboseprintf(_gstr("[GAME] Car::Update - Added traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
+			//_glogprintf(_gstr("[GAME] Car::Update - Added Vehicle 0x%X Frame 0x%X"), (uint32_t)pCar, (uint32_t)(pCar->GetFrame()));
+			//_glogverboseprintf(_gstr("[GAME] Car::Update - Added traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(pCar->GetFrame())].c_str()));
 
-			g_pClientGame->OnTrafficCarCreate(g_pCarUpdate_Car);
+			g_pClientGame->OnTrafficCarCreate(pCar);
 		}
 		else
 		{
@@ -251,11 +177,11 @@ RAWCODECALL CarUpdate()
 			float fDistance = vecGamePosition.distance(pClientVehicle->m_vecCachedPositionForTraffic);
 			if (fDistance >= 25.0f)
 			{
-				//_glogprintf(_gstr("[GAME] Car::Update - Respawned Vehicle 0x%X Frame 0x%X %f"), (uint32_t)g_pCarUpdate_Car, (uint32_t)(g_pCarUpdate_Car->GetFrame()), fDistance);
-				//printf("Model Name for Respawn: %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str());
-				//_glogverboseprintf(_gstr("[GAME] Car::Update - Respawn traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(g_pCarUpdate_Car->GetFrame())].c_str()));
+				//_glogprintf(_gstr("[GAME] Car::Update - Respawned Vehicle 0x%X Frame 0x%X %f"), (uint32_t)pCar, (uint32_t)(pCar->GetFrame()), fDistance);
+				//printf("Model Name for Respawn: %s\n", g_umapModelNames[(uint32_t)(pCar->GetFrame())].c_str());
+				//_glogverboseprintf(_gstr("[GAME] Car::Update - Respawn traffic vehicle with model %s\n", g_umapModelNames[(uint32_t)(pCar->GetFrame())].c_str()));
 
-				g_pClientGame->OnTrafficCarRespawn(pClientVehicle, g_pCarUpdate_Car);
+				g_pClientGame->OnTrafficCarRespawn(pClientVehicle, pCar);
 			}
 
 			pClientVehicle->m_vecCachedPositionForTraffic = vecGamePosition;
@@ -300,6 +226,8 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 			frame_ex->SetOn(false);
 		return nullptr;
 	}
+
+	g_pClientGame->OnActorAdded(type, Name.CString());
 
 	for (auto forbidden_type : forbidden_objects) {
 		if (type == forbidden_type && frame != NULL) {
@@ -417,7 +345,7 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 	return actor;
 }
 
-RAWCODECALL HumanSetAimPose()
+static void HumanSetAimPose(MafiaSDK::C_Human* pHuman, const S_vector& vecPose)
 {
 	if (g_pClientGame->m_bHumanSetAimPoseInvokedByGame)
 	{
@@ -427,15 +355,15 @@ RAWCODECALL HumanSetAimPose()
 		{
 			MafiaSDK::C_Human* pLocalGameHuman = pLocalClientHuman->GetGameHuman();
 
-			if (g_pHumanSetAimPose_Human == pLocalGameHuman)
+			if (pHuman == pLocalGameHuman)
 			{
-				pLocalClientHuman->m_vecCamera = *g_pvecHumanSetAimPose_Vec;
+				pLocalClientHuman->m_vecCamera = CVecTools::ConvertFromMafiaVec(vecPose);
 			}
 		}
 	}
 }
 
-RAWCODECALL HumanSetNormalPose()
+static void HumanSetNormalPose(MafiaSDK::C_Human* pHuman, const S_vector& vecPose)
 {
 	if (g_pClientGame->m_bHumanSetNormalPoseInvokedByGame)
 	{
@@ -445,117 +373,11 @@ RAWCODECALL HumanSetNormalPose()
 		{
 			MafiaSDK::C_Human* pLocalGameHuman = pLocalClientHuman->GetGameHuman();
 
-			if (g_pHumanSetNormalPose_Human == pLocalGameHuman)
+			if (pHuman == pLocalGameHuman)
 			{
-				pLocalClientHuman->m_vecCamera = *g_pvecHumanSetNormalPose_Vec;
+				pLocalClientHuman->m_vecCamera = CVecTools::ConvertFromMafiaVec(vecPose);
 			}
 		}
-	}
-}
-
-RAWCODE HookHumanDoThrowCocotFromCar()
-{
-	_asm
-	{
-		mov g_pHumanDoThrowCocotFromCar_Human, ecx
-		mov eax, [esp + 4]
-		mov g_pHumanDoThrowCocotFromCar_Car, eax
-		mov eax, [esp + 8]
-		mov g_pHumanDoThrowCocotFromCar_SeatID, eax
-		pushad
-	}
-
-	g_bCancelHumanDoThrowCocotFromCar = false;
-	HumanDoThrowCocotFromCar();
-	if (g_bCancelHumanDoThrowCocotFromCar)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
-	_asm
-	{
-		popad
-		push 0xFFFFFFFF
-		push 0x6206A2 // 0x587D70
-		jmp g_ReturnHumanDoThrowCocotFromCar
-	}
-}
-
-RAWCODE HookHumanUseActor()
-{
-	_asm
-	{
-		mov g_pHumanUseActor_Human, ecx
-		mov eax, [esp + 4]
-		mov g_pHumanUseActor_Actor, eax
-		mov eax, [esp + 8]
-		mov g_pHumanUseActor_Unk1, eax
-		mov eax, [esp + 0x0C]
-		mov g_pHumanUseActor_Unk2, eax
-		mov eax, [esp + 0x10]
-		mov g_pHumanUseActor_Unk3, eax
-		pushad
-	}
-	g_bCancelHumanUseActor = false;
-	HumanUseActor();
-	if (g_bCancelHumanUseActor)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
-	_asm
-	{
-		popad
-		sub esp, 0xF8
-		jmp g_ReturnHumanUseActor
-	}
-}
-
-RAWCODE HookCreateActor()
-{
-	_asm
-	{
-		mov eax, [esp + 4]
-		mov g_pCreateActor_Arg1, eax
-		pushad
-	}
-	g_bCancelCreateActor = false;
-	CreateActor();
-	if (g_bCancelCreateActor)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
-	_asm
-	{
-		popad
-		mov eax, fs:0
-		jmp g_ReturnCreateActor
-	}
-}
-
-RAWCODE HookCarUpdate()
-{
-	_asm
-	{
-		mov		g_pCarUpdate_Car, ecx
-		pushad
-	}
-	CarUpdate();
-	_asm
-	{
-		popad
-		mov     eax, fs:0
-		jmp		g_ReturnCarUpdate
 	}
 }
 
@@ -568,88 +390,6 @@ RAWCODE HookSceneCreateActor()
 		call SceneCreateActor
 		add esp, 0x8
 		jmp g_ReturnSceneCreateActor
-	}
-}
-
-RAWCODE HookModelOpen()
-{
-	_asm
-	{
-		mov eax, [esp + 4]
-		mov g_pModelOpen_Arg1, eax
-		mov eax, [esp + 8]
-		mov g_pModelOpen_Arg2, eax
-		pushad
-	}
-	g_bCancelModelOpen = false;
-	ModelOpen();
-	if (g_bCancelModelOpen)
-	{
-		_asm
-		{
-			//popad
-			//retn
-		}
-	}
-	__asm {
-		popad
-		push    ebx
-		mov     ebx, [esp + 8]
-		jmp		g_ReturnModelOpen
-	}
-}
-
-RAWCODE HookHumanSetAimPose()
-{
-	_asm
-	{
-		mov g_pHumanSetAimPose_Human, ecx
-		mov g_pvecHumanSetAimPose_Vec, esp
-		add g_pvecHumanSetAimPose_Vec, 4
-		pushad
-	}
-	g_bCancelHumanSetAimPose = false;
-	HumanSetAimPose();
-	if (g_bCancelHumanSetAimPose)
-	{
-		_asm
-		{
-			popad
-			retn
-		}
-	}
-	_asm
-	{
-		popad
-		sub		esp, 0xB4
-		jmp		g_ReturnHumanSetAimPose
-	}
-}
-
-RAWCODE HookHumanSetNormalPose()
-{
-	_asm
-	{
-		mov g_pHumanSetNormalPose_Human, ecx
-		mov g_pvecHumanSetNormalPose_Vec, esp
-		add g_pvecHumanSetNormalPose_Vec, 4
-		pushad
-	}
-	g_bCancelHumanSetNormalPose = false;
-	HumanSetNormalPose();
-	if (g_bCancelHumanSetNormalPose)
-	{
-		_asm
-		{
-			popad
-			retn
-		}
-	}
-	_asm
-	{
-		popad
-		sub		esp, 0xC0
-		jmp		g_ReturnHumanSetNormalPose
 	}
 }
 
@@ -814,62 +554,46 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponChange(OnHumanWeaponChange);
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
+	MafiaSDK::C_Human_Hooks::HookUseActor(HumanUseActor);
+	MafiaSDK::C_Human_Hooks::HookDoThrowCocotFromCar(HumanDoThrowCocotFromCar);
+	MafiaSDK::C_Human_Hooks::HookHumanSetAimPose(HumanSetAimPose);
+	MafiaSDK::C_Human_Hooks::HookHumanSetNormalPose(HumanSetNormalPose);
+
+	// Mission Hooks
+	MafiaSDK::C_Mission_Hooks::HookCreateActor(CreateActor);
+
+	// Car Hooks
+	MafiaSDK::C_Car_Hooks::HookOnUpdate(CarUpdate);
+
+	// Engine Hooks
+	MafiaSDK::I3D_Model_Hooks::HookOnOpen(ModelOpen);
 
 	// Remove dropped clip
-	new CHackJumpHack(g_pHack, (void*)0x0058D4C6, (void*)0x0058D553, 6);
+	new CHackJumpHack(g_pHack, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::RemoveDroppedClipPatch, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::RemoveDroppedClipPatchSkip, 6);
 
 	// Disable local player weapon drop
-	new CHackJumpHack(g_pHack, (void*)0x00585D90, (void*)0x00585DCB, 6);
+	new CHackJumpHack(g_pHack, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::Do_WeaponDrop, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::Do_WeaponDropPatchSkip, 6);
 
 	// Disable weapon drops
-	new CHackJumpHack(g_pHack, (void*)0x0057FAA0, (void*)0x00580196, 6);
+	new CHackJumpHack(g_pHack, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::DisableWeaponDropsPatch, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::DisableWeaponDropsPatchSkip, 6);
 
 	// Game Exit
-	new CHackJumpHack(g_pHack, (void*)0x00612485, (void*)OnGameExit_Hook, 6);
-	new CHackJumpHack(g_pHack, (void*)0x005A7F44, (void*)0x005A7F4B, 6);
-
-	// Hook UseActor
-	new CHackJumpHack(g_pHack, (void*)0x582180, HookHumanUseActor, 6);
-	g_ReturnHumanUseActor = (void*)(0x582180 + 6);
-
-	// Hook DoThrowCocotFromCar (jack/steal car)
-	new CHackJumpHack(g_pHack, (void*)0x00587D70, HookHumanDoThrowCocotFromCar, 7);
-	g_ReturnHumanDoThrowCocotFromCar = (void*)(0x00587D70 + 7);
-
-	// Hook CreateActor
-	new CHackJumpHack(g_pHack, (void*)0x0053F7D0, HookCreateActor, 6);
-	g_ReturnCreateActor = (void*)(0x0053F7D0 + 6);
+	MafiaSDK::C_Game_Hooks::HookOnGameExit(OnGameExit);
 
 	// Note (Sevenisko): Currently unnecessary to work on
 	new CHackJumpHack(g_pHack, (void*)UpdateProgress_Addr, &SetProgress_Hook, 6);
 
 	// Fix exiting vehicle for passengers.
-	new CHackValueHack(g_pHack, (void*)0x595040, 1, (uint8_t)0xEB);
-
-	// Hook Human::SetAimPose
-	new CHackJumpHack(g_pHack, (void*)0x579EA0, HookHumanSetAimPose, 6);
-	g_ReturnHumanSetAimPose = (void*)(0x579EA0 + 6);
-
-	// Hook Human::SetNormalPose
-	new CHackJumpHack(g_pHack, (void*)0x579630, HookHumanSetNormalPose, 6);
-	g_ReturnHumanSetNormalPose = (void*)(0x579630 + 6);
+	new CHackValueHack(g_pHack, (void*)MafiaSDK::C_Human_Enum::FunctionsAddresses::ExitingVehiclePassengerFix, 1, (uint8_t)0xEB);
 
 	// Hook SceneCreateActor
-	g_ReturnSceneCreateActor = (void*)(0x00544B07);
-	new CHackJumpHack(g_pHack, (void*)0x00544AFF, HookSceneCreateActor, 8);
-
-	// Hook Car::Update
-	new CHackJumpHack(g_pHack, (void*)0x41FAC0, HookCarUpdate, 6);
-	g_ReturnCarUpdate = (void*)(0x41FAC0 + 6);
-
-	// Hook I3D_Model::Open
-	new CHackJumpHack(g_pHack, (void*)0x100335A0, HookModelOpen, 5);
-	g_ReturnModelOpen = (void*)(0x100335A0 + 5);
+	g_ReturnSceneCreateActor = (void*)MafiaSDK::C_Mission_Enum::FunctionAddresses::SceneCreateActorReturn;
+	new CHackJumpHack(g_pHack, (void*)MafiaSDK::C_Mission_Enum::FunctionAddresses::SceneCreateActor, HookSceneCreateActor, 8);
 
 	// (From Mex) To fix the fullscreen game being suspended when using alt+tab
-	new CHackNOPHack(g_pHack, (void*)0x1006DBF7, 7);
-	new CHackNOPHack(g_pHack, (void*)0x1006DD1D, 7);
-	new CHackNOPHack(g_pHack, (void*)0x1006DB2B, 7);
+	new CHackNOPHack(g_pHack, (void*)MafiaSDK::C_Game_Patches::AltTabSuspendFix1, 7);
+	new CHackNOPHack(g_pHack, (void*)MafiaSDK::C_Game_Patches::AltTabSuspendFix2, 7);
+	new CHackNOPHack(g_pHack, (void*)MafiaSDK::C_Game_Patches::AltTabSuspendFix3, 7);
 
 
 	// Fix bug where window border disappears and bugs out the bottom of the window

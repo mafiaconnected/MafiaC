@@ -19,19 +19,41 @@
 
 namespace MafiaSDK
 {
+    // Cross-checked field-for-field against reMafia's C_actor (Actors/C_actor.h, same
+    // author, MafiaOrbitCam/Vendors/reMafia) - every field this SDK already named
+    // (objectType/position/rotation/isActive/doRemove/frame) landed at the exact same
+    // byte offset there, so the previously-unnamed padding gaps below are filled in
+    // from that source with high confidence. Field names kept as-is for compatibility.
     struct C_Entity_Interface
     {
         unsigned long vtable;									// 0-4
-        PADDING(C_Entity_Interface, _pad0, 0xC);
+        unsigned long flags;									// 4-8
+        unsigned long unk1;										// 8-12
+        unsigned short refCount;								// 12-14
+        PADDING(C_Entity_Interface, _pad0, 0x2);
         unsigned long objectType;								// 16-20
-        PADDING(C_Entity_Interface, _pad1, 0x10);
+        unsigned long unk2;										// 20-24
+        unsigned long id;										// 24-28
+        unsigned long state;									// 28-32
+        bool unkBool;											// 32-33
+        PADDING(C_Entity_Interface, _pad1, 0x3);
         S_vector position;										// 36-48
-        S_vector rotation;										// 48-56
-        PADDING(C_Entity_Interface, _pad2, 0x21);
+        S_vector rotation;										// 48-60
+        S_vector truePosition;									// 60-72
+        S_quat trueRotation;									// 72-88
+        I3D_Frame *previousFrame;								// 88-92
+        bool isOn;												// 92-93
         bool isActive;											// 93-94
         bool doRemove;											// 94-95
-        PADDING(C_Entity_Interface, _pad3, 0x9);
+        bool unk3;												// 95-96
+        PADDING(C_Entity_Interface, _pad2, 0x2);
+        bool unk4;												// 98-99
+        bool isHidden;											// 99-100
+        bool isInited;											// 100-101
+        PADDING(C_Entity_Interface, _pad3, 0x3);
         I3D_Frame *frame;										// 104-108
+        bool unk5;												// 108-109
+        PADDING(C_Entity_Interface, _pad4, 0x3);
     };
 
 	//const size_t Offset = offsetof(C_Entity_Interface, frame);

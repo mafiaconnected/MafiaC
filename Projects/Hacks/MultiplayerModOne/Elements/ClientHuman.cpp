@@ -27,18 +27,7 @@ void CClientHuman::UpdateGameMatrix()
 	if (m_MafiaHuman->GetFrame() == nullptr)
 		return;
 
-	uint32_t frame = (uint32_t)m_MafiaHuman->GetFrame();
-	__asm
-	{
-		pushad
-		pushfd
-		mov eax, 0x60FC30 // update frame
-		mov ecx, frame
-		call eax
-		popfd
-		popad
-	}
-
+	m_MafiaHuman->GetFrame()->UpdateWMatrixProc();
 	m_MafiaHuman->GetFrame()->Update();
 }
 
@@ -525,27 +514,18 @@ void CClientHuman::Process()
 			GetGameHuman()->GetInterface()->isShooting = m_IsShooting;
 		}
 
-		auto IHuman = GetGameHuman()->GetInterface();
-		if (!IsInVehicle()) 
+		if (!IsInVehicle())
 		{
 			if (m_vecCamera.GetLength() != 0.0f)
 			{
-				uint32_t uiCamera = (uint32_t)&m_vecCamera;
 				g_pClientGame->m_bHumanSetAimPoseInvokedByGame = false;
-				float x, y, z;
-				x = m_vecCamera.x;
-				y = m_vecCamera.y;
-				z = m_vecCamera.z;
-				uint32_t uiFunc = m_IsAiming ? 0x579EA0 : 0x579630; // set aim pose / set normal pose
-				__asm
-				{
-					push z
-					push y
-					push x
-					mov ecx, IHuman
-					mov eax, uiFunc
-					call eax
-				}
+
+				S_vector vecPose = CVecTools::ConvertToMafiaVec(m_vecCamera);
+				if (m_IsAiming)
+					GetGameHuman()->PoseSetPoseAimed(vecPose);
+				else
+					GetGameHuman()->PoseSetPoseNormal(vecPose);
+
 				g_pClientGame->m_bHumanSetAimPoseInvokedByGame = true;
 			}
 		}
@@ -829,14 +809,7 @@ void CClientHuman::SetActiveWeapon(unsigned short usWeapon)
 
 	*(uint16_t*)(uiHuman + 1184) = usWeapon; // uint16 +1184 = active weapon id
 
-	__asm
-	{
-		push 1
-		push 1
-		mov ecx, uiHuman
-		mov eax, 0x57F550 // Human::ChangeWeapon
-		call eax
-	}
+	GetGameHuman()->Do_ChangeWeapon(1, 1);
 }
 
 int CClientHuman::GetFirstEmptyWeaponIndex()

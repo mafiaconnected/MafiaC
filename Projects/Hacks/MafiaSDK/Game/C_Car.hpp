@@ -24,7 +24,6 @@ namespace MafiaSDK
 	struct C_Car_Interface
 	{
 		C_Entity_Interface		 entity;
-		PADDING(C_Car_Interface, _pad0, 0x4);
 		C_Vehicle_Interface	vehicle_interface;
 	};
 
@@ -368,6 +367,41 @@ namespace MafiaSDK
 			}
 		}
 		*/
+	};
+
+	namespace C_Car_Hooks
+	{
+		void HookOnUpdate(std::function<void(C_Car*)> functionPointer);
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+		namespace FunctionsPointers
+		{
+			extern std::function<void(C_Car*)> onUpdate;
+		};
+
+		namespace Functions
+		{
+			inline void OnUpdate(C_Car* car)
+			{
+				if (FunctionsPointers::onUpdate != nullptr)
+					FunctionsPointers::onUpdate(car);
+			}
+		};
+
+		namespace NakedFunctions
+		{
+			extern void Update();
+			extern void* updateReturn;
+		};
+
+		inline void HookOnUpdate(std::function<void(C_Car*)> functionPointer)
+		{
+			FunctionsPointers::onUpdate = functionPointer;
+
+			NakedFunctions::updateReturn = (void*)(C_Car_Enum::FunctionsAddresses::Update + 6);
+			MemoryPatcher::InstallJmpHook(C_Car_Enum::FunctionsAddresses::Update, (unsigned long)&NakedFunctions::Update);
+		}
+#endif
 	};
 };
 

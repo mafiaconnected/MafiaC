@@ -29,6 +29,22 @@ namespace MafiaSDK
         return *(I3D_Driver**)(I3D_Driver_Const);
     }
 
+    namespace C_Game_Patches
+    {
+        namespace NakedFunctions
+        {
+            DWORD JumpBackMenu = 0x00594896;
+
+            __declspec(naked) void AllowMultipleMenus()
+            {
+                __asm {
+                    mov eax, 0x0a9
+                    jmp JumpBackMenu
+                }
+            }
+        }
+    }
+
     namespace C_Game_Hooks
     {
         namespace FunctionsPointers
@@ -38,10 +54,23 @@ namespace MafiaSDK
             std::function<void()> gameInit;
             std::function<void()> localPlayerFallDown;
             std::function<void(C_Human*, S_vector)> humanOnShoot;
+            std::function<void()> gameExit;
         }
 
         namespace NakedFunctions
         {
+            __declspec(naked) void GameExit()
+            {
+                __asm
+                {
+                    pushad
+                    call Functions::GameExit
+                    popad
+
+                    retn
+                }
+            }
+
             __declspec(naked) void LocalPlayerFallDown()
             {
                 __asm
@@ -104,6 +133,10 @@ namespace MafiaSDK
             std::function<void(const S_vector&)> humanShoot;
             std::function<void(MafiaSDK::C_Human*, byte)> humanDoWeaponChange;
             std::function<void(MafiaSDK::C_Human*)> humanDoWeaponDrop;
+            std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
+            std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
+            std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
+            std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
         };
 
         namespace NakedFunctions
@@ -251,6 +284,194 @@ namespace MafiaSDK
 
                     MOV EAX, 0x00590252
                     JMP EAX
+                }
+            }
+
+            void* useActorReturn;
+
+            // Human::Use_Actor(C_Actor* actor, int unk1, int unk2, int unk3)
+            __declspec(naked) void UseActor()
+            {
+                __asm
+                {
+                    mov eax, [esp + 4]
+                    mov edx, [esp + 8]
+                    mov ebx, [esp + 0x0C]
+                    mov esi, [esp + 0x10]
+                    pushad
+
+                    push esi
+                    push ebx
+                    push edx
+                    push eax
+                    push ecx
+                    call Functions::UseActor
+                    add esp, 0x14
+
+                    popad
+                    sub esp, 0xF8
+                    jmp useActorReturn
+                }
+            }
+
+            void* doThrowCocotFromCarReturn;
+
+            // Human::Do_ThrowCocotFromCar(C_Car* car, int seatId)
+            __declspec(naked) void DoThrowCocotFromCar()
+            {
+                __asm
+                {
+                    mov eax, [esp + 4]
+                    mov edx, [esp + 8]
+                    pushad
+
+                    push edx
+                    push eax
+                    push ecx
+                    call Functions::DoThrowCocotFromCar
+                    add esp, 0x0C
+
+                    popad
+                    push 0xFFFFFFFF
+                    push 0x6206A2 // 0x587D70
+                    jmp doThrowCocotFromCarReturn
+                }
+            }
+
+            void* setAimPoseReturn;
+
+            // Human::PoseSetPoseAimed(S_vector pose)
+            __declspec(naked) void SetAimPose()
+            {
+                __asm
+                {
+                    lea eax, [esp + 4]
+                    pushad
+
+                    push eax
+                    push ecx
+                    call Functions::HumanSetAimPose
+                    add esp, 8
+
+                    popad
+                    sub esp, 0xB4
+                    jmp setAimPoseReturn
+                }
+            }
+
+            void* setNormalPoseReturn;
+
+            // Human::PoseSetPoseNormal(S_vector pose)
+            __declspec(naked) void SetNormalPose()
+            {
+                __asm
+                {
+                    lea eax, [esp + 4]
+                    pushad
+
+                    push eax
+                    push ecx
+                    call Functions::HumanSetNormalPose
+                    add esp, 8
+
+                    popad
+                    sub esp, 0xC0
+                    jmp setNormalPoseReturn
+                }
+            }
+        };
+    }
+
+    namespace C_Mission_Hooks
+    {
+        namespace FunctionsPointers
+        {
+            std::function<void(C_Mission_Enum::ObjectTypes)> createActor;
+        }
+
+        namespace NakedFunctions
+        {
+            void* createActorReturn;
+
+            // C_Mission::CreateActor(C_Mission_Enum::ObjectTypes actorType)
+            __declspec(naked) void CreateActor()
+            {
+                __asm
+                {
+                    mov eax, [esp + 4]
+                    pushad
+
+                    push eax
+                    call Functions::CreateActor
+                    add esp, 4
+
+                    popad
+                    mov eax, fs:0
+                    jmp createActorReturn
+                }
+            }
+        };
+    }
+
+    namespace C_Car_Hooks
+    {
+        namespace FunctionsPointers
+        {
+            std::function<void(C_Car*)> onUpdate;
+        }
+
+        namespace NakedFunctions
+        {
+            void* updateReturn;
+
+            // C_Car::Update(float dt)
+            __declspec(naked) void Update()
+            {
+                __asm
+                {
+                    pushad
+
+                    push ecx
+                    call Functions::OnUpdate
+                    add esp, 4
+
+                    popad
+                    mov eax, fs:0
+                    jmp updateReturn
+                }
+            }
+        };
+    }
+
+    namespace I3D_Model_Hooks
+    {
+        namespace FunctionsPointers
+        {
+            std::function<void(uint32_t, const char*)> onOpen;
+        }
+
+        namespace NakedFunctions
+        {
+            void* openReturn;
+
+            // I3D_Model::Open(char const* modelName, unsigned int, callback, void*)
+            __declspec(naked) void Open()
+            {
+                __asm
+                {
+                    mov eax, [esp + 4]
+                    mov edx, [esp + 8]
+                    pushad
+
+                    push edx
+                    push eax
+                    call Functions::OnOpen
+                    add esp, 8
+
+                    popad
+                    push    ebx
+                    mov     ebx, [esp + 8]
+                    jmp		openReturn
                 }
             }
         };

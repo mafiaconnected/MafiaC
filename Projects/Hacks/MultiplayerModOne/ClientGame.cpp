@@ -2154,6 +2154,47 @@ bool CClientGame::OnTrafficCarRespawn(CClientVehicle* pClientVehicle, MafiaSDK::
 	return true;
 }
 
+bool CClientGame::OnActorAdded(MafiaSDK::C_Mission_Enum::ObjectTypes Type, const GChar* pszName)
+{
+	using ObjTypes = MafiaSDK::C_Mission_Enum::ObjectTypes;
+
+	if (Type != ObjTypes::Trolley && Type != ObjTypes::Wagon && Type != ObjTypes::Bridge)
+		return false;
+
+	if (pszName == nullptr || pszName[0] == '\0')
+		return false;
+
+	if ((Type == ObjTypes::Trolley || Type == ObjTypes::Wagon) && !IsGameComponentEnabled(GAMECOMPONENT_TROLLEYS))
+		return false;
+
+	if (Type == ObjTypes::Bridge && !IsGameComponentEnabled(GAMECOMPONENT_BRIDGES))
+		return false;
+
+	auto pMultiplayer = GetMultiplayer();
+	if (pMultiplayer == nullptr || !pMultiplayer->IsConnected() || !pMultiplayer->IsJoined())
+		return false;
+
+	if (!pMultiplayer->m_bNetworkedEntities)
+		return false;
+
+	// Every client independently discovers the same actor names for the same map - only report ones we
+	// don't already know about. Covers both a report of our own still in flight and one the server already
+	// streamed in from another client that got here first.
+	if (m_pClientManager->FromName(pszName, ELEMENT_ACTOR) != nullptr)
+		return false;
+
+	auto pClientActor = Strong<CClientActor>::New(m_pClientManager->Create(ELEMENT_ACTOR));
+	pClientActor->SetName(pszName);
+	m_pClientManager->RegisterNetObject(pClientActor);
+
+	pClientActor->GenerateGUID();
+	pClientActor->SetSyncer(pMultiplayer->m_NetMachines.GetMachine(pMultiplayer->m_iLocalIndex));
+
+	pMultiplayer->EnqueuePeerElement(pClientActor);
+
+	return true;
+}
+
 bool CClientGame::IsGameComponentEnabled(eGameComponent GameComponent)
 {
 	switch (GameComponent)

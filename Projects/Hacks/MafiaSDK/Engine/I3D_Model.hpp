@@ -19,6 +19,50 @@ limitations under the License.
 
 namespace MafiaSDK
 {
+    namespace I3D_Model_Enum
+    {
+        enum FunctionAddresses
+        {
+            Open = 0x100335A0
+        };
+    };
+
+    namespace I3D_Model_Hooks
+    {
+        // frame = the I3D_Model/I3D_Frame instance being opened, modelName = the model file path being loaded
+        void HookOnOpen(std::function<void(uint32_t frame, const char* modelName)> functionPointer);
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+        namespace FunctionsPointers
+        {
+            extern std::function<void(uint32_t, const char*)> onOpen;
+        };
+
+        namespace Functions
+        {
+            inline void OnOpen(uint32_t frame, const char* modelName)
+            {
+                if (FunctionsPointers::onOpen != nullptr)
+                    FunctionsPointers::onOpen(frame, modelName);
+            }
+        };
+
+        namespace NakedFunctions
+        {
+            extern void Open();
+            extern void* openReturn;
+        };
+
+        inline void HookOnOpen(std::function<void(uint32_t, const char*)> functionPointer)
+        {
+            FunctionsPointers::onOpen = functionPointer;
+
+            NakedFunctions::openReturn = (void*)(I3D_Model_Enum::FunctionAddresses::Open + 5);
+            MemoryPatcher::InstallJmpHook(I3D_Model_Enum::FunctionAddresses::Open, (unsigned long)&NakedFunctions::Open);
+        }
+#endif
+    };
+
     class I3D_Model : public I3D_Frame
     {
     public:
