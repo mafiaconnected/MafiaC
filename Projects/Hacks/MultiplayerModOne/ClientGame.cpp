@@ -1167,7 +1167,6 @@ void CClientGame::OnRender2DStuff()
 			m_pCmdWindow->Disable();
 			UpdateCursorEnabled();
 		}
-		return;
 	}
 
 	m_pOnDrawnHUDEventType->Trigger();

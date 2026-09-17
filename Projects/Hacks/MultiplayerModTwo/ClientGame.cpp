@@ -1188,7 +1188,6 @@ void CClientGameII::OnRender2DStuff()
 			m_pCmdWindow->Disable();
 			UpdateCursorEnabled();
 		}
-		return;
 	}
 
 	//m_pOnDrawnHUDEventType->Trigger();
@@ -1196,7 +1195,6 @@ void CClientGameII::OnRender2DStuff()
 	int width = 0;
 	int height = 0;
 
-	if (M2::C_MafiaFramework::GetActive())
 	{
 		HWND pWindow = GetActiveWindow();
 		RECT rect;
