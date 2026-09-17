@@ -1,3 +1,5 @@
 #pragma once
 
 #define MAFIAC_RMLUI 0
+#define MAFIAC_REMOTE_SCRIPTING 0
+#define MAFIAC_SCRIPTING_DEBUG_SERVER 0

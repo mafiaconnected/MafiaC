@@ -17,6 +17,8 @@ using namespace Galactic3D;
 #include <Multiplayer/Multiplayer.h>
 #include <Scripting/Scripting.h>
 
+#include <MafiaCConfig.h>
+
 #include <MafiaHackSupport.h>
 
 #include <LauncherVersion.h>

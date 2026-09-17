@@ -30,6 +30,8 @@ target_link_libraries(
 	Multiplayer_static
 	Network_static
 	Scripting_static
+	IPC_static
+	RemoteScripting_static
 	mozjs-52
 	dxerr
 	dxguid
@@ -41,6 +43,7 @@ target_link_libraries(
 	curl_static
 	png_static
 	freetype_static
+	harfbuzz_static
 	lua53_static
 	sqstdlib_static
 	squirrel_static

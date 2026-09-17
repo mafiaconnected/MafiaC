@@ -6,6 +6,9 @@
 #include "Elements/Elements.h"
 #include <Multiplayer/ChatWindow.h>
 #include <d3dx9.h>
+#if MAFIAC_REMOTE_SCRIPTING
+#include <RemoteScripting/RemoteScripting.h>
+#endif
 
 using namespace Galactic3D;
 
@@ -104,9 +107,36 @@ extern bool RegisterSqVM(CScripting* pScripting);
 
 CMafiaClientResourceMgrII::CMafiaClientResourceMgrII(Galactic3D::Context* pContext) : CClientResourceMgr(pContext)
 {
+#if MAFIAC_REMOTE_SCRIPTING
+	const GChar* rgpszLanguages[] = {
+		_gstr("Lua"),
+		_gstr("Squirrel"),
+		_gstr("SpiderMonkey")
+	};
+
+	GString ScriptingHostPath;
+	pContext->GetFileSystem()->ResolvePath(_gstr("/ScriptingHost.exe"), ScriptingHostPath);
+	m_pRemoteScriptingVM = RegisterRemoteVMs(m_pScripting, ScriptingHostPath.c_str(), rgpszLanguages, ARRAY_COUNT(rgpszLanguages));
+#else
 	RegisterLuaVM(m_pScripting);
 	RegisterJSVM(m_pScripting);
 	RegisterSqVM(m_pScripting);
+#endif
+}
+
+void CMafiaClientResourceMgrII::Process(double fDeltaTime)
+{
+	CClientResourceMgr::Process(fDeltaTime);
+
+#if MAFIAC_REMOTE_SCRIPTING
+	// Every VM RegisterRemoteVMs() creates shares one pool - any single one of them is enough to drive that
+	// pool's own Process() (combined-memory watchdog, per-frame batched-release flush, and IPCPROTO_FRAMETICK
+	// for frame-scoped caching). Calling it on more than one VM sharing a pool would over-accumulate delta
+	// time and check/tick more often than intended - m_pRemoteScriptingVM is deliberately just the one
+	// RegisterRemoteVMs() itself returned for exactly this reason.
+	if (m_pRemoteScriptingVM != nullptr)
+		m_pRemoteScriptingVM->Process(fDeltaTime);
+#endif
 }
 
 void CMafiaClientResourceMgrII::RemoveThingsAssociatedWithResource(CResource* pResource)

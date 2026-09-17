@@ -62,6 +62,7 @@ target_link_libraries(
 	SDL2
 	sqlite3
 	zlib_static
+	bzip2_static
 	png_static
 	tinyxml_static
 	Taskbar_static

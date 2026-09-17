@@ -9,6 +9,9 @@
 #include "ScriptingFunctions/ScriptingFunctions.h"
 #include <Multiplayer/ChatWindow.h>
 #include <Multiplayer/CmdWindow.h>
+#if MAFIAC_SCRIPTING_DEBUG_SERVER
+#include <Multiplayer/ScriptingDebugServer.h>
+#endif
 #include <Audio/BassRenderer.h>
 #include <Audio/BassRenderer.hpp>
 //#include <Audio/FMODRenderer.h>
@@ -243,6 +246,7 @@ void CClientGame::InitialiseScripting()
 
 #if MAFIAC_RMLUI
 	m_pRmlUi = new CRmlUi2(m_pContext);
+	m_pRmlUi->m_pFonts = &m_Fonts;
 	m_pRmlUi->Initialise();
 #endif
 
@@ -288,6 +292,7 @@ void CClientGame::InitialiseScripting()
 		delete m_pAudioScriptingFunctions->m_pSoundMgr;
 		m_pAudioScriptingFunctions->m_pSoundMgr = NULL;
 	}
+	m_LucasFontFunctions.m_pFonts = &m_Fonts;
 	m_LucasFontFunctions.RegisterFunctions(m_pResourceMgr->m_pScripting);
 	m_LucasFontFunctions.m_CreateFreeTypeTextureFontPageTextureData.m_p2D = &m_p2D;
 	m_GUISystem.RegisterFunctions(m_pResourceMgr->m_pScripting);
@@ -312,6 +317,12 @@ void CClientGame::InitialiseScripting()
 		m_pMultiplayer->m_pClientManager = m_pClientManager;
 		m_pMultiplayer->SetNetObjectMgr(m_pClientManager);
 	}
+
+#if MAFIAC_SCRIPTING_DEBUG_SERVER
+	m_pResourceMgr->StartDebugServer();
+	m_pResourceMgr->m_pDebugServer->SetNetObjectMgr(m_pClientManager);
+	m_pClientManager->SetDebugServer(m_pResourceMgr->m_pDebugServer); // reverse link - lets Register/UnregisterNetObject push Elements tab create/remove deltas
+#endif
 }
 
 void CClientGame::ShutdownScripting()
@@ -346,7 +357,6 @@ void CClientGame::ShutdownScripting()
 		m_pDownloadManager = nullptr;
 	delete m_pResourceMgr;
 	m_pResourceMgr = nullptr;
-	m_LucasFontFunctions.m_Fonts.Flush();
 	m_Fonts.Flush();
 	m_SlotMgr.DeleteHWResources();
 #if MAFIAC_RMLUI
@@ -354,28 +364,13 @@ void CClientGame::ShutdownScripting()
 #endif
 }
 
-static bool LoadSystemFontCB(const TCHAR* pszValueName, const TCHAR* pszValue)
-{
-	if (_tcsstr(pszValueName, _T("Arial")) ||
-		_tcsstr(pszValueName, _T("Tahoma")) ||
-		_tcsstr(pszValueName, _T("Segoe UI Emoji")) ||
-		_tcsstr(pszValueName, _T("Comic Sans MS")) ||
-		_tcsstr(pszValueName, _T("Times New Roman")) ||
-		_tcsstr(pszValueName, _T("Courier New")) ||
-		_tcsstr(pszValueName, _T("Impact")))
-		return true;
-	return false;
-}
-
 void CClientGame::LoadFonts()
 {
 	// Clear the existing fonts first
-	m_LucasFontFunctions.m_Fonts.Clear();
 	m_Fonts.Clear();
 
 	_glogprintf(_gstr("Loading System Fonts\n"));
-	m_LucasFontFunctions.m_Fonts.LoadSystemFonts(LoadSystemFontCB);
-	m_Fonts.LoadSystemFonts(LoadSystemFontCB);
+	m_Fonts.LoadSystemFonts();
 
 	{
 		m_pContext->GetFileSystem()->Enumerate(_gstr("/Fonts"), [](const Galactic3D::CFileMgr::tDirectoryEntry& Entry, void* pUser) {
@@ -386,7 +381,6 @@ void CClientGame::LoadFonts()
 			if (pStream != nullptr)
 			{
 				//_glogprintf(_gstr("Loading Font - %s\n"), Path.c_str());
-				pClientGame->m_LucasFontFunctions.m_Fonts.LoadFont(pStream);
 				pClientGame->m_Fonts.LoadFont(pStream);
 			}
 			return true;
@@ -797,7 +791,6 @@ void CClientGame::OnEndInGame()
 
 	m_GUISystem.Clear();
 
-	m_LucasFontFunctions.m_Fonts.Flush();
 	m_Fonts.Flush();
 
 #if GTAC_RMLUI

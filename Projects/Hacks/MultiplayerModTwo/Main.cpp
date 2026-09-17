@@ -11,6 +11,9 @@
 #include "ClientManager.h"
 #include <curl/curl.h>
 #include <thread>
+#if MAFIAC_REMOTE_SCRIPTING
+#include <RemoteScripting/RemoteScripting.h>
+#endif
 
 tHack* g_pHack;
 Context* g_pContext;
@@ -43,6 +46,44 @@ static bool LoadTARArchive(CFileSystem* pFileSystem, const GChar* pszArchive, co
 	return false;
 }
 
+static bool LoadPakArchive(CFileSystem* pFileSystem, Stream* pStream, const GChar* pszTarget, bool bExclusive)
+{
+	CPakArchive* pArchive = new CPakArchive;
+	if (pArchive->Read(pStream))
+	{
+		pFileSystem->Mount(pArchive, pszTarget, bExclusive);
+		return true;
+	}
+	else
+		delete pArchive;
+	return false;
+}
+
+// Peeks the first 4 bytes to identify a PAK ("GPAK" - see Pak.cpp's own magic check), rewound after either
+// way - falls through to TAR as the default otherwise (CTARArchive::Read() validates via a full-header
+// checksum and fails cleanly if that guess is wrong) - same convention as ModLauncher's own LoadArchive(),
+// letting MafiaC.pak/MafiaC.tar (and the embedded IDR_MAIN_ARCHIVE resource, either format) all work
+// transparently through one call site.
+static bool LoadArchive(CFileSystem* pFileSystem, Stream* pStream, const GChar* pszTarget, bool bCaseSensitive, bool bExclusive)
+{
+	uint8_t Magic[4] = {};
+	size_t BytesRead = pStream->Read(Magic, sizeof(Magic));
+	pStream->Rewind();
+
+	if (BytesRead == sizeof(Magic) && memcmp(Magic, "GPAK", 4) == 0)
+		return LoadPakArchive(pFileSystem, pStream, pszTarget, bExclusive);
+
+	return LoadTARArchive(pFileSystem, pStream, pszTarget, bCaseSensitive, bExclusive);
+}
+
+static bool LoadArchive(CFileSystem* pFileSystem, const GChar* pszArchive, const GChar* pszTarget, bool bCaseSensitive, bool bExclusive)
+{
+	auto pStream = Strong<Stream>::New(pFileSystem->Open(pszArchive, false));
+	if (pStream != nullptr)
+		return LoadArchive(pFileSystem, pStream, pszTarget, bCaseSensitive, bExclusive);
+	return false;
+}
+
 static void Load(tHackEventDataLoad* pData)
 {
 	g_pHack = pData->m_pHack;
@@ -51,16 +92,16 @@ static void Load(tHackEventDataLoad* pData)
 
 	{
 #if MAFIAC_ARCHIVE_EXTERNAL
-		LoadTARArchive(g_pContext->GetFileSystem(), _gstr("/MafiaC.tar"), _gstr("/"), true, false);
+		LoadArchive(g_pContext->GetFileSystem(), _gstr("/MafiaC.tar"), _gstr("/"), true, false);
 #else
 		auto pStream = Strong<Stream>::New(OpenResource(HINST_THISCOMPONENT, MAKEINTRESOURCE(IDR_MAIN_ARCHIVE), RT_RCDATA));
 		if (pStream != nullptr)
 		{
-			LoadTARArchive(g_pContext->GetFileSystem(), pStream, _gstr("/"), true, false);
+			LoadArchive(g_pContext->GetFileSystem(), pStream, _gstr("/"), true, false);
 		}
 		else
 		{
-			LoadTARArchive(g_pContext->GetFileSystem(), _gstr("/MafiaC.tar"), _gstr("/"), true, false);
+			LoadArchive(g_pContext->GetFileSystem(), _gstr("/MafiaC.tar"), _gstr("/"), true, false);
 		}
 #endif
 	}
@@ -152,6 +193,9 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		case HACKEVENT_FRAME:
 			{
 				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+#if MAFIAC_REMOTE_SCRIPTING
+				CRemoteScriptingVM::CHotPathScope HotPathScope;
+#endif
 				if (!M2::C_MafiaFramework::GetActive())
 				{
 					g_pClientGame->OnFrame();
@@ -162,6 +206,9 @@ HACKEVENTRESULT HackMain(uint32_t Event, tHackEventData* pData)
 		case HACKEVENT_PROCESS:
 			{
 				assert(GetCurrentThreadId() == CHackSupport::m_pInstance->m_dwMainThread);
+#if MAFIAC_REMOTE_SCRIPTING
+				CRemoteScriptingVM::CHotPathScope HotPathScope;
+#endif
 				g_pClientGame->OnProcess();
 			}
 			return HACKEVENTRESULT_NORMAL;

@@ -129,20 +129,6 @@ bool CRmlUi2::Initialise()
 	}
 #endif
 
-	m_pContext->GetFileSystem()->Enumerate(_gstr("/Fonts"), [](const Galactic3D::CFileMgr::tDirectoryEntry& Entry, void* pUser) {
-		auto pRmlUi = ((CRmlUi2*)pUser);
-		GString Path = Entry.pszPath;
-		PathUtil::AppendPath(Path, Entry.pszFileName);
-		//auto pStream = Strong<Stream>::New(pRmlUi->m_pContext->GetFileSystem()->Open(Path.c_str(), false));
-		//if (pStream != nullptr)
-		{
-			//_glogprintf(_gstr("Loading Font - %s\n"), Path.c_str());
-			UTF8String Path2(false, Path.c_str(), Path.length());
-			Rml::LoadFontFace(Rml::String(Path2), false);
-		}
-		return true;
-	}, this);
-
 	if (Rml::DataModelConstructor constructor = m_pRmlContext->CreateDataModel("animals"))
 	{
 		constructor.Bind("show_text", &my_data.show_text);

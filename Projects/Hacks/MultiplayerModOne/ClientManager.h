@@ -7,6 +7,10 @@
 
 class CMafiaClientManager;
 
+#if MAFIAC_REMOTE_SCRIPTING
+namespace Galactic3D { class CRemoteScriptingVM; }
+#endif
+
 class CClientEntity;
 class CClientHuman;
 class CClientPlayer;
@@ -76,6 +80,14 @@ class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr
 {
 public:
 	CMafiaClientResourceMgr(Galactic3D::Context* pContext);
+
+private:
+#if MAFIAC_REMOTE_SCRIPTING
+	Galactic3D::CRemoteScriptingVM* m_pRemoteScriptingVM = nullptr;
+#endif
+
+public:
+	void Process(double fDeltaTime);
 
 	virtual void RemoveThingsAssociatedWithResource(Galactic3D::CResource* pResource);
 };

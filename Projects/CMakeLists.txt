@@ -44,6 +44,10 @@ if(WIN32)
 	add_definitions(-D_UNICODE)
 endif()
 
+# Enable debug asserts/logging in RelWithDebInfo
+define(RELWITHDEBINFO GALACTIC_DEBUG_ASSERTS=1)
+define(RELWITHDEBINFO GALACTIC_DEBUG_LOGGING=1)
+
 # So we can omit things from public release
 define(RELEASE PUBLIC_RELEASE=1)
 
