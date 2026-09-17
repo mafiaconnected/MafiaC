@@ -28,7 +28,40 @@ namespace MafiaSDK
 	{
 		enum FunctionsAddresses
 		{
-			
+			SetWeatherSystemParam = 0x1004BCE0 // LS3DF.dll base (0x10000000) + 0x4BCE0
+		};
+
+		/*
+			Rain/weather-system parameter IDs for SetWeatherSystemParam() below. Values 0, 3-10
+			and 14 are confirmed from MultiplayerModOne's own WEATHER_* MafiaScript defines
+			(GameFunctions.cpp's RegisterGameDefines) and match the documented `weather_setparam`
+			MafiaScript command (ON, COLOR_L/COLOR_H, SPEED, LEN, WIDTH, MAX_DIST, MAX_HEIGHT,
+			MAX_CNT, MODE). DIR_X/DIR_Y/DIR_Z at 11-13 are inferred - they exactly fill the only
+			gap in that list, immediately before MODE, and the doc separately lists a 3-axis rain
+			direction - but they're not yet confirmed against the real engine values. 1 and 2 are
+			unaccounted for by any known name; don't assume they're unused without checking.
+
+			All of these except ON/MAX_CNT/MODE are documented as float ranges (e.g. SPEED 20-40,
+			LEN 0.5-1, WIDTH 0.02-0.05) despite SetWeatherSystemParam() taking a raw uint32_t -
+			use the float overload below for those, which just bit-reinterprets the value.
+		*/
+		enum WS_PARAM
+		{
+			WS_PARAM_ON         = 0,
+			WS_PARAM_UNKNOWN1   = 1,
+			WS_PARAM_UNKNOWN2   = 2,
+			WS_PARAM_COLOR_L    = 3,
+			WS_PARAM_COLOR_H    = 4,
+			WS_PARAM_SPEED      = 5,
+			WS_PARAM_LEN        = 6,
+			WS_PARAM_WIDTH      = 7,
+			WS_PARAM_MAX_DIST   = 8,
+			WS_PARAM_MAX_HEIGHT = 9,
+			WS_PARAM_MAX_CNT    = 10,
+			WS_PARAM_DIR_X      = 11,
+			WS_PARAM_DIR_Y      = 12,
+			WS_PARAM_DIR_Z      = 13,
+			WS_PARAM_MODE       = 14
 		};
 	};
 
@@ -86,6 +119,29 @@ namespace MafiaSDK
 				push eax
 				call dword ptr ds : [ecx + 0x5C]
 			}
+		}
+
+		// Not a vtable call - a direct function in LS3DF.dll (see FunctionsAddresses above).
+		void __stdcall SetWeatherSystemParam(I3D_Sector_Enum::WS_PARAM eParam, uint32_t uiValue)
+		{
+			unsigned long addressFunc = I3D_Sector_Enum::FunctionsAddresses::SetWeatherSystemParam;
+
+			__asm
+			{
+				push uiValue
+				push eParam
+				mov ecx, this
+				call addressFunc
+			}
+		}
+
+		// Convenience for the params documented as floats (SPEED, LEN, WIDTH, MAX_DIST,
+		// MAX_HEIGHT, DIR_X/Y/Z, and probably COLOR_L/COLOR_H) - bit-reinterprets fValue into
+		// the raw uint32_t the real function takes. Use the uint32_t overload directly for
+		// true integer params (ON, MAX_CNT, MODE).
+		void SetWeatherSystemParam(I3D_Sector_Enum::WS_PARAM eParam, float fValue)
+		{
+			SetWeatherSystemParam(eParam, *reinterpret_cast<uint32_t*>(&fValue));
 		}
 	};
 }

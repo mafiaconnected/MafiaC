@@ -229,6 +229,9 @@ namespace MafiaSDK
             return GetMissionInterface()->mGame;
         }
 
+        // Defined below, after C_Mission_Extended (which it reads through).
+        I3D_Sector* GetScene();
+
         C_Actor* CreateActor(C_Mission_Enum::ObjectTypes actorType)
         {
             unsigned long funcAddress = C_Mission_Enum::FunctionAddresses::CreateActor;
@@ -388,6 +391,21 @@ namespace MafiaSDK
 		vc6_vector<C_Actor*> activeActors;
 		vc6_vector<C_Actor*> actorSounds;
 	};
+
+	/*
+		Resolves C_Mission_Extended's own "uncorrected, verify before relying on them" caveat
+		above, for its first three fields (actors, scene, animModels) specifically:
+		MafiaSDK::vc6_vector<T*>'s real layout ({ allocator; _First; _Last; _End; }) is a
+		1-byte empty allocator padded to 4 plus three 4-byte pointers = 16 bytes on this
+		build's x86 target, so actors(0x10) + scene(0x04) lands `game` at offset 0x24 -
+		exactly the offset already verified independently via C_Mission_Interface::mGame.
+		That match is what justifies reading `scene` here; fields after `game` are still
+		unverified.
+	*/
+	inline I3D_Sector* C_Mission::GetScene()
+	{
+		return reinterpret_cast<C_Mission_Extended*>(this)->scene;
+	}
 }
 
 #endif
