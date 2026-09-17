@@ -499,6 +499,52 @@ static bool FunctionGameSetDoorOpenAngle(IScriptState* pState, int argc, void* p
 	return true;
 }
 
+// C_Bridge_Interface (MafiaSDK::C_Bridge) has no readable fields at all - Shutdown(BOOL) is
+// a fire-and-forget native call with no corresponding state to read back. This map tracks
+// the last state a script commanded per bridge actor name purely for getBridgeState(); it
+// does not reflect the bridge's real animation/position if something else moved it.
+static std::unordered_map<std::string, bool> g_umapBridgeStates;
+
+static bool FunctionGameSetBridgeState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	bool bEnabled = false;
+	if (!pState->CheckBoolean(1, bEnabled))
+		return false;
+
+	MafiaSDK::C_Bridge* actor = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Bridge not found: %s"), name);
+	}
+
+	actor->Shutdown(bEnabled);
+	g_umapBridgeStates[name2.CString()] = bEnabled;
+	return true;
+}
+
+static bool FunctionGameGetBridgeState(IScriptState* pState, int argc, void* pUser)
+{
+	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
+
+	const GChar* name = pState->CheckString(0);
+	if (!name) return false;
+	UTF8String name2(true, name);
+
+	MafiaSDK::C_Bridge* actor = (MafiaSDK::C_Bridge*)MafiaSDK::GetMission()->FindActorByName(name2);
+	if (actor == nullptr) {
+		return pState->Error(_gstr("Bridge not found: %s"), name);
+	}
+
+	auto it = g_umapBridgeStates.find(name2.CString());
+	pState->ReturnBoolean(it != g_umapBridgeStates.end() && it->second);
+	return true;
+}
+
 static bool FunctionGameGetActorPosition(IScriptState* pState, int argc, void* pUser)
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
@@ -962,6 +1008,12 @@ void CScriptingFunctions::RegisterGameFunctions(Galactic3D::CScripting* pScripti
 		pGameNamespace->RegisterFunction(_gstr("getDoorOpenAngle"), _gstr("s"), FunctionGameGetDoorOpenAngle, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setDoorState"), _gstr("sibb"), FunctionGameSetDoorState, pClientManager);
 		pGameNamespace->RegisterFunction(_gstr("setDoorOpenAngle"), _gstr("sf"), FunctionGameSetDoorOpenAngle, pClientManager);
+	}
+
+	// Bridges
+	{
+		pGameNamespace->RegisterFunction(_gstr("getBridgeState"), _gstr("s"), FunctionGameGetBridgeState, pClientManager);
+		pGameNamespace->RegisterFunction(_gstr("setBridgeState"), _gstr("sb"), FunctionGameSetBridgeState, pClientManager);
 	}
 
 	// Actors (generic)

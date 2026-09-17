@@ -318,12 +318,84 @@ namespace MafiaSDK
 	class C_Vehicle_Extended
 	{
 	public:
-		void EnableRightIndicator(bool enable);
-		void DisableTurnIndicatorFlag(bool enable);
-		void EnableLeftIndicator(bool enable);
-		void SetLightFlags(unsigned long flags);
-		void EnableLight(bool enable);
-		void EnableLightsValue(bool enable);
+		/*
+			Bodies below ported from reMafia's C_Vehicle.cpp (same author,
+			MafiaOrbitCam/Vendors/reMafia) - confirmed, working bit-flag logic against
+			m_uLightFlags/lightFlags. EnableLeftIndicator/EnableRightIndicator/
+			DisableTurnIndicatorFlag/SetLightFlags/EnableLight are all exactly as
+			reMafia implements them.
+
+			SetLightFlags only merges bits 20-27 (mask 0xFF00000) of `flags` into
+			lightFlags; which of those bits correspond to headlight high/low beam vs.
+			police/roof lights has NOT been confirmed anywhere (no repo scanned - MafiaC,
+			MafiaC-Server, MafiaSDK, reMafia, rc1-oakwood - identifies them), so this is
+			exposed to scripts as a raw, undocumented-semantics flags word rather than
+			named properties; treat any specific bit meaning within that byte as
+			unverified until confirmed live.
+		*/
+		void EnableRightIndicator(bool enable)
+		{
+			if (!(lightFlags & 8))
+			{
+				if (enable)
+				{
+					lightFlags |= 2;
+					if (callbackWU)
+						((void(*)(const void*))(callbackWU))(car);
+				}
+				else
+				{
+					lightFlags &= 0xFD;
+				}
+			}
+		}
+
+		void DisableTurnIndicatorFlag(bool enable)
+		{
+			if (enable)
+				lightFlags |= 8;
+			else
+				lightFlags &= 0xF7;
+		}
+
+		void EnableLeftIndicator(bool enable)
+		{
+			if (!(lightFlags & 8))
+			{
+				if (enable)
+				{
+					lightFlags |= 1;
+					if (callbackWU)
+						((void(*)(const void*))(callbackWU))(car);
+				}
+				else
+				{
+					lightFlags &= 0xFE;
+				}
+			}
+		}
+
+		void SetLightFlags(unsigned long flags)
+		{
+			lightFlags ^= (flags ^ lightFlags) & 0xFF00000;
+			if (callbackWU)
+				((void(*)(const void*))(callbackWU))(car);
+		}
+
+		void EnableLight(bool enable)
+		{
+			if (enable)
+				lightFlags |= 0x80;
+			else
+				lightFlags &= 0x7F;
+			if (callbackWU)
+				((void(*)(const void*))(callbackWU))(car);
+		}
+
+		// Not ported: reMafia's EnableLightsValue writes a byte at a fixed offset
+		// (_pad28[360]) that falls outside its own declared padding array, landing in
+		// guessed/unconfirmed territory - left undeclared rather than porting an
+		// out-of-bounds write with no verified meaning.
 
 		PADDING(C_Vehicle_Extended, _pad1, 0x64);
 		unsigned short moveFramesCnt;

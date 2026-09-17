@@ -890,6 +890,219 @@ bool CClientVehicle::GetLights()
 	return pVehicleInterface->lights;
 }
 
+bool CClientVehicle::SetIndicatorLeft(bool state)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->EnableLeftIndicator(state);
+	return true;
+}
+
+bool CClientVehicle::GetIndicatorLeft()
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	return (m_MafiaVehicle->GetExtendedInterface()->lightFlags & 1) != 0;
+}
+
+bool CClientVehicle::SetIndicatorRight(bool state)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->EnableRightIndicator(state);
+	return true;
+}
+
+bool CClientVehicle::GetIndicatorRight()
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	return (m_MafiaVehicle->GetExtendedInterface()->lightFlags & 2) != 0;
+}
+
+bool CClientVehicle::SetIndicatorsEnabled(bool state)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	// DisableTurnIndicatorFlag is negative-sense (true = disabled), flip it here so the
+	// script-facing property reads naturally ("indicatorsEnabled = false" disables them).
+	m_MafiaVehicle->GetExtendedInterface()->DisableTurnIndicatorFlag(!state);
+	return true;
+}
+
+bool CClientVehicle::GetIndicatorsEnabled()
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	return (m_MafiaVehicle->GetExtendedInterface()->lightFlags & 8) == 0;
+}
+
+bool CClientVehicle::SetLightFlags(uint32_t flags)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	// Only bits 20-27 (mask 0xFF00000) are actually merged in by SetLightFlags; see the
+	// caveat on C_Vehicle_Extended::SetLightFlags about their meaning being unconfirmed.
+	m_MafiaVehicle->GetExtendedInterface()->SetLightFlags(flags);
+	return true;
+}
+
+uint32_t CClientVehicle::GetLightFlags()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0;
+
+	return m_MafiaVehicle->GetExtendedInterface()->lightFlags;
+}
+
+/*
+	Handling stats live in MafiaSDK::S_CarInit, embedded inside C_Vehicle_Extended - the
+	same reMafia-sourced parallel struct used above for lightFlags, and subject to the same
+	unconfirmed-offset-drift caveat documented on C_Vehicle_Extended in C_Vehicle.hpp.
+*/
+bool CClientVehicle::SetHandlingMass(float mass)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.mass = mass;
+	return true;
+}
+
+float CClientVehicle::GetHandlingMass()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.mass;
+}
+
+bool CClientVehicle::SetHandlingEnginePower(float power)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.engineEffectPower = power;
+	return true;
+}
+
+float CClientVehicle::GetHandlingEnginePower()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.engineEffectPower;
+}
+
+bool CClientVehicle::SetHandlingEngineTorque(float torque)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.engineTorqueMax = torque;
+	return true;
+}
+
+float CClientVehicle::GetHandlingEngineTorque()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.engineTorqueMax;
+}
+
+bool CClientVehicle::SetHandlingGearCount(float gearCount)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.numGears = gearCount;
+	return true;
+}
+
+float CClientVehicle::GetHandlingGearCount()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.numGears;
+}
+
+bool CClientVehicle::SetHandlingBrakeEfficiency(float efficiency)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.brakeEfficiency = efficiency;
+	return true;
+}
+
+float CClientVehicle::GetHandlingBrakeEfficiency()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.brakeEfficiency;
+}
+
+bool CClientVehicle::SetHandlingHandbrakeEfficiency(float efficiency)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.handbrakeEfficiency = efficiency;
+	return true;
+}
+
+float CClientVehicle::GetHandlingHandbrakeEfficiency()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.handbrakeEfficiency;
+}
+
+bool CClientVehicle::SetHandlingFuelTankCapacity(float capacity)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.fuelTank = capacity;
+	return true;
+}
+
+float CClientVehicle::GetHandlingFuelTankCapacity()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.fuelTank;
+}
+
+bool CClientVehicle::SetHandlingFuelConsumption(float consumption)
+{
+	if (m_MafiaVehicle == nullptr)
+		return false;
+
+	m_MafiaVehicle->GetExtendedInterface()->carInit.fuelConsumption = consumption;
+	return true;
+}
+
+float CClientVehicle::GetHandlingFuelConsumption()
+{
+	if (m_MafiaVehicle == nullptr)
+		return 0.0f;
+
+	return m_MafiaVehicle->GetExtendedInterface()->carInit.fuelConsumption;
+}
+
 bool CClientVehicle::SetEngine(bool state, bool unknown1 = true)
 {
 	if (m_MafiaVehicle == nullptr)
