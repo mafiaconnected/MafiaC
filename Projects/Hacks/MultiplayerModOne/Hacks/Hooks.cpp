@@ -227,6 +227,8 @@ MafiaSDK::C_Actor* SceneCreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes type, 
 		return nullptr;
 	}
 
+	g_pClientGame->OnActorAdded(type, Name.CString());
+
 	for (auto forbidden_type : forbidden_objects) {
 		if (type == forbidden_type && frame != NULL) {
 			if (frame_ex)

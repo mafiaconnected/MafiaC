@@ -965,11 +965,14 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 
 			if (nServerElementId != INVALID_NETWORK_ID)
 			{
-				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(FromGUID(nLocalElementId));
-				if (pClientVehicle != nullptr)
+				// Generic by GUID, not vehicle-specific - also completes CClientActor's peer2peer
+				// registration (MAFIAPACKET_PEER_CREATEACTOR), which the server replies to with this same
+				// packet. SetId/DoAttachments are plain CNetObject methods, so no subtype cast is needed.
+				CNetObject* pClientElement = FromGUID(nLocalElementId);
+				if (pClientElement != nullptr)
 				{
-					pClientVehicle->SetId(nServerElementId);
-					pClientVehicle->DoAttachments();
+					pClientElement->SetId(nServerElementId);
+					pClientElement->DoAttachments();
 				}
 			}
 		}
@@ -1146,8 +1149,30 @@ bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
 			}
 		}
 	}
+	else if (pElement->IsType(ELEMENT_ACTOR))
+	{
+		auto pClientActor = static_cast<CClientActor*>(pElement);
 
+		if (pClientActor->GetGameActor() != nullptr)
+		{
+			// GUID is already generated when the actor is first discovered (OnActorAdded), so it's stable
+			// across every retry here until the server actually replies. Name is written explicitly up
+			// front (it's also inside WriteCreatePacket's own generic payload) so the server can dedupe by
+			// name - every client independently discovers and reports the same actor - before it has to
+			// parse the rest of the create packet.
+			Packet Packet(MAFIAPACKET_PEER_CREATEACTOR);
+			Packet.Write<uint64_t>(pClientActor->GetGUID());
+			Packet.WriteString(pClientActor->GetName());
+			pClientActor->WriteCreatePacket(&Packet);
+			pClientActor->WriteSyncPacket(&Packet);
 
+			SendHostPacket(&Packet);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void CMultiplayer::ProcessNewPeerElements()

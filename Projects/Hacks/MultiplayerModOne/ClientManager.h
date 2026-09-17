@@ -15,6 +15,7 @@ class CClientDummy;
 class CClientObject;
 class CClientDoor;
 class CClientBridge;
+class CClientActor;
 
 // Changable limits
 #include <IncreasedLimits.h>
@@ -29,6 +30,7 @@ enum eMafiaElementType
 	ELEMENT_OBJECT = ELEMENT_ENTITY | 128,
 	ELEMENT_DOOR = ELEMENT_ENTITY | 256,
 	ELEMENT_BRIDGE = ELEMENT_ENTITY | 512,
+	ELEMENT_ACTOR = ELEMENT_ENTITY | 1024,
 };
 
 class CMafiaClientManager : public Galactic3D::CClientManager
@@ -47,6 +49,7 @@ public:
 	Galactic3D::ReflectedClass* m_pClientObjectClass;
 	Galactic3D::ReflectedClass* m_pClientDoorClass;
 	Galactic3D::ReflectedClass* m_pClientBridgeClass;
+	Galactic3D::ReflectedClass* m_pClientActorClass;
 
 public:
 	//void RegisterFunctions(Galactic3D::CScripting* pScripting);
@@ -70,6 +73,7 @@ public:
 	Galactic3D::Weak<CClientObject> m_rgpObjects[MAX_OBJECTS];
 	Galactic3D::Weak<CClientDoor> m_rgpDoors[MAX_DOORS];
 	Galactic3D::Weak<CClientBridge> m_rgpBridges[MAX_BRIDGES];
+	Galactic3D::Weak<CClientActor> m_rgpActors[MAX_ACTORS];
 };
 
 class CMafiaClientResourceMgr : public Galactic3D::CClientResourceMgr

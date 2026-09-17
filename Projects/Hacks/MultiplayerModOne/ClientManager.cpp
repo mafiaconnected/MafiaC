@@ -26,6 +26,7 @@ CMafiaClientManager::CMafiaClientManager(Galactic3D::Context* pContext, CClientR
 	m_pClientObjectClass = pElements->NewClass(_gstr("Object"), m_pClientEntityClass);
 	m_pClientDoorClass = pElements->NewClass(_gstr("Door"), m_pClientEntityClass);
 	m_pClientBridgeClass = pElements->NewClass(_gstr("Bridge"), m_pClientEntityClass);
+	m_pClientActorClass = pElements->NewClass(_gstr("Actor"), m_pClientEntityClass);
 
 	m_pSurfaceClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Surface"));
 	m_pTextureClass = pResourceMgr->m_pScripting->m_Global.NewClass(_gstr("Texture"), m_pSurfaceClass);
@@ -41,6 +42,7 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 	CClientObject* object;
 	CClientDoor* door;
 	CClientBridge* bridge;
+	CClientActor* actor;
 
 	switch (nType)
 	{
@@ -114,6 +116,17 @@ CNetObject* CMafiaClientManager::Create(int32_t nType)
 			}
 		}
 		break;
+	case ELEMENT_ACTOR:
+		actor = new CClientActor(this);
+		for (int i = 0; i < MAX_ACTORS; i++)
+		{
+			if (m_rgpActors[i].IsNull())
+			{
+				m_rgpActors[i] = actor;
+				return actor;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -136,6 +149,15 @@ void CMafiaClientManager::Remove(CNetObject* pNetObject)
 		if (m_rgpPeds[i] != nullptr && !m_rgpPeds[i].IsNull() && m_rgpPeds[i].GetPointer() == pNetObject)
 		{
 			m_rgpPeds[i].SetNull();
+			return;
+		}
+	}
+
+	for (int i = 0; i < MAX_ACTORS; i++)
+	{
+		if (m_rgpActors[i] != nullptr && !m_rgpActors[i].IsNull() && m_rgpActors[i].GetPointer() == pNetObject)
+		{
+			m_rgpActors[i].SetNull();
 			return;
 		}
 	}

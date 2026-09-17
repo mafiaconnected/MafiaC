@@ -8,3 +8,4 @@
 #include "ClientObject.h"
 #include "ClientDoor.h"
 #include "ClientBridge.h"
+#include "ClientActor.h"

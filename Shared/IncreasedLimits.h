@@ -6,3 +6,4 @@ const size_t MAX_VEHICLES = 512;
 const size_t MAX_OBJECTS = 512;
 const size_t MAX_DOORS = 1024;
 const size_t MAX_BRIDGES = 16;
+const size_t MAX_ACTORS = 256;

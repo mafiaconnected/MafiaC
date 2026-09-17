@@ -299,6 +299,11 @@ public:
 	//bool OnTrafficCarReset(MafiaSDK::C_Car* pCar);
 	bool OnTrafficCarRespawn(CClientVehicle *pClientVehicle, MafiaSDK::C_Car* pCar);
 
+	// Auto-registers a scene-loaded actor (trolley/wagon/bridge) for sync as soon as it's loaded, by name -
+	// every client loads the same actor names for the same map, so this fires independently on every client
+	// and CNetObjectMgr::FromName dedupes whichever one gets there first. See Hooks.cpp's SceneCreateActor.
+	bool OnActorAdded(MafiaSDK::C_Mission_Enum::ObjectTypes Type, const GChar* pszName);
+
 	bool IsGameComponentEnabled(eGameComponent GameComponent);
 
 	void CClientGame::SetLocalPlayer(CClientHuman* pClientHuman);
