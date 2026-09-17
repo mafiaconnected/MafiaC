@@ -765,7 +765,7 @@ void CClientHuman::ClearInventory()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		auto item = items[i];
+		auto& item = items[i];
 
 		if (item.weapId != 0) GetGameHuman()->G_Inventory_RemoveWeapon(item.weapId);
 
@@ -869,7 +869,7 @@ void CClientHuman::TakeWeapon(unsigned short ucWeapon)
 	{
 		auto index = GetIndexOfWeapon(ucWeapon);
 
-		InventoryItem item = items[index];
+		InventoryItem& item = items[index];
 
 		item.weapId = 0;
 		item.ammo1 = 0;
