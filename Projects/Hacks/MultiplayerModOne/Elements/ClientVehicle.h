@@ -118,6 +118,43 @@ public:
 	virtual bool SetLights(bool state);
 	virtual bool GetLights();
 
+	virtual bool SetIndicatorLeft(bool state);
+	virtual bool GetIndicatorLeft();
+
+	virtual bool SetIndicatorRight(bool state);
+	virtual bool GetIndicatorRight();
+
+	virtual bool SetIndicatorsEnabled(bool state);
+	virtual bool GetIndicatorsEnabled();
+
+	virtual bool SetLightFlags(uint32_t flags);
+	virtual uint32_t GetLightFlags();
+
+	// Handling stats (per-model, from MafiaSDK::S_CarInit inside C_Vehicle_Extended).
+	virtual bool SetHandlingMass(float mass);
+	virtual float GetHandlingMass();
+
+	virtual bool SetHandlingEnginePower(float power);
+	virtual float GetHandlingEnginePower();
+
+	virtual bool SetHandlingEngineTorque(float torque);
+	virtual float GetHandlingEngineTorque();
+
+	virtual bool SetHandlingGearCount(float gearCount);
+	virtual float GetHandlingGearCount();
+
+	virtual bool SetHandlingBrakeEfficiency(float efficiency);
+	virtual float GetHandlingBrakeEfficiency();
+
+	virtual bool SetHandlingHandbrakeEfficiency(float efficiency);
+	virtual float GetHandlingHandbrakeEfficiency();
+
+	virtual bool SetHandlingFuelTankCapacity(float capacity);
+	virtual float GetHandlingFuelTankCapacity();
+
+	virtual bool SetHandlingFuelConsumption(float consumption);
+	virtual float GetHandlingFuelConsumption();
+
 	virtual bool Repair();
 	virtual bool Explode();
 

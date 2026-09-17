@@ -58,6 +58,16 @@ namespace MafiaSDK
 			return reinterpret_cast<C_Car_Interface*>(this);
 		}
 
+		// C_Vehicle_Extended (Game/C_Vehicle.hpp) is a fuller, reMafia-sourced view over the
+		// same native vehicle object as GetInterface()->vehicle_interface (SetEngineOn/SetGear/
+		// Engine above all reach that same object via `ecx = this + 0x70`, the offset of
+		// vehicle_interface within C_Car_Interface). See that class's own comment for the
+		// caveat about unconfirmed offset drift versus C_Vehicle_Interface.
+		C_Vehicle_Extended* GetExtendedInterface()
+		{
+			return reinterpret_cast<C_Vehicle_Extended*>(&GetInterface()->vehicle_interface);
+		}
+
 		void Update(float dt)
 		{
 			unsigned long functionAddress = C_Car_Enum::FunctionsAddresses::Update;
