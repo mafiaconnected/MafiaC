@@ -31,7 +31,12 @@ namespace MafiaSDK
             DelActors = 0x00540240,
             FindActorByName = 0x00540490,
             Open = 0x005409D0,
-            Close = 0x005405E0
+            Close = 0x005405E0,
+
+            // Scene-graph actor creation path (separate from C_Mission::CreateActor); hook target/return
+            // for MultiplayerModOne's Hooks.cpp SceneCreateActor. Unfinished - see comment at its call site.
+            SceneCreateActor = 0x00544AFF,
+            SceneCreateActorReturn = 0x00544B07
         };
 
 		enum MissionID
@@ -141,6 +146,41 @@ namespace MafiaSDK
     {
         PADDING(C_Mission_Interface, _pad0, 0x24);
         C_Game * mGame;
+    };
+
+    namespace C_Mission_Hooks
+    {
+        void HookCreateActor(std::function<void(C_Mission_Enum::ObjectTypes)> functionPointer);
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+        namespace FunctionsPointers
+        {
+            extern std::function<void(C_Mission_Enum::ObjectTypes)> createActor;
+        };
+
+        namespace Functions
+        {
+            inline void CreateActor(C_Mission_Enum::ObjectTypes actorType)
+            {
+                if (FunctionsPointers::createActor != nullptr)
+                    FunctionsPointers::createActor(actorType);
+            }
+        };
+
+        namespace NakedFunctions
+        {
+            extern void CreateActor();
+            extern void* createActorReturn;
+        };
+
+        inline void HookCreateActor(std::function<void(C_Mission_Enum::ObjectTypes)> functionPointer)
+        {
+            FunctionsPointers::createActor = functionPointer;
+
+            NakedFunctions::createActorReturn = (void*)(C_Mission_Enum::FunctionAddresses::CreateActor + 6);
+            MemoryPatcher::InstallJmpHook(C_Mission_Enum::FunctionAddresses::CreateActor, (unsigned long)&NakedFunctions::CreateActor);
+        }
+#endif
     };
 
     class C_Mission

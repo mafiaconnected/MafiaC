@@ -188,17 +188,7 @@ void CClientVehicle::UpdateGameMatrix()
 
 	*(uint32_t*)(frame + 172) &= ~0x10;
 
-	__asm
-	{
-		pushad
-		pushfd
-		mov eax, 0x60FC30 // update frame
-		mov ecx, frame
-		call eax
-		popfd
-		popad
-	}
-
+	m_MafiaVehicle->GetFrame()->UpdateWMatrixProc();
 	m_MafiaVehicle->GetFrame()->Update();
 }
 

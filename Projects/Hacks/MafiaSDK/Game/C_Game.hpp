@@ -35,9 +35,33 @@ namespace MafiaSDK
             SetCamerRotRepair = 0x005BA010,
             Init = 0x005A0810,
             SetHuman = 0x005A07E0,
-            UpdateMusicVolume = 0x005B6600
+            UpdateMusicVolume = 0x005B6600,
+            ReloadVehicleTables = 0x0060A350,
+            OnExit = 0x00612485
         };
     };
+
+    // Misc global data addresses that aren't tied to a C_Game_Interface member
+    constexpr unsigned long MainVolume_Addr = 0x006D4B10;
+    constexpr unsigned long VehicleTables_Addr = 0x006D4560;
+    constexpr unsigned long GameMapEnabled_Addr = 0x006C406C;
+
+    inline void SetGameMapEnabled(bool bEnabled)
+    {
+        *reinterpret_cast<BOOL*>(GameMapEnabled_Addr) = bEnabled;
+    }
+
+    inline void ReloadVehicleTables()
+    {
+        unsigned long funcAddress = C_Game_Enum::FunctionAddresses::ReloadVehicleTables;
+        void* pVehicleTables = (void*)VehicleTables_Addr;
+
+        __asm
+        {
+            mov ecx, pVehicleTables
+            call funcAddress
+        }
+    }
 
     namespace C_Game_Patches
     {
@@ -104,6 +128,16 @@ namespace MafiaSDK
             MemoryPatcher::PatchAddress(0x1006DAB7, disableProcess, sizeof(disableProcess));
         }
 
+        // (From Mex) NOP targets that fix the fullscreen game being suspended when using alt+tab.
+        // Installed as tracked hack patches by the mod itself (see MultiplayerModOne's Hooks.cpp),
+        // not applied here, since they're expected to be revertible on unload like the rest of that file.
+        enum AltTabSuspendFixAddresses
+        {
+            AltTabSuspendFix1 = 0x1006DBF7,
+            AltTabSuspendFix2 = 0x1006DD1D,
+            AltTabSuspendFix3 = 0x1006DB2B
+        };
+
         inline void PatchDisableGameScripting()
         {
             // Disable - mafia scripts
@@ -132,6 +166,27 @@ namespace MafiaSDK
             MemoryPatcher::InstallNopPatch(0x0057ACD1, 10);
             MemoryPatcher::InstallNopPatch(0x0058A780, 10);*/
         }
+
+        inline void PatchAllowMultipleInstances()
+        {
+            // NOP the global mutex check so multiple game instances can run side by side
+            MemoryPatcher::InstallNopPatch(0x005BEC27, 6);
+        }
+
+        void PatchAllowMultipleMenus();
+
+#ifdef MAFIA_SDK_IMPLEMENTATION
+        namespace NakedFunctions
+        {
+            extern void AllowMultipleMenus();
+        };
+
+        inline void PatchAllowMultipleMenus()
+        {
+            // Forces the menu-open check to always see menu id 0xA9, allowing more than one menu at once
+            MemoryPatcher::InstallJmpHook(0x00594885, (unsigned long)&NakedFunctions::AllowMultipleMenus);
+        }
+#endif
     };
 
     namespace C_Game_Hooks
@@ -149,6 +204,7 @@ namespace MafiaSDK
             extern std::function<void()> gameInit;
             extern std::function<void()> localPlayerFallDown;
             extern std::function<void(C_Human*, S_vector)> humanOnShoot;
+            extern std::function<void()> gameExit;
         };
 
         namespace Functions
@@ -177,6 +233,11 @@ namespace MafiaSDK
                     FunctionsPointers::localPlayerFallDown();
             }
 
+            inline void GameExit()
+            {
+                if (FunctionsPointers::gameExit != nullptr)
+                    FunctionsPointers::gameExit();
+            }
 
         };
 
@@ -186,6 +247,7 @@ namespace MafiaSDK
             extern void GameInit();
             extern void GameDone();
             extern void LocalPlayerFallDown();
+            extern void GameExit();
         };
 
         inline void HookOnGameTick(std::function<void()> funcitonPointer)
@@ -215,6 +277,15 @@ namespace MafiaSDK
         {
             FunctionsPointers::localPlayerFallDown = functionPointer;
             MemoryPatcher::InstallJmpHook(0x005A543B, (unsigned long)&NakedFunctions::LocalPlayerFallDown);
+        }
+
+        inline void HookOnGameExit(std::function<void()> functionPointer)
+        {
+            FunctionsPointers::gameExit = functionPointer;
+            MemoryPatcher::InstallJmpHook(C_Game_Enum::FunctionAddresses::OnExit, (unsigned long)&NakedFunctions::GameExit);
+
+            // Skip additional cleanup that conflicts with exiting early via the hook above
+            MemoryPatcher::InstallJmpHook(0x005A7F44, 0x005A7F4B);
         }
 #endif
     };
@@ -426,8 +497,12 @@ namespace MafiaSDK
             }
 
             //Set volume of stream to same value as in options
-            float currentMainVolume = *reinterpret_cast<float*>(0x6D4B10);
-            SetStreamVolume(streamId, currentMainVolume);
+            SetStreamVolume(streamId, GetMainVolume());
+        }
+
+        float GetMainVolume()
+        {
+            return *reinterpret_cast<float*>(MainVolume_Addr);
         }
 
         void PauseStream(int streamId)

@@ -5,23 +5,13 @@
 
 //#pragma region "ONE"
 
-DWORD JumpBackMenu = 0x00594896;
-
-__declspec(naked) void HookMultipleMenus()
-{
-    __asm {
-        mov eax, 0x0a9
-        jmp JumpBackMenu
-    }
-}
-
 __declspec(naked) void RETN4() {
     __asm retn 0x4
 }
 
 void CGameHacks::EnableGameMap(bool state)
 {
-    *(BOOL*)(0x006C406C) = state;
+    MafiaSDK::SetGameMapEnabled(state);
 }
 
 void CGameHacks::InstallHacks()
@@ -39,9 +29,6 @@ void CGameHacks::InstallHacks()
     //BYTE pCarPhys[] = { 0xE9, 0xF1, 0x00, 0x00, 0x90 };
     //MemoryPatcher::PatchAddress(0x0004E034A, pCarPhys, sizeof(pCarPhys));
 
-    MemoryPatcher::InstallJmpHook(0x00594885, (DWORD)&HookMultipleMenus);
-
-    // Patch global mutex (allows multiple game instances)
-    MemoryPatcher::InstallNopPatch(0x5BEC27, 6);
-    //new CHackNOPHack(g_pHack, 0x5BEC27, 6);
+    MafiaSDK::C_Game_Patches::PatchAllowMultipleMenus();
+    MafiaSDK::C_Game_Patches::PatchAllowMultipleInstances();
 }

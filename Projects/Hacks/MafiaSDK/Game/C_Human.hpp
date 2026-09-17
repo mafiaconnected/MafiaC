@@ -102,6 +102,14 @@ namespace MafiaSDK
 			Death = 0x00570570,
 			RecompileDeathPos = 0x0058B8D0,
 			Do_DeadBodyDrop = 0x0058B7E0,
+
+			// Patch targets (see C_Human_Patches / MultiplayerModOne's Hooks.cpp)
+			RemoveDroppedClipPatch = 0x0058D4C6,
+			RemoveDroppedClipPatchSkip = 0x0058D553,
+			DisableWeaponDropsPatch = 0x0057FAA0,
+			DisableWeaponDropsPatchSkip = 0x00580196,
+			Do_WeaponDropPatchSkip = 0x00585DCB,
+			ExitingVehiclePassengerFix = 0x00595040,
         };
 
         //Thanks for DjBozkosz Documentation
@@ -778,6 +786,10 @@ namespace MafiaSDK
     namespace C_Human_Hooks
     {
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> funcitonPointer);
+        void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer);
+        void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer);
+        void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
+        void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
 
 #ifdef MAFIA_SDK_IMPLEMENTATION
         namespace FunctionsPointers
@@ -786,6 +798,10 @@ namespace MafiaSDK
             extern std::function<void(const S_vector &)> humanShoot;
             extern std::function<void(MafiaSDK::C_Human*, byte)> humanDoWeaponChange;
             extern std::function<void(MafiaSDK::C_Human*)> humanDoWeaponDrop;
+            extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
+            extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
+            extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
+            extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
         };
 
         namespace Functions
@@ -817,21 +833,57 @@ namespace MafiaSDK
                     FunctionsPointers::humanDoWeaponChange(thisInstance, weaponId);
                 }
             }
+
+            inline void UseActor(MafiaSDK::C_Human* human, MafiaSDK::C_Actor* actor, int unk1, int unk2, int unk3)
+            {
+                if (FunctionsPointers::useActor != nullptr)
+                    FunctionsPointers::useActor(human, actor, unk1, unk2, unk3);
+            }
+
+            inline void DoThrowCocotFromCar(MafiaSDK::C_Human* human, MafiaSDK::C_Car* car, int seatId)
+            {
+                if (FunctionsPointers::doThrowCocotFromCar != nullptr)
+                    FunctionsPointers::doThrowCocotFromCar(human, car, seatId);
+            }
+
+            inline void HumanSetAimPose(MafiaSDK::C_Human* human, const S_vector& pos)
+            {
+                if (FunctionsPointers::humanSetAimPose != nullptr)
+                    FunctionsPointers::humanSetAimPose(human, pos);
+            }
+
+            inline void HumanSetNormalPose(MafiaSDK::C_Human* human, const S_vector& pos)
+            {
+                if (FunctionsPointers::humanSetNormalPose != nullptr)
+                    FunctionsPointers::humanSetNormalPose(human, pos);
+            }
         };
 
         namespace NakedFunctions
         {
             extern void HumanHitOne();
-            
+
             extern void HumanHitTwo();
-            
+
             extern void HumanShoot();
-           
+
             extern void HumanDoWeaponChangeOne();
-            
+
             extern void HumanDoWeaponChangeTwo();
 
             extern void HumanDoWeaponDrop();
+
+            extern void UseActor();
+            extern void* useActorReturn;
+
+            extern void DoThrowCocotFromCar();
+            extern void* doThrowCocotFromCarReturn;
+
+            extern void SetAimPose();
+            extern void* setAimPoseReturn;
+
+            extern void SetNormalPose();
+            extern void* setNormalPoseReturn;
         };
 
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> functionPointer)
@@ -861,6 +913,38 @@ namespace MafiaSDK
             FunctionsPointers::humanDoWeaponDrop = functionPointer;
 
             MemoryPatcher::InstallJmpHook(0x0059024D, (unsigned long)&NakedFunctions::HumanDoWeaponDrop);
+        }
+
+        inline void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer)
+        {
+            FunctionsPointers::useActor = functionPointer;
+
+            NakedFunctions::useActorReturn = (void*)(C_Human_Enum::FunctionsAddresses::Use_Actor + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::Use_Actor, (unsigned long)&NakedFunctions::UseActor);
+        }
+
+        inline void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer)
+        {
+            FunctionsPointers::doThrowCocotFromCar = functionPointer;
+
+            NakedFunctions::doThrowCocotFromCarReturn = (void*)(C_Human_Enum::FunctionsAddresses::Do_ThrowCocotFromCar + 7);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::Do_ThrowCocotFromCar, (unsigned long)&NakedFunctions::DoThrowCocotFromCar);
+        }
+
+        inline void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer)
+        {
+            FunctionsPointers::humanSetAimPose = functionPointer;
+
+            NakedFunctions::setAimPoseReturn = (void*)(C_Human_Enum::FunctionsAddresses::PoseSetPoseAimed + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::PoseSetPoseAimed, (unsigned long)&NakedFunctions::SetAimPose);
+        }
+
+        inline void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer)
+        {
+            FunctionsPointers::humanSetNormalPose = functionPointer;
+
+            NakedFunctions::setNormalPoseReturn = (void*)(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal + 6);
+            MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal, (unsigned long)&NakedFunctions::SetNormalPose);
         }
 #endif
     };

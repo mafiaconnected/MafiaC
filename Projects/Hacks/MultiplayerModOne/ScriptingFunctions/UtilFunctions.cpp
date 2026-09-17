@@ -353,11 +353,11 @@ inline auto WorldToScreen2(D3DXVECTOR3 pos, float matrix[16], int windowWidth, i
 // Mex's Version (working)
 inline auto WorldToScreen1(D3DXVECTOR3 input) -> D3DXVECTOR3
 {
-	uint32_t cam = *(uint32_t*)0x101C4CF8;
+	uint32_t cam = *(uint32_t*)D3D_CAMERA_PTR;
 	uint32_t viewProj = cam + 484;
 
 	D3DVIEWPORT9 vp;
-	vp = *(D3DVIEWPORT9*)0x101C5590;
+	vp = *(D3DVIEWPORT9*)D3D_VIEWPORT_PTR;
 
 	D3DXMATRIX VIEWPROJ;
 	D3DXMatrixTranspose(&VIEWPROJ, (D3DXMATRIX*)viewProj);

@@ -806,7 +806,7 @@ static bool FunctionGameGetMainVolume(IScriptState* pState, int argc, void* pUse
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	float currentMainVolume = *reinterpret_cast<float*>(0x6D4B10);
+	float currentMainVolume = MafiaSDK::GetMission()->GetGame()->GetMainVolume();
 
 	pState->ReturnNumber(currentMainVolume);
 	return true;
@@ -816,7 +816,7 @@ static bool FunctionGameReloadVehicleTables(IScriptState* pState, int argc, void
 {
 	CMafiaClientManager* pClientManager = (CMafiaClientManager*)pUser;
 
-	((void(__thiscall*)(void*))0x60A350)((void*)0x6D4560);
+	MafiaSDK::ReloadVehicleTables();
 	return true;
 }
 
