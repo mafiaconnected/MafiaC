@@ -57,8 +57,10 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 
 			if (nPlayerNetworkIndex == INVALID_NETWORK_ID)
 			{
-				pClient->SetPlayer(nullptr);
-				pClient->SetPlayerId(INVALID_NETWORK_ID);
+				// "Not created for you (yet)". The server sends this right after PACKET_SETMACHINEPLAYER, before the
+				// player's create packet, so clearing the machine's player id here would make CClientHuman::
+				// ReadCreatePacket spawn the local player as a plain Human with no input. PACKET_SETMACHINEPLAYER owns
+				// the machine<->player assignment, including clearing it.
 			}
 			else
 			{
