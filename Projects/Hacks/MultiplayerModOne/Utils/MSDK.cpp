@@ -295,11 +295,14 @@ namespace MafiaSDK
             {
                 __asm
                 {
-                    mov eax, [esp + 4]
-                    mov edx, [esp + 8]
-                    mov ebx, [esp + 0x0C]
-                    mov esi, [esp + 0x10]
+                    // Load the arguments after pushad: EBX/ESI are callee-saved, so clobbering them before it would
+                    // leak the argument values back to Use_Actor's caller once popad "restores" them.
                     pushad
+
+                    mov eax, [esp + 0x20 + 4]
+                    mov edx, [esp + 0x20 + 8]
+                    mov ebx, [esp + 0x20 + 0x0C]
+                    mov esi, [esp + 0x20 + 0x10]
 
                     push esi
                     push ebx

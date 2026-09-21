@@ -335,12 +335,14 @@ namespace MafiaSDK
                 mov ax, behavior
                 mov byte ptr ds : [ ecx + 0x5FC ], ax
             }*/
-            *(byte*)(this + 0x5FC) = behavior;
+            // Cast first: C_Actor has virtuals, so sizeof(C_Human) is 4 and a plain `this + 0x5FC` would
+            // advance 0x5FC * 4 bytes, writing to the wrong field
+            *(byte*)((unsigned long)this + 0x5FC) = behavior;
         }
 
         void SetShooting(float shooting)
         {
-            *(float*)(this + 0x628) = shooting;
+            *(float*)((unsigned long)this + 0x628) = shooting;
         }
 
         void Intern_UseCar(C_Car* car, int seatID)

@@ -33,7 +33,10 @@ void CClientHuman::UpdateGameMatrix()
 
 bool CClientHuman::GetPosition(CVector3D& vecPos)
 {
-	//auto bResult = CClientEntity::GetPosition(vecPos);
+	// No game object (not spawned/streamed in, or being removed): report the last known position
+	if (GetGameHuman() == nullptr)
+		return CClientEntity::GetPosition(vecPos);
+
 	vecPos = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->entity.position);
 	return true;
 }
@@ -41,6 +44,9 @@ bool CClientHuman::GetPosition(CVector3D& vecPos)
 bool CClientHuman::SetPosition(const CVector3D& vecPos)
 {
 	auto bResult = CClientEntity::SetPosition(vecPos);
+
+	if (GetGameHuman() == nullptr)
+		return bResult;
 
 	GetGameHuman()->GetInterface()->entity.position = CVecTools::ConvertToMafiaVec(vecPos);
 
