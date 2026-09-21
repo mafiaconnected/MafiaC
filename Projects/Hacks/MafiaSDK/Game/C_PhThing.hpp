@@ -110,13 +110,13 @@ namespace MafiaSDK
             }
         }
 
-        void ExternalImpuls(const S_vector& force, const S_vector& offset)
+        void ExternalImpuls(const S_vector& force, const S_vector& applyOffset)
         {
             unsigned long funcAddress = C_PhThing_Enum::FunctionAddresses::ExternalImpuls;
 
             __asm
             {
-                push offset
+                push applyOffset
                 push force
                 mov ecx, this
                 call funcAddress

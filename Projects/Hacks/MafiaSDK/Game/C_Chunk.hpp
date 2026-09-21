@@ -25,14 +25,14 @@ namespace MafiaSDK
             return Read((void*)target, sizeof(T));
         }
 
-        bool Read(void* buffer, size_t size)
+        bool Read(void* buffer, size_t bufferSize)
         {
             unsigned long funcAddress = C_Chunk_Enum::FunctionAddresses::Read;
             bool result = false;
 
             __asm
             {
-                push size
+                push bufferSize
                 push buffer
                 mov ecx, this
                 call funcAddress

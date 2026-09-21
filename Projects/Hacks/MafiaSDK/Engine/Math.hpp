@@ -15,6 +15,9 @@ struct S_vector2
 struct S_vector
 {
 public:
+	S_vector() { x = 0; y = 0; z = 0; }
+	S_vector(float x, float y, float z) { this->x = x; this->y = y; this->z = z; }
+
 	S_vector operator*=(const S_matrix& mat)
 	{
 		DWORD S_vector__mul_equal_operator = 0x0060FC54;

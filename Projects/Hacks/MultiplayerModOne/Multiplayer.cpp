@@ -1162,7 +1162,7 @@ bool CMultiplayer::MigrateEntity(CClientEntity* pElement)
 			// parse the rest of the create packet.
 			Packet Packet(MAFIAPACKET_PEER_CREATEACTOR);
 			Packet.Write<uint64_t>(pClientActor->GetGUID());
-			Packet.WriteString(pClientActor->GetName());
+			CBinaryWriter(&Packet).WriteString(pClientActor->GetName());
 			pClientActor->WriteCreatePacket(&Packet);
 			pClientActor->WriteSyncPacket(&Packet);
 

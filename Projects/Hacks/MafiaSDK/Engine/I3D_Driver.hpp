@@ -50,22 +50,6 @@ namespace MafiaSDK
         };
     };
 
-    struct I3D_bsphere 
-    {
-        float offsetX;
-        float offsetY;
-        float offsetZ;
-        float radius;
-    };
-
-    struct I3D_bbox
-    {
-        float unk1;
-        float unk2;
-        float unk3;
-        float unk4;
-    };
-
 	class I3D_Driver
 	{
 	public:

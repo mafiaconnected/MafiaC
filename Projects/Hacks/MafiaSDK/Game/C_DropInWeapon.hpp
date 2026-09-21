@@ -1,5 +1,5 @@
 /*
-	Copyright 2017 Dávid Svitana
+	Copyright 2017 Dï¿½vid Svitana
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -66,8 +66,10 @@ namespace MafiaSDK
 			}
 		}
 		
-		void Init(I3D_Frame* frame) 
+		bool Init(I3D_Frame* frame)
 		{
+			bool result = false;
+
 			__asm
 			{
 				push frame
@@ -75,7 +77,10 @@ namespace MafiaSDK
 				mov eax, [edi]
 				mov ecx, edi
 				call dword ptr ds : [ eax + 0x48 ]
+				mov result, al
 			}
+
+			return result;
 		}
 	};
 };
