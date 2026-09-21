@@ -121,6 +121,7 @@ tip_GameEXEPath=The path to the game executable.
 column_ServerName=Server Name
 column_Players=Players
 column_GameMode=Game Mode
+column_Ping=Ping
 
 # Group Boxes
 group_Players=Players
@@ -201,6 +202,8 @@ opt_GameOutput=Show all game output in console
 opt_MultithreadedNetworking=Multithreaded networking
 opt_SCM=SCM
 opt_DisableStoryMode=Disable Story Mode
+opt_AllowMultipleInstances=Allow Multiple Instances
+opt_Console=Enable Console
 
 opt_AlwaysUsePrimaryMonitorResolution=Always use primary monitor resolution
 opt_AutomaticAspectRatio=Automatic aspect ratio

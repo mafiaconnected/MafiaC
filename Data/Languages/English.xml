@@ -2,7 +2,7 @@
 <Language>
 	<!-- Main Menu -->
 	<String Name="company_name">Jack's Mini Network</String>
-	<String Name="game_title">Grand Theft Auto Connected</String>
+	<String Name="game_title">Mafia Connected</String>
 	<String Name="sample_window">Console</String>
 
 	<!-- Generic buttons -->
