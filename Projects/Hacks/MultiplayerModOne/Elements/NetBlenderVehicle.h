@@ -29,8 +29,13 @@ public:
 	virtual void UpdateTargetRotationMat();
 	virtual void UpdateTargetRotationQuat();
 
+	void SetTargetEngineRPM(float engineRPM);
+	void SetTargetWheelAngle(float wheelAngle);
+
 	void UpdateTargetEngineRPM();
 	void UpdateTargetWheelAngle();
+
+	virtual void Interpolate() override;
 
 	virtual void GetPosition(CVector3D& vecPos) override;
 	virtual void SetPosition(const CVector3D& vecPos) override;

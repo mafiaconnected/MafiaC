@@ -15,6 +15,8 @@ public:
 		CVector3D m_vecError;
 		CQuaternion m_quatTarget;
 		CQuaternion m_quatError;
+		float m_fTarget = 0.0f;
+		float m_fError = 0.0f;
 		float m_fLastAlpha;
 		uint32_t m_uiStartTime = 0;
 		uint32_t m_uiFinishTime = 0;
@@ -24,8 +26,10 @@ public:
 
 		void Update(CVector3D& vecResult, float fMaxError);
 		void Update(CQuaternion& quatResult, float fMaxError);
+		void Update(float& fResult, float fMaxError);
 		void SetTarget(const CVector3D& vecTarget, const CVector3D& vecError, uint32_t uiDelay);
 		void SetTarget(const CQuaternion& quatTarget, const CQuaternion& quatError, uint32_t uiDelay);
+		void SetTarget(float fTarget, float fError, uint32_t uiDelay);
 	};
 
 	uint32_t m_uiDelay;

@@ -8,6 +8,8 @@
 
 class CClientVehicle : public CClientEntity
 {
+	friend class CNetBlenderVehicle;
+
 private:
 	MafiaSDK::C_Car* m_MafiaVehicle;
 

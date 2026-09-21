@@ -189,14 +189,16 @@ void CNetBlenderVehicle::SetTurnSpeed(const CVector3D& vecTurnSpeed)
 	m_pEntity->SetRotationVelocity(vecTurnSpeed);
 }
 
+// The engine RPM is blended on the entity's m_EngineRPM rather than the game's own engine_rpm, because
+// CClientVehicle::Process() copies m_EngineRPM into the game vehicle every frame after Interpolate().
 float CNetBlenderVehicle::GetEngineRPM()
 {
-	return m_pEntity->GetEngineRPM();
+	return m_pEntity->m_EngineRPM;
 }
 
 void CNetBlenderVehicle::SetEngineRPM(float engineRPM)
 {
-	m_pEntity->SetEngineRPM(engineRPM);
+	m_pEntity->m_EngineRPM = engineRPM;
 }
 
 float CNetBlenderVehicle::GetWheelAngle()
@@ -209,17 +211,29 @@ void CNetBlenderVehicle::SetWheelAngle(float wheelAngle)
 	m_pEntity->SetWheelAngle(wheelAngle);
 }
 
+void CNetBlenderVehicle::SetTargetEngineRPM(float engineRPM)
+{
+	UpdateTargetEngineRPM();
+
+	m_EngineRPM.SetTarget(engineRPM, engineRPM - GetEngineRPM(), m_uiDelay);
+}
+
+void CNetBlenderVehicle::SetTargetWheelAngle(float wheelAngle)
+{
+	UpdateTargetWheelAngle();
+
+	// The wheel angle is a steering deflection, not a wrapping angle, so a plain difference is right.
+	m_WheelAngle.SetTarget(wheelAngle, wheelAngle - GetWheelAngle(), m_uiDelay);
+}
+
 void CNetBlenderVehicle::UpdateTargetWheelAngle()
 {
 	if (m_WheelAngle.HasTarget())
 	{
-		float vecCurrentWheelAngle;
-		vecCurrentWheelAngle = GetWheelAngle();
+		float fNewWheelAngle = GetWheelAngle();
+		m_WheelAngle.Update(fNewWheelAngle, m_fWheelAngleMaxError);
 
-		float vecNewWheelAngle = vecCurrentWheelAngle;
-		//m_WheelAngle.Update(vecNewWheelAngle, m_fWheelAngleMaxError);
-
-		SetWheelAngle(vecNewWheelAngle);
+		SetWheelAngle(fNewWheelAngle);
 	}
 }
 
@@ -227,14 +241,19 @@ void CNetBlenderVehicle::UpdateTargetEngineRPM()
 {
 	if (m_EngineRPM.HasTarget())
 	{
-		float vecCurrentEngineRPM;
-		vecCurrentEngineRPM = GetEngineRPM();
+		float fNewEngineRPM = GetEngineRPM();
+		m_EngineRPM.Update(fNewEngineRPM, m_fEngineRPMMaxError);
 
-		float vecNewEngineRPM = vecCurrentEngineRPM;
-		///m_EngineRPM.Update(vecNewEngineRPM, m_fEngineRPMMaxError);
-
-		SetWheelAngle(vecNewEngineRPM);
+		SetEngineRPM(fNewEngineRPM);
 	}
+}
+
+void CNetBlenderVehicle::Interpolate()
+{
+	CNetBlenderLerp::Interpolate();
+
+	UpdateTargetEngineRPM();
+	UpdateTargetWheelAngle();
 }
 
 void CNetBlenderVehicle::ResetInterpolation()
@@ -247,4 +266,13 @@ void CNetBlenderVehicle::ResetInterpolation()
 	m_RotationFront.RemoveTarget();
 	m_RotationUp.RemoveTarget();
 	m_RotationRight.RemoveTarget();
+
+	if (m_EngineRPM.HasTarget())
+		SetEngineRPM(m_EngineRPM.m_fTarget);
+
+	if (m_WheelAngle.HasTarget())
+		SetWheelAngle(m_WheelAngle.m_fTarget);
+
+	m_EngineRPM.RemoveTarget();
+	m_WheelAngle.RemoveTarget();
 }

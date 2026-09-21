@@ -90,6 +90,28 @@ void CNetBlenderLerp::CInterpolation::Update(CQuaternion& quatResult, float fMax
 		m_uiFinishTime = 0;
 }
 
+void CNetBlenderLerp::CInterpolation::Update(float& fResult, float fMaxError)
+{
+	// Get the factor of time spent from the interpolation start
+	// to the current time.
+	uint32_t uiCurrentTime = OS::GetTicks();
+	float fAlpha = Unlerp((float)m_uiStartTime, (float)uiCurrentTime, (float)m_uiFinishTime);
+
+	// Don't let it overcompensate the error too much
+	fAlpha = Clamp(fAlpha, 0.0f, fMaxError);
+
+	// Get the current error portion to compensate
+	float fCurrentAlpha = (fAlpha - m_fLastAlpha);
+	m_fLastAlpha = fAlpha;
+
+	// If we finished compensating the error, finish it for the next pulse
+	if (fAlpha == fMaxError)
+		m_uiFinishTime = 0;
+
+	// Apply the error compensation
+	fResult += m_fError * fCurrentAlpha;
+}
+
 void CNetBlenderLerp::CInterpolation::SetTarget(const CVector3D& vecTarget, const CVector3D& vecError, uint32_t uiDelay)
 {
 	uint32_t uiTime = OS::GetTicks();
@@ -109,6 +131,19 @@ void CNetBlenderLerp::CInterpolation::SetTarget(const CQuaternion& quatTarget, c
 
 	m_quatTarget = quatTarget;
 	m_quatError = quatError;
+
+	m_uiStartTime = uiTime;
+	m_uiFinishTime = (uiTime + uiDelay);
+
+	m_fLastAlpha = 0.0f;
+}
+
+void CNetBlenderLerp::CInterpolation::SetTarget(float fTarget, float fError, uint32_t uiDelay)
+{
+	uint32_t uiTime = OS::GetTicks();
+
+	m_fTarget = fTarget;
+	m_fError = fError;
 
 	m_uiStartTime = uiTime;
 	m_uiFinishTime = (uiTime + uiDelay);

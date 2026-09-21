@@ -566,7 +566,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 	pGameVehicle->hand_break = Packet.handBrake;
 	pGameVehicle->speed_limit = Packet.speedLimit;
 	pGameVehicle->clutch = Packet.clutch;
-	pGameVehicle->wheel_angle = Packet.wheelAngle;
 
 	if (Packet.gear != GetGear())
 	{
@@ -588,7 +587,6 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		}
 	}
 
-	m_EngineRPM = Packet.rpm;
 	m_Horn = Packet.horn;
 
 	m_RelativePosition = Packet.speed;
@@ -606,8 +604,14 @@ bool CClientVehicle::ReadSyncPacket(Galactic3D::Stream* pStream)
 		pBlender->SetTargetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
 		pBlender->SetTargetRotationQuat(Packet.quatRot);
 		pBlender->SetTargetSpeed(Packet.speed, Packet.rotSpeed);
-		//pBlender->SetTargetEngineRPM(Packet.rpm);
-		//pBlender->SetTargetWheelAngle(Packet.wheelAngle);
+		pBlender->SetTargetEngineRPM(Packet.rpm);
+		pBlender->SetTargetWheelAngle(Packet.wheelAngle);
+	}
+	else
+	{
+		// Nothing is blending for the syncer, apply directly.
+		m_EngineRPM = Packet.rpm;
+		pGameVehicle->wheel_angle = Packet.wheelAngle;
 	}
 
 	//_glogprintf(_gstr("Got sync packet for vehicle #%d:\n\tPosition: [%f, %f, %f]\n\tPos. difference: [%f, %f, %f]\n\tRotation: [%f, %f, %f]\n\tRotation Front: [%f, %f, %f]\n\tRotation Up: [%f, %f, %f]\n\tRotation Right: [%f, %f, %f]\n\tRot. difference: [%f, %f, %f]"), GetId(), m_Position.x, m_Position.y, m_Position.z, m_RelativePosition.x, m_RelativePosition.y, m_RelativePosition.z, m_Rotation.x, m_Rotation.y, m_Rotation.z, m_RelativeRotation.x, m_RelativeRotation.y, m_RelativeRotation.z, m_RotationFront.x, m_RotationFront.y, m_RotationFront.z, m_RotationUp.x, m_RotationUp.y, m_RotationUp.z, m_RotationRight.x, m_RotationRight.y, m_RotationRight.z);
