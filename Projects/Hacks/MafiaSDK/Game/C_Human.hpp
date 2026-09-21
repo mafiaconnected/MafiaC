@@ -920,6 +920,7 @@ namespace MafiaSDK
         void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer);
         void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
         void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
+        void HookHumanThrowGrenade(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
 
 #ifdef MAFIA_SDK_IMPLEMENTATION
         namespace FunctionsPointers
@@ -932,6 +933,7 @@ namespace MafiaSDK
             extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
+            extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanThrowGrenade;
         };
 
         namespace Functions
@@ -987,6 +989,12 @@ namespace MafiaSDK
                 if (FunctionsPointers::humanSetNormalPose != nullptr)
                     FunctionsPointers::humanSetNormalPose(human, pos);
             }
+
+            inline void HumanThrowGrenade(MafiaSDK::C_Human* human, const S_vector& pos)
+            {
+                if (FunctionsPointers::humanThrowGrenade != nullptr)
+                    FunctionsPointers::humanThrowGrenade(human, pos);
+            }
         };
 
         namespace NakedFunctions
@@ -1014,6 +1022,8 @@ namespace MafiaSDK
 
             extern void SetNormalPose();
             extern void* setNormalPoseReturn;
+
+            extern void HumanThrowGrenade();
         };
 
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> functionPointer)
@@ -1075,6 +1085,15 @@ namespace MafiaSDK
 
             NakedFunctions::setNormalPoseReturn = (void*)(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal + 6);
             MemoryPatcher::InstallJmpHook(C_Human_Enum::FunctionsAddresses::PoseSetPoseNormal, (unsigned long)&NakedFunctions::SetNormalPose);
+        }
+
+        // Fires when a human starts the grenade throw animation inside Do_Shoot (not from Do_ThrowGranade itself,
+        // so replaying a remote throw through Do_ThrowGranade does not re-trigger it)
+        inline void HookHumanThrowGrenade(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer)
+        {
+            FunctionsPointers::humanThrowGrenade = functionPointer;
+
+            MemoryPatcher::InstallJmpHook(0x00583A56, (unsigned long)&NakedFunctions::HumanThrowGrenade);
         }
 #endif
     };

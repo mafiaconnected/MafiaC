@@ -461,6 +461,20 @@ static void OnHumanShoot(const S_vector& pos)
 	}
 }
 
+static void OnHumanThrowGrenade(MafiaSDK::C_Human* human, const S_vector& pos)
+{
+	auto pMultiplayer = g_pClientGame->GetMultiplayer();
+	if (pMultiplayer == nullptr)
+		return;
+
+	// Only the local player's throws are ours to send; remote ones are replayed from the network
+	auto pClientHuman = g_pClientGame->m_pClientManager->FindHuman(human);
+	if (pClientHuman == nullptr || pClientHuman != g_pClientGame->m_pClientManager->m_pLocalPlayer.GetPointer())
+		return;
+
+	pMultiplayer->SendLocalPlayerThrowGrenade(CVecTools::ConvertFromMafiaVec(pos));
+}
+
 static void OnRender2DStuff()
 {
 	if (g_pD3D9 && g_p2D != nullptr)
@@ -558,6 +572,7 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponChange(OnHumanWeaponChange);
 	MafiaSDK::C_Human_Hooks::HookHumanDoWeaponDrop(OnHumanWeaponDrop);
 	MafiaSDK::C_Human_Hooks::HookOnHumanShoot(OnHumanShoot);
+	MafiaSDK::C_Human_Hooks::HookHumanThrowGrenade(OnHumanThrowGrenade);
 	MafiaSDK::C_Human_Hooks::HookUseActor(HumanUseActor);
 	MafiaSDK::C_Human_Hooks::HookDoThrowCocotFromCar(HumanDoThrowCocotFromCar);
 	MafiaSDK::C_Human_Hooks::HookHumanSetAimPose(HumanSetAimPose);

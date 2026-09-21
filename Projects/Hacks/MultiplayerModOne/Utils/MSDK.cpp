@@ -137,6 +137,7 @@ namespace MafiaSDK
             std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
+            std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanThrowGrenade;
         };
 
         namespace NakedFunctions
@@ -377,6 +378,34 @@ namespace MafiaSDK
                     popad
                     sub esp, 0xC0
                     jmp setNormalPoseReturn
+                }
+            }
+
+            DWORD humanThrowGrenadeReturn = 0x00583A68;
+            DWORD humanPersonAnim = 0x00573E50;
+
+            // Grenade throw inside Human::Do_Shoot. Replaces the 18 bytes at 0x00583A56..0x00583A67; the throw
+            // target is stored at human + 0x200
+            __declspec(naked) void HumanThrowGrenade()
+            {
+                __asm
+                {
+                    lea eax, [esi + 0x200]
+                    pushad
+
+                    push eax
+                    push esi
+                    call Functions::HumanThrowGrenade
+                    add esp, 8
+
+                    popad
+                    push ebx
+                    push 1
+                    push ebx
+                    mov ecx, esi
+                    mov dword ptr [esi + 0x74], 0xA3
+                    call dword ptr [humanPersonAnim] // indirect, so eax stays untouched like the original rel32 call
+                    jmp humanThrowGrenadeReturn
                 }
             }
         };

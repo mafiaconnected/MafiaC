@@ -1211,6 +1211,14 @@ void CMultiplayer::SendLocalPlayerShoot(bool bState, CVector3D position)
 	SendHostPacket(&Packet);
 }
 
+void CMultiplayer::SendLocalPlayerThrowGrenade(CVector3D position)
+{
+	Packet Packet(MAFIAPACKET_HUMAN_THROWGRENADE);
+	Packet.Write<int32_t>(m_pClientManager->m_pLocalPlayer->GetId());
+	Packet.Write<CVector3D>(position);
+	SendHostPacket(&Packet);
+}
+
 void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 {
 	if (target->IsLocal() || !target->IsSyncer())
