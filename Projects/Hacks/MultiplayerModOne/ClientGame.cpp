@@ -1793,12 +1793,34 @@ void CClientGame::LockControls(bool state)
 	m_pClientManager->m_pLocalPlayer.StaticCast<CClientPlayer>()->GetGamePlayer()->LockControls(state);
 }
 
+// Which seat a door means. Going in by the passenger door (1) with hop-seats set ends up in the driver's seat.
+static int8_t SeatFromDoor(int8_t iDoor, uint32_t iHopSeatsBool)
+{
+	return (iHopSeatsBool == 1 && iDoor == 1) ? 0 : iDoor;
+}
+
+// The game started (or is about to start) a ped entering a vehicle. Like rc1-oakwood this isn't allowed to just
+// happen: the request goes to the server and the game's own call is held back (returning false). The server answers
+// every client, this one included, with MAFIAPACKET_HUMAN_USEVEHICLE and HumanUseVehicleApproved() runs it then.
 bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool)
 {
-	int8_t iSeat = (iHopSeatsBool == 1 && iDoor == 1) ? 0 : iDoor;
+	int8_t iSeat = SeatFromDoor(iDoor, iHopSeatsBool);
 
-	_glogverboseprintf(_gstr("[CClientGame::HumanEnteredVehicle] pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iDoor: %d, iHopSeatsBool: %d, iAction: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool, iAction);
-	
+	_glogverboseprintf(_gstr("[CClientGame::HumanEnteringVehicle] pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iDoor: %d, iHopSeatsBool: %d, iAction: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool, iAction);
+
+	auto pMultiplayer = GetMultiplayer();
+	if (pMultiplayer != nullptr)
+	{
+		// Only the syncer of a ped decides what it does. The game working one out on a ped we don't sync waits for
+		// the server's word like everyone else does.
+		if (!pClientHuman->IsSyncer())
+			return false;
+
+		// Already asked and waiting for the answer (the game asks again while the key is held)
+		if (pClientHuman->HasPendingVehicleRequest())
+			return false;
+	}
+
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1811,34 +1833,28 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 		//_glogprintf(_gstr("Prevented human entering vehicle"));
 		return false;
 	}
-	
-	auto pMultiplayer = GetMultiplayer();
-	if (pMultiplayer != nullptr)
+
+	if (pMultiplayer == nullptr)
 	{
-		if (pClientHuman->IsSyncer()) {
-			Packet Packet(MAFIAPACKET_HUMAN_ENTERINGVEHICLE);
-			Packet.Write<int32_t>(pClientHuman->GetId());
-			Packet.Write<int32_t>(pClientVehicle->GetId());
-			Packet.Write<int8_t>(iDoor);
-			Packet.Write<uint32_t>(iAction);
-			Packet.Write<uint32_t>(iHopSeatsBool);
-			m_pMultiplayer->SendHostPacket(&Packet);
-		}
-		else if (pClientHuman->GetGameHuman() != nullptr && pClientVehicle->GetGameVehicle() != nullptr)
+		// Offline, nobody to ask
+		if (pClientVehicle->AssignSeat(pClientHuman, iSeat))
 		{
-			m_bUseActorInvokedByGame = false;
-			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
-			m_bUseActorInvokedByGame = true;
+			pClientHuman->m_nVehicleNetworkIndex = pClientVehicle->GetId();
+			pClientHuman->m_nVehicleSeatIndex = iSeat;
 		}
+		return true;
 	}
 
-	if (pClientVehicle->AssignSeat(pClientHuman, iSeat))
-	{
-		pClientHuman->m_nVehicleNetworkIndex = pClientVehicle->GetId();
-		pClientHuman->m_nVehicleSeatIndex = iSeat;
-	}
+	Packet Packet(MAFIAPACKET_HUMAN_USEVEHICLE_REQUEST);
+	Packet.Write<int32_t>(pClientHuman->GetId());
+	Packet.Write<int32_t>(pClientVehicle->GetId());
+	Packet.Write<int8_t>(iDoor);
+	Packet.Write<uint32_t>(iAction);
+	Packet.Write<uint32_t>(iHopSeatsBool);
+	m_pMultiplayer->SendHostPacket(&Packet);
 
-	return true;
+	pClientHuman->MarkVehicleRequestPending();
+	return false;
 }
 
 void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)
@@ -1875,11 +1891,23 @@ void CClientGame::HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle
 	return;
 }
 
+// The exit counterpart of HumanEnteringVehicle(): ask, and hold the game's own call back until the server answers.
 bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2)
 {
 	int8_t iSeat = pClientHuman->GetVehicleSeat();
 
 	_glogverboseprintf(_gstr("[CClientGame::HumanExitingVehicle]: pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iUnknown1: %d, iAction: %d, iUnknown2: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iUnknown1, iAction, iUnknown2);
+
+	auto pMultiplayer = GetMultiplayer();
+	if (pMultiplayer != nullptr)
+	{
+		if (!pClientHuman->IsSyncer())
+			return false;
+
+		if (pClientHuman->HasPendingVehicleRequest())
+			return false;
+	}
+
 	CArguments Args;
 	Args.AddObject(pClientHuman);
 	Args.AddObject(pClientVehicle);
@@ -1893,33 +1921,104 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 		return false;
 	}
 
-	auto pMultiplayer = GetMultiplayer();
-	if (pMultiplayer != nullptr)
+	if (pMultiplayer == nullptr)
 	{
-		if (pClientHuman->IsSyncer()) {
-			Packet Packet(MAFIAPACKET_HUMAN_EXITINGVEHICLE);
-			Packet.Write<int32_t>(pClientHuman->GetId());
-			Packet.Write<int32_t>(pClientVehicle->GetId());
-			Packet.Write<int8_t>(iUnknown1);
-			Packet.Write<uint32_t>(iAction);
-			Packet.Write<uint32_t>(iUnknown2);
-			m_pMultiplayer->SendHostPacket(&Packet);
-		}
-		else if (pClientHuman->GetGameHuman() != nullptr && pClientVehicle->GetGameVehicle() != nullptr)
+		if (pClientVehicle->FreeSeat(iSeat))
 		{
-			m_bUseActorInvokedByGame = false;
-			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
-			m_bUseActorInvokedByGame = true;
+			pClientHuman->m_nVehicleSeatIndex = -1;
+			pClientHuman->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+		}
+		return true;
+	}
+
+	Packet Packet(MAFIAPACKET_HUMAN_USEVEHICLE_REQUEST);
+	Packet.Write<int32_t>(pClientHuman->GetId());
+	Packet.Write<int32_t>(pClientVehicle->GetId());
+	Packet.Write<int8_t>(iUnknown1);
+	Packet.Write<uint32_t>(iAction);
+	Packet.Write<uint32_t>(iUnknown2);
+	m_pMultiplayer->SendHostPacket(&Packet);
+
+	pClientHuman->MarkVehicleRequestPending();
+	return false;
+}
+
+// The server approved an enter/exit (MAFIAPACKET_HUMAN_USEVEHICLE). Every client gets this for every ped, the one that
+// asked included, and runs the game's own Use_Actor from it - so it all starts at the same point, in the same order.
+void CClientGame::HumanUseVehicleApproved(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool, int8_t iSeat)
+{
+	_glogverboseprintf(_gstr("[CClientGame::HumanUseVehicleApproved]: pClientHuman: %d, pClientVehicle: %d, iSeat: %d, iDoor: %d, iHopSeatsBool: %d, iAction: %d"), pClientHuman->GetId(), pClientVehicle->GetId(), iSeat, iDoor, iHopSeatsBool, iAction);
+
+	pClientHuman->ClearVehicleRequestPending();
+
+	const bool bExit = (iAction == 2);
+
+	// The asker's script already had its say when the game started it, the rest are only hearing of it now. The
+	// server has said yes, so it can't be stopped from here.
+	if (!pClientHuman->IsSyncer())
+	{
+		CArguments Args;
+		Args.AddObject(pClientHuman);
+		Args.AddObject(pClientVehicle);
+		Args.AddNumber(iSeat);
+
+		bool bPreventDefault = false;
+		(bExit ? m_pOnHumanExitingVehicleEventType : m_pOnHumanEnteringVehicleEventType)->Trigger(Args, bPreventDefault);
+	}
+
+	if (pClientHuman->GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr)
+	{
+		// Nothing to run it on here. Just note where they are: the ped is put in the car when both exist
+		// (CClientHuman::ProcessWaitingForVehicle) or stays out of it.
+		pClientHuman->m_nVehicleNetworkIndex = bExit ? INVALID_NETWORK_ID : pClientVehicle->GetId();
+		pClientHuman->m_nVehicleSeatIndex = bExit ? -1 : iSeat;
+		return;
+	}
+
+	if (!bExit)
+	{
+		// Whoever we still had down for that seat isn't in it any more if the server says it's this ped's
+		CClientHuman* pOccupant = pClientVehicle->GetHumanInSeat(iSeat);
+		if (pOccupant != nullptr && pOccupant != pClientHuman)
+		{
+			pClientVehicle->FreeSeat(iSeat);
+			if (pOccupant->m_nVehicleNetworkIndex == pClientVehicle->GetId())
+			{
+				pOccupant->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+				pOccupant->m_nVehicleSeatIndex = -1;
+			}
+		}
+
+		if (pClientVehicle->AssignSeat(pClientHuman, iSeat))
+		{
+			pClientHuman->m_nVehicleNetworkIndex = pClientVehicle->GetId();
+			pClientHuman->m_nVehicleSeatIndex = iSeat;
 		}
 	}
 
-	if (pClientVehicle->FreeSeat(iSeat))
+	// Going in again while already seated in it would only confuse the game
+	bool bAlreadySeated = !bExit && pClientHuman->GetGameHuman()->GetInterface()->playersCar == pClientVehicle->GetGameVehicle();
+	if (!bAlreadySeated)
 	{
-		pClientHuman->m_nVehicleSeatIndex = -1;
-		pClientHuman->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+		m_bUseActorInvokedByGame = false;
+		pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
+		m_bUseActorInvokedByGame = true;
 	}
 
-	return true;
+	if (bExit)
+	{
+		for (int8_t i = 0; i < 4; i++)
+		{
+			if (pClientVehicle->GetHumanInSeat(i) == pClientHuman)
+				pClientVehicle->FreeSeat(i);
+		}
+
+		if (pClientHuman->m_nVehicleNetworkIndex == pClientVehicle->GetId())
+		{
+			pClientHuman->m_nVehicleSeatIndex = -1;
+			pClientHuman->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+		}
+	}
 }
 
 void CClientGame::HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown)

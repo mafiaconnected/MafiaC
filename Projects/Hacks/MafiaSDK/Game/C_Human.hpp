@@ -918,7 +918,8 @@ namespace MafiaSDK
     namespace C_Human_Hooks
     {
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> funcitonPointer);
-        void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer);
+        // The callback returns false to stop the game's own Use_Actor from running.
+        void HookUseActor(std::function<bool(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer);
         void HookDoThrowCocotFromCar(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> functionPointer);
         void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
         void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
@@ -931,7 +932,7 @@ namespace MafiaSDK
             extern std::function<void(const S_vector &)> humanShoot;
             extern std::function<void(MafiaSDK::C_Human*, byte)> humanDoWeaponChange;
             extern std::function<void(MafiaSDK::C_Human*)> humanDoWeaponDrop;
-            extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
+            extern std::function<bool(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
             extern std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
@@ -968,10 +969,12 @@ namespace MafiaSDK
                 }
             }
 
-            inline void UseActor(MafiaSDK::C_Human* human, MafiaSDK::C_Actor* actor, int unk1, int unk2, int unk3)
+            // Returns whether the game's own Use_Actor should go on to run
+            inline bool UseActor(MafiaSDK::C_Human* human, MafiaSDK::C_Actor* actor, int unk1, int unk2, int unk3)
             {
                 if (FunctionsPointers::useActor != nullptr)
-                    FunctionsPointers::useActor(human, actor, unk1, unk2, unk3);
+                    return FunctionsPointers::useActor(human, actor, unk1, unk2, unk3);
+                return true;
             }
 
             inline void DoThrowCocotFromCar(MafiaSDK::C_Human* human, MafiaSDK::C_Car* car, int seatId)
@@ -1057,7 +1060,7 @@ namespace MafiaSDK
             MemoryPatcher::InstallJmpHook(0x0059024D, (unsigned long)&NakedFunctions::HumanDoWeaponDrop);
         }
 
-        inline void HookUseActor(std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer)
+        inline void HookUseActor(std::function<bool(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> functionPointer)
         {
             FunctionsPointers::useActor = functionPointer;
 

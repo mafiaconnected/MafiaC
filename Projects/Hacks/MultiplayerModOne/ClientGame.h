@@ -289,6 +289,8 @@ public:
 	bool HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool);
 	void HumanEnteredVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat, uint32_t iAction, uint32_t iUnknown);
 	bool HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iUnknown);
+	// The server's answer to a HumanEnteringVehicle/HumanExitingVehicle request: run it (on every client, the asker included)
+	void HumanUseVehicleApproved(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iDoor, uint32_t iAction, uint32_t iHopSeatsBool, int8_t iSeat);
 	void HumanExitedVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iUnknown1, uint32_t iAction, uint32_t iUnknown2);
 	void HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* pClientVehicle, int8_t iSeat);
 	void HumanHit(CClientHuman* humanTarget, CVector3D vv1, CVector3D vv2, CVector3D vv3, int hitType, float damage, int bodyPart);

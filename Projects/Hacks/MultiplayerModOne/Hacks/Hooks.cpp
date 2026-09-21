@@ -98,33 +98,31 @@ static void HumanDoThrowCocotFromCar(MafiaSDK::C_Human* pHuman, MafiaSDK::C_Car*
 	}
 }
 
-static void HumanUseActor(MafiaSDK::C_Human* pHuman, MafiaSDK::C_Actor* pActor, int iUnk1, int iUnk2, int iUnk3)
+// Returns false to stop the game's own Use_Actor from running. For a vehicle that's how an enter/exit the game
+// starts is held back until the server has answered it (see HumanEnteringVehicle/HumanExitingVehicle).
+static bool HumanUseActor(MafiaSDK::C_Human* pHuman, MafiaSDK::C_Actor* pActor, int iUnk1, int iUnk2, int iUnk3)
 {
-	if (g_pClientGame->m_bUseActorInvokedByGame)
-	{
-		CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(pHuman);
-		if (pClientHuman != nullptr)
-		{
-			CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)pActor);
-			if (pClientVehicle != nullptr)
-			{
-				//_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), iUnk1, iUnk2, iUnk3);
+	// Our own replays (and calls made through the SDK on purpose) go straight through
+	if (!g_pClientGame->m_bUseActorInvokedByGame)
+		return true;
 
-				if (iUnk1 == 2)
-				{
-					g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
-				}
-				else
-				{
-					g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
-				}
-			}
-			else
-			{
-				g_pClientGame->HumanUsingActor(pClientHuman, pActor, iUnk1, iUnk2, iUnk3);
-			}
-		}
+	CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(pHuman);
+	if (pClientHuman == nullptr)
+		return true;
+
+	CClientVehicle* pClientVehicle = g_pClientGame->m_pClientManager->FindVehicle((MafiaSDK::C_Car*)pActor);
+	if (pClientVehicle == nullptr)
+	{
+		g_pClientGame->HumanUsingActor(pClientHuman, pActor, iUnk1, iUnk2, iUnk3);
+		return true;
 	}
+
+	//_glogverboseprintf(_gstr("[GAME] HumanUseActor - Human %d used Vehicle %d with action %d. Extra2: %d, Extra 3: %d\n"), pClientHuman->GetId(), pClientVehicle->GetId(), iUnk1, iUnk2, iUnk3);
+
+	if (iUnk1 == 2)
+		return g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
+
+	return g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, iUnk2, iUnk1, iUnk3);
 }
 
 static void CreateActor(MafiaSDK::C_Mission_Enum::ObjectTypes objectType)

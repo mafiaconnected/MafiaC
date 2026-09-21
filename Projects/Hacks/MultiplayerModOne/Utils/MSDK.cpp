@@ -133,7 +133,7 @@ namespace MafiaSDK
             std::function<void(const S_vector&)> humanShoot;
             std::function<void(MafiaSDK::C_Human*, byte)> humanDoWeaponChange;
             std::function<void(MafiaSDK::C_Human*)> humanDoWeaponDrop;
-            std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
+            std::function<bool(MafiaSDK::C_Human*, MafiaSDK::C_Actor*, int, int, int)> useActor;
             std::function<void(MafiaSDK::C_Human*, MafiaSDK::C_Car*, int)> doThrowCocotFromCar;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
@@ -312,9 +312,19 @@ namespace MafiaSDK
                     call Functions::UseActor
                     add esp, 0x14
 
+                    // false = don't run the game's own Use_Actor. It's a thiscall taking four stack arguments, so
+                    // skipping it means returning to the caller here and popping them (0x10) the way it would have
+                    test al, al
+                    jz skipUseActor
+
                     popad
                     sub esp, 0xF8
                     jmp useActorReturn
+
+                skipUseActor:
+                    popad
+                    xor eax, eax
+                    ret 0x10
                 }
             }
 

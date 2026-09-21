@@ -728,39 +728,31 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		}
 		break;
 
-		case MAFIAPACKET_HUMAN_ENTERINGVEHICLE:
+		// The server's answer to an enter/exit request: run it. Every client gets this for every ped, including
+		// the one that asked (whose own game call was held back until now), so nobody starts it early.
+		case MAFIAPACKET_HUMAN_USEVEHICLE:
 		{
 			int32_t nHumanNetworkIndex;
 			int32_t nVehicleNetworkIndex;
+			int8_t nDoor;
 			int8_t nSeatId;
 			uint32_t nAction;
 			uint32_t nHopSeatsBool;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
 			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
+			Reader.ReadInt8(&nDoor, 1);
 			Reader.ReadInt8(&nSeatId, 1);
 			Reader.ReadUInt32(&nAction, 1);
 			Reader.ReadUInt32(&nHopSeatsBool, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
 			{
-				if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
+				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PED));
+				CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
+				if (pClientHuman != nullptr && pClientVehicle != nullptr)
 				{
-					CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
-					if (pClientHuman != nullptr)
-					{
-						CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
-						if (pClientVehicle != nullptr)
-						{
-							if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
-							{
-								if (!pClientHuman->IsSyncer())
-								{
-									g_pClientGame->HumanEnteringVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nHopSeatsBool);
-								}
-							}
-						}
-					}
+					g_pClientGame->HumanUseVehicleApproved(pClientHuman, pClientVehicle, nDoor, nAction, nHopSeatsBool, nSeatId);
 				}
 			}
 		}
@@ -793,41 +785,6 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 							if (!pClientHuman->IsSyncer())
 							{
 								g_pClientGame->HumanEnteredVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
-							}
-						}
-					}
-				}
-			}
-		}
-		break;
-
-		case MAFIAPACKET_HUMAN_EXITINGVEHICLE:
-		{
-			int32_t nHumanNetworkIndex;
-			int32_t nVehicleNetworkIndex;
-			int8_t nSeatId;
-			uint32_t nAction;
-			uint32_t nUnknown;
-
-			Reader.ReadInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadInt32(&nVehicleNetworkIndex, 1);
-			Reader.ReadInt8(&nSeatId, 1);
-			Reader.ReadUInt32(&nAction, 1);
-			Reader.ReadUInt32(&nUnknown, 1);
-
-			if (nHumanNetworkIndex != INVALID_NETWORK_ID && nVehicleNetworkIndex != INVALID_NETWORK_ID)
-			{
-				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
-				if (pClientHuman != nullptr)
-				{
-					CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(nVehicleNetworkIndex, ELEMENT_VEHICLE));
-					if (pClientVehicle != nullptr)
-					{
-						if (m_pClientManager->m_pLocalPlayer.GetPointer() != pClientHuman)
-						{
-							if (!pClientHuman->IsSyncer())
-							{
-								g_pClientGame->HumanExitingVehicle(pClientHuman, pClientVehicle, nSeatId, nAction, nUnknown);
 							}
 						}
 					}

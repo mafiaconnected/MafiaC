@@ -40,6 +40,18 @@ public:
 	// retries the warp until the vehicle shows up or the human is reported out of it.
 	bool m_bWaitingForVehicle = false;
 
+	// How long the syncer may report this human in a vehicle we can see before we stop waiting for the replayed
+	// enter to take and warp it in ourselves.
+	static const uint32_t ENTER_REPLAY_GRACE_MS = 1000;
+	// GetTicks() of when the human was first seen in that state, 0 when it isn't.
+	uint32_t m_uiOutOfReportedVehicleSince = 0;
+
+	// An enter/exit was asked of the server and the answer hasn't come back. The game asks again for as long as the
+	// key is held, so those are dropped meanwhile. If the server never answers (it said no) this lapses.
+	static const uint32_t VEHICLE_REQUEST_TIMEOUT_MS = 1500;
+	bool m_bVehicleRequestPending = false;
+	uint32_t m_uiVehicleRequestTicks = 0;
+
 	float m_Health;
 	int16_t m_WeaponID;
 
@@ -155,6 +167,13 @@ public:
 	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 
 	void AttemptCorrectVehicle();
+	// The syncer's report (not our game state) says this human is in a vehicle that's spawned here.
+	bool IsReportedInSpawnedVehicle();
+	void ProcessReportedVehicle();
+
+	bool HasPendingVehicleRequest();
+	void MarkVehicleRequestPending();
+	void ClearVehicleRequestPending() { m_bVehicleRequestPending = false; }
 	void ProcessWaitingForVehicle();
 
 	float GetVehicleAim();

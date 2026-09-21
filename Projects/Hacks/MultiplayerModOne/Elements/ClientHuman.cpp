@@ -348,7 +348,15 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	{
 		auto pBlender = static_cast<CNetBlenderHuman*>(m_pBlender);
 
-		if (!IsInVehicle()) {
+		if (IsReportedInSpawnedVehicle())
+		{
+			// While the syncer reports a vehicle the server sends the car's position in place of the ped's, so
+			// it's not somewhere to blend to: doing so drags a ped that isn't seated in the car along with its
+			// origin. The game's own enter/exit/seat places the ped. Drop (not reset - that would snap to it) any
+			// target from before the report so it isn't applied in one go once interpolation resumes.
+			pBlender->RemoveInterpolation();
+		}
+		else if (!IsInVehicle()) {
 			pBlender->SetTargetPosition(vecPos);
 			pBlender->SetTargetRotation(vecRot);
 		}
@@ -488,13 +496,15 @@ void CClientHuman::OnCreated()
 
 void CClientHuman::Process()
 {
+	ProcessReportedVehicle();
 	ProcessWaitingForVehicle();
 
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
 		// Leave the position alone while seated or mid enter/exit - the game's own animation is moving the ped
-		// and interpolating on top of it fights that.
-		if (GetGameHuman()->GetInterface()->playersCar == nullptr && !IsEnteringOrExitingVehicle()) {
+		// and interpolating on top of it fights that. The same goes for a ped the syncer reports in a vehicle
+		// that ours isn't seated in (yet): the position it sends then is the car's, not the ped's.
+		if (GetGameHuman()->GetInterface()->playersCar == nullptr && !IsEnteringOrExitingVehicle() && !IsReportedInSpawnedVehicle()) {
 			m_pBlender->Interpolate();
 		}
 		else 
@@ -517,9 +527,10 @@ void CClientHuman::Process()
 			}
 			else
 			{
-				GetGameHuman()->GetInterface()->animStateLocal = m_AnimStateLocal;
+				// Once seated only the pose comes from the syncer. animStateLocal and isInAnimWithCar are the game's
+				// own enter/exit bookkeeping for the seated ped: the syncer's last packet can still carry the
+				// enter-phase values at the moment the enter finishes, and forcing them leaves the ped stuck in it.
 				GetGameHuman()->GetInterface()->animState = m_AnimState;
-				GetGameHuman()->GetInterface()->isInAnimWithCar = true;
 			}
 
 			int32_t iAnimTimeLeft = GetGameHuman()->GetInterface()->animTimeLeft;
@@ -629,12 +640,12 @@ void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, int8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
-	if (!pVehicle->AssignSeat(this, iSeat))
+	if (GetGameHuman() == nullptr || pVehicle == nullptr || pVehicle->GetGameVehicle() == nullptr)
 		return;
 
-	GetGameHuman()->Use_Actor((MafiaSDK::C_Actor*)pVehicle->GetGameVehicle(), iSeat, 0, 0);
-	m_nVehicleNetworkIndex = pVehicle->GetId();
-	m_nVehicleSeatIndex = iSeat;
+	// The game's own enter (action 1, then the door for the seat): the hook asks the server, and the seat is
+	// recorded once the server has answered rather than here.
+	GetGameHuman()->Use_Actor((MafiaSDK::C_Actor*)pVehicle->GetGameVehicle(), 1, iSeat, 0);
 }
 
 void CClientHuman::RemoveFromVehicle(bool bForce)
@@ -670,12 +681,10 @@ void CClientHuman::ExitVehicle()
 	CClientVehicle* pVehicle = GetOccupiedVehicle();
 	if (pVehicle != nullptr)
 	{
-		pVehicle->FreeSeat(m_nVehicleSeatIndex);
-		GetGameHuman()->Use_Actor(pVehicle->GetGameVehicle(), m_nVehicleSeatIndex, 2, 0);
+		// Action 2 is leaving, for the seat we're in. Same as entering: the hook asks the server and the seat is
+		// freed when it answers.
+		GetGameHuman()->Use_Actor(pVehicle->GetGameVehicle(), 2, m_nVehicleSeatIndex, 0);
 	}
-
-	m_nVehicleSeatIndex = -1;
-	m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
 }
 
 bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat)
@@ -980,6 +989,63 @@ void CClientHuman::AttemptCorrectVehicle()
 			RemoveFromVehicle();
 		}
 	}
+}
+
+bool CClientHuman::IsReportedInSpawnedVehicle()
+{
+	if (m_nVehicleNetworkIndex == INVALID_NETWORK_ID)
+		return false;
+
+	CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
+	return pVehicle != nullptr && pVehicle->GetGameVehicle() != nullptr;
+}
+
+bool CClientHuman::HasPendingVehicleRequest()
+{
+	if (!m_bVehicleRequestPending)
+		return false;
+
+	// Not answered in time: the server said no, or the answer was lost. Free to ask again.
+	if (OS::GetTicks() - m_uiVehicleRequestTicks >= VEHICLE_REQUEST_TIMEOUT_MS)
+	{
+		m_bVehicleRequestPending = false;
+		return false;
+	}
+
+	return true;
+}
+
+void CClientHuman::MarkVehicleRequestPending()
+{
+	m_bVehicleRequestPending = true;
+	m_uiVehicleRequestTicks = OS::GetTicks();
+}
+
+void CClientHuman::ProcessReportedVehicle()
+{
+	// The syncer says this ped is in a vehicle we have, yet ours is neither in it nor on its way in - the enter we
+	// replayed from its packet didn't take (refused by the game, or never reached it). Nothing else corrects that
+	// after the create packet, so it would stay outside the car. Give an enter that's still starting up a moment
+	// (packet ordering, the game only flags it a tick later), then seat it.
+	if (IsSyncer() || GetGameHuman() == nullptr || !IsReportedInSpawnedVehicle()
+		|| GetGameHuman()->GetInterface()->playersCar != nullptr || IsEnteringOrExitingVehicle())
+	{
+		m_uiOutOfReportedVehicleSince = 0;
+		return;
+	}
+
+	uint32_t uiNow = OS::GetTicks();
+	if (m_uiOutOfReportedVehicleSince == 0)
+	{
+		m_uiOutOfReportedVehicleSince = uiNow;
+		return;
+	}
+
+	if (uiNow - m_uiOutOfReportedVehicleSince < ENTER_REPLAY_GRACE_MS)
+		return;
+
+	m_uiOutOfReportedVehicleSince = 0;
+	m_bWaitingForVehicle = true;
 }
 
 void CClientHuman::ProcessWaitingForVehicle()

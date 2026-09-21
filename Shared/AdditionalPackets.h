@@ -2,7 +2,7 @@
 
 #pragma pack(push,1)
 
-#define NETGAME_CURRENT_VERSION 5
+#define NETGAME_CURRENT_VERSION 6
 
 #include <Multiplayer/Packets.h>
 
@@ -59,6 +59,12 @@ enum eMafiaPacket : unsigned int
 	MAFIAPACKET_PEER_CREATECIVILIAN,
 	MAFIAPACKET_PEER_IDENTIFY,
 	MAFIAPACKET_PEER_CREATEACTOR,
+
+	// Mafia 1 vehicle enter/exit round trip. The syncer of a ped asks (REQUEST) instead of just doing it; the server
+	// checks it, records the seat and answers everyone, the requester included, with USEVEHICLE. Every client
+	// (requester too) starts the enter/exit from that, so they all run it at the same point in the same order.
+	MAFIAPACKET_HUMAN_USEVEHICLE_REQUEST,
+	MAFIAPACKET_HUMAN_USEVEHICLE,
 };
 
 enum eElementCreatedBy : uint8_t

@@ -1248,7 +1248,10 @@ bool CClientVehicle::AssignSeat(CClientHuman* pHuman, int8_t iSeat)
 	if (iSeat < 0 || iSeat >= ARRAY_COUNT(m_pOccupants))
 		return false;
 
-	if (IsSeatOccupied(iSeat))
+	// Already held by this human (a replayed enter registers the seat before the game seats them) is fine - only
+	// someone else being in it is a conflict.
+	CClientHuman* pOccupant = GetHumanInSeat(iSeat);
+	if (pOccupant != nullptr && pOccupant != pHuman)
 		return false;
 
 	m_pOccupants[iSeat] = pHuman;
