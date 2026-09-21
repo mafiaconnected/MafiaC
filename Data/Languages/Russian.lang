@@ -109,6 +109,7 @@ tip_GameEXEPath=Путь до исполняемого файла игры
 column_ServerName=Название
 column_Players=Игроки
 column_GameMode=Режим игры
+column_Ping=Пинг
 
 # Buttons
 button_OpenMenu=Открыть
@@ -179,6 +180,8 @@ opt_VerboseLogging=Включить отладочный лог
 opt_GameOutput=Выводить лог игры в консоль
 opt_SCM=SCM
 opt_DisableStoryMode=Отключить режим сюжета
+opt_AllowMultipleInstances=Разрешить несколько экземпляров
+opt_Console=Включить консоль
 
 opt_AlwaysUsePrimaryMonitorResolution=Использовать разрешение основного монитора
 opt_AutomaticAspectRatio=Автоматическое соотн. сторон
