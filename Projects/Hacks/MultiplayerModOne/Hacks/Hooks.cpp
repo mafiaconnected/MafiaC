@@ -27,6 +27,10 @@ extern C2D* g_p2D;
 
 static void OnGameInit()
 {
+	// A new mission means the game already discarded every actor of the old one, so anything still waiting to be
+	// removed points at freed memory
+	g_pClientGame->m_DeferredVehicleRemovals.clear();
+
 	auto mName = MafiaSDK::GetCurrentMissionName();
 
 	MafiaSDK::GetIGraph()->SetAppName("Mafia Connected");

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <Engine/KeyScanCodes.h>
 #include <Audio/Audio.h>
 #include <LucasGUI/GUI/GUI.h>
@@ -294,6 +295,15 @@ public:
 	void HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor* pActor, uint32_t iUnk1, uint32_t iUnk2, uint32_t iUnk3);
 
 	void DestroyUninitializedGameElements();
+
+	// Game cars that are due for removal but still have someone entering/leaving them. Raw game pointers on
+	// purpose - by the time they're removed the owning CClientVehicle is long gone.
+	std::vector<MafiaSDK::C_Car*> m_DeferredVehicleRemovals;
+
+	bool IsVehicleBusy(MafiaSDK::C_Car* pCar);
+	void EjectVehicleOccupants(MafiaSDK::C_Car* pCar);
+	void RemoveVehicleWhenSafe(MafiaSDK::C_Car* pCar);
+	void ProcessDeferredVehicleRemovals();
 
 	bool OnTrafficCarCreate(MafiaSDK::C_Car* pCar);
 	//bool OnTrafficCarReset(MafiaSDK::C_Car* pCar);

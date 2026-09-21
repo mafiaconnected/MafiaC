@@ -126,8 +126,9 @@ void CClientVehicle::Create(const GChar* model, const CVector3D& pos, const CVec
 	}
 
 	// Set the position just a little higher ... some vehicles are spawning halfway into the ground :(
+	// Mafia is Y-up (ConvertToMafiaVec is an identity copy), so the lift goes on Y. Lifting Z shifts the car sideways instead.
 	CVector3D pos2(pos);
-	pos2.z += 2.5f; // TODO
+	pos2.y += 2.5f; // TODO
 	SetPosition(pos2);
 	SetRotation(rot);
 	SetRotationMat(m_RotationFront, m_RotationUp, m_RotationRight);
@@ -164,9 +165,43 @@ void CClientVehicle::Despawn()
 	if (m_bDontRemoveGameItem)
 		return;
 
+	MafiaSDK::C_Car* pCar = GetGameVehicle();
+
+	// Drop our record of whoever was seated - the car is going away, so they're no longer in it.
+	for (int8_t i = 0; i < 4; i++)
+	{
+		CClientHuman* pHuman = GetHumanInSeat(i);
+		if (pHuman != nullptr && pHuman->m_nVehicleNetworkIndex == GetId())
+		{
+			pHuman->m_nVehicleNetworkIndex = INVALID_NETWORK_ID;
+			pHuman->m_nVehicleSeatIndex = -1;
+		}
+
+		FreeSeat(i);
+	}
+
+	if (pCar != nullptr)
+	{
+		// Removing a car while a ped is part-way through entering/leaving it crashes the game, so hand it to
+		// CClientGame to finish the removal once that's over. This element no longer refers to the game car.
+		if (g_pClientGame->IsVehicleBusy(pCar))
+		{
+			m_pEntity = nullptr;
+			m_MafiaVehicle = nullptr;
+			g_pClientGame->RemoveVehicleWhenSafe(pCar);
+			return;
+		}
+
+		// Anyone still seated has to leave before the car does, or their playersCar is left dangling.
+		g_pClientGame->EjectVehicleOccupants(pCar);
+	}
+
 	CClientEntity::Delete();
 
-	MafiaSDK::GetMission()->GetGame()->RemoveTemporaryActor((MafiaSDK::C_Actor*)GetGameVehicle());
+	if (pCar != nullptr)
+	{
+		MafiaSDK::GetMission()->GetGame()->RemoveTemporaryActor((MafiaSDK::C_Actor*)pCar);
+	}
 }
 
 bool CClientVehicle::SetModel(const GChar* modelName)

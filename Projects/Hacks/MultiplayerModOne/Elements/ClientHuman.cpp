@@ -250,11 +250,14 @@ void CClientHuman::Despawn()
 {
 	if (GetGameHuman() != nullptr)
 	{
-		if (IsInVehicle())
+		// Always detach from the car before the actor goes away. Going by the game's own playersCar (rather than
+		// IsInVehicle()) also covers cars that aren't CClientVehicles, and the forced detach still happens while
+		// the game is mid enter/exit - otherwise the car keeps a dangling owner pointer to this actor.
+		if (GetGameHuman()->GetInterface()->playersCar != nullptr)
 		{
 			GetGameHuman()->EraseDynColls();
-			RemoveFromVehicle();
 		}
+		RemoveFromVehicle(true);
 
 		MafiaSDK::GetMission()->GetGame()->RemoveTemporaryActor(GetGameHuman());
 		m_MafiaHuman = nullptr;
@@ -283,7 +286,12 @@ bool CClientHuman::ReadCreatePacket(Galactic3D::Stream* pStream)
 
 	if (GetGameHuman() == nullptr)
 	{
-		bool isLocalPlayer = IsType(ELEMENT_PLAYER) && (GetSyncer() == g_pClientGame->GetMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetMultiplayer()->m_iLocalIndex));
+		// Only the player element the server assigned to this machine may become the game's Player actor (which
+		// owns input and the camera). Being the syncer isn't enough: a script-created player element that has
+		// no owner gets whichever machine it streams in to as its syncer, and a null syncer would also match a
+		// not-yet-known local machine.
+		CNetMachine* pLocalMachine = g_pClientGame->GetMultiplayer()->m_NetMachines.GetMachine(g_pClientGame->GetMultiplayer()->m_iLocalIndex);
+		bool isLocalPlayer = IsType(ELEMENT_PLAYER) && pLocalMachine != nullptr && pLocalMachine->GetPlayerId() == GetId();
 		Spawn(m_Position, CVecTools::DirToRotation180(m_Rotation), isLocalPlayer);
 	}
 
@@ -458,8 +466,12 @@ void CClientHuman::OnCreated()
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 	{
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
-		if (pVehicle != nullptr) {
+		if (pVehicle != nullptr && pVehicle->GetGameVehicle() != nullptr) {
 			WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+		}
+		else {
+			// The vehicle isn't spawned here yet, retry from Process() once it is.
+			m_bWaitingForVehicle = true;
 		}
 	}
 
@@ -470,9 +482,13 @@ void CClientHuman::OnCreated()
 
 void CClientHuman::Process()
 {
+	ProcessWaitingForVehicle();
+
 	if (!IsSyncer() && m_pBlender != nullptr && GetGameHuman() != nullptr)
 	{
-		if (!IsInVehicle()) {
+		// Leave the position alone while seated or mid enter/exit - the game's own animation is moving the ped
+		// and interpolating on top of it fights that.
+		if (GetGameHuman()->GetInterface()->playersCar == nullptr && !IsEnteringOrExitingVehicle()) {
 			m_pBlender->Interpolate();
 		}
 		else 
@@ -481,13 +497,14 @@ void CClientHuman::Process()
 		}
 	}
 
-	if (!IsSyncer()) 
+	if (!IsSyncer() && GetGameHuman() != nullptr)
 	{
 		SetActiveWeapon(m_WeaponID);
 
-		if (GetEnteringExitingVehicle() == nullptr)
+		// Ask the game rather than the CClientVehicle lookups, which are null for cars that aren't registered
+		if (!IsEnteringOrExitingVehicle())
 		{
-			if (GetOccupiedVehicle() == nullptr)
+			if (GetGameHuman()->GetInterface()->playersCar == nullptr)
 			{
 				GetGameHuman()->GetInterface()->animState = m_AnimState;
 				GetGameHuman()->GetInterface()->isInAnimWithCar = false;
@@ -543,8 +560,19 @@ bool CClientHuman::IsInVehicle(CClientVehicle* pClientVehicle)
 	return GetOccupiedVehicle() == pClientVehicle;
 }
 
+bool CClientHuman::IsEnteringOrExitingVehicle()
+{
+	if (GetGameHuman() == nullptr)
+		return false;
+
+	return GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr;
+}
+
 CClientVehicle* CClientHuman::GetOccupiedVehicle()
 {
+	if (GetGameHuman() == nullptr)
+		return nullptr;
+
 	MafiaSDK::C_Car* pVehicle = GetGameHuman()->GetInterface()->playersCar;
 	if (pVehicle == nullptr)
 		return nullptr;
@@ -555,6 +583,9 @@ CClientVehicle* CClientHuman::GetOccupiedVehicle()
 
 CClientVehicle* CClientHuman::GetEnteringExitingVehicle()
 {
+	if (GetGameHuman() == nullptr)
+		return nullptr;
+
 	MafiaSDK::C_Car* pVehicle = GetGameHuman()->GetInterface()->carLeavingOrEntering;
 	if (pVehicle == nullptr)
 		return nullptr;
@@ -600,12 +631,17 @@ void CClientHuman::EnterVehicle(CClientVehicle* pVehicle, int8_t iSeat)
 	m_nVehicleSeatIndex = iSeat;
 }
 
-void CClientHuman::RemoveFromVehicle()
+void CClientHuman::RemoveFromVehicle(bool bForce)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
-	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+	if (GetGameHuman() == nullptr)
 		return;
+
+	if (!bForce && GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+		return;
+
+	m_bWaitingForVehicle = false;
 
 	CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
 
@@ -640,10 +676,12 @@ bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat)
 {
 	//_glogverboseprintf(__gstr(__FUNCTION__));
 
-	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+	// Null checks first - the carLeavingOrEntering read below dereferences the game human.
+	if (GetGameHuman() == nullptr || pClientVehicle == nullptr || pClientVehicle->GetGameVehicle() == nullptr)
 		return false;
 
-	if (GetGameHuman() == nullptr || pClientVehicle->GetGameVehicle() == nullptr) return false;
+	if (GetGameHuman()->GetInterface()->carLeavingOrEntering != nullptr)
+		return false;
 
 	if (IsInVehicle())
 	{
@@ -656,6 +694,7 @@ bool CClientHuman::WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat)
 	GetGameHuman()->Intern_UseCar(pClientVehicle->GetGameVehicle(), iSeat);
 	m_nVehicleNetworkIndex = pClientVehicle->GetId();
 	m_nVehicleSeatIndex = iSeat;
+	m_bWaitingForVehicle = false;
 	return true;
 }
 
@@ -901,6 +940,9 @@ void CClientHuman::ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, ui
 
 void CClientHuman::AttemptCorrectVehicle()
 {
+	if (GetGameHuman() == nullptr)
+		return;
+
 	if (m_nVehicleNetworkIndex != INVALID_NETWORK_ID)
 	{
 		CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
@@ -910,20 +952,63 @@ void CClientHuman::AttemptCorrectVehicle()
 			{
 				WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 			}
-			else if (pVehicle->GetGameVehicle() != GetOccupiedVehicle()->GetGameVehicle())
+			// Compare against the game's own car - GetOccupiedVehicle() is null for a car we have no CClientVehicle for.
+			else if (pVehicle->GetGameVehicle() != GetGameHuman()->GetInterface()->playersCar)
 			{
 				RemoveFromVehicle();
 				WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 			}
 		}
+		else
+		{
+			// The vehicle isn't spawned here yet, retry from Process() once it is.
+			m_bWaitingForVehicle = true;
+		}
 	}
 	else
 	{
+		m_bWaitingForVehicle = false;
+
 		if (IsInVehicle())
 		{
 			RemoveFromVehicle();
 		}
 	}
+}
+
+void CClientHuman::ProcessWaitingForVehicle()
+{
+	if (!m_bWaitingForVehicle || GetGameHuman() == nullptr)
+		return;
+
+	// Reported out of the vehicle (or never in one) in the meantime
+	if (m_nVehicleNetworkIndex == INVALID_NETWORK_ID)
+	{
+		m_bWaitingForVehicle = false;
+		return;
+	}
+
+	CClientVehicle* pVehicle = static_cast<CClientVehicle*>(m_pClientManager->FromId(m_nVehicleNetworkIndex, ELEMENT_VEHICLE));
+	if (pVehicle == nullptr || pVehicle->GetGameVehicle() == nullptr)
+		return;
+
+	// Already seated in it by other means
+	if (GetGameHuman()->GetInterface()->playersCar == pVehicle->GetGameVehicle())
+	{
+		m_bWaitingForVehicle = false;
+		return;
+	}
+
+	// Seat taken by someone else, warping in would only fight over it - give up
+	CClientHuman* pSeated = pVehicle->GetHumanInSeat(m_nVehicleSeatIndex);
+	if (pSeated != nullptr && pSeated != this)
+	{
+		m_bWaitingForVehicle = false;
+		return;
+	}
+
+	// Clears m_bWaitingForVehicle on success, and stays set (retried next frame) if the game is mid enter/exit.
+	WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
 }
 
 float CClientHuman::GetVehicleAim()

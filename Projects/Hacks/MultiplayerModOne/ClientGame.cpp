@@ -1003,6 +1003,8 @@ void CClientGame::OnProcess()
 		m_pGalacticFunctions->OnProcess(pTime);
 	}
 
+	ProcessDeferredVehicleRemovals();
+
 	m_pClientManager->OnProcess();
 }
 
@@ -1822,7 +1824,7 @@ bool CClientGame::HumanEnteringVehicle(CClientHuman* pClientHuman, CClientVehicl
 			Packet.Write<uint32_t>(iHopSeatsBool);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
-		else
+		else if (pClientHuman->GetGameHuman() != nullptr && pClientVehicle->GetGameVehicle() != nullptr)
 		{
 			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iDoor, iHopSeatsBool);
@@ -1903,7 +1905,7 @@ bool CClientGame::HumanExitingVehicle(CClientHuman* pClientHuman, CClientVehicle
 			Packet.Write<uint32_t>(iUnknown2);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
-		else
+		else if (pClientHuman->GetGameHuman() != nullptr && pClientVehicle->GetGameVehicle() != nullptr)
 		{
 			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pClientVehicle->GetGameVehicle(), iAction, iUnknown1, iUnknown2);
@@ -1973,7 +1975,7 @@ void CClientGame::HumanJackVehicle(CClientHuman* pClientHuman, CClientVehicle* p
 			Packet.Write<int8_t>(iSeat);
 			m_pMultiplayer->SendHostPacket(&Packet);
 		}
-		else
+		else if (pClientHuman->GetGameHuman() != nullptr && pClientVehicle->GetGameVehicle() != nullptr)
 		{
 			m_bDoThrowCocotFromCarInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Do_ThrowCocotFromCar(pClientVehicle->GetGameVehicle(), iSeat);
@@ -2064,7 +2066,7 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 			Writer.WriteUInt32(iUnknown3);
 			m_pMultiplayer->SendHostPacket(&Packet);			
 		}
-		else
+		else if (pClientHuman->GetGameHuman() != nullptr)
 		{
 			m_bUseActorInvokedByGame = false;
 			pClientHuman->GetGameHuman()->Use_Actor(pActor, iUnknown1, iUnknown2, iUnknown3);
@@ -2076,6 +2078,75 @@ void CClientGame::HumanUsingActor(CClientHuman* pClientHuman, MafiaSDK::C_Actor*
 void CClientGame::DestroyUninitializedGameElements()
 {
 
+}
+
+bool CClientGame::IsVehicleBusy(MafiaSDK::C_Car* pCar)
+{
+	// True while any seated ped is part-way through entering/leaving. Removing the car then leaves that ped
+	// pointing at freed memory.
+	for (int i = 0; i < 4; i++)
+	{
+		auto pOwner = reinterpret_cast<MafiaSDK::C_Human*>(pCar->GetOwner(i));
+		if (pOwner != nullptr && pOwner->GetInterface()->carLeavingOrEntering != nullptr)
+			return true;
+	}
+
+	return false;
+}
+
+void CClientGame::EjectVehicleOccupants(MafiaSDK::C_Car* pCar)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		auto pOwner = reinterpret_cast<MafiaSDK::C_Human*>(pCar->GetOwner(i));
+		if (pOwner != nullptr)
+			pOwner->Intern_FromCar();
+	}
+}
+
+void CClientGame::RemoveVehicleWhenSafe(MafiaSDK::C_Car* pCar)
+{
+	if (pCar == nullptr)
+		return;
+
+	for (auto pQueued : m_DeferredVehicleRemovals)
+	{
+		if (pQueued == pCar)
+			return;
+	}
+
+	m_DeferredVehicleRemovals.push_back(pCar);
+}
+
+void CClientGame::ProcessDeferredVehicleRemovals()
+{
+	if (m_DeferredVehicleRemovals.empty())
+		return;
+
+	// No mission means the game already tore its actors down, nothing left to remove
+	if (MafiaSDK::GetMission() == nullptr || MafiaSDK::GetMission()->GetGame() == nullptr)
+	{
+		m_DeferredVehicleRemovals.clear();
+		return;
+	}
+
+	for (size_t i = 0; i < m_DeferredVehicleRemovals.size();)
+	{
+		MafiaSDK::C_Car* pCar = m_DeferredVehicleRemovals[i];
+
+		if (IsVehicleBusy(pCar))
+		{
+			i++;
+			continue;
+		}
+
+		m_DeferredVehicleRemovals.erase(m_DeferredVehicleRemovals.begin() + i);
+
+		// Same pair of calls CClientVehicle::Despawn makes for an immediate removal
+		EjectVehicleOccupants(pCar);
+		MafiaSDK::GetMission()->DelActor((MafiaSDK::C_Actor*)pCar);
+		MafiaSDK::GetMission()->GetGame()->RemoveTemporaryActor((MafiaSDK::C_Actor*)pCar);
+	}
 }
 
 bool CClientGame::OnTrafficCarCreate(MafiaSDK::C_Car* pCar)

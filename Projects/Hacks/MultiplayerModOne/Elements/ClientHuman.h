@@ -36,6 +36,10 @@ public:
 	bool m_bExitedVehicleEvent = false;
 	bool m_bExitingVehicleEvent = false;
 
+	// Set when we were told this human is in a vehicle that isn't spawned here yet (stream-in order); Process()
+	// retries the warp until the vehicle shows up or the human is reported out of it.
+	bool m_bWaitingForVehicle = false;
+
 	float m_Health;
 	int16_t m_WeaponID;
 
@@ -104,9 +108,12 @@ public:
 
 	bool IsInVehicle();
 	bool IsInVehicle(CClientVehicle* pClientVehicle);
+	// Reads the game's own state, so it also covers cars that aren't CClientVehicles (e.g. unregistered traffic).
+	bool IsEnteringOrExitingVehicle();
 	//bool IsInVehicleSeat(CClientVehicle* pClientVehicle, uint8_t iSeat);
 	void EnterVehicle(CClientVehicle* pVehicle, int8_t iSeat);
-	void RemoveFromVehicle();
+	// bForce also detaches while the game is mid enter/exit animation (used when the actor is about to be removed).
+	void RemoveFromVehicle(bool bForce = false);
 	void ExitVehicle();
 	bool WarpIntoVehicle(CClientVehicle* pClientVehicle, int8_t iSeat);
 
@@ -148,6 +155,7 @@ public:
 	void ForceAI(uint32_t value1, uint32_t value2, uint32_t value3, uint32_t value4);
 
 	void AttemptCorrectVehicle();
+	void ProcessWaitingForVehicle();
 
 	float GetVehicleAim();
 	bool SetVehicleAim(float aim);
