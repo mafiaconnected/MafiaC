@@ -58,6 +58,9 @@ public:
 	CVector3D m_vecCamera;
 	CVector3D m_AimVector;
 
+	// A Do_Shoot(true) was replayed for the syncer's in-vehicle shooting and hasn't been released yet.
+	bool m_bVehicleShooting = false;
+
 	float m_InCarRotation;
 	float m_CarAim;
 
@@ -178,4 +181,11 @@ public:
 
 	float GetVehicleAim();
 	bool SetVehicleAim(float aim);
+
+	// A human somebody else syncs, seated in a vehicle and not mid enter/exit. Nothing here is aiming it, so the game's
+	// own in-vehicle aim (worked out from the local player's targeting) is not what should move it - what the syncer
+	// reports is (see ProcessVehicleShooting and the CNetBlenderHuman vehicle aim).
+	bool IsVehicleAimDriven();
+	// Replays the syncer's in-vehicle shooting: Do_Shoot is what makes the game fire and animate the shot.
+	void ProcessVehicleShooting();
 };

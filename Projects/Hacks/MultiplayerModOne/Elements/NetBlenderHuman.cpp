@@ -38,6 +38,13 @@ void CNetBlenderHuman::SetTargetRotation(CVector3D& vecRotation)
 	m_Rotation.SetTarget(vecRotation, vecError, m_uiDelay);
 }
 
+void CNetBlenderHuman::SetTargetVehicleAim(float aim)
+{
+	UpdateTargetVehicleAim();
+
+	m_VehicleAim.SetTarget(aim, aim - GetVehicleAim(), m_uiDelay);
+}
+
 void CNetBlenderHuman::GetPosition(CVector3D& vecPos)
 {
 	m_pEntity->GetPosition(vecPos);
@@ -122,7 +129,7 @@ void CNetBlenderHuman::UpdateTargetVehicleAim()
 		fCurrentVehicleAim = GetVehicleAim();
 
 		float fNewVehicleAim = fCurrentVehicleAim;
-		//m_VehicleAim.Update(vecNewVehicleAimPosition, m_fVehicleAimRotationMaxError);
+		m_VehicleAim.Update(fNewVehicleAim, m_fVehicleAimMaxError);
 
 		SetVehicleAim(fNewVehicleAim);
 	}

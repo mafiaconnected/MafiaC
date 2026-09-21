@@ -924,6 +924,8 @@ namespace MafiaSDK
         void HookHumanSetAimPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
         void HookHumanSetNormalPose(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
         void HookHumanThrowGrenade(std::function<void(MafiaSDK::C_Human*, const S_vector&)> functionPointer);
+        // The callback returns false to stop the game storing its own in-vehicle aim (inCarRotation) for that human.
+        void HookHumanVehicleAim(std::function<bool(MafiaSDK::C_Human*)> functionPointer);
 
 #ifdef MAFIA_SDK_IMPLEMENTATION
         namespace FunctionsPointers
@@ -937,6 +939,7 @@ namespace MafiaSDK
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
             extern std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanThrowGrenade;
+            extern std::function<bool(MafiaSDK::C_Human*)> humanVehicleAim;
         };
 
         namespace Functions
@@ -1000,6 +1003,14 @@ namespace MafiaSDK
                 if (FunctionsPointers::humanThrowGrenade != nullptr)
                     FunctionsPointers::humanThrowGrenade(human, pos);
             }
+
+            // Returns whether the game's own store of the in-vehicle aim should go ahead
+            inline bool HumanVehicleAim(MafiaSDK::C_Human* human)
+            {
+                if (FunctionsPointers::humanVehicleAim != nullptr)
+                    return FunctionsPointers::humanVehicleAim(human);
+                return true;
+            }
         };
 
         namespace NakedFunctions
@@ -1029,6 +1040,8 @@ namespace MafiaSDK
             extern void* setNormalPoseReturn;
 
             extern void HumanThrowGrenade();
+
+            extern void HumanVehicleAim();
         };
 
         inline void HookOnHumanHit(std::function<int(MafiaSDK::C_Human*, int, const S_vector &, const S_vector &, const S_vector &, float, MafiaSDK::C_Actor*, unsigned long, MafiaSDK::I3D_Frame*)> functionPointer)
@@ -1099,6 +1112,15 @@ namespace MafiaSDK
             FunctionsPointers::humanThrowGrenade = functionPointer;
 
             MemoryPatcher::InstallJmpHook(0x00583A56, (unsigned long)&NakedFunctions::HumanThrowGrenade);
+        }
+
+        // The human's per-frame update eases inCarRotation (the aim while seated in a vehicle) toward what the local
+        // player is targeting. Replaces the store of it at 0x0057B5C3 so a human aimed from elsewhere can keep its own.
+        inline void HookHumanVehicleAim(std::function<bool(MafiaSDK::C_Human*)> functionPointer)
+        {
+            FunctionsPointers::humanVehicleAim = functionPointer;
+
+            MemoryPatcher::InstallJmpHook(0x0057B5C3, (unsigned long)&NakedFunctions::HumanVehicleAim);
         }
 #endif
     };

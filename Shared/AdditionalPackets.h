@@ -2,7 +2,7 @@
 
 #pragma pack(push,1)
 
-#define NETGAME_CURRENT_VERSION 6
+#define NETGAME_CURRENT_VERSION 7
 
 #include <Multiplayer/Packets.h>
 
@@ -158,6 +158,9 @@ struct tHumanSyncPacket
 	int32_t animStopTime;
 	int16_t weaponId;
 	CVector3D camera;
+	// Where the human is aiming/firing at (the target Do_Shoot was last given). With inCarRotation (the aim within
+	// the vehicle) it is what the game needs to replay in-vehicle aiming and shooting on the other clients.
+	CVector3D aimVector;
 };
 
 struct tVehicleCreatePacket

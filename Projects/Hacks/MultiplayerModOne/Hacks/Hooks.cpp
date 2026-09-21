@@ -473,6 +473,17 @@ static void OnHumanThrowGrenade(MafiaSDK::C_Human* human, const S_vector& pos)
 	pMultiplayer->SendLocalPlayerThrowGrenade(CVecTools::ConvertFromMafiaVec(pos));
 }
 
+// Whether the game may store its own in-vehicle aim for this human. It works that out from what the local player is
+// targeting, which is right for a human this machine syncs; one somebody else syncs is aimed by what they report
+static bool OnHumanVehicleAim(MafiaSDK::C_Human* human)
+{
+	if (g_pClientGame == nullptr || g_pClientGame->m_pClientManager == nullptr)
+		return true;
+
+	CClientHuman* pClientHuman = g_pClientGame->m_pClientManager->FindHuman(human);
+	return pClientHuman == nullptr || !pClientHuman->IsVehicleAimDriven();
+}
+
 static void OnRender2DStuff()
 {
 	if (g_pD3D9 && g_p2D != nullptr)
@@ -575,6 +586,7 @@ void CGameHooks::InstallHooks()
 	MafiaSDK::C_Human_Hooks::HookDoThrowCocotFromCar(HumanDoThrowCocotFromCar);
 	MafiaSDK::C_Human_Hooks::HookHumanSetAimPose(HumanSetAimPose);
 	MafiaSDK::C_Human_Hooks::HookHumanSetNormalPose(HumanSetNormalPose);
+	MafiaSDK::C_Human_Hooks::HookHumanVehicleAim(OnHumanVehicleAim);
 
 	// Mission Hooks
 	MafiaSDK::C_Mission_Hooks::HookCreateActor(CreateActor);

@@ -338,6 +338,7 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 	m_IsShooting = Packet.isShooting;
 	m_InCarRotation = Packet.inCarRotation;
 	m_vecCamera = Packet.camera;
+	m_AimVector = Packet.aimVector;
 	m_WeaponID = Packet.weaponId;
 
 	SetActiveWeapon(m_WeaponID);
@@ -360,6 +361,12 @@ bool CClientHuman::ReadSyncPacket(Galactic3D::Stream* pStream)
 			pBlender->SetTargetPosition(vecPos);
 			pBlender->SetTargetRotation(vecRot);
 		}
+
+		// Seated and aiming, what the syncer reports is where the aim is headed
+		if (m_IsAiming && IsVehicleAimDriven())
+			pBlender->SetTargetVehicleAim(m_InCarRotation);
+		else
+			pBlender->m_VehicleAim.RemoveTarget();
 	}
 
 	return true;
@@ -464,6 +471,7 @@ bool CClientHuman::WriteSyncPacket(Galactic3D::Stream* pStream)
 	Packet.animStopTime = GetGameHuman()->GetInterface()->animTimeLeft;
 	Packet.weaponId = *(int16_t*)(((uint32_t)GetGameHuman()->GetInterface()) + 1184);
 	Packet.camera = m_vecCamera;
+	Packet.aimVector = CVecTools::ConvertFromMafiaVec(GetGameHuman()->GetInterface()->shootTarget);
 	Packet.seat = seatId;
 
 	if (pStream->Write(&Packet, sizeof(Packet)) != sizeof(Packet))
@@ -507,9 +515,9 @@ void CClientHuman::Process()
 		if (GetGameHuman()->GetInterface()->playersCar == nullptr && !IsEnteringOrExitingVehicle() && !IsReportedInSpawnedVehicle()) {
 			m_pBlender->Interpolate();
 		}
-		else 
+		else if (IsVehicleAimDriven())
 		{
-			// Interpolate aiming in vehicle
+			static_cast<CNetBlenderHuman*>(m_pBlender)->UpdateTargetVehicleAim();
 		}
 	}
 
@@ -545,8 +553,13 @@ void CClientHuman::Process()
 
 			GetGameHuman()->GetInterface()->isDucking = m_IsCrouching;
 			GetGameHuman()->GetInterface()->isAiming = m_IsAiming;
-			GetGameHuman()->GetInterface()->isShooting = m_IsShooting;
+			// Seated, the flag comes from the Do_Shoot replayed below: setting it beforehand makes Do_Shoot take the shot
+			// for one that's already underway and skip the start of it.
+			if (!IsVehicleAimDriven())
+				GetGameHuman()->GetInterface()->isShooting = m_IsShooting;
 		}
+
+		ProcessVehicleShooting();
 
 		if (!IsInVehicle())
 		{
@@ -1081,6 +1094,34 @@ void CClientHuman::ProcessWaitingForVehicle()
 
 	// Clears m_bWaitingForVehicle on success, and stays set (retried next frame) if the game is mid enter/exit.
 	WarpIntoVehicle(pVehicle, m_nVehicleSeatIndex);
+}
+
+bool CClientHuman::IsVehicleAimDriven()
+{
+	if (GetGameHuman() == nullptr || IsSyncer())
+		return false;
+
+	return GetGameHuman()->GetInterface()->playersCar != nullptr && !IsEnteringOrExitingVehicle();
+}
+
+void CClientHuman::ProcessVehicleShooting()
+{
+	if (!IsVehicleAimDriven())
+	{
+		m_bVehicleShooting = false;
+		return;
+	}
+
+	if (m_IsShooting)
+	{
+		GetGameHuman()->Do_Shoot(true, CVecTools::ConvertToMafiaVec(m_AimVector));
+		m_bVehicleShooting = true;
+	}
+	else if (m_bVehicleShooting)
+	{
+		GetGameHuman()->Do_Shoot(false, CVecTools::ConvertToMafiaVec(m_AimVector));
+		m_bVehicleShooting = false;
+	}
 }
 
 float CClientHuman::GetVehicleAim()

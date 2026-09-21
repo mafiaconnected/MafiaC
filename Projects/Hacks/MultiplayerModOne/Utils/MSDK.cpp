@@ -138,6 +138,7 @@ namespace MafiaSDK
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetAimPose;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanSetNormalPose;
             std::function<void(MafiaSDK::C_Human*, const S_vector&)> humanThrowGrenade;
+            std::function<bool(MafiaSDK::C_Human*)> humanVehicleAim;
         };
 
         namespace NakedFunctions
@@ -419,6 +420,35 @@ namespace MafiaSDK
                     mov dword ptr [esi + 0x74], 0xA3
                     call dword ptr [humanPersonAnim] // indirect, so eax stays untouched like the original rel32 call
                     jmp humanThrowGrenadeReturn
+                }
+            }
+
+            DWORD humanVehicleAimReturn = 0x0057B5CF;
+
+            // The store of the in-vehicle aim in the human's update. Replaces the 12 bytes at 0x0057B5C3..0x0057B5CE
+            // (fstp [esi+0x5F4] / fld [esi+0x5F0]). Skipping the store still has to pop the x87 stack the way the fstp
+            // did, or every skipped frame leaves one more value on it.
+            __declspec(naked) void HumanVehicleAim()
+            {
+                __asm
+                {
+                    pushad
+                    push esi
+                    call Functions::HumanVehicleAim
+                    add esp, 4
+                    test al, al
+                    popad // leaves the flags from the test alone
+                    je skipStore
+
+                    fstp dword ptr [esi + 0x5F4]
+                    jmp storeDone
+
+                skipStore:
+                    fstp st(0)
+
+                storeDone:
+                    fld dword ptr [esi + 0x5F0]
+                    jmp humanVehicleAimReturn
                 }
             }
         };
