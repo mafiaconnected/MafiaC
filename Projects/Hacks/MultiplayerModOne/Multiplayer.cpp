@@ -908,17 +908,17 @@ void CMultiplayer::ProcessPacket(uint32_t PacketID, Galactic3D::Stream* pStream)
 		case MAFIAPACKET_HUMAN_SETHEALTH:
 		{
 			int32_t nHumanNetworkIndex;
-			double fHealth;
+			float fHealth;
 
 			Reader.ReadInt32(&nHumanNetworkIndex, 1);
-			Reader.ReadDouble(&fHealth, 1);
+			Reader.ReadSingle(&fHealth, 1);
 
 			if (nHumanNetworkIndex != INVALID_NETWORK_ID)
 			{
 				CClientHuman* pClientHuman = static_cast<CClientHuman*>(m_pClientManager->FromId(nHumanNetworkIndex, ELEMENT_PLAYER));
 				if (pClientHuman != nullptr)
 				{
-					pClientHuman->SetHealth((float)fHealth);
+					pClientHuman->SetHealth(fHealth);
 				}
 			}
 		}
@@ -1225,7 +1225,6 @@ void CMultiplayer::SendHumanDeath(CClientHuman* target, CClientEntity* attacker)
 	{
 		Packet.Write<int32_t>(INVALID_NETWORK_ID);
 	}
-	Packet.Write<int32_t>(INVALID_NETWORK_ID);
 	SendHostPacket(&Packet);
 }
 

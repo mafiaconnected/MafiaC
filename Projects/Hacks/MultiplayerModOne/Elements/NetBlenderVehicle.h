@@ -13,6 +13,8 @@ public:
 	CInterpolation m_RotationUp;
 	CInterpolation m_RotationRight;
 
+	CInterpolation m_RotationQuat;
+
 	CInterpolation m_EngineRPM;
 	CInterpolation m_WheelAngle;
 
@@ -21,9 +23,11 @@ public:
 	float m_fEngineRPMMaxError = 1.0f;
 
 	void SetTargetRotationMat(CVector3D& front, CVector3D& up, CVector3D& right);
+	void SetTargetRotationQuat(CQuaternion& quatNewRotation);
 
 	virtual void UpdateTargetRotation() override;
 	virtual void UpdateTargetRotationMat();
+	virtual void UpdateTargetRotationQuat();
 
 	void UpdateTargetEngineRPM();
 	void UpdateTargetWheelAngle();
@@ -36,6 +40,9 @@ public:
 
 	virtual void GetRotationMat(CVector3D& vecRotationFront, CVector3D& vecRotationUp, CVector3D& vecRotationRight);
 	virtual void SetRotationMat(const CVector3D& vecRotationFront, const CVector3D& vecRotationUp, const CVector3D& vecRotationRight);
+
+	virtual void GetRotationQuat(CQuaternion& quatRot);
+	virtual void SetRotationQuat(CQuaternion& quatRot);
 
 	virtual void GetMoveSpeed(CVector3D& vecMoveSpeed) override;
 	virtual void SetMoveSpeed(const CVector3D& vecMoveSpeed) override;
