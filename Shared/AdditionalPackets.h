@@ -2,7 +2,7 @@
 
 #pragma pack(push,1)
 
-#define NETGAME_CURRENT_VERSION 7
+#define NETGAME_CURRENT_VERSION 6
 
 #include <Multiplayer/Packets.h>
 
